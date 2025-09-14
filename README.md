@@ -1,16 +1,49 @@
 # crazy_phone_pos
 
-A new Flutter project.
+**Crazy Phone POS** is a local desktop Point of Sale (POS) system built with **Flutter**.  
+It is designed for mobile phone shops to handle daily sales, inventory, and notifications in a clean and professional way.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## ✨ Features
+- 📊 **Dashboard**: Quick overview of sales, products, low stock, and notifications.  
+- 💰 **Sales (Cashier Screen)**: Scan QR/Barcode to add products, manage cart, and checkout easily.  
+- 📦 **Product Management**: Add, edit, delete, and search products with stock levels.  
+- ⚠️ **Out of Stock Page**: Dedicated page to track low and out-of-stock items.  
+- 🔔 **Notifications**: Local alerts when stock is low or products are unavailable.  
+- 👥 **Multi-user support**: Different roles for **Admin** (manage system, products, users) and **Cashier** (sales only).  
+- ⚙️ **Settings**: Manage store info, users, and local database backup/restore.  
+- 💻 **Offline-First**: Works locally without internet using SQLite/Hive.  
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🖥️ Tech Stack
+- [Flutter](https://flutter.dev/) (Desktop – Windows/Linux/MacOS)  
+- [Bloc / Cubit](https://bloclibrary.dev) for state management  
+- [Hive](https://docs.hivedb.dev) for local database  
+- Local notifications  
+- QR/Barcode scanner integration  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Install [Flutter SDK](https://docs.flutter.dev/get-started/install)  
+- Set up Flutter for **desktop development** (enable Windows/Linux/MacOS support).  
+
+### Run the project
+```bash
+# Clone the repository
+git clone https://github.com/Desha29/crazy_phone_pos.git
+
+# Enter the project folder
+cd crazy_phone_pos
+
+# Get dependencies
+flutter pub get
+
+# Run the app (desktop)
+flutter run -d windows   # for Windows
+flutter run -d linux     # for Linux
+flutter run -d macos     # for MacOS
