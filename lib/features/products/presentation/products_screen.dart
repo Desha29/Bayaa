@@ -149,111 +149,135 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                     Text(
+                    Text(
                       'إدارة المنتجات والمخزون',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.grey[600],
+                      ),
                     ),
                     const SizedBox(height: 20),
 
                     // Filters
-                    ProductFilters(
-                      isMobile: isMobile,
-                      searchController: _searchController,
-                      categoryFilter: _categoryFilter,
-                      availabilityFilter: _availabilityFilter,
-                      categories: categories,
-                      availabilities: availabilities,
-                      onCategoryChanged: (v) =>
-                          setState(() => _categoryFilter = v),
-                      onAvailabilityChanged: (v) =>
-                          setState(() => _availabilityFilter = v),
-                      onAddPressed: () => _showAddEditDialog(),
+                    Card(
+                      color: AppColors.surfaceColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: const BorderSide(color: AppColors.borderColor),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ProductFilters(
+                          isMobile: isMobile,
+                          searchController: _searchController,
+                          categoryFilter: _categoryFilter,
+                          availabilityFilter: _availabilityFilter,
+                          categories: categories,
+                          availabilities: availabilities,
+                          onCategoryChanged: (v) =>
+                              setState(() => _categoryFilter = v),
+                          onAvailabilityChanged: (v) =>
+                              setState(() => _availabilityFilter = v),
+                          onAddPressed: () => _showAddEditDialog(),
+                        ),
+                      ),
                     ),
-
                     const SizedBox(height: 20),
 
                     // Products list
                     Expanded(
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(color: AppColors.borderColor),
                         ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isMobile ? 12 : 20,
-                                vertical: 14,
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'قائمة المنتجات',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: isMobile ? 14 : 16,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xffeef6f6),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text('(${filteredProducts.length})'),
-                                  ),
-                                  const Spacer(),
-                                ],
-                              ),
-                            ),
-                            const Divider(height: 1),
-                            Expanded(
-                              child: isMobile
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: ListView.builder(
-                                        itemCount: filteredProducts.length,
-                                        itemBuilder: (context, index) {
-                                          final p = filteredProducts[index];
-                                          return ProductCard(
-                                            product: p,
-                                            onDelete: () => setState(
-                                              () => _products.remove(p),
-                                            ),
-                                            onEdit: () => _showAddEditDialog(p),
-                                            statusColor: _statusColor(
-                                              p['qty'],
-                                              p['min'],
-                                            ),
-                                            statusText: _statusText(
-                                              p['qty'],
-                                              p['min'],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    )
-                                  : Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: ProductTable(
-                                        products: filteredProducts,
-                                        onDelete: (p) =>
-                                            setState(() => _products.remove(p)),
-                                        onEdit: (p) => _showAddEditDialog(p),
-                                        statusColorFn: _statusColor,
-                                        statusTextFn: _statusText,
+                        color: AppColors.surfaceColor,
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isMobile ? 12 : 20,
+                                  vertical: 14,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'قائمة المنتجات',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: isMobile ? 16 : 18,
                                       ),
                                     ),
-                            ),
-                          ],
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xffeef6f6),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        '(${filteredProducts.length})',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                  ],
+                                ),
+                              ),
+
+                              Expanded(
+                                child: isMobile
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: ListView.builder(
+                                          itemCount: filteredProducts.length,
+                                          itemBuilder: (context, index) {
+                                            final p = filteredProducts[index];
+                                            return ProductCard(
+                                              product: p,
+                                              onDelete: () => setState(
+                                                () => _products.remove(p),
+                                              ),
+                                              onEdit: () =>
+                                                  _showAddEditDialog(p),
+                                              statusColor: _statusColor(
+                                                p['qty'],
+                                                p['min'],
+                                              ),
+                                              statusText: _statusText(
+                                                p['qty'],
+                                                p['min'],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: ProductTable(
+                                          products: filteredProducts,
+                                          onDelete: (p) => setState(
+                                            () => _products.remove(p),
+                                          ),
+                                          onEdit: (p) => _showAddEditDialog(p),
+                                          statusColorFn: _statusColor,
+                                          statusTextFn: _statusText,
+                                        ),
+                                      ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -304,12 +328,8 @@ class ProductFilters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isMobile) {
-      return Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             TextField(
@@ -375,12 +395,8 @@ class ProductFilters extends StatelessWidget {
     }
 
     // Desktop / Tablet layout
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return Padding(
+      padding: const EdgeInsets.all(32),
       child: Row(
         children: [
           Expanded(
@@ -647,7 +663,6 @@ class ProductTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      clipBehavior: Clip.none,
 
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -656,70 +671,26 @@ class ProductTable extends StatelessWidget {
         ),
 
         child: DataTable(
-          border: TableBorder.symmetric(
-            borderRadius: BorderRadius.circular(20),
-            outside: BorderSide(width: 2, color: Colors.grey.shade200),
+          headingTextStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
           ),
-          dataRowColor: MaterialStateProperty.all(Colors.white),
-          headingRowColor: MaterialStateProperty.all(Colors.grey.shade50),
-          dataRowHeight: 64,
+          dataTextStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
           headingRowHeight: 52,
           columnSpacing: 28,
           columns: const [
-            DataColumn(
-              label: Text(
-                'الكود',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'اسم المنتج',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'التصنيف',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'الباركود',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'السعر',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'الكمية',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'تاريخ الإضافة',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'الحالة',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'العمليات',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
+            DataColumn(label: Text('الكود')),
+            DataColumn(label: Text('اسم المنتج')),
+            DataColumn(label: Text('التصنيف')),
+            DataColumn(label: Text('الباركود')),
+            DataColumn(label: Text('السعر')),
+            DataColumn(label: Text('الكمية')),
+            DataColumn(label: Text('تاريخ الإضافة')),
+            DataColumn(label: Text('الحالة')),
+            DataColumn(label: Text('العمليات')),
           ],
           rows: products.map((p) {
             final qty = p['qty'] as int;
@@ -733,7 +704,10 @@ class ProductTable extends StatelessWidget {
                 DataCell(
                   Text(
                     p['barcode'],
-                    style: TextStyle(color: Colors.grey.shade600),
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 DataCell(
@@ -792,7 +766,7 @@ class ProductTable extends StatelessWidget {
                           padding: EdgeInsets.zero,
                           onPressed: () => onEdit(p),
                           icon: const Icon(
-                            Icons.edit,
+                            Icons.edit_square,
                             color: Colors.white,
                             size: 16,
                           ),

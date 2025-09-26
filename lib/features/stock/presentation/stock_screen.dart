@@ -280,7 +280,6 @@ class _StockScreenState extends State<StockScreen> {
     });
   }
 
-  @override
   Widget _buildMobileCards(List<Product> filtered) {
     return ListView.builder(
       itemCount: filtered.length,
@@ -350,7 +349,7 @@ class _StockScreenState extends State<StockScreen> {
                 children: [
                   Row(
                     children: [
-                      _statusChip(product.status, isOut, isLow),
+                      _statusChip(isOut, isLow),
                       const SizedBox(width: 8),
                       _priorityChip(product.priority),
                     ],
@@ -381,7 +380,8 @@ class _StockScreenState extends State<StockScreen> {
     );
   }
 
-  build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final List<Product> filtered = products.where((p) {
       if (filter == 'all') return true;
       if (filter == 'low') return (p.quantity > 0 && p.quantity < p.min);
@@ -493,34 +493,48 @@ class _StockScreenState extends State<StockScreen> {
                     const SizedBox(height: 32),
 
                     // Filter Buttons
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _filterButton(
-                          'جميع المنتجات',
-                          '($totalCount)',
-                          filter == 'all',
-                          const Color(0xFF06B6D4),
-                          () => setState(() => filter = 'all'),
+                    Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: const BorderSide(color: AppColors.borderColor),
+                      ),
+                      color: AppColors.surfaceColor,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: isDesktop
+                              ? MediaQuery.of(context).size.width / 3.5
+                              : 16,
                         ),
-                        _filterButton(
-                          'مخزون منخفض',
-                          '($lowStockCount)',
-                          filter == 'low',
-                          const Color(0xFFF59E0B),
-                          () => setState(() => filter = 'low'),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _filterButton(
+                              'جميع المنتجات',
+                              '($totalCount)',
+                              filter == 'all',
+                              const Color(0xFF06B6D4),
+                              () => setState(() => filter = 'all'),
+                            ),
+                            _filterButton(
+                              'مخزون منخفض',
+                              '($lowStockCount)',
+                              filter == 'low',
+                              const Color(0xFFF59E0B),
+                              () => setState(() => filter = 'low'),
+                            ),
+                            _filterButton(
+                              'غير متوفر',
+                              '($outOfStockCount)',
+                              filter == 'out',
+                              const Color(0xFFEF4444),
+                              () => setState(() => filter = 'out'),
+                            ),
+                          ],
                         ),
-                        _filterButton(
-                          'غير متوفر',
-                          '($outOfStockCount)',
-                          filter == 'out',
-                          const Color(0xFFEF4444),
-                          () => setState(() => filter = 'out'),
-                        ),
-                      ],
+                      ),
                     ),
-
                     const SizedBox(height: 24),
 
                     // Table Header
@@ -547,7 +561,7 @@ class _StockScreenState extends State<StockScreen> {
                     // Data Table/Cards - Expanded to fill remaining space
                     Expanded(
                       child: isDesktop
-                          ? _buildDataTable(filtered)
+                          ? _buildDataTable(filtered, context)
                           : _buildMobileCards(filtered),
                     ),
                   ],
@@ -625,6 +639,7 @@ class _StockScreenState extends State<StockScreen> {
     );
   }
 
+  // زر الفلترة العلوي
   Widget _filterButton(
     String text,
     String count,
@@ -643,236 +658,330 @@ class _StockScreenState extends State<StockScreen> {
           width: 1,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       ),
-      child: Text(
-        '$text $count',
-        style: const TextStyle(fontWeight: FontWeight.w500),
-      ),
-    );
-  }
-
-  Widget _buildDataTable(List<Product> filtered) {
-    const TextStyle _headerStyle = TextStyle(
-      fontWeight: FontWeight.w600,
-      fontSize: 14,
-      color: Color(0xFF374151),
-    );
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Table Header
+          Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+          const SizedBox(width: 6),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF9FAFB),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? Colors.white.withOpacity(0.2)
+                  : color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              count,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : color,
               ),
             ),
-            child: Table(
-              columnWidths: const {
-                0: FlexColumnWidth(2), // العمليات
-                1: FlexColumnWidth(2), // آخر تخزين
-                2: FlexColumnWidth(2), // مستوى الأولوية
-                3: FlexColumnWidth(2), // الحالة
-                4: FlexColumnWidth(1), // الحد الأدنى
-                5: FlexColumnWidth(1), // الكمية الحالية
-                6: FlexColumnWidth(3), // اسم المنتج
-                7: FlexColumnWidth(1), // الكود
-              },
-              children: const [
-                TableRow(
-                  children: [
-                    TableCell(child: Text('العمليات', style: _headerStyle)),
-                    TableCell(child: Text('آخر تخزين', style: _headerStyle)),
-                    TableCell(
-                      child: Text('مستوى الأولوية', style: _headerStyle),
-                    ),
-                    TableCell(child: Text('الحالة', style: _headerStyle)),
-                    TableCell(child: Text('الحد الأدنى', style: _headerStyle)),
-                    TableCell(
-                      child: Text('الكمية الحالية', style: _headerStyle),
-                    ),
-                    TableCell(child: Text('اسم المنتج', style: _headerStyle)),
-                    TableCell(child: Text('الكود', style: _headerStyle)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Table Body - Scrollable
-          Expanded(
-            child: ListView.builder(
-              itemCount: filtered.length,
-              itemBuilder: (context, index) {
-                final product = filtered[index];
-                final isOut = product.quantity == 0;
-                final isLow =
-                    product.quantity > 0 && product.quantity < product.min;
-
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade100, width: 1),
-                    ),
-                  ),
-                  child: Table(
-                    columnWidths: const {
-                      0: FlexColumnWidth(2),
-                      1: FlexColumnWidth(2),
-                      2: FlexColumnWidth(2),
-                      3: FlexColumnWidth(2),
-                      4: FlexColumnWidth(1),
-                      5: FlexColumnWidth(1),
-                      6: FlexColumnWidth(3),
-                      7: FlexColumnWidth(1),
-                    },
-                    children: [
-                      TableRow(
-                        decoration: BoxDecoration(
-                          color: isOut
-                              ? Colors.red.shade50
-                              : (isLow
-                                    ? Colors.yellow.shade50
-                                    : Colors.transparent),
-                        ),
-                        children: [
-                          // العمليات
-                          TableCell(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                final origIndex = products.indexWhere(
-                                  (p) => p.code == product.code,
-                                );
-                                if (origIndex >= 0)
-                                  _openRestockDialog(origIndex);
-                              },
-                              icon: const Icon(Icons.refresh, size: 14),
-                              label: const Text('إعادة التخزين'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF10B981),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 8,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          // آخر تخزين
-                          TableCell(child: Text(product.lastRestock)),
-
-                          // مستوى الأولوية
-                          TableCell(child: _priorityChip(product.priority)),
-
-                          // الحالة
-                          TableCell(
-                            child: _statusChip(product.status, isOut, isLow),
-                          ),
-
-                          // الحد الأدنى
-                          TableCell(child: Text(product.min.toString())),
-
-                          // الكمية الحالية
-                          TableCell(
-                            child: Text(
-                              product.quantity.toString(),
-                              style: TextStyle(
-                                color: isOut
-                                    ? const Color(0xFFEF4444)
-                                    : (isLow
-                                          ? const Color(0xFFF59E0B)
-                                          : const Color(0xFF10B981)),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-
-                          // اسم المنتج
-                          TableCell(child: Text(product.name)),
-
-                          // الكود
-                          TableCell(child: Text(product.code)),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _statusChip(String status, bool isOut, bool isLow) {
-    Color bgColor;
+  // Chip حالة المنتج
+  Widget _statusChip(bool isOut, bool isLow) {
     if (isOut) {
-      bgColor = const Color(0xFFFEF2F2);
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Text(
+          'غير متوفر',
+          style: TextStyle(color: Color(0xFFDC2626), fontSize: 13),
+        ),
+      );
     } else if (isLow) {
-      bgColor = const Color(0xFFFEF3C7);
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.yellow.shade50,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Text(
+          'مخزون منخفض',
+          style: TextStyle(color: Color(0xFFCA8A04), fontSize: 13),
+        ),
+      );
     } else {
-      bgColor = const Color(0xFFECFDF5);
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.green.shade50,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Text(
+          'متوفر',
+          style: TextStyle(color: Color(0xFF059669), fontSize: 13),
+        ),
+      );
     }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        status,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-      ),
-    );
   }
 
+  // Chip مستوى الأولوية
   Widget _priorityChip(String priority) {
-    Color bgColor;
-    if (priority == 'عاجل جداً') {
-      bgColor = const Color(0xFFffe2e2);
-    } else if (priority == 'عاجل') {
-      bgColor = const Color(0xFFFEF3C7);
-    } else if (priority == 'متوسط') {
-      bgColor = const Color(0xFFfef9c2);
-    } else {
-      bgColor = const Color(0xFFEFF6FF);
+    Color bg;
+    Color textColor;
+    switch (priority) {
+      case "عاجل جدا":
+        bg = Colors.red.shade100;
+        textColor = Colors.red.shade800;
+        break;
+      case "متوسط":
+        bg = Colors.blue.shade100;
+        textColor = Colors.blue.shade800;
+        break;
+      default:
+        bg = Colors.green.shade100;
+        textColor = Colors.green.shade800;
     }
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         priority,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
+      ),
+    );
+  }
+
+  // الجدول (Responsive)
+  Widget _buildDataTable(List<Product> filtered, BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 700;
+
+    if (isMobile) {
+      // عرض كروت في الموبايل
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: filtered.length,
+          itemBuilder: (context, index) {
+            final product = filtered[index];
+            final isOut = product.quantity == 0;
+            final isLow =
+                product.quantity > 0 && product.quantity < product.min;
+
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("الكود: ${product.code}"),
+                        _priorityChip(product.priority),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("الكمية: ${product.quantity}"),
+                        _statusChip(isOut, isLow),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      onPressed: () => _openRestockDialog(index),
+                      icon: const Icon(Icons.refresh, size: 16),
+                      label: const Text("إعادة التخزين"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF10B981),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    // جدول الديسكتوب
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: AppColors.borderColor),
+      ),
+      color: AppColors.surfaceColor,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF9FAFB),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+              ),
+              child: Row(
+                children: const [
+                  Expanded(
+                    child: Text(
+                      "الكود",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      "اسم المنتج",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "الكمية الحالية",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "الحد الأدنى",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "الحالة",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "الأولوية",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "آخر تخزين",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "العمليات",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Body
+            Expanded(
+              child: ListView.separated(
+                itemCount: filtered.length,
+                separatorBuilder: (_, __) =>
+                    Divider(height: 1, color: Colors.grey.shade200),
+                itemBuilder: (context, index) {
+                  final product = filtered[index];
+                  final isOut = product.quantity == 0;
+                  final isLow =
+                      product.quantity > 0 && product.quantity < product.min;
+
+                  return Container(
+                    color: isOut
+                        ? Colors.red.shade50
+                        : (isLow ? Colors.yellow.shade50 : Colors.transparent),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(product.code)),
+                        Expanded(flex: 2, child: Text(product.name)),
+                        Expanded(
+                          child: Text(
+                            "${product.quantity}",
+                            style: TextStyle(
+                              color: isOut
+                                  ? Colors.red
+                                  : (isLow ? Colors.orange : Colors.green),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Text("${product.min}")),
+                        Expanded(child: _statusChip(isOut, isLow)),
+                        Expanded(child: _priorityChip(product.priority)),
+                        Expanded(child: Text(product.lastRestock)),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _openRestockDialog(index),
+                            icon: const Icon(Icons.refresh, size: 16),
+                            label: const Text("إعادة التخزين"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF10B981),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,4 +1,4 @@
-import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
+//import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; 
 
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
 
       builder: (context, child) {
         return Directionality(
-          textDirection: TextDirection.rtl, // اتجاه RTL افتراضي
+          textDirection: TextDirection.rtl, 
           child: child!,
         );
       },
