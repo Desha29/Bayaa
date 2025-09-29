@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
+import '../../../../core/utils/responsive_helper.dart';
 import 'product_card.dart';
+
 
 class ProductsGridView extends StatelessWidget {
   final List<Product> products;
@@ -17,21 +18,26 @@ class ProductsGridView extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         int crossAxisCount;
-        if (constraints.maxWidth >= 1200) {
+        double aspectRatio;
+
+        if (ResponsiveHelper.isDesktop(context)) {
           crossAxisCount = 3;
-        } else if (constraints.maxWidth >= 800) {
-          crossAxisCount = 2;
+          aspectRatio = 1.4;
+        } else if (ResponsiveHelper.isTablet(context)) {
+          crossAxisCount = 3;
+          aspectRatio = 1.2;
         } else {
-          crossAxisCount = 1;
+          crossAxisCount = 2;
+          aspectRatio = 1;
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(ResponsiveHelper.isMobile(context) ? 6 : 12),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            childAspectRatio: 1.2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+            childAspectRatio: aspectRatio,
+            crossAxisSpacing: ResponsiveHelper.isMobile(context) ? 6 : 12,
+            mainAxisSpacing: ResponsiveHelper.isMobile(context) ? 6 : 12,
           ),
           itemCount: products.length,
           itemBuilder: (context, index) {

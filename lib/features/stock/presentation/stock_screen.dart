@@ -1,16 +1,12 @@
-// stock_screen.dart
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/components/screen_header.dart';
+
 import 'widgets/filter_button.dart';
 import 'widgets/product_card.dart';
 import 'widgets/products_grid_view.dart';
 import 'widgets/restock_dialog.dart';
 
-
-// Restock Dialog Widget
-
-// Main Screen
 class StockScreen extends StatefulWidget {
   const StockScreen({super.key});
 
@@ -89,66 +85,83 @@ class _StockScreenState extends State<StockScreen> {
       return true;
     }).toList();
 
+    // ✅ Responsive padding
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+    final isDesktop = MediaQuery.of(context).size.width >= 1000;
+    double horizontalPadding = 12;
+    if (isTablet) horizontalPadding = 4;
+    if (isDesktop) horizontalPadding = 24;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                const ScreenHeader(
-                  title: 'المنتجات الناقصة',
-                  subtitle: 'متابعة المنتجات التي تحتاج إعادة تخزين',
-                ),
-
-                const SizedBox(height: 32),
-
-                // Filter Buttons
-                FilterButtonsWidget(
-                  filter: filter,
-                  totalCount: totalCount,
-                  lowStockCount: lowStockCount,
-                  outOfStockCount: outOfStockCount,
-                  onFilterChanged: (newFilter) {
-                    setState(() {
-                      filter = newFilter;
-                    });
-                  },
-                ),
-                const SizedBox(height: 24),
-
-                // Products Grid Header
-                Row(
-                  children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      color: const Color(0xFFF59E0B),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          'المنتجات التي تحتاج إعادة تخزين (${filtered.length})',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
+          child: CustomScrollView(
+            slivers: [
+              // Header + Filter + Title
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: 24,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const ScreenHeader(
+                        title: 'المنتجات الناقصة',
+                        subtitle: 'متابعة المنتجات التي تحتاج إعادة تخزين',
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
+                      const SizedBox(height: 32),
 
-                // Products Grid - Expanded to fill remaining space
-                Expanded(
+                      FilterButtonsWidget(
+                        filter: filter,
+                        totalCount: totalCount,
+                        lowStockCount: lowStockCount,
+                        outOfStockCount: outOfStockCount,
+                        onFilterChanged: (newFilter) {
+                          setState(() {
+                            filter = newFilter;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 8),
+
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.warning_amber_rounded,
+                            color: Color(0xFFF59E0B),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                'المنتجات التي تحتاج إعادة تخزين (${filtered.length})',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Products Grid or Empty State
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                sliver: SliverFillRemaining(
+                  hasScrollBody: true,
                   child: filtered.isEmpty
                       ? Center(
                           child: Column(
@@ -173,7 +186,6 @@ class _StockScreenState extends State<StockScreen> {
                       : ProductsGridView(
                           products: filtered,
                           onRestock: (index) {
-                            // Find the original index in the main products list
                             final originalIndex = products.indexWhere(
                               (p) => p.code == filtered[index].code,
                             );
@@ -183,8 +195,8 @@ class _StockScreenState extends State<StockScreen> {
                           },
                         ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

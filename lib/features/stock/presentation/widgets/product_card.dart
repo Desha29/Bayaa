@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-
+import '../../../../core/utils/responsive_helper.dart';
 import 'priorty_chip.dart';
 import 'status_chip.dart';
+
+/// ---------------- Product Model ----------------
 class Product {
   String code;
   String name;
@@ -31,7 +33,10 @@ class Product {
     return 'منخفض';
   }
 }
-class ProductCard extends StatelessWidget {
+
+/// ---------------- Product Card ----------------
+
+class ProductCard extends StatefulWidget {
   final Product product;
   final VoidCallback onRestock;
 
@@ -42,153 +47,236 @@ class ProductCard extends StatelessWidget {
   });
 
   @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
+    final product = widget.product;
     final isOut = product.quantity == 0;
     final isLow = product.quantity > 0 && product.quantity < product.min;
 
-    return Container(
-      margin: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isOut
-              ? Colors.red.withOpacity(0.3)
-              : isLow
-              ? Colors.orange.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.2),
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 200),
+        scale: _isHovered ? 1.02 : 1.0,
+        child: Padding(
+          padding: ResponsiveHelper.padding(
+            context,
+            mobile: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            tablet: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            desktop: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with product name and code
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          product.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'كود: ${product.code}',
-                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: _isHovered
+                    ? Colors.blueAccent.withOpacity(0.5)
+                    : isOut
+                    ? Colors.red.withOpacity(0.3)
+                    : isLow
+                    ? Colors.orange.withOpacity(0.3)
+                    : Colors.grey.withOpacity(0.2),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: _isHovered
+                      ? Colors.black.withOpacity(0.12)
+                      : Colors.black.withOpacity(0.05),
+                  blurRadius: _isHovered ? 16 : 12,
+                  offset: const Offset(0, 6),
                 ),
-                PriorityChip(priority: product.priority),
               ],
             ),
-
-            const SizedBox(height: 16),
-
-            // Quantity information
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: ResponsiveHelper.padding(
+                context,
+                mobile: const EdgeInsets.all(10),
+                tablet: const EdgeInsets.all(14),
+                desktop: const EdgeInsets.all(18),
               ),
               child: Column(
+                mainAxisSize: MainAxisSize.min, // ✅ يمنع الـ overflow
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  /// -------- Header --------
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('الكمية الحالية:'),
-                      Text(
-                        product.quantity.toString(),
-                        style: TextStyle(
-                          color: isOut
-                              ? const Color(0xFFEF4444)
-                              : (isLow
-                                    ? const Color(0xFFF59E0B)
-                                    : const Color(0xFF10B981)),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                product.name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: ResponsiveHelper.fontSize(
+                                    context,
+                                    mobile: 14,
+                                    tablet: 15,
+                                    desktop: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'كود: ${product.code}',
+                                style: TextStyle(
+                                  fontSize: ResponsiveHelper.fontSize(
+                                    context,
+                                    mobile: 12,
+                                    tablet: 13,
+                                    desktop: 13,
+                                  ),
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                      PriorityChip(priority: product.priority),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('الحد الأدنى:'),
-                      Text(
-                        product.min.toString(),
-                        style: const TextStyle(fontWeight: FontWeight.w500),
+
+                  const SizedBox(height: 12),
+
+                  /// -------- Quantity Info --------
+                  Expanded(
+                    // ✅ هنا يتمدد بشكل مرن جوا الكارت
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                         
+                            child: _buildInfoRow(
+                              context,
+                              'الكمية الحالية:',
+                              product.quantity.toString(),
+                              isOut
+                                  ? const Color(0xFFEF4444)
+                                  : (isLow
+                                        ? const Color(0xFFF59E0B)
+                                        : const Color(0xFF10B981)),
+                              bold: true,
+                              valueSize: 16,
+                            ),
+                          ),
+                   
+                          Flexible(
+                            child: _buildInfoRow(
+                              context,
+                              'الحد الأدنى:',
+                              product.min.toString(),
+                              Colors.black,
+                            ),
+                          ),
+                     
+                          Flexible(
+                            child: _buildInfoRow(
+                              context,
+                              'آخر تخزين:',
+                              product.lastRestock,
+                              Colors.grey[600]!,
+                              valueSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 8),
+
+                  const SizedBox(height: 12),
+
+                  /// -------- Status & Action --------
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('آخر تخزين:'),
-                      Text(
-                        product.lastRestock,
-                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                      Expanded(
+                        child: StatusChip(isOut: isOut, isLow: isLow),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: widget.onRestock,
+                          icon: const Icon(Icons.refresh, size: 16),
+                          label: const FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text('إعادة التخزين'),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 16),
-
-            // Status and Action
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                StatusChip(isOut: isOut, isLow: isLow),
-                ElevatedButton.icon(
-                  onPressed: onRestock,
-                  icon: const Icon(Icons.refresh, size: 16),
-                  label: const FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text('إعادة التخزين'),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF10B981),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoRow(
+    BuildContext context,
+    String label,
+    String value,
+    Color valueColor, {
+    bool bold = false,
+    double valueSize = 14,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: FittedBox(fit: BoxFit.scaleDown, child: Text(label)),
+        ),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                color: valueColor,
+                fontWeight: bold ? FontWeight.bold : FontWeight.w500,
+                fontSize: valueSize,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
