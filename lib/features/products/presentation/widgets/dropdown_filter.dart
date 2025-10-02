@@ -24,33 +24,30 @@ class DropDownFilter extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2)),
         ],
       ),
       child: DropdownButtonFormField<String>(
         value: value,
+        isDense: true,
+        isExpanded: true,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon, color: const Color(0xff0fa2a9)),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
+          // tighten to prevent fractional right overflow
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
         items: items
-            .map((item) => DropdownMenuItem(
-                  value: item,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerRight,
-                    child: Text(item),
-                  ),
-                ))
+            .map(
+              (item) => DropdownMenuItem(
+                value: item,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: FittedBox(fit: BoxFit.scaleDown, child: Text(item)),
+                ),
+              ),
+            )
             .toList(),
         onChanged: (v) => onChanged(v ?? value),
       ),

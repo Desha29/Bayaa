@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'desktop_layout_filter.dart';
 import 'mobile_layout_filter.dart';
 
@@ -43,39 +42,34 @@ class ProductsFilterSection extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              // Search and Filters
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  if (constraints.maxWidth > 800) {
-                    return DesktopLayout(
-                      searchController: searchController,
-                      onSearchChanged: onSearchChanged,
-                      categoryFilter: categoryFilter,
-                      categories: categories,
-                      onCategoryChanged: onCategoryChanged,
-                      availabilityFilter: availabilityFilter,
-                      availabilities: availabilities,
-                      onAvailabilityChanged: onAvailabilityChanged,
-                      onAddPressed: onAddPressed,
-                    );
-                  } else {
-                    return MobileLayout(
-                      searchController: searchController,
-                      onSearchChanged: onSearchChanged,
-                      categoryFilter: categoryFilter,
-                      categories: categories,
-                      onCategoryChanged: onCategoryChanged,
-                      availabilityFilter: availabilityFilter,
-                      availabilities: availabilities,
-                      onAvailabilityChanged: onAvailabilityChanged,
-                      onAddPressed: onAddPressed,
-                    );
-                  }
-                },
-              ),
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth >= 800) {
+                return DesktopLayout(
+                  searchController: searchController,
+                  onSearchChanged: onSearchChanged,
+                  categoryFilter: categoryFilter,
+                  categories: categories,
+                  onCategoryChanged: onCategoryChanged,
+                  availabilityFilter: availabilityFilter,
+                  availabilities: availabilities,
+                  onAvailabilityChanged: onAvailabilityChanged,
+                  onAddPressed: onAddPressed,
+                );
+              } else {
+                return MobileLayout(
+                  searchController: searchController,
+                  onSearchChanged: onSearchChanged,
+                  categoryFilter: categoryFilter,
+                  categories: categories,
+                  onCategoryChanged: onCategoryChanged,
+                  availabilityFilter: availabilityFilter,
+                  availabilities: availabilities,
+                  onAvailabilityChanged: onAvailabilityChanged,
+                  onAddPressed: onAddPressed,
+                );
+              }
+            },
           ),
         ),
       ),

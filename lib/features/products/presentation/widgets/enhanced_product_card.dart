@@ -21,23 +21,23 @@ class EnhancedProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final qty = product['qty'] as int;
     final min = product['min'] as int;
-    final isLowStock = qty > 0 && qty < min;
+    final isLowStock = qty > 0 && qty <= min;
     final isOutOfStock = qty == 0;
 
-    final padding = ResponsiveHelper.padding(context);
-    final fontTitle = ResponsiveHelper.fontSize(
+    final pad = ResponsiveHelper.padding(context);
+    final titleSize = ResponsiveHelper.fontSize(
       context,
-      mobile: 14,
-      tablet: 16,
-      desktop: 18,
+      mobile: 13,
+      tablet: 15,
+      desktop: 17,
     );
-    final fontSmall = ResponsiveHelper.fontSize(
+    final small = ResponsiveHelper.fontSize(
       context,
       mobile: 10,
       tablet: 11,
       desktop: 12,
     );
-    final fontValue = ResponsiveHelper.fontSize(
+    final value = ResponsiveHelper.fontSize(
       context,
       mobile: 12,
       tablet: 13,
@@ -46,290 +46,438 @@ class EnhancedProductCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.all(8),
-      constraints: const BoxConstraints(
-        minWidth: 160,
-        maxWidth: 280,
-        maxHeight: 360,
-      ),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey.shade100],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isOutOfStock
+              ? Colors.red.withOpacity(0.25)
+              : isLowStock
+              ? Colors.orange.withOpacity(0.25)
+              : Colors.grey.withOpacity(0.15),
+          width: 3,
         ),
-        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 16,
             offset: const Offset(0, 6),
           ),
         ],
-        border: Border.all(
-          color: isOutOfStock
-              ? Colors.red.withOpacity(0.3)
-              : isLowStock
-              ? Colors.orange.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.15),
-          width: 1,
+        gradient: LinearGradient(
+          colors: [Colors.white, Colors.grey.shade50],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
       child: Padding(
-        padding: padding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            /// Title + Status
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    product['name'],
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: fontTitle,
-                      color: const Color(0xff1e293b),
-                      shadows: [
-                        Shadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          blurRadius: 2,
-                          offset: const Offset(1, 1),
-                        ),
-                      ],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                _buildStatusChip(fontSmall),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'كود: ${product['code']}',
-              style: TextStyle(fontSize: fontSmall, color: Colors.grey[600]),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 12),
+        padding: EdgeInsetsDirectional.fromSTEB(
+          pad.left.clamp(6.0, 12.0),
+          pad.top.clamp(6.0, 12.0),
+          pad.right.clamp(6.0, 12.0),
+          pad.bottom.clamp(6.0, 12.0),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final tightW = constraints.maxWidth < 180;
+            final tightH = constraints.maxHeight < 240;
 
-            /// Info Grid with Rounded Cards
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 10,
-              runSpacing: 10,
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildInfoItem(
-                  'السعر',
-                  '${product['price']}ج',
-                  Icons.attach_money_rounded,
-                  const Color(0xff059669),
-                  fontSmall,
-                  fontValue,
+                // Top image
+                Flexible(
+                  flex: 2,
+                  child: _CategoryImage(tightH: tightH, tightW: tightW),
                 ),
-                _buildInfoItem(
-                  'كمية',
-                  product['qty'].toString(),
-                  Icons.inventory_2_rounded,
-                  qty == 0 ? Colors.red : const Color(0xff0fa2a9),
-                  fontSmall,
-                  fontValue,
-                ),
-                _buildInfoItem(
-                  'حد أدنى',
-                  product['min'].toString(),
-                  Icons.trending_down_rounded,
-                  const Color(0xfff59e0b),
-                  fontSmall,
-                  fontValue,
-                ),
-                _buildInfoItem(
-                  'فئة',
-                  product['category'] ?? '---',
-                  Icons.category_rounded,
-                  const Color(0xff8b5cf6),
-                  fontSmall,
-                  fontValue,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
 
-            /// Phone
-            if (product['phone'] != null)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
+                SizedBox(height: tightH ? 4 : 6),
+
+                // Header row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.phone_rounded,
-                      size: fontSmall + 6,
-                      color: Colors.blueGrey[700],
-                    ),
-                    const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        product['phone'],
-                        style: TextStyle(
-                          fontSize: fontSmall,
-                          color: Colors.blueGrey[800],
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          product['name'] ?? '---',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: titleSize,
+                            color: const Color(0xff1e293b),
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    SizedBox(width: tightW ? 4 : 6),
+                    _StatusChip(
+                      text: statusText,
+                      color: statusColor,
+                      font: small,
+                    ),
                   ],
                 ),
-              ),
-            const Spacer(),
 
-            /// Actions
-            Row(
-              children: [
-                Expanded(
-                  child: _ActionButton(
-                    text: 'تعديل',
-                    icon: Icons.edit_rounded,
-                    color: Colors.blueAccent,
-                    onPressed: onEdit,
-                    fontSize: fontValue,
+                SizedBox(height: tightH ? 2 : 4),
+
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      product['code']?.toString() ?? '---',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: small,
+                        color: Colors.grey[600],
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 10),
+
+                SizedBox(height: tightH ? 4 : 6),
+
+                Flexible(
+                  flex: 2,
+                  child: _InfoGrid(
+                    small: small,
+                    value: value,
+                    qty: qty,
+                    product: product,
+                    tightW: tightW,
+                  ),
+                ),
+                SizedBox(height: tightH ? 12 : 18),
                 Expanded(
-                  child: _ActionButton(
-                    text: 'حذف',
-                    icon: Icons.delete_rounded,
-                    color: Colors.redAccent,
-                    onPressed: onDelete,
-                    fontSize: fontValue,
+                  child: _ActionsBar(
+                    edit: onEdit,
+                    del: onDelete,
+                    value: value,
+                    tightH: tightH,
                   ),
                 ),
               ],
-            ),
-          ],
+            );
+          },
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatusChip(double fontSize) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Text(
-        statusText,
-        style: TextStyle(
-          color: statusColor,
-          fontSize: fontSize,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoItem(
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-    double fontLabel,
-    double fontValue,
-  ) {
-    return Container(
-      width: 75,
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: fontValue + 5),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(fontSize: fontLabel, color: Colors.grey[700]),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: fontValue,
-              color: color,
-            ),
-          ),
-        ],
       ),
     );
   }
 }
 
-class _ActionButton extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onPressed;
-  final double? fontSize;
+class _CategoryImage extends StatelessWidget {
+  final bool tightH;
+  final bool tightW;
+  const _CategoryImage({required this.tightH, required this.tightW});
 
-  const _ActionButton({
-    super.key,
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        color: Colors.grey.shade100,
+        child: Padding(
+          padding: EdgeInsets.all(tightW ? 4 : 6),
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Image.asset(
+              'assets/images/p_image.png',
+              errorBuilder: (_, __, ___) =>
+                  Icon(Icons.image_outlined, size: 36, color: Colors.grey[400]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final String text;
+  final Color color;
+  final double font;
+  const _StatusChip({
     required this.text,
-    required this.icon,
     required this.color,
-    required this.onPressed,
-    this.fontSize,
+    required this.font,
   });
 
   @override
   Widget build(BuildContext context) {
-    final fSize = fontSize ?? 13;
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: color.withOpacity(0.15),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: FittedBox(
+        child: Text(
+          text,
+          style: TextStyle(
+            color: color,
+            fontSize: font,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: fSize + 5),
-            const SizedBox(width: 6),
-            Flexible(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.w600,
-                    fontSize: fSize,
+      ),
+    );
+  }
+}
+
+class _InfoGrid extends StatelessWidget {
+  final double small;
+  final double value;
+  final int qty;
+  final Map<String, dynamic> product;
+  final bool tightW;
+  const _InfoGrid({
+    required this.small,
+    required this.value,
+    required this.qty,
+    required this.product,
+    required this.tightW,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget chip(String label, String val, IconData icon, Color color) {
+      // Remove Flexible; Wrap children must not be Flexible
+      return ConstrainedBox(
+        constraints: BoxConstraints(minWidth: tightW ? 60 : 68, maxWidth: 120),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Icon(icon, color: color, size: value + 2),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    style: TextStyle(fontSize: small, color: Colors.grey[700]),
                   ),
                 ),
               ),
+              const SizedBox(height: 2),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    val,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: value,
+                      color: color,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      spacing: 10,
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flexible(
+          child: FittedBox(
+            child: chip(
+              'السعر',
+              '${product['price']}',
+              Icons.attach_money_rounded,
+              const Color(0xff059669),
             ),
-          ],
+          ),
+        ),
+        Flexible(
+          child: FittedBox(
+            child: chip(
+              'المتوفر',
+              qty.toString(),
+              Icons.inventory_2_rounded,
+              qty == 0 ? Colors.red : const Color(0xff0fa2a9),
+            ),
+          ),
+        ),
+        Flexible(
+          child: FittedBox(
+            child: chip(
+              'التصنيف',
+              (product['category'] ?? '---').toString(),
+              Icons.category_rounded,
+              const Color(0xff8b5cf6),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActionsBar extends StatelessWidget {
+  final VoidCallback edit;
+  final VoidCallback del;
+  final double value;
+  final bool tightH;
+  const _ActionsBar({
+    required this.edit,
+    required this.del,
+    required this.value,
+    required this.tightH,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Flexible(
+          child: FittedBox(
+            child: ActionButton(
+              text: 'تعديل',
+              icon: Icons.edit_rounded,
+              baseColor: Colors.blueAccent,
+              onPressed: edit,
+              fontSize: value,
+              compact: tightH,
+            ),
+          ),
+        ),
+        const Spacer(),
+        Flexible(
+          child: FittedBox(
+            child: ActionButton(
+              text: 'حذف',
+              icon: Icons.delete_rounded,
+              baseColor: Colors.redAccent,
+              onPressed: del,
+              fontSize: value,
+              compact: tightH,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ActionButton extends StatefulWidget {
+  final String text;
+  final IconData icon;
+  final Color baseColor;
+  final VoidCallback onPressed;
+  final double? fontSize;
+  final bool compact;
+
+  const ActionButton({
+    super.key,
+    required this.text,
+    required this.icon,
+    required this.baseColor,
+    required this.onPressed,
+    this.fontSize,
+    this.compact = false,
+  });
+
+  @override
+  State<ActionButton> createState() => _ActionButtonState();
+}
+
+class _ActionButtonState extends State<ActionButton> {
+  bool hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final f = (widget.fontSize ?? 13).clamp(10, 14).toDouble();
+    final bgColor = hovering
+        ? widget.baseColor
+        : widget.baseColor.withOpacity(0.10);
+    final borderColor = hovering
+        ? widget.baseColor.withOpacity(0.00)
+        : widget.baseColor.withOpacity(0.28);
+    final fgColor = hovering ? Colors.white : widget.baseColor;
+    final scale = hovering ? 1.02 : 1.0;
+    final elevation = hovering ? 3.0 : 0.0;
+    const duration = Duration(milliseconds: 140);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => hovering = true),
+      onExit: (_) => setState(() => hovering = false),
+      child: AnimatedScale(
+        scale: scale,
+        duration: duration,
+        curve: Curves.easeOut,
+        child: Material(
+          color: Colors.transparent,
+          elevation: elevation,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            onTap: widget.onPressed,
+            borderRadius: BorderRadius.circular(12),
+            hoverColor: widget.baseColor.withOpacity(0.08),
+            splashColor: widget.baseColor.withOpacity(0.18),
+            child: AnimatedContainer(
+              duration: duration,
+              curve: Curves.easeOut,
+              padding: EdgeInsets.symmetric(
+                vertical: widget.compact ? 6 : 8,
+                horizontal: 8,
+              ),
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: borderColor, width: 1),
+                boxShadow: hovering
+                    ? [
+                        BoxShadow(
+                          color: widget.baseColor.withOpacity(0.22),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : const [],
+              ),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(widget.icon, color: fgColor, size: f + 3),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.text,
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: fgColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: f,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

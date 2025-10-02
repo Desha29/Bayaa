@@ -1,5 +1,8 @@
+import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:flutter/material.dart';
+import '../../../core/components/anim_wrappers.dart';
 import '../../../core/constants/app_colors.dart';
+
 import 'widgets/barcode_scan_card.dart';
 import 'widgets/cart_list.dart';
 import 'widgets/recent_sales.dart';
@@ -12,15 +15,8 @@ class SalesScreen extends StatefulWidget {
   State<SalesScreen> createState() => _SalesScreenState();
 }
 
-class _SalesScreenState extends State<SalesScreen>
-    with SingleTickerProviderStateMixin {
+class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStateMixin {
   final _barcodeController = TextEditingController();
-
-  late AnimationController _controller;
-  late Animation<double> _fadeTitle;
-  late Animation<Offset> _slideTitle;
-  late Animation<double> _fadeBody;
-  late Animation<Offset> _slideBody;
 
   List<Map<String, dynamic>> cartItems = [
     {
@@ -45,45 +41,8 @@ class _SalesScreenState extends State<SalesScreen>
   ];
 
   @override
-  void initState() {
-    super.initState();
-
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
-
-    // Title Animation
-    _fadeTitle = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
-    );
-    _slideTitle = Tween<Offset>(
-      begin: const Offset(0, -0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-    ));
-
-    // Body Animation
-    _fadeBody = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.4, 1.0, curve: Curves.easeIn),
-    );
-    _slideBody = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.4, 1.0, curve: Curves.easeOut),
-    ));
-
-    _controller.forward();
-  }
-
-  @override
   void dispose() {
     _barcodeController.dispose();
-    _controller.dispose();
     super.dispose();
   }
 
@@ -143,7 +102,6 @@ class _SalesScreenState extends State<SalesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
     final isDesktop = width > 1000;
 
@@ -155,78 +113,70 @@ class _SalesScreenState extends State<SalesScreen>
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Animated Title
-        FadeTransition(
-          opacity: _fadeTitle,
-          child: SlideTransition(
-            position: _slideTitle,
-            child: Text(
-              'المبيعات',
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 32,
-              ),
-            ),
+        // Header subtle slide-in from top
+        const FadeSlideIn(
+          beginOffset: Offset(0, -0.06),
+          child: ScreenHeader(
+            title: "المبيعات",
+            subtitle: "شاشة الكاشير لإدارة عمليات البيع",
           ),
         ),
-        const SizedBox(height: 4),
-        FadeTransition(
-          opacity: _fadeTitle,
-          child: Text(
-            'شاشة الكاشير لإدارة عمليات البيع',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: Colors.grey[600],
-            ),
-          ),
-        ),
+
         const SizedBox(height: 24),
 
-        // Animated Body
-        FadeTransition(
-          opacity: _fadeBody,
-          child: SlideTransition(
-            position: _slideBody,
-            child: Column(
-              children: [
-                BarcodeScanCard(
-                  barcodeController: _barcodeController,
-                  onAddProduct: _addProduct,
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  height: 300,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 400),
-                    child: cartItems.isEmpty
-                        ? Center(
-                            key: const ValueKey("empty"),
-                            child: Text(
-                              "السلة فارغة",
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
-                          )
-                        : CartList(
-                            key: ValueKey(cartItems.length),
-                            items: cartItems,
-                            onRemove: _removeItem,
-                            onQtyIncrease: (i) => _updateQuantity(i, 1),
-                            onQtyDecrease: (i) => _updateQuantity(i, -1),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TotalSectionCard(
-                  totalAmount: totalAmount,
-                  onClearCart: cartItems.isNotEmpty ? _clearCart : null,
-                  onCheckout: _checkout,
-                ),
-                if (!isDesktop) ...[
-                  const SizedBox(height: 24),
-                  RecentSalesWidget(sales: recentSales),
-                ],
-              ],
+        Column(
+          children: [
+            // Barcode card slide-in from right
+            FadeSlideIn(
+              beginOffset: const Offset(0.06, 0),
+              child: BarcodeScanCard(
+                barcodeController: _barcodeController,
+                onAddProduct: _addProduct,
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
+
+            // Cart list with switcher keyed by length
+            SizedBox(
+              height: 300,
+              child: SubtleSwitcher(
+                child: cartItems.isEmpty
+                    ? const Center(
+                        key: ValueKey("empty"),
+                        child: Text("السلة فارغة"),
+                      )
+                    : KeyedSubtree(
+                        key: ValueKey(cartItems.length),
+                        child: CartList(
+                          items: cartItems,
+                          onRemove: _removeItem,
+                          onQtyIncrease: (i) => _updateQuantity(i, 1),
+                          onQtyDecrease: (i) => _updateQuantity(i, -1),
+                        ),
+                      ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Totals fade-scale in
+            FadeScale(
+              child: TotalSectionCard(
+                totalAmount: totalAmount,
+                onClearCart: cartItems.isNotEmpty ? _clearCart : null,
+                onCheckout: _checkout,
+              ),
+            ),
+
+            if (!isDesktop) ...[
+              const SizedBox(height: 24),
+              // Recent sales fade-slide from bottom on mobile
+              const FadeSlideIn(
+                beginOffset: Offset(0, 0.06),
+                child: SizedBox.shrink(), // placeholder, replaced below
+              ),
+            ],
+          ],
         ),
       ],
     );
@@ -239,12 +189,33 @@ class _SalesScreenState extends State<SalesScreen>
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: 3, child: SingleChildScrollView(child: content)),
+                  Expanded(
+                    flex: 3,
+                    child: SingleChildScrollView(child: content),
+                  ),
                   const SizedBox(width: 24),
-                  Expanded(flex: 1, child: RecentSalesWidget(sales: recentSales)),
+                  // Right column recent sales with fade-scale
+                  Expanded(
+                    flex: 1,
+                    child: FadeScale(
+                      child: RecentSalesWidget(sales: recentSales),
+                    ),
+                  ),
                 ],
               )
-            : SingleChildScrollView(child: content),
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    content,
+                    // Actual recent sales on mobile with gentle fade-slide up
+                    const SizedBox(height: 24),
+                    FadeSlideIn(
+                      beginOffset: const Offset(0, 0.06),
+                      child: RecentSalesWidget(sales: recentSales),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }

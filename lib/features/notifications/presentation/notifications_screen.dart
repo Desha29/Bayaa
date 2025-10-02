@@ -1,129 +1,200 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:crazy_phone_pos/core/components/screen_header.dart';
 
-class NotificationsScreen extends StatelessWidget {
+import '../../../core/components/empty_state.dart';
+import '../../../core/components/section_card.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../dashboard/data/models/notify_model.dart';
+
+import 'widgets/filters_bar.dart';
+import 'widgets/notification_card.dart';
+import 'widgets/summary_row.dart';
+
+
+
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  final List<NotifyItem> _items = [
+    NotifyItem(
+      id: 'IP13',
+      title: 'نفد من المخزون',
+      message: 'آيفون 13 - نفد من المخزون تماماً',
+      badge: 'عاجل',
+      priority: NotifyPriority.high,
+      icon: LucideIcons.package,
+      createdAgo: 'منذ 6س 25د',
+      sku: 'IP13',
+      quantityHint: null,
+    ),
+    NotifyItem(
+      id: 'SGS23',
+      title: 'مخزون منخفض',
+      message: 'سامسونج جالاكسي S23 - باقي 6 قطع فقط',
+      badge: 'متوسط',
+      priority: NotifyPriority.medium,
+      icon: LucideIcons.package,
+      createdAgo: 'منذ 8س 45د',
+      sku: 'SGS23',
+      quantityHint: '6 قطع',
+    ),
+    NotifyItem(
+      id: 'POCO',
+      title: 'مخزون منخفض',
+      message: 'بوكو X6 برو - باقي 3 قطع فقط',
+      badge: 'متوسط',
+      priority: NotifyPriority.medium,
+      icon: LucideIcons.package,
+      createdAgo: 'منذ 1ي',
+      sku: 'POCOX6',
+      quantityHint: '3 قطع',
+    ),
+  ];
+
+  NotifyFilter _filter = NotifyFilter.all;
+  final Set<String> _selected = {};
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
-    // بيانات وهمية Placeholder
-    final notifications = [
-      {
-        'title': 'طلب جديد',
-        'message': 'تم استلام طلب جديد من العميل رقم #1023',
-        'icon': LucideIcons.shoppingCart,
-        'color': Colors.blue,
-      },
-      {
-        'title': 'نفاذ منتج',
-        'message': 'المنتج "سكر 1 كجم" أوشك على النفاذ',
-        'icon': LucideIcons.alertTriangle,
-        'color': Colors.orange,
-      },
-      {
-        'title': 'نجاح العملية',
-        'message': 'تم تحديث المخزون بنجاح',
-        'icon': LucideIcons.checkCircle,
-        'color': Colors.green,
-      },
-    ];
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.background,
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Text(
-              'التنبيهات',
-              style: theme.textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onBackground,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'إدارة التنبيهات والإشعارات',
-           style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
-            ),
-            const SizedBox(height: 24),
+    final total = _items.length;
+    final unread = _items.where((e) => !e.read).length;
+    final urgent = _items
+        .where((e) => e.priority == NotifyPriority.high)
+        .length;
+    final opened = total - unread;
 
-            // Content
-            Expanded(
-              child: notifications.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            LucideIcons.bell,
-                            size: 64,
-                            color: theme.colorScheme.onSurface.withOpacity(0.3),
+    final visible = _items.where((e) {
+      switch (_filter) {
+        case NotifyFilter.all:
+          return true;
+        case NotifyFilter.unread:
+          return !e.read;
+        case NotifyFilter.urgent:
+          return e.priority == NotifyPriority.high;
+      }
+    }).toList();
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                ScreenHeader(
+                  title: 'التنبيهات',
+                  subtitle: 'إدارة التنبيهات والإشعارات',
+                ),
+
+                const SizedBox(height: 20),
+
+                // Summary
+                SectionCard(
+                  child: SummaryRow(
+                    total: total,
+                    opened: opened,
+                    urgent: urgent,
+                    unread: unread,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Filters
+                SectionCard(
+                  child: FiltersBar(
+                    filter: _filter,
+                    onFilterChanged: (f) => setState(() => _filter = f),
+                    total: total,
+                    unread: unread,
+                    urgent: urgent,
+                    onMarkAllRead: () {
+                      setState(() {
+                        for (final e in _items) {
+                          e.read = true;
+                        }
+                        _selected.clear();
+                      });
+                    },
+                    onDeleteSelected: _selected.isEmpty
+                        ? null
+                        : () {
+                            setState(() {
+                              _items.removeWhere(
+                                (e) => _selected.contains(e.id),
+                              );
+                              _selected.clear();
+                            });
+                          },
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+              
+                Expanded(
+                  child: SectionCard(
+                    
+                    child: visible.isEmpty
+                        ? EmptyState()
+                        : ListView.separated(
+                            itemCount: visible.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              final n = visible[index];
+                              final checked = _selected.contains(n.id);
+                              return NotificationCard(
+                                item: n,
+                                checked: checked,
+                                onToggleCheck: () {
+                                  setState(() {
+                                    if (checked) {
+                                      _selected.remove(n.id);
+                                    } else {
+                                      _selected.add(n.id);
+                                    }
+                                  });
+                                },
+                                onDelete: () {
+                                  setState(() {
+                                    _items.removeWhere((e) => e.id == n.id);
+                                    _selected.remove(n.id);
+                                  });
+                                },
+                                onMarkReadToggle: () {
+                                  setState(() {
+                                    n.read = !n.read;
+                                  });
+                                },
+                              );
+                            },
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'لا توجد تنبيهات جديدة',
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.5),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'سيتم عرض التنبيهات هنا عند توفرها',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.5),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: notifications.length,
-                      itemBuilder: (context, index) {
-                        final notification = notifications[index];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          child: ListTile(
-                            leading: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color:
-                                    (notification['color'] as Color).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                notification['icon'] as IconData,
-                                color: notification['color'] as Color,
-                              ),
-                            ),
-                            title: Text(
-                              notification['title'] as String,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              notification['message'] as String,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface.withOpacity(0.7),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
+
+
+
+
+
+
+

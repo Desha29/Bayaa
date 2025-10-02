@@ -1,12 +1,10 @@
+import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'dashboard_card.dart';
 
 class DashboardHome extends StatefulWidget {
-  const DashboardHome({
-    super.key,
-    required this.onCardTap,
-  });
+  const DashboardHome({super.key, required this.onCardTap});
 
   final void Function(int index) onCardTap;
 
@@ -44,7 +42,6 @@ class _DashboardHomeState extends State<DashboardHome>
       "subtitle": "إدارة عمليات البيع",
       "color": Colors.purple,
     },
-  
   ];
 
   @override
@@ -97,21 +94,9 @@ class _DashboardHomeState extends State<DashboardHome>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "لوحة التحكم",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                "مرحباً بك في نظام Crazy Phone لإدارة نقاط البيع",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Colors.grey[600]),
+              ScreenHeader(
+                title: "لوحة التحكم",
+                subtitle: "مرحباً بك في نظام Crazy Phone لإدارة نقاط البيع",
               ),
               const SizedBox(height: 32),
               Expanded(
@@ -145,10 +130,7 @@ class _DashboardHomeState extends State<DashboardHome>
   Widget _buildAnimatedCard({required int index, required Widget child}) {
     return ScaleTransition(
       scale: _animations[index],
-      child: FadeTransition(
-        opacity: _animations[index],
-        child: child,
-      ),
+      child: FadeTransition(opacity: _animations[index], child: child),
     );
   }
 }

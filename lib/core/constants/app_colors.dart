@@ -15,5 +15,5 @@ class AppColors {
   static const Color kSuccessGreen = Color(0xFF198754);
   static const Color kDangerRed = Color(0xFFDC3545);
   static const Color kDarkChip = Color(0xFF212529);
-  static const Color kCardBackground = Color(0xFFf9fafb);
+  static const Color kCardBackground = Color(0xFFF9FAFB);
 }
