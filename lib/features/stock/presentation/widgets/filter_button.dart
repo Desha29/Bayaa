@@ -1,8 +1,7 @@
 // ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
-
 import '../../../../core/components/hover_wrapper.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class FilterButtonsWidget extends StatelessWidget {
   final String filter;
@@ -29,7 +28,7 @@ class FilterButtonsWidget extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey.shade50],
+            colors: [Colors.white, AppColors.surfaceColor],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -44,23 +43,23 @@ class FilterButtonsWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF06B6D4).withOpacity(0.1),
+                      color: AppColors.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.filter_list_rounded,
-                      color: Color(0xFF06B6D4),
+                      color: AppColors.primaryColor,
                       size: 24,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'فلترة المنتجات',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1F2937),
+                        color: AppColors.secondaryColor,
                       ),
                     ),
                   ),
@@ -81,7 +80,7 @@ class FilterButtonsWidget extends StatelessWidget {
                             totalCount,
                             'all',
                             Icons.inventory_2_outlined,
-                            const Color(0xFF06B6D4),
+                            AppColors.primaryColor,
                             'عرض جميع المنتجات',
                           ),
                         ),
@@ -92,7 +91,7 @@ class FilterButtonsWidget extends StatelessWidget {
                             lowStockCount,
                             'low',
                             Icons.warning_amber_rounded,
-                            const Color(0xFFF59E0B),
+                            AppColors.warningColor,
                             'المنتجات التي تحتاج إعادة تخزين',
                           ),
                         ),
@@ -103,7 +102,7 @@ class FilterButtonsWidget extends StatelessWidget {
                             outOfStockCount,
                             'out',
                             Icons.cancel_outlined,
-                            const Color(0xFFEF4444),
+                            AppColors.errorColor,
                             'المنتجات المنتهية الصلاحية',
                           ),
                         ),
@@ -118,7 +117,7 @@ class FilterButtonsWidget extends StatelessWidget {
                           totalCount,
                           'all',
                           Icons.inventory_2_outlined,
-                          const Color(0xFF06B6D4),
+                          AppColors.primaryColor,
                           'عرض جميع المنتجات',
                         ),
                         const SizedBox(height: 12),
@@ -127,7 +126,7 @@ class FilterButtonsWidget extends StatelessWidget {
                           lowStockCount,
                           'low',
                           Icons.warning_amber_rounded,
-                          const Color(0xFFF59E0B),
+                          AppColors.warningColor,
                           'المنتجات التي تحتاج إعادة تخزين',
                         ),
                         const SizedBox(height: 12),
@@ -136,7 +135,7 @@ class FilterButtonsWidget extends StatelessWidget {
                           outOfStockCount,
                           'out',
                           Icons.cancel_outlined,
-                          const Color(0xFFEF4444),
+                          AppColors.errorColor,
                           'المنتجات المنتهية الصلاحية',
                         ),
                       ],
@@ -178,7 +177,7 @@ class FilterButtonsWidget extends StatelessWidget {
                     : Colors.white.withOpacity(hovering ? 0.98 : 1.0),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? color : Colors.grey.shade300,
+                  color: isSelected ? color : AppColors.borderColor,
                   width: isSelected ? 2 : 1,
                 ),
                 boxShadow: isSelected
@@ -208,15 +207,12 @@ class FilterButtonsWidget extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color:
-                              (isSelected
-                                      ? color.withOpacity(0.15)
-                                      : color.withOpacity(0.10))
-                                  .withOpacity(
-                                    hovering
-                                        ? 0.18
-                                        : (isSelected ? 0.15 : 0.10),
-                                  ),
+                          color: (isSelected
+                                  ? color.withOpacity(0.15)
+                                  : color.withOpacity(0.10))
+                              .withOpacity(
+                            hovering ? 0.18 : (isSelected ? 0.15 : 0.10),
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(icon, color: color, size: 20),
@@ -236,7 +232,7 @@ class FilterButtonsWidget extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: isSelected
                                       ? color
-                                      : const Color(0xFF374151),
+                                      : AppColors.secondaryColor,
                                 ),
                               ),
                             ),
@@ -245,7 +241,7 @@ class FilterButtonsWidget extends StatelessWidget {
                               description,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: AppColors.mutedColor,
                               ),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
@@ -261,7 +257,10 @@ class FilterButtonsWidget extends StatelessWidget {
                     children: [
                       Text(
                         'العدد:',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.mutedColor,
+                        ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(

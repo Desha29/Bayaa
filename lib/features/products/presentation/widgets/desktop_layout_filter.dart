@@ -1,3 +1,4 @@
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'add_button.dart';
@@ -53,7 +54,7 @@ class DesktopLayout extends StatelessWidget {
               hintStyle: TextStyle(color: Colors.grey[500]),
               prefixIcon: const Icon(
                 Icons.search,
-                color: Color(0xff0fa2a9),
+                color: AppColors.primaryColor,
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
@@ -64,24 +65,33 @@ class DesktopLayout extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Filters Row
         Row(
           children: [
             Expanded(
               flex: 2,
-              child: DropDownFilter(label: 'حسب الفئة', value: categoryFilter, items: categories, onChanged: onCategoryChanged, icon: Icons.category_outlined),
+              child: DropDownFilter(
+                label: 'حسب الفئة',
+                value: categoryFilter,
+                items: categories,
+                onChanged: onCategoryChanged,
+                icon: Icons.category_outlined,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
               flex: 2,
-              child: DropDownFilter(label: 'حسب التوفر', value: availabilityFilter, items: availabilities, onChanged: onAvailabilityChanged, icon: Icons.inventory_outlined),
+              child: DropDownFilter(
+                label: 'حسب التوفر',
+                value: availabilityFilter,
+                items: availabilities,
+                onChanged: onAvailabilityChanged,
+                icon: Icons.inventory_outlined,
+              ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              flex: 1,
-              child: AddButton(onAddPressed: onAddPressed),
-            ),
+            Expanded(flex: 1, child: AddButton(onAddPressed: onAddPressed)),
           ],
         ),
       ],

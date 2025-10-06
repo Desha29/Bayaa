@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: deprecated_member_use
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -13,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final void Function()? onTap;
+  final void Function()? onSuffixTap;
   final bool readOnly;
   final int? maxLines;
   final int? maxLength;
@@ -30,6 +33,7 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.onChanged,
     this.onTap,
+    this.onSuffixTap,
     this.readOnly = false,
     this.maxLines = 1,
     this.maxLength,
@@ -38,19 +42,23 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
+            fontSize: 16,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
+          cursorColor: theme.colorScheme.primary,
+          cursorWidth: 2,
+
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
@@ -61,24 +69,28 @@ class CustomTextField extends StatelessWidget {
           readOnly: readOnly,
           maxLines: maxLines,
           maxLength: maxLength,
-          style: theme.textTheme.bodyMedium,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontSize: 16,
+            color: AppColors.kDarkChip,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: theme.textTheme.bodyMedium?.copyWith(
+              fontSize: 14,
               color: theme.colorScheme.onSurface.withOpacity(0.5),
             ),
             prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                    size: 20,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  )
+                ? Icon(prefixIcon, size: 18, color: theme.colorScheme.onSurface)
                 : null,
             suffixIcon: suffixIcon != null
-                ? Icon(
-                    suffixIcon,
-                    size: 20,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                ? IconButton(
+                    icon: Icon(
+                      suffixIcon,
+                      size: 20,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    onPressed: onSuffixTap,
                   )
                 : null,
             filled: true,
@@ -104,16 +116,11 @@ class CustomTextField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: theme.colorScheme.error,
-              ),
+              borderSide: BorderSide(color: theme.colorScheme.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: theme.colorScheme.error,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,

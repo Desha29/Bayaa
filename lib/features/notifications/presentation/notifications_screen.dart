@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
-
 import '../../../core/components/empty_state.dart';
 import '../../../core/components/section_card.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../dashboard/data/models/notify_model.dart';
-
 import 'widgets/filters_bar.dart';
 import 'widgets/notification_card.dart';
 import 'widgets/summary_row.dart';
 
-
-
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
+
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
 }
@@ -61,13 +58,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
     final total = _items.length;
     final unread = _items.where((e) => !e.read).length;
-    final urgent = _items
-        .where((e) => e.priority == NotifyPriority.high)
-        .length;
+    final urgent =
+        _items.where((e) => e.priority == NotifyPriority.high).length;
     final opened = total - unread;
 
     final visible = _items.where((e) {
@@ -86,115 +80,114 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                ScreenHeader(
-                  title: 'التنبيهات',
-                  subtitle: 'إدارة التنبيهات والإشعارات',
-                ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isMobile = constraints.maxWidth < 600;
+              final padding = isMobile ? 16.0 : 24.0;
+              final spacing = isMobile ? 12.0 : 20.0;
 
-                const SizedBox(height: 20),
+              return Padding(
+                padding: EdgeInsets.all(padding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Header
+                    ScreenHeader(
+                      title: 'التنبيهات',
+                      subtitle: 'إدارة التنبيهات والإشعارات',
+                    ),
+                    SizedBox(height: spacing),
 
-                // Summary
-                SectionCard(
-                  child: SummaryRow(
-                    total: total,
-                    opened: opened,
-                    urgent: urgent,
-                    unread: unread,
-                  ),
-                ),
+                    // Summary
+                    SectionCard(
+                      child: SummaryRow(
+                        total: total,
+                        opened: opened,
+                        urgent: urgent,
+                        unread: unread,
+                      ),
+                    ),
+                    SizedBox(height: spacing),
 
-                const SizedBox(height: 20),
+                    // Filters
+                    SectionCard(
+                      child: FiltersBar(
+                        filter: _filter,
+                        onFilterChanged: (f) => setState(() => _filter = f),
+                        total: total,
+                        unread: unread,
+                        urgent: urgent,
+                        onMarkAllRead: () {
+                          setState(() {
+                            for (final e in _items) {
+                              e.read = true;
+                            }
+                            _selected.clear();
+                          });
+                        },
+                        onDeleteSelected: _selected.isEmpty
+                            ? null
+                            : () {
+                                setState(() {
+                                  _items.removeWhere(
+                                    (e) => _selected.contains(e.id),
+                                  );
+                                  _selected.clear();
+                                });
+                              },
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
 
-                // Filters
-                SectionCard(
-                  child: FiltersBar(
-                    filter: _filter,
-                    onFilterChanged: (f) => setState(() => _filter = f),
-                    total: total,
-                    unread: unread,
-                    urgent: urgent,
-                    onMarkAllRead: () {
-                      setState(() {
-                        for (final e in _items) {
-                          e.read = true;
-                        }
-                        _selected.clear();
-                      });
-                    },
-                    onDeleteSelected: _selected.isEmpty
-                        ? null
-                        : () {
-                            setState(() {
-                              _items.removeWhere(
-                                (e) => _selected.contains(e.id),
-                              );
-                              _selected.clear();
-                            });
-                          },
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-              
-                Expanded(
-                  child: SectionCard(
-                    
-                    child: visible.isEmpty
-                        ? EmptyState()
-                        : ListView.separated(
-                            itemCount: visible.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (context, index) {
-                              final n = visible[index];
-                              final checked = _selected.contains(n.id);
-                              return NotificationCard(
-                                item: n,
-                                checked: checked,
-                                onToggleCheck: () {
-                                  setState(() {
-                                    if (checked) {
-                                      _selected.remove(n.id);
-                                    } else {
-                                      _selected.add(n.id);
-                                    }
-                                  });
+                    // Notifications list
+                    Expanded(
+                      child: SectionCard(
+                        child: visible.isEmpty
+                            ? EmptyState()
+                            : ListView.separated(
+                                padding: EdgeInsets.all(isMobile ? 8 : 12),
+                                itemCount: visible.length,
+                                separatorBuilder: (_, __) => SizedBox(
+                                  height: isMobile ? 8 : 12,
+                                ),
+                                itemBuilder: (context, index) {
+                                  final n = visible[index];
+                                  final checked = _selected.contains(n.id);
+                                  return NotificationCard(
+                                    item: n,
+                                    checked: checked,
+                                    onToggleCheck: () {
+                                      setState(() {
+                                        if (checked) {
+                                          _selected.remove(n.id);
+                                        } else {
+                                          _selected.add(n.id);
+                                        }
+                                      });
+                                    },
+                                    onDelete: () {
+                                      setState(() {
+                                        _items.removeWhere((e) => e.id == n.id);
+                                        _selected.remove(n.id);
+                                      });
+                                    },
+                                    onMarkReadToggle: () {
+                                      setState(() {
+                                        n.read = !n.read;
+                                      });
+                                    },
+                                  );
                                 },
-                                onDelete: () {
-                                  setState(() {
-                                    _items.removeWhere((e) => e.id == n.id);
-                                    _selected.remove(n.id);
-                                  });
-                                },
-                                onMarkReadToggle: () {
-                                  setState(() {
-                                    n.read = !n.read;
-                                  });
-                                },
-                              );
-                            },
-                          ),
-                  ),
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
     );
   }
 }
-
-
-
-
-
-
-

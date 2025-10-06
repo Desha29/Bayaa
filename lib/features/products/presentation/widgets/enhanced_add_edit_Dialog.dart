@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class EnhancedAddEditProductDialog extends StatefulWidget {
   final List<String> categories;
@@ -74,7 +75,7 @@ class _EnhancedAddEditProductDialogState
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey.shade50],
+            colors: [Colors.white, AppColors.surfaceColor],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -90,14 +91,14 @@ class _EnhancedAddEditProductDialogState
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xff0fa2a9).withOpacity(0.1),
+                      color: AppColors.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       widget.productToEdit == null
                           ? Icons.add_box_outlined
                           : Icons.edit_outlined,
-                      color: const Color(0xff0fa2a9),
+                      color: AppColors.primaryColor,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -123,7 +124,6 @@ class _EnhancedAddEditProductDialogState
                 ],
               ),
               const SizedBox(height: 24),
-
               // Form
               Flexible(
                 child: SingleChildScrollView(
@@ -168,9 +168,7 @@ class _EnhancedAddEditProductDialogState
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
-
               // Actions
               Row(
                 children: [
@@ -191,8 +189,8 @@ class _EnhancedAddEditProductDialogState
                     child: ElevatedButton(
                       onPressed: _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff0fa2a9),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: AppColors.primaryForeground,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -237,7 +235,7 @@ class _EnhancedAddEditProductDialogState
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
@@ -251,7 +249,7 @@ class _EnhancedAddEditProductDialogState
         keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: const Color(0xff0fa2a9)),
+          prefixIcon: Icon(icon, color: AppColors.primaryColor),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -267,7 +265,7 @@ class _EnhancedAddEditProductDialogState
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
@@ -285,11 +283,11 @@ class _EnhancedAddEditProductDialogState
                 ))
             .toList(),
         onChanged: (v) => setState(() => selectedCategory = v ?? selectedCategory),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           border: InputBorder.none,
           labelText: 'الفئة',
-          prefixIcon: Icon(Icons.category, color: Color(0xff0fa2a9)),
-          contentPadding: EdgeInsets.symmetric(
+          prefixIcon: Icon(Icons.category, color: AppColors.primaryColor),
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 16,
           ),

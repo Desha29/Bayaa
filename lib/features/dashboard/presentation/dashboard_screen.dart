@@ -11,7 +11,6 @@ import '../../stock/presentation/stock_screen.dart';
 import 'widgets/dashboard_home.dart';
 import 'widgets/side_bar.dart';
 
-
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -28,7 +27,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       icon: LucideIcons.layoutDashboard,
       title: "لوحة التحكم",
       screen: DashboardHome(
-        onCardTap: handleCardTap,
+        onCardTap: (selectedIndex) => handleCardTap(selectedIndex),
       ),
     ),
     SidebarItem(
@@ -78,7 +77,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               )
             : null,
 
-    
         drawer: isMobileOrTablet
             ? Drawer(
                 child: CustomSidebar(
@@ -94,7 +92,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               )
             : null,
 
-      
         body: Row(
           children: [
             if (!isMobileOrTablet)
@@ -109,7 +106,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
               ),
 
-              
             Expanded(
               child: Container(
                 color: AppColors.backgroundColor,
@@ -118,7 +114,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
-       
       ),
     );
   }

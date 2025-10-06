@@ -1,3 +1,4 @@
+import 'package:crazy_phone_pos/core/components/logo.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -99,6 +100,29 @@ class _DashboardHomeState extends State<DashboardHome>
                 subtitle: "مرحباً بك في نظام Crazy Phone لإدارة نقاط البيع",
               ),
               const SizedBox(height: 32),
+              Align(
+                alignment: Alignment.center,
+                child: Shimmer(
+                  enabled: true,
+                  child: CircleAvatar(
+                    radius: 100,
+                    backgroundColor: Colors.white,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.broken_image_outlined,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
               Expanded(
                 child: GridView.count(
                   crossAxisCount: crossAxisCount,
@@ -114,7 +138,7 @@ class _DashboardHomeState extends State<DashboardHome>
                         title: card["title"],
                         subtitle: card["subtitle"],
                         color: card["color"],
-                        onTap: () => widget.onCardTap(index),
+                        onTap: () => widget.onCardTap(_getTargetScreenIndex(index)),
                       ),
                     );
                   }),
@@ -132,5 +156,20 @@ class _DashboardHomeState extends State<DashboardHome>
       scale: _animations[index],
       child: FadeTransition(opacity: _animations[index], child: child),
     );
+  }
+
+  int _getTargetScreenIndex(int cardIndex) {
+    switch (cardIndex) {
+      case 0:
+        return 4; // التنبيهات
+      case 1:
+        return 3; // المنتجات الناقصة
+      case 2:
+        return 2; // المنتجات
+      case 3:
+        return 1; // المبيعات
+      default:
+        return 0;
+    }
   }
 }

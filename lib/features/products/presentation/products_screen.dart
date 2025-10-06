@@ -2,7 +2,6 @@ import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:flutter/material.dart';
 import '../../../core/components/anim_wrappers.dart';
 import '../../../core/constants/app_colors.dart';
-
 import 'widgets/enhanced_add_edit_dialog.dart';
 import 'widgets/product_filter_section.dart';
 import 'widgets/product_grid_view.dart';
@@ -16,10 +15,8 @@ class ProductsScreen extends StatefulWidget {
 
 class ProductsScreenState extends State<ProductsScreen> {
   final TextEditingController searchController = TextEditingController();
-
   String categoryFilter = 'الكل';
   String availabilityFilter = 'الكل';
-
   final List<String> categories = ['الكل', 'آيفون', 'سامسونج', 'هواوي'];
   final List<String> availabilities = ['الكل', 'متوفر', 'منخفض', 'غير متوفر'];
 
@@ -80,7 +77,6 @@ class ProductsScreenState extends State<ProductsScreen> {
         return false;
       if (availabilityFilter == 'متوفر' && !(qty > (p['min'] as int)))
         return false;
-
       if (q.isNotEmpty) {
         final low = q.toLowerCase();
         return p['name'].toString().toLowerCase().contains(low) ||
@@ -93,9 +89,9 @@ class ProductsScreenState extends State<ProductsScreen> {
   }
 
   Color statusColor(int qty, int min) {
-    if (qty == 0) return const Color(0xFFD14343);
-    if (qty <= min) return const Color(0xFFF0A23B);
-    return const Color(0xFF1E9A68);
+    if (qty == 0) return AppColors.errorColor;
+    if (qty <= min) return AppColors.warningColor;
+    return AppColors.successColor;
   }
 
   String statusText(int qty, int min) {
@@ -175,7 +171,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                           borderRadius: BorderRadius.circular(12),
                           side: const BorderSide(color: AppColors.borderColor),
                         ),
-                        color: AppColors.surfaceColor,
+                        color: Colors.white,
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: isMobile ? 12 : 20,
@@ -183,9 +179,9 @@ class ProductsScreenState extends State<ProductsScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.inventory_outlined,
-                                color: Color(0xff0fa2a9),
+                                color: AppColors.primaryColor,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
@@ -209,19 +205,19 @@ class ProductsScreenState extends State<ProductsScreen> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xff0fa2a9,
-                                  ).withOpacity(0.1),
+                                  color: AppColors.primaryColor.withOpacity(
+                                    0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   child: Text(
                                     '${filteredProducts.length}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
-                                      color: Color(0xff0fa2a9),
+                                      color: AppColors.primaryColor,
                                     ),
                                   ),
                                 ),
@@ -235,7 +231,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                     Expanded(
                       child: SubtleSwitcher(
                         child: KeyedSubtree(
-                          key: ValueKey<int>(filteredProducts.length),
+                          key: ValueKey(filteredProducts.length),
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),

@@ -94,32 +94,34 @@ class EnhancedProductCard extends StatelessWidget {
                 SizedBox(height: tightH ? 4 : 6),
 
                 // Header row
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          product['name'] ?? '---',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: titleSize,
-                            color: const Color(0xff1e293b),
+                Flexible(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            product['name'] ?? '---',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: titleSize,
+                              color: const Color(0xff1e293b),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: tightW ? 4 : 6),
-                    _StatusChip(
-                      text: statusText,
-                      color: statusColor,
-                      font: small,
-                    ),
-                  ],
+                      SizedBox(width: tightW ? 4 : 6),
+                      _StatusChip(
+                        text: statusText,
+                        color: statusColor,
+                        font: small,
+                      ),
+                    ],
+                  ),
                 ),
 
                 SizedBox(height: tightH ? 2 : 4),

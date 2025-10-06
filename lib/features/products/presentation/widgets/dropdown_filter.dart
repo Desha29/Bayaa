@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class DropDownFilter extends StatelessWidget {
   const DropDownFilter({
@@ -22,9 +23,13 @@ class DropDownFilter extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: AppColors.borderColor),
         boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: DropdownButtonFormField<String>(
@@ -33,9 +38,8 @@ class DropDownFilter extends StatelessWidget {
         isExpanded: true,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: const Color(0xff0fa2a9)),
+          prefixIcon: Icon(icon, color: AppColors.primaryColor),
           border: InputBorder.none,
-          // tighten to prevent fractional right overflow
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
         items: items

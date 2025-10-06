@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/components/logo.dart';
+import '../../dashboard/presentation/dashboard_screen.dart';
 import 'widgets/custom_button.dart';
 import 'widgets/custom_text_field.dart';
 
@@ -15,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool isPasswordVisible = false;
 
   @override
   void dispose() {
@@ -25,170 +29,154 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC), // خلفية فاتحة مثل الصورة
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo and Title
-              Column(
-                children: [
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(16),
+    return LayoutBuilder(
+      builder: (context, c) {
+        final isMobile = c.maxWidth < 520;
+        final pad = isMobile ? 14.0 : 24.0;
+        final cardWidth = isMobile ? c.maxWidth - 28 : 500.0;
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF8FAFC),
+          body: LayoutBuilder(
+            builder: (context, c2) {
+              final isShort = c2.maxHeight < 680;
+              final avatarRadius = isMobile ? (isShort ? 56.0 : 68.0) : (isShort ? 76.0 : 92.0);
+
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 720,
+                      minHeight: c2.maxHeight - pad * 2,
                     ),
-                    child: const Icon(
-                      LucideIcons.smartphone,
-                      size: 36,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Crazy Phone',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'نظام نقاط البيع الاحترافي',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // Login Form
-              Container(
-                width: 500, // عشان يفضل متناسق في الشاشات الكبيرة
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'تسجيل الدخول',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'أدخل بياناتك للوصول إلى النظام',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Username Field
-                      CustomTextField(
-                        controller: _usernameController,
-                        label: 'اسم المستخدم',
-                        prefixIcon: LucideIcons.user,
-                        textDirection: TextDirection.rtl,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'يرجى إدخال اسم المستخدم';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Password Field
-                      CustomTextField(
-                        controller: _passwordController,
-                        label: 'كلمة المرور',
-                        prefixIcon: LucideIcons.lock,
-                        obscureText: true,
-                        textDirection: TextDirection.rtl,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'يرجى إدخال كلمة المرور';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Login Button
-                      CustomButton(
-                        text: _isLoading
-                            ? 'جاري تسجيل الدخول...'
-                            : 'تسجيل الدخول',
-                        onPressed: _isLoading ? null : _handleLogin,
-                        isLoading: _isLoading,
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Demo Credentials
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Padding(
+                      padding: EdgeInsets.all(pad),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            'بيانات تجريبية:',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
+                          // Logo + titles
+                          Logo(isMobile: isMobile, avatarRadius: avatarRadius),
+                          SizedBox(height: isShort ? 16 : 24),
+
+                          // Form card
+                          Container(
+                            width: cardWidth,
+                            padding: EdgeInsets.all(isMobile ? 20 : 28),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'تسجيل الدخول',
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'أدخل بياناتك للوصول إلى النظام',
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: Colors.grey[600],
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  CustomTextField(
+                                    controller: _usernameController,
+                                    label: 'اسم المستخدم',
+                                    prefixIcon: LucideIcons.user,
+                                    textDirection: TextDirection.rtl,
+                                    validator: (v) => (v == null || v.trim().isEmpty)
+                                        ? 'يرجى إدخال اسم المستخدم'
+                                        : null,
+                                  ),
+                                  const SizedBox(height: 14),
+
+                                  CustomTextField(
+                                    controller: _passwordController,
+                                    label: 'كلمة المرور',
+                                    prefixIcon:
+                                        isPasswordVisible ? LucideIcons.unlock : LucideIcons.lock,
+                                    obscureText: !isPasswordVisible,
+                                    textDirection: TextDirection.rtl,
+                                    suffixIcon:
+                                        isPasswordVisible ? LucideIcons.eyeOff : LucideIcons.eye,
+                                    onSuffixTap: () =>
+                                        setState(() => isPasswordVisible = !isPasswordVisible),
+                                    validator: (v) =>
+                                        (v == null || v.isEmpty) ? 'يرجى إدخال كلمة المرور' : null,
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  CustomButton(
+                                    text: _isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول',
+                                    onPressed: _isLoading ? null : _handleLogin,
+                                    isLoading: _isLoading,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'اسم المستخدم: أي اسم',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          Text(
-                            'كلمة المرور: 123456',
-                            style: Theme.of(context).textTheme.bodySmall,
+
+                          const SizedBox(height: 16),
+
+                          // Footer
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      '© 2025 Crazy Phone. جميع الحقوق محفوظة',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(color: Colors.grey[600]),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Footer
-              Text(
-                '© 2025 Crazy Phone. جميع الحقوق محفوظة',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
-                textAlign: TextAlign.center,
-              ),
-            ],
+              );
+            },
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -196,14 +184,16 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 2), () async {
         setState(() => _isLoading = false);
 
         if (_passwordController.text == "123456") {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("تم تسجيل الدخول بنجاح ✅")),
           );
-          // TODO: Navigate to home/dashboard screen
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const DashboardScreen()),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("كلمة المرور غير صحيحة ❌")),

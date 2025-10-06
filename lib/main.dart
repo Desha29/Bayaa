@@ -1,4 +1,5 @@
 //import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
+import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; 
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       title: 'Crazy Phone POS',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: DashboardScreen(),
+      home:DashboardScreen(),
 
     
       locale: const Locale('ar'),
