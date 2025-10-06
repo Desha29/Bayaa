@@ -1,6 +1,6 @@
 import 'package:hive_flutter/adapters.dart';
 
-enum UserType { maneger, cashier }
+enum UserType { manager, cashier }
 
 class User {
   String username;
@@ -25,18 +25,18 @@ class UserTypeAdapter extends TypeAdapter<UserType> {
   UserType read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return UserType.maneger;
+        return UserType.manager;
       case 1:
         return UserType.cashier;
       default:
-        return UserType.maneger;
+        return UserType.manager;
     }
   }
 
   @override
   void write(BinaryWriter writer, UserType obj) {
     switch (obj) {
-      case UserType.maneger:
+      case UserType.manager:
         writer.writeByte(0);
         break;
       case UserType.cashier:

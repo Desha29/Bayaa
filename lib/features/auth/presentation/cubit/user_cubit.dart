@@ -8,9 +8,14 @@ class UserCubit extends Cubit<UserStates> {
   final UserRepositoryInt userRepository;
   static UserCubit get(context) => BlocProvider.of(context);
   late User currentUser;
+  bool _isPasswordVisible = false;
+
+  bool get isPasswordVisible => _isPasswordVisible;
+
   void getAllUsers() async {
     emit(UserLoading());
     final result = userRepository.getAllUsers();
+
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
       (users) => emit(UsersLoaded(users)),
@@ -59,5 +64,20 @@ class UserCubit extends Cubit<UserStates> {
         }
       },
     );
+  }
+
+  void togglePasswordVisibility() {
+    _isPasswordVisible = !_isPasswordVisible;
+    emit(PasswordVisibilityChanged(_isPasswordVisible));
+  }
+
+  void logout() {
+    currentUser = User(
+        name: '',
+        phone: '',
+        username: '',
+        password: '',
+        userType: UserType.cashier);
+    emit(UserInitial());
   }
 }

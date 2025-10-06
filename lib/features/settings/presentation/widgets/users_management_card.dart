@@ -1,67 +1,156 @@
+// users_management_card.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/components/section_card.dart';
-
+import '../../../../core/functions/messege.dart';
+import '../../../auth/presentation/cubit/user_cubit.dart';
+import '../../../auth/presentation/cubit/user_states.dart';
+import '../../../auth/data/models/user_model.dart';
 import '../../data/models/user_row.dart';
 import 'mobile_user_list.dart';
 import 'desktop_user_table.dart';
+import 'add_edit_user_dialog.dart';
 
 class UsersManagementCard extends StatelessWidget {
   const UsersManagementCard({
     super.key,
-    required this.users,
     required this.isMobile,
   });
 
-  final List<UserRow> users;
   final bool isMobile;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return SectionCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+    return BlocConsumer<UserCubit, UserStates>(
+      listener: (context, state) {
+        if (state is UserSuccess) {
+          MotionSnackBarSuccess(context, state.message);
+        } else if (state is UserFailure) {
+          MotionSnackBarError(context, state.error); // ✅ Fixed: was state.error
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is UserLoading;
+        List<UserRow> userRows = [];
+        List<User> usersData = [];
+
+        if (state is UsersLoaded) {
+          usersData = state.users as List<User>; // ✅ Already List<User>
+          userRows = _convertUsersToRows(usersData);
+        }
+
+        return SectionCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(
-                LucideIcons.users,
-                size: 18,
-                color: Colors.grey[700],
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'إدارة المستخدمين',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
+              Row(
+                children: [
+                  Icon(
+                    LucideIcons.users,
+                    size: 18,
+                    color: Colors.grey[700],
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 12),
-              FilledButton.icon(
-                onPressed: () {},
-                icon: const Icon(LucideIcons.plus, size: 18),
-                label: Text(isMobile ? 'إضافة' : 'إضافة مستخدم جديد'),
-                style: FilledButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 12 : 16,
-                    vertical: 12,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'إدارة المستخدمين',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  FilledButton.icon(
+                    onPressed: isLoading ? null : () => _showAddUserDialog(context),
+                    icon: const Icon(LucideIcons.plus, size: 18),
+                    label: Text(isMobile ? 'إضافة' : 'إضافة مستخدم جديد'),
+                    style: FilledButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 12 : 16,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              SizedBox(height: isMobile ? 12 : 16),
+              if (isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(48.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else if (userRows.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(48.0),
+                    child: Column(
+                      children: [
+                        Icon(
+                          LucideIcons.users,
+                          size: 48,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'لا يوجد مستخدمين',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                isMobile
+                    ? MobileUserList(
+                        users: userRows,
+                        usersData: usersData,
+                      )
+                    : DesktopUserTable(
+                        users: userRows,
+                        usersData: usersData,
+                      ),
             ],
           ),
-          SizedBox(height: isMobile ? 12 : 16),
-          if (isMobile)
-            MobileUserList(users: users)
-          else
-            DesktopUserTable(users: users),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  List<UserRow> _convertUsersToRows(List<User> users) {
+    return users.map((user) {
+      final isManager = user.userType == UserType.manager; // ✅ Fixed: was UserType.manager
+      return UserRow(
+        name: user.name,
+        email: user.username,
+        roleLabel: isManager ? 'مدير النظام' : 'كاشير',
+        roleTint: isManager
+            ? const Color(0xFFFEE2E2)
+            : const Color(0xFFE0F2FE),
+        roleColor: isManager
+            ? const Color(0xFFDC2626)
+            : const Color(0xFF0369A1),
+        active: true,
+        lastLogin: 'اليوم',
+      );
+    }).toList();
+  }
+
+  void _showAddUserDialog(BuildContext context) async {
+    final result = await showDialog<User>(
+      context: context,
+      builder: (dialogContext) => const AddEditUserDialog(),
+    );
+
+    if (result != null && context.mounted) {
+      context.read<UserCubit>().saveUser(result);
+    }
   }
 }

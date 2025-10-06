@@ -1,23 +1,27 @@
+// desktop_user_table.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
-
+import '../../../auth/data/models/user_model.dart';
+import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
-
+import 'add_edit_user_dialog.dart';
 
 class DesktopUserTable extends StatelessWidget {
   const DesktopUserTable({
     super.key,
     required this.users,
+    required this.usersData,
   });
 
   final List<UserRow> users;
+  final List<User> usersData;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-  
     return SizedBox(
       height: 400,
       child: DataTable2(
@@ -31,7 +35,7 @@ class DesktopUserTable extends StatelessWidget {
           color: Colors.grey[700],
           fontWeight: FontWeight.w700,
         ),
-        dataRowColor: WidgetStateProperty.resolveWith<Color?>(
+        dataRowColor: WidgetStateProperty.resolveWith(
           (states) {
             if (states.contains(WidgetState.hovered)) {
               return theme.colorScheme.primary.withOpacity(0.04);
@@ -62,7 +66,10 @@ class DesktopUserTable extends StatelessWidget {
             fixedWidth: 140,
           ),
         ],
-        rows: users.map((user) {
+        rows: List.generate(users.length, (index) {
+          final user = users[index];
+          final userData = usersData[index];
+
           return DataRow2(
             cells: [
               DataCell(
@@ -148,7 +155,7 @@ class DesktopUserTable extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () => _showEditDialog(context, userData),
                         icon: Icon(
                           LucideIcons.edit,
                           size: 18,
@@ -162,7 +169,7 @@ class DesktopUserTable extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () => _showDeleteDialog(context, userData),
                         icon: const Icon(
                           LucideIcons.trash2,
                           size: 18,
@@ -175,27 +182,50 @@ class DesktopUserTable extends StatelessWidget {
                           minHeight: 32,
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          LucideIcons.moreVertical,
-                          size: 18,
-                          color: Colors.grey[600],
-                        ),
-                        tooltip: 'المزيد',
-                        padding: const EdgeInsets.all(6),
-                        constraints: const BoxConstraints(
-                          minWidth: 32,
-                          minHeight: 32,
-                        ),
-                      ),
                     ],
                   ),
                 ),
               ),
             ],
           );
-        }).toList(),
+        }),
+      ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, User user) async {
+    final result = await showDialog<User>(
+      context: context,
+      builder: (dialogContext) => AddEditUserDialog(userToEdit: user),
+    );
+
+    if (result != null && context.mounted) {
+      context.read<UserCubit>().saveUser(user);
+    }
+  }
+
+  void _showDeleteDialog(BuildContext context, User user) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('تأكيد الحذف'),
+        content: Text('هل أنت متأكد من حذف المستخدم "${user.name}"؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              context.read<UserCubit>().deleteUser(user.username);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('حذف'),
+          ),
+        ],
       ),
     );
   }

@@ -85,7 +85,7 @@ class _StockScreenState extends State<StockScreen> {
       return true;
     }).toList();
 
-    // ✅ Responsive padding
+
     final isTablet = MediaQuery.of(context).size.width >= 600;
     final isDesktop = MediaQuery.of(context).size.width >= 1000;
     double horizontalPadding = 12;
@@ -98,9 +98,12 @@ class _StockScreenState extends State<StockScreen> {
         backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
           child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            
             slivers: [
               // Header + Filter + Title
               SliverToBoxAdapter(
+
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: horizontalPadding,

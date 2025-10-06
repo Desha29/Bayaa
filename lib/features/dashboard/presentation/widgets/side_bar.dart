@@ -220,7 +220,7 @@ class _SidebarHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final w = maxW.clamp(56.0, 320.0);
+
     final radius = compact ? 20.0 : 30.0; // slightly smaller
 
     return Column(

@@ -1,50 +1,40 @@
-
+// settings_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
-
-import '../data/models/user_row.dart';
+import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:crazy_phone_pos/features/settings/data/data_source/store_info_data_source.dart';
+import 'package:crazy_phone_pos/features/settings/presentation/cubit/settings_cubit.dart';
+import '../data/repository/settings_repository_imp.dart';
 import 'widgets/logout_warning_banner.dart';
 import 'widgets/store_info_card.dart';
 import 'widgets/users_management_card.dart';
-
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Mock store data
-    final store = {
-      'name': 'Crazy Phone',
-      'phone': '966+ 11 123 4567',
-      'email': 'info@crazyphone.sa',
-      'address': 'شارع الملك فهد، الرياض، المملكة العربية السعودية',
-      'vat': '123456789012345',
-    };
-
-    // Mock users data
-    final users = <UserRow>[
-      UserRow(
-        name: 'أحمد محمد',
-        email: 'ahmed@crazyphone.sa',
-        roleLabel: 'مدير النظام',
-        roleTint: const Color(0xFFFEE2E2),
-        roleColor: const Color(0xFFDC2626),
-        active: true,
-        lastLogin: '١٤٥٣/٢/٣',
+    final userCubit = context.read<UserCubit>();
+    
+    return BlocProvider(
+      create: (context) => SettingsCubit(
+        userCubit: userCubit,
+        storeRepository: StoreInfoRepository(
+          dataSource: StoreInfoDataSource(),
+        ),
       ),
-      UserRow(
-        name: 'فاطمة علي',
-        email: 'fatima@crazyphone.sa',
-        roleLabel: 'كاشير',
-        roleTint: const Color(0xFFE0F2FE),
-        roleColor: const Color(0xFF0369A1),
-        active: true,
-        lastLogin: '١٤٥٣/٢/٣',
-      ),
-    ];
+      child: const _SettingsScreenContent(),
+    );
+  }
+}
 
+class _SettingsScreenContent extends StatelessWidget {
+  const _SettingsScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -60,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ScreenHeader(
+                    const ScreenHeader(
                       title: 'الإعدادات',
                       subtitle: 'إعدادات النظام وإدارة المستخدمين',
                     ),
@@ -70,15 +60,9 @@ class SettingsScreen extends StatelessWidget {
                     Expanded(
                       child: ListView(
                         children: [
-                          StoreInfoCard(
-                            store: store,
-                            isMobile: isMobile,
-                          ),
+                          StoreInfoCard(isMobile: isMobile),
                           SizedBox(height: isMobile ? 12 : 16),
-                          UsersManagementCard(
-                            users: users,
-                            isMobile: isMobile,
-                          ),
+                          UsersManagementCard(isMobile: isMobile),
                         ],
                       ),
                     ),

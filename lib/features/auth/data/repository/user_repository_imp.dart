@@ -13,7 +13,7 @@ class UserRepositoryImp extends UserRepositoryInt {
       userDataSource.deleteUser(username);
       return Right(null);
     } on Exception catch (e) {
-      return Left(Failure("Failed to delete user"));
+      return Left(CacheFailure("Failed to delete user"));
     }
   }
 
@@ -23,7 +23,7 @@ class UserRepositoryImp extends UserRepositoryInt {
       final users = userDataSource.getAllUsers();
       return Right(users);
     } on Exception catch (e) {
-      return Left(Failure("Failed to get users"));
+      return Left(CacheFailure("Failed to get users"));
     }
   }
 
@@ -34,10 +34,10 @@ class UserRepositoryImp extends UserRepositoryInt {
       if (user != null) {
         return Right(user);
       } else {
-        return Left(Failure("User not found"));
+        return Left(CacheFailure("User not found"));
       }
     } on Exception catch (e) {
-      return Left(Failure("Failed to get user"));
+      return Left(CacheFailure("Failed to get user"));
     }
   }
 
@@ -47,7 +47,7 @@ class UserRepositoryImp extends UserRepositoryInt {
       userDataSource.saveUser(user);
       return Right(null);
     } on Exception catch (e) {
-      return Left(Failure("Failed to save user"));
+      return Left(CacheFailure("Failed to save user"));
     }
   }
 }

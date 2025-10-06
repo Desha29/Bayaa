@@ -16,6 +16,8 @@ class UserDataSource {
     }
   }
 
+
+
   User? getUser(String username) {
     try {
       return _userBox.get(username);
@@ -26,6 +28,8 @@ class UserDataSource {
 
   List<User> getAllUsers() {
     try {
+      print(_userBox.values.cast<User>().toList().first.password);
+      print(_userBox.values.cast<User>().toList().first.username);
       return _userBox.values.cast<User>().toList();
     } on Exception {
       rethrow;

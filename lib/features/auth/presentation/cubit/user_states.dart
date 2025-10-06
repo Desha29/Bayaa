@@ -18,3 +18,8 @@ class UsersLoaded extends UserStates {
   final List users;
   UsersLoaded(this.users);
 }
+
+class PasswordVisibilityChanged extends UserStates {
+  final bool isVisible;
+  PasswordVisibilityChanged(this.isVisible);
+}
