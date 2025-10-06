@@ -1,41 +1,77 @@
+
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
+
+
+
 import 'package:flutter/material.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+
 import '../../../core/components/logo.dart';
+
+import '../../../core/di/dependency_injection.dart';
 import '../../dashboard/presentation/dashboard_screen.dart';
+import '../data/repository/user_repository_imp.dart';
+import 'cubit/user_cubit.dart';
+import 'cubit/user_states.dart';
 import 'widgets/custom_button.dart';
 import 'widgets/custom_text_field.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreen extends StatelessWidget {
+  LoginScreen({super.key});
+
   final _formKey = GlobalKey<FormState>();
+
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
+
   bool isPasswordVisible = false;
 
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+
 
   @override
   Widget build(BuildContext context) {
+
     return LayoutBuilder(
       builder: (context, c) {
         final isMobile = c.maxWidth < 520;
         final pad = isMobile ? 14.0 : 24.0;
         final cardWidth = isMobile ? c.maxWidth - 28 : 500.0;
 
-        return Scaffold(
+        return BlocProvider(
+      create: (context) =>
+          UserCubit(userRepository: getIt<UserRepositoryImp>()),
+      child: BlocListener<UserCubit, UserStates>(
+        listener: (context, state) {
+          if (state is UserFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.error),
+                backgroundColor: Colors.red,
+              ),
+            );
+          } else if (state is UserSuccess) {
+            if (state.message == "Login successful") {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardScreen(),
+                  ));
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          }
+        },
+        child: 
+        Scaffold(
           backgroundColor: const Color(0xFFF8FAFC),
           body: LayoutBuilder(
             builder: (context, c2) {
@@ -126,18 +162,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                     textDirection: TextDirection.rtl,
                                     suffixIcon:
                                         isPasswordVisible ? LucideIcons.eyeOff : LucideIcons.eye,
-                                    onSuffixTap: () =>
-                                        setState(() => isPasswordVisible = !isPasswordVisible),
+                                    onSuffixTap: () {
+                                      
+                                    },
+                                        
                                     validator: (v) =>
                                         (v == null || v.isEmpty) ? 'يرجى إدخال كلمة المرور' : null,
                                   ),
                                   const SizedBox(height: 20),
 
-                                  CustomButton(
-                                    text: _isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول',
-                                    onPressed: _isLoading ? null : _handleLogin,
-                                    isLoading: _isLoading,
-                                  ),
+                                 BlocBuilder<UserCubit, UserStates>(
+                            builder: (context, state) => CustomButton(
+                              text: (state is UserLoading)
+                                  ? 'جاري تسجيل الدخول...'
+                                  : 'تسجيل الدخول',
+                              onPressed: (state is UserLoading)
+                                  ? null
+                                  : () {
+                                      _handleLogin(context);
+                                    },
+                              isLoading: (state is UserLoading),
+                            ),
+                          ),
                                 ],
                               ),
                             ),
@@ -168,38 +214,32 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ],
+
                       ),
                     ),
                   ),
+
                 ),
               );
             },
+
           ),
+        ),
+      ),
         );
       },
     );
   }
 
-  void _handleLogin() {
+  void _handleLogin(context) {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
 
-      Future.delayed(const Duration(seconds: 2), () async {
-        setState(() => _isLoading = false);
 
-        if (_passwordController.text == "123456") {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("تم تسجيل الدخول بنجاح ✅")),
-          );
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const DashboardScreen()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("كلمة المرور غير صحيحة ❌")),
-          );
-        }
-      });
+      UserCubit.get(context).login(
+        _usernameController.text.trim(),
+        _passwordController.text,
+      );
+
     }
   }
 }
