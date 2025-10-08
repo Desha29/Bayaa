@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 
               } else if (state is UserSuccess) {
                 MotionSnackBarSuccess(context, state.message);
-                if (state.message == "Login successful") {
+                if (state.message == "تم تسجيل الدخول بنجاح") {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(

@@ -7,5 +7,6 @@ abstract class UserRepositoryInt {
   Either<Failure, User> getUser(String username);
   Either<Failure, List<User>> getAllUsers();
   Either<Failure, void> saveUser(User user);
+  Either<Failure, void> updateUser(User user);
   Either<Failure, void> deleteUser(String username);
 }

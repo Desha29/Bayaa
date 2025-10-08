@@ -15,31 +15,47 @@ class UserCubit extends Cubit<UserStates> {
   void getAllUsers() async {
     emit(UserLoading());
     final result = userRepository.getAllUsers();
-
+    print(result.toString());
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
       (users) => emit(UsersLoaded(users)),
     );
   }
 
-  void deleteUser(String username) async {
-    emit(UserLoading());
-    final result = userRepository.deleteUser(username);
-    result.fold(
-      (failure) => emit(UserFailure(failure.message)),
-      (_) => emit(UserSuccess("User deleted successfully")),
-    );
-  }
+ void deleteUser(String username) async {
+  emit(UserLoading());
+  final result = userRepository.deleteUser(username);
+  result.fold(
+    (failure) => emit(UserFailure(failure.message)),
+    (_) {
+      emit(UserSuccess("تم حذف المستخدم بنجاح"));
+      getAllUsers(); 
+    },
+  );
+}
 
-  void saveUser(User user) async {
-    emit(UserLoading());
-    final result = userRepository.saveUser(user);
-    result.fold(
-      (failure) => emit(UserFailure(failure.message)),
-      (_) => emit(UserSuccess("User saved successfully")),
-    );
-  }
-
+void saveUser(User user) async {
+  emit(UserLoading());
+  final result = userRepository.saveUser(user);
+  result.fold(
+    (failure) => emit(UserFailure(failure.message)),
+    (_) {
+      emit(UserSuccess("تم إضافة المستخدم بنجاح"));
+      getAllUsers(); 
+    },
+  );
+}
+void updateUser(User user) async {
+  emit(UserLoading());
+  final result = userRepository.updateUser(user);
+  result.fold(
+    (failure) => emit(UserFailure(failure.message)),
+    (_) {
+      emit(UserSuccess("تم تحديث المستخدم بنجاح"));
+      getAllUsers(); 
+    },
+  );
+}
   void getUser(String username) async {
     emit(UserLoading());
     final result = userRepository.getUser(username);
@@ -58,9 +74,9 @@ class UserCubit extends Cubit<UserStates> {
       (user) {
         if (user.password == password) {
           currentUser = user;
-          emit(UserSuccess("Login successful"));
+          emit(UserSuccess("تم تسجيل الدخول بنجاح"));
         } else {
-          emit(UserFailure("Invalid password"));
+          emit(UserFailure("كلمة المرور غير صحيحة"));
         }
       },
     );

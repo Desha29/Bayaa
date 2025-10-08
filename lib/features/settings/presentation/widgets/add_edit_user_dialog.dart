@@ -61,8 +61,17 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
       password: passwordCtrl.text.trim(),
       userType: selectedUserType,
     );
-    getIt<UserCubit>().saveUser(user);
-    MotionSnackBarSuccess(context, 'تم حفظ المستخدم بنجاح');
+
+    if (widget.userToEdit == null) {
+      getIt<UserCubit>().saveUser(user);
+      MotionSnackBarSuccess(context, 'تم إضافة المستخدم بنجاح');
+      getIt<UserCubit>().getAllUsers(); 
+    } else {
+      getIt<UserCubit>().updateUser(user);
+      MotionSnackBarSuccess(context, 'تم تعديل المستخدم بنجاح');
+    }
+
+    
      
 
     Navigator.of(context).pop(user);

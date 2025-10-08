@@ -14,7 +14,17 @@ class UserDataSource {
     }
   }
 
-
+void updateUser(User user) {
+  try {
+    if (_userBox.containsKey(user.username)) {
+      _userBox.put(user.username, user);
+    } else {
+      throw Exception('User not found');
+    }
+  } on Exception {
+    rethrow;
+  }
+}
 
   User? getUser(String username) {
     try {

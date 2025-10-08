@@ -9,22 +9,17 @@ import 'package:hive_flutter/adapters.dart';
 import 'core/constants/bloc_observer.dart';
 import 'core/di/dependency_injection.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/data/data_sources/user_data_source.dart';
+
 import 'features/auth/data/models/user_model.dart';
-import 'features/auth/data/repository/user_repository_imp.dart';
+
 import 'features/settings/data/models/store_info_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
   await Hive.initFlutter();
-  //  // 🚨 DELETE CORRUPTED BOX - Run once, then remove this block
-  // try {
-  //   await Hive.deleteBoxFromDisk('storeBox');
-  //   print('✅ Deleted corrupted storeBox');
-  // } catch (e) {
-  //   print('⚠️ storeBox already clean');
-  // }
+ 
+
   // Register Adapters
   Hive.registerAdapter(UserTypeAdapter());
   Hive.registerAdapter(UserAdapter());

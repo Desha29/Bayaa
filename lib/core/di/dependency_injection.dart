@@ -3,7 +3,7 @@ import 'package:crazy_phone_pos/features/auth/data/repository/user_repository_im
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../features/settings/presentation/cubit/settings_cubit.dart';
+
 
 final getIt = GetIt.instance;
 

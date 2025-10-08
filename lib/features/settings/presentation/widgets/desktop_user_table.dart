@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../core/functions/messege.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
@@ -48,8 +49,8 @@ class DesktopUserTable extends StatelessWidget {
           horizontalInside: BorderSide(color: Colors.grey[200]!, width: 1),
         ),
         columns: const [
-          DataColumn2(label: Text('الاسم'), size: ColumnSize.L),
-          DataColumn2(label: Text('البريد الإلكتروني'), size: ColumnSize.L),
+          DataColumn2(label: Center(child: Text('الاسم')), size: ColumnSize.L),
+          DataColumn2(label: Center(child: Text('اسم المستخدم')), size: ColumnSize.L),
           DataColumn2(
             label: Center(child: Text('الدور')),
             size: ColumnSize.M,
@@ -74,19 +75,23 @@ class DesktopUserTable extends StatelessWidget {
           return DataRow2(
             cells: [
               DataCell(
-                Text(
-                  user.name,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
+                Center(
+                  child: Text(
+                    user.name,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               DataCell(
-                Text(
-                  user.email,
-                  style: theme.textTheme.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
+                Center(
+                  child: Text(
+                    user.email,
+                    style: theme.textTheme.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               DataCell(
@@ -99,7 +104,8 @@ class DesktopUserTable extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: user.roleTint,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: user.roleColor.withOpacity(0.3)),
+                      border:
+                          Border.all(color: user.roleColor.withOpacity(0.3)),
                     ),
                     child: Text(
                       user.roleLabel,
@@ -156,7 +162,10 @@ class DesktopUserTable extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: getIt<UserCubit>().currentUser.userType==UserType.cashier ? null :()=> _showEditDialog(context, userData),
+                        onPressed: getIt<UserCubit>().currentUser.userType ==
+                                UserType.cashier
+                            ? null
+                            : () => _showEditDialog(context, userData),
                         icon: Icon(
                           LucideIcons.edit,
                           size: 18,
@@ -170,7 +179,10 @@ class DesktopUserTable extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: getIt<UserCubit>().currentUser.userType==UserType.cashier ? null :()=> _showDeleteDialog(context, userData),
+                        onPressed: getIt<UserCubit>().currentUser.userType ==
+                                UserType.cashier
+                            ? null
+                            : () => _showDeleteDialog(context, userData),
                         icon: const Icon(
                           LucideIcons.trash2,
                           size: 18,
@@ -195,14 +207,12 @@ class DesktopUserTable extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context, User user) async {
-    final result = await showDialog<User>(
+    await showDialog<User>(
       context: context,
       builder: (dialogContext) => AddEditUserDialog(userToEdit: user),
     );
 
-    if (result != null && context.mounted) {
-      context.read<UserCubit>().saveUser(user);
-    }
+ 
   }
 
   void _showDeleteDialog(BuildContext context, User user) {

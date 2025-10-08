@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/di/dependency_injection.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
@@ -117,15 +118,12 @@ class MobileUserList extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context, User user) async {
-  final result = await showDialog<User>(
+ await showDialog<User>(
     context: context,
     builder: (dialogContext) => AddEditUserDialog(userToEdit: user),
   );
 
-  if (result != null && context.mounted) {
-    // ✅ Fixed: Use updateUser instead of saveUser
-    context.read<UserCubit>().saveUser(user);
-  }
+ 
 }
 
 

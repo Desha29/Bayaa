@@ -21,6 +21,9 @@ class UserRepositoryImp extends UserRepositoryInt {
   Either<Failure, List<User>> getAllUsers() {
     try {
       final users = userDataSource.getAllUsers();
+      for (var user in users) {
+        print('User: ${user.username}, Password: ${user.password}');
+      }
       return Right(users);
     } on Exception catch (e) {
       return Left(CacheFailure("Failed to get users"));
@@ -50,4 +53,14 @@ class UserRepositoryImp extends UserRepositoryInt {
       return Left(CacheFailure("Failed to save user"));
     }
   }
+  @override
+Either<Failure, void> updateUser(User user) {
+  try {
+    userDataSource.updateUser(user);
+    return const Right(null); 
+  } on Exception catch (e) {
+    return Left(CacheFailure("Failed to update user: ${e.toString()}"));
+  }
+}
+
 }
