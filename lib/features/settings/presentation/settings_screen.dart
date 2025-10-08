@@ -6,6 +6,8 @@ import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:crazy_phone_pos/features/settings/data/data_source/store_info_data_source.dart';
 import 'package:crazy_phone_pos/features/settings/presentation/cubit/settings_cubit.dart';
+import '../../../core/di/dependency_injection.dart';
+import '../../auth/data/repository/user_repository_imp.dart';
 import '../data/repository/settings_repository_imp.dart';
 import 'widgets/logout_warning_banner.dart';
 import 'widgets/store_info_card.dart';
@@ -16,15 +18,20 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userCubit = context.read<UserCubit>();
     
-    return BlocProvider(
-      create: (context) => SettingsCubit(
-        userCubit: userCubit,
+    
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<UserCubit>.value(
+          value:  getIt<UserCubit>()..getAllUsers() ),
+        BlocProvider( create: (context) => SettingsCubit(
+        userCubit: getIt<UserCubit>(),
         storeRepository: StoreInfoRepository(
           dataSource: StoreInfoDataSource(),
         ),
-      ),
+      ),)
+      ],
+     
       child: const _SettingsScreenContent(),
     );
   }

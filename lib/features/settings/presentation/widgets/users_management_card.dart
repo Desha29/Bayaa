@@ -1,4 +1,5 @@
 // users_management_card.dart
+import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -29,16 +30,16 @@ class UsersManagementCard extends StatelessWidget {
         if (state is UserSuccess) {
           MotionSnackBarSuccess(context, state.message);
         } else if (state is UserFailure) {
-          MotionSnackBarError(context, state.error); // ✅ Fixed: was state.error
+          MotionSnackBarError(context, state.error); 
         }
       },
       builder: (context, state) {
-        final isLoading = state is UserLoading;
+     
         List<UserRow> userRows = [];
         List<User> usersData = [];
 
         if (state is UsersLoaded) {
-          usersData = state.users as List<User>; // ✅ Already List<User>
+          usersData = state.users as List<User>; 
           userRows = _convertUsersToRows(usersData);
         }
 
@@ -65,7 +66,7 @@ class UsersManagementCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   FilledButton.icon(
-                    onPressed: isLoading ? null : () => _showAddUserDialog(context),
+                    onPressed: getIt<UserCubit>().currentUser.userType==UserType.cashier ? null : () => _showAddUserDialog(context),
                     icon: const Icon(LucideIcons.plus, size: 18),
                     label: Text(isMobile ? 'إضافة' : 'إضافة مستخدم جديد'),
                     style: FilledButton.styleFrom(
@@ -78,14 +79,8 @@ class UsersManagementCard extends StatelessWidget {
                 ],
               ),
               SizedBox(height: isMobile ? 12 : 16),
-              if (isLoading)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(48.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              else if (userRows.isEmpty)
+            
+               if (userRows.isEmpty)
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(48.0),

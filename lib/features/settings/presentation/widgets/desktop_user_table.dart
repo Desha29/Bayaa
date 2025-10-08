@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
+import '../../../../core/di/dependency_injection.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
@@ -155,7 +156,7 @@ class DesktopUserTable extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () => _showEditDialog(context, userData),
+                        onPressed: getIt<UserCubit>().currentUser.userType==UserType.cashier ? null :()=> _showEditDialog(context, userData),
                         icon: Icon(
                           LucideIcons.edit,
                           size: 18,
@@ -169,7 +170,7 @@ class DesktopUserTable extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () => _showDeleteDialog(context, userData),
+                        onPressed: getIt<UserCubit>().currentUser.userType==UserType.cashier ? null :()=> _showDeleteDialog(context, userData),
                         icon: const Icon(
                           LucideIcons.trash2,
                           size: 18,

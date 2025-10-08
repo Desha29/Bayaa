@@ -1,4 +1,5 @@
 // add_edit_user_dialog.dart
+import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
@@ -60,7 +61,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
       password: passwordCtrl.text.trim(),
       userType: selectedUserType,
     );
-    UserCubit.get(context).saveUser(user);
+    getIt<UserCubit>().saveUser(user);
     MotionSnackBarSuccess(context, 'تم حفظ المستخدم بنجاح');
      
 

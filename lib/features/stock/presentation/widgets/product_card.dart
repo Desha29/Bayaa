@@ -1,3 +1,7 @@
+import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
+import 'package:crazy_phone_pos/core/functions/messege.dart';
+import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
+import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/responsive_helper.dart';
 import 'priorty_chip.dart';
@@ -81,10 +85,10 @@ class _ProductCardState extends State<ProductCard> {
                 color: _isHovered
                     ? Colors.blueAccent.withOpacity(0.5)
                     : isOut
-                    ? Colors.red.withOpacity(0.3)
-                    : isLow
-                    ? Colors.orange.withOpacity(0.3)
-                    : Colors.grey.withOpacity(0.2),
+                        ? Colors.red.withOpacity(0.3)
+                        : isLow
+                            ? Colors.orange.withOpacity(0.3)
+                            : Colors.grey.withOpacity(0.2),
                 width: 2,
               ),
               boxShadow: [
@@ -170,7 +174,6 @@ class _ProductCardState extends State<ProductCard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Flexible(
-                         
                             child: _buildInfoRow(
                               context,
                               'الكمية الحالية:',
@@ -178,13 +181,12 @@ class _ProductCardState extends State<ProductCard> {
                               isOut
                                   ? const Color(0xFFEF4444)
                                   : (isLow
-                                        ? const Color(0xFFF59E0B)
-                                        : const Color(0xFF10B981)),
+                                      ? const Color(0xFFF59E0B)
+                                      : const Color(0xFF10B981)),
                               bold: true,
                               valueSize: 16,
                             ),
                           ),
-                   
                           Flexible(
                             child: _buildInfoRow(
                               context,
@@ -193,7 +195,6 @@ class _ProductCardState extends State<ProductCard> {
                               Colors.black,
                             ),
                           ),
-                     
                           Flexible(
                             child: _buildInfoRow(
                               context,
@@ -219,7 +220,10 @@ class _ProductCardState extends State<ProductCard> {
                       const SizedBox(width: 6),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: widget.onRestock,
+                          onPressed: getIt<UserCubit>().currentUser.userType ==
+                                  UserType.manager
+                              ? widget.onRestock
+                              : disableMesg,
                           icon: const Icon(Icons.refresh, size: 16),
                           label: const FittedBox(
                             fit: BoxFit.scaleDown,
@@ -247,6 +251,10 @@ class _ProductCardState extends State<ProductCard> {
         ),
       ),
     );
+  }
+
+  void disableMesg() {
+    MotionSnackBarWarning(context, "لا يوجد لديك صلاحيات");
   }
 
   Widget _buildInfoRow(

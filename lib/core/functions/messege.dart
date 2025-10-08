@@ -3,7 +3,10 @@ import 'package:motion_toast/motion_toast.dart';
 
 void MotionSnackBarSuccess(BuildContext context, String message) {
   MotionToast.success(
-    title: Text(message),
+  title: Text(
+      message,
+      style: TextStyle(fontWeight: FontWeight.w700),
+    ),
     toastDuration: Duration(seconds: 2),
     toastAlignment: Alignment.bottomRight,
     animationType: AnimationType.slideInFromLeft,
@@ -16,7 +19,10 @@ void MotionSnackBarSuccess(BuildContext context, String message) {
 
 void MotionSnackBarError(BuildContext context, String message) {
   MotionToast.error(
-    title: Text(message),
+    title: Text(
+      message,
+      style: TextStyle(fontWeight: FontWeight.w700),
+    ),
     toastDuration: Duration(seconds: 2),
     toastAlignment: Alignment.bottomRight,
     animationType: AnimationType.slideInFromLeft,
@@ -29,7 +35,10 @@ void MotionSnackBarError(BuildContext context, String message) {
 
 void MotionSnackBarInfo(BuildContext context, String message) {
   MotionToast.info(
-    title: Text(message),
+     title: Text(
+      message,
+      style: TextStyle(fontWeight: FontWeight.w700),
+    ),
     toastDuration: Duration(seconds: 2),
     toastAlignment: Alignment.bottomRight,
     animationType: AnimationType.slideInFromLeft,
@@ -42,7 +51,10 @@ void MotionSnackBarInfo(BuildContext context, String message) {
 
 void MotionSnackBarWarning(BuildContext context, String message) {
   MotionToast.warning(
-    title: Text(message),
+    title: Text(
+      message,
+      style: TextStyle(fontWeight: FontWeight.w700),
+    ),
     toastDuration: Duration(seconds: 2),
     toastAlignment: Alignment.bottomRight,
     animationType: AnimationType.slideInFromLeft,

@@ -6,11 +6,9 @@ class UserDataSource {
   final Box _userBox = Hive.box<User>('userBox');
   void saveUser(User user) {
     try {
-      if (_userBox.containsKey(user.username)) {
-        throw Exception('User already exists');
-      } else {
+      
         _userBox.put(user.username, user);
-      }
+      
     } on Exception {
       rethrow;
     }

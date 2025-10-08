@@ -69,35 +69,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      // Provide UserCubit at the app level
-      create: (context) => UserCubit(
-        userRepository: UserRepositoryImp(
-          userDataSource: UserDataSource(),
-        )..getAllUsers(),
-      ),
-      child: MaterialApp(
-        title: 'Crazy Phone POS',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        home: const LoginScreen(),
-        locale: const Locale('ar'),
-        supportedLocales: const [
-          Locale('ar'), // العربية
-          Locale('en'), // الإنجليزية
-        ],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        builder: (context, child) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: child!,
-          );
-        },
-      ),
+    return MaterialApp(
+      
+      title: 'Crazy Phone POS',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      home: const LoginScreen(),
+      locale: const Locale('ar'),
+      supportedLocales: const [
+        Locale('ar'), // العربية
+        Locale('en'), // الإنجليزية
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
     );
   }
 }
