@@ -1,9 +1,12 @@
+import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../cubit/product_cubit.dart';
 
 class EnhancedAddEditProductDialog extends StatefulWidget {
   final List<String> categories;
-  final Map<String, dynamic>? productToEdit;
+  final Product? productToEdit;
 
   const EnhancedAddEditProductDialog({
     super.key,
@@ -30,13 +33,12 @@ class _EnhancedAddEditProductDialogState
   void initState() {
     super.initState();
     final p = widget.productToEdit;
-    codeCtrl = TextEditingController(text: p?['code'] ?? '');
-    nameCtrl = TextEditingController(text: p?['name'] ?? '');
-    barcodeCtrl = TextEditingController(text: p?['barcode'] ?? '');
-    priceCtrl = TextEditingController(text: p?['price']?.toString() ?? '');
-    qtyCtrl = TextEditingController(text: p?['qty']?.toString() ?? '');
-    minCtrl = TextEditingController(text: p?['min']?.toString() ?? '');
-    selectedCategory = p?['category'] ??
+    nameCtrl = TextEditingController(text: p?.name ?? '');
+    barcodeCtrl = TextEditingController(text: p?.barcode ?? '');
+    priceCtrl = TextEditingController(text: p?.price.toString() ?? '');
+    qtyCtrl = TextEditingController(text: p?.quantity.toString() ?? '');
+    minCtrl = TextEditingController(text: p?.minQuantity.toString() ?? '');
+    selectedCategory = p?.category ??
         (widget.categories.isNotEmpty ? widget.categories.first : '');
   }
 
@@ -52,18 +54,15 @@ class _EnhancedAddEditProductDialogState
   }
 
   void _submit() {
-    if (codeCtrl.text.trim().isEmpty || nameCtrl.text.trim().isEmpty) return;
-    final Map<String, dynamic> out = {
-      'code': codeCtrl.text.trim(),
-      'name': nameCtrl.text.trim(),
-      'barcode': barcodeCtrl.text.trim(),
-      'price': int.tryParse(priceCtrl.text) ?? 0,
-      'qty': int.tryParse(qtyCtrl.text) ?? 0,
-      'min': int.tryParse(minCtrl.text) ?? 0,
-      'category': selectedCategory,
-      'createdAt': widget.productToEdit?['createdAt'] ?? DateTime.now(),
-    };
-    Navigator.of(context).pop(out);
+    getIt<ProductCubit>().saveProduct(Product(
+      name: nameCtrl.text.trim(),
+      barcode: barcodeCtrl.text.trim(),
+      price: double.tryParse(priceCtrl.text.trim()) ?? 0.0,
+      quantity: int.tryParse(qtyCtrl.text.trim()) ?? 0,
+      minQuantity: int.tryParse(minCtrl.text.trim()) ?? 0,
+      category: selectedCategory,
+    ));
+    Navigator.of(context).pop();
   }
 
   @override
@@ -134,31 +133,43 @@ class _EnhancedAddEditProductDialogState
                         children: [
                           if (isWide) ...[
                             _buildTwoColumnRow([
-                              _buildTextField(codeCtrl, 'كود المنتج *', Icons.qr_code),
-                              _buildTextField(nameCtrl, 'اسم المنتج *', Icons.inventory_2),
+                              _buildTextField(
+                                  nameCtrl, 'اسم المنتج *', Icons.inventory_2),
+                              const SizedBox.shrink(),
                             ]),
                             const SizedBox(height: 16),
                             _buildTwoColumnRow([
-                              _buildTextField(barcodeCtrl, 'رقم الباركود', Icons.qr_code_scanner),
-                              _buildTextField(priceCtrl, 'السعر بالجنيه المصري *', Icons.attach_money, TextInputType.number),
+                              _buildTextField(barcodeCtrl, 'رقم الباركود',
+                                  Icons.qr_code_scanner),
+                              _buildTextField(
+                                  priceCtrl,
+                                  'السعر بالجنيه المصري *',
+                                  Icons.attach_money,
+                                  TextInputType.number),
                             ]),
                             const SizedBox(height: 16),
                             _buildTwoColumnRow([
-                              _buildTextField(qtyCtrl, 'الكمية المتوفرة *', Icons.inventory, TextInputType.number),
-                              _buildTextField(minCtrl, 'الحد الأدنى للمخزون', Icons.trending_down, TextInputType.number),
+                              _buildTextField(qtyCtrl, 'الكمية المتوفرة *',
+                                  Icons.inventory, TextInputType.number),
+                              _buildTextField(minCtrl, 'الحد الأدنى للمخزون',
+                                  Icons.trending_down, TextInputType.number),
                             ]),
                           ] else ...[
-                            _buildTextField(codeCtrl, 'كود المنتج *', Icons.qr_code),
                             const SizedBox(height: 16),
-                            _buildTextField(nameCtrl, 'اسم المنتج *', Icons.inventory_2),
+                            _buildTextField(
+                                nameCtrl, 'اسم المنتج *', Icons.inventory_2),
                             const SizedBox(height: 16),
-                            _buildTextField(barcodeCtrl, 'رقم الباركود', Icons.qr_code_scanner),
+                            _buildTextField(barcodeCtrl, 'رقم الباركود',
+                                Icons.qr_code_scanner),
                             const SizedBox(height: 16),
-                            _buildTextField(priceCtrl, 'السعر بالجنيه المصري *', Icons.attach_money, TextInputType.number),
+                            _buildTextField(priceCtrl, 'السعر بالجنيه المصري *',
+                                Icons.attach_money, TextInputType.number),
                             const SizedBox(height: 16),
-                            _buildTextField(qtyCtrl, 'الكمية المتوفرة *', Icons.inventory, TextInputType.number),
+                            _buildTextField(qtyCtrl, 'الكمية المتوفرة *',
+                                Icons.inventory, TextInputType.number),
                             const SizedBox(height: 16),
-                            _buildTextField(minCtrl, 'الحد الأدنى للمخزون', Icons.trending_down, TextInputType.number),
+                            _buildTextField(minCtrl, 'الحد الأدنى للمخزون',
+                                Icons.trending_down, TextInputType.number),
                           ],
                           const SizedBox(height: 16),
                           _buildCategoryDropdown(),
@@ -282,7 +293,8 @@ class _EnhancedAddEditProductDialogState
                   child: Text(c),
                 ))
             .toList(),
-        onChanged: (v) => setState(() => selectedCategory = v ?? selectedCategory),
+        onChanged: (v) =>
+            setState(() => selectedCategory = v ?? selectedCategory),
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: 'الفئة',

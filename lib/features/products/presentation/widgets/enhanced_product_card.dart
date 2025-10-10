@@ -1,8 +1,9 @@
+import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/responsive_helper.dart';
 
 class EnhancedProductCard extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
   final Color statusColor;
@@ -19,8 +20,8 @@ class EnhancedProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final qty = product['qty'] as int;
-    final min = product['min'] as int;
+    final qty = product.quantity;
+    final min = product.minQuantity;
     final isLowStock = qty > 0 && qty <= min;
     final isOutOfStock = qty == 0;
 
@@ -53,8 +54,8 @@ class EnhancedProductCard extends StatelessWidget {
           color: isOutOfStock
               ? Colors.red.withOpacity(0.25)
               : isLowStock
-              ? Colors.orange.withOpacity(0.25)
-              : Colors.grey.withOpacity(0.15),
+                  ? Colors.orange.withOpacity(0.25)
+                  : Colors.grey.withOpacity(0.15),
           width: 3,
         ),
         boxShadow: [
@@ -103,7 +104,7 @@ class EnhancedProductCard extends StatelessWidget {
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerRight,
                           child: Text(
-                            product['name'] ?? '---',
+                            product.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -125,21 +126,6 @@ class EnhancedProductCard extends StatelessWidget {
                 ),
 
                 SizedBox(height: tightH ? 2 : 4),
-
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      product['code']?.toString() ?? '---',
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: small,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                ),
 
                 SizedBox(height: tightH ? 4 : 6),
 
@@ -234,7 +220,7 @@ class _InfoGrid extends StatelessWidget {
   final double small;
   final double value;
   final int qty;
-  final Map<String, dynamic> product;
+  final Product product;
   final bool tightW;
   const _InfoGrid({
     required this.small,
@@ -305,7 +291,7 @@ class _InfoGrid extends StatelessWidget {
           child: FittedBox(
             child: chip(
               'السعر',
-              '${product['price']}',
+              '${product.price.toStringAsFixed(2)} ',
               Icons.attach_money_rounded,
               const Color(0xff059669),
             ),
@@ -325,7 +311,7 @@ class _InfoGrid extends StatelessWidget {
           child: FittedBox(
             child: chip(
               'التصنيف',
-              (product['category'] ?? '---').toString(),
+              (product.category).toString(),
               Icons.category_rounded,
               const Color(0xff8b5cf6),
             ),
@@ -410,9 +396,8 @@ class _ActionButtonState extends State<ActionButton> {
   @override
   Widget build(BuildContext context) {
     final f = (widget.fontSize ?? 13).clamp(10, 14).toDouble();
-    final bgColor = hovering
-        ? widget.baseColor
-        : widget.baseColor.withOpacity(0.10);
+    final bgColor =
+        hovering ? widget.baseColor : widget.baseColor.withOpacity(0.10);
     final borderColor = hovering
         ? widget.baseColor.withOpacity(0.00)
         : widget.baseColor.withOpacity(0.28);

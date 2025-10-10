@@ -12,48 +12,35 @@ import 'core/theme/app_theme.dart';
 
 import 'features/auth/data/models/user_model.dart';
 
+import 'features/products/data/models/product_model.dart';
 import 'features/settings/data/models/store_info_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
   await Hive.initFlutter();
- 
 
   // Register Adapters
   Hive.registerAdapter(UserTypeAdapter());
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(StoreInfoAdapter());
-
+  Hive.registerAdapter(ProductAdapter());
   // Open Boxes
   await Hive.openBox<User>('userBox');
+  await Hive.openBox<Product>('productsBox');
+  await Hive.openBox('categoryBox');
   await Hive.openBox<StoreInfo>('storeBox');
 
-  Hive.box<User>('userBox').put(
-    "admin",
-    User(
-      name: "Mostafa",
-      phone: "01060030388",
-      username: 'admin',
-      password: '123456789',
-      userType: UserType.manager,
-    ),
-  );
-final storeBox = Hive.box<StoreInfo>('storeBox');
-  if (!storeBox.containsKey('store_info')) {
-    storeBox.put(
-      'store_info',
-      StoreInfo(
-        name: 'Crazy Phone',
-        phone: '01000000000',
-        email: 'info@crazyphone.com',
-        address: "امام شارع الحجار - الخانكة - القليوبية",
-        vat: '123456789',
-      ),
-    );
-  }
-
-
+  Hive.box<Product>('productsBox').put(
+      '600600',
+      Product(
+        name: 'سماعة ابل',
+        barcode: '600600',
+        price: 500,
+        quantity: 10,
+        minQuantity: 2,
+        category: 'سماعة',
+      ));
   setup();
 
   runApp(const MyApp());
@@ -65,7 +52,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
       title: 'Crazy Phone POS',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

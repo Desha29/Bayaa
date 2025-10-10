@@ -1,3 +1,4 @@
+import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/components/empty_state.dart';
 import '../../../../core/utils/responsive_helper.dart';
@@ -5,9 +6,9 @@ import '../../../../core/utils/responsive_helper.dart';
 import 'enhanced_product_card.dart';
 
 class ProductsGridView extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
-  final void Function(Map<String, dynamic>) onDelete;
-  final void Function(Map<String, dynamic>) onEdit;
+  final List<Product> products;
+  final void Function(Product) onDelete;
+  final void Function(Product) onEdit;
   final Color Function(int, int) statusColorFn;
   final String Function(int, int) statusTextFn;
 
@@ -22,7 +23,8 @@ class ProductsGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (products.isEmpty) return const EmptyState(variant: EmptyStateVariant.products);
+    if (products.isEmpty)
+      return const EmptyState(variant: EmptyStateVariant.products);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -48,8 +50,8 @@ class ProductsGridView extends StatelessWidget {
           itemCount: products.length,
           itemBuilder: (context, index) {
             final product = products[index];
-            final qty = product['qty'] as int;
-            final min = product['min'] as int;
+            final qty = product.quantity;
+            final min = product.minQuantity;
             return EnhancedProductCard(
               product: product,
               onDelete: () => onDelete(product),
