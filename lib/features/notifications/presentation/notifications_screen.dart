@@ -95,6 +95,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     ScreenHeader(
                       title: 'التنبيهات',
                       subtitle: 'إدارة التنبيهات والإشعارات',
+                      icon: LucideIcons.bell,
+                      titleColor: AppColors.kDarkChip,
+                      iconColor: AppColors.primaryColor,
                     ),
                     SizedBox(height: spacing),
 

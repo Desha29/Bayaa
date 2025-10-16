@@ -19,7 +19,7 @@ class CustomTextField extends StatelessWidget {
   final bool readOnly;
   final int? maxLines;
   final int? maxLength;
-
+final void Function()?  onEditingComplete;
   const CustomTextField({
     super.key,
     required this.controller,
@@ -36,7 +36,7 @@ class CustomTextField extends StatelessWidget {
     this.onSuffixTap,
     this.readOnly = false,
     this.maxLines = 1,
-    this.maxLength,
+    this.maxLength, this.onEditingComplete,
   });
 
   @override
@@ -69,6 +69,7 @@ class CustomTextField extends StatelessWidget {
           readOnly: readOnly,
           maxLines: maxLines,
           maxLength: maxLength,
+          onEditingComplete: onEditingComplete,
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 16,
             color: AppColors.kDarkChip,

@@ -143,13 +143,15 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                         phoneCtrl, 
                         'رقم الهاتف', 
                         Icons.phone,
-                        TextInputType.phone,
+                        keyboardType: TextInputType.phone,
+                        readOnly: true
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         usernameCtrl, 
                         'اسم المستخدم *', 
                         Icons.account_circle,
+                        
                       ),
                       const SizedBox(height: 16),
                       _buildPasswordField(),
@@ -207,9 +209,10 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   Widget _buildTextField(
     TextEditingController controller,
     String label,
-    IconData icon, [
+    IconData icon, {
     TextInputType? keyboardType,
-  ]) {
+    bool readOnly = false
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -224,6 +227,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
         ],
       ),
       child: TextField(
+        readOnly: readOnly,
         controller: controller,
         keyboardType: keyboardType,
         decoration: InputDecoration(

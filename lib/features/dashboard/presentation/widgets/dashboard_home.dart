@@ -1,5 +1,6 @@
 import 'package:crazy_phone_pos/core/components/logo.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'dashboard_card.dart';
@@ -98,6 +99,9 @@ class _DashboardHomeState extends State<DashboardHome>
               ScreenHeader(
                 title: "لوحة التحكم",
                 subtitle: "مرحباً بك في نظام Crazy Phone لإدارة نقاط البيع",
+                icon: LucideIcons.layoutDashboard,
+                titleColor: AppColors.kDarkChip,
+                iconColor: AppColors.primaryColor,
               ),
               const SizedBox(height: 32),
               Align(
@@ -138,7 +142,8 @@ class _DashboardHomeState extends State<DashboardHome>
                         title: card["title"],
                         subtitle: card["subtitle"],
                         color: card["color"],
-                        onTap: () => widget.onCardTap(_getTargetScreenIndex(index)),
+                        onTap: () =>
+                            widget.onCardTap(_getTargetScreenIndex(index)),
                       ),
                     );
                   }),

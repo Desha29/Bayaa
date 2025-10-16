@@ -29,7 +29,7 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) {
-        emit(ProductSuccessState());
+        emit(ProductSuccessState("تم التعديل بنجاح"));
         getAllProducts();
       },
     );
@@ -41,7 +41,7 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) {
-        emit(ProductSuccessState());
+        emit(ProductSuccessState("تم الحذف  بنجاح"));
         getAllProducts();
       },
     );

@@ -30,6 +30,14 @@ void main() async {
   await Hive.openBox<Product>('productsBox');
   await Hive.openBox('categoryBox');
   await Hive.openBox<StoreInfo>('storeBox');
+  Hive.box<User>("userBox").put(
+      'admin',
+      User(
+          name: "Mostafa",
+          phone: "01000000000",
+          username: 'admin',
+          password: 'admin',
+          userType: UserType.manager));
 
   Hive.box<Product>('productsBox').put(
       '600600',
@@ -39,7 +47,7 @@ void main() async {
         price: 500,
         quantity: 10,
         minQuantity: 2,
-        category: 'سماعة',
+        category: 'الكل',
       ));
   setup();
 

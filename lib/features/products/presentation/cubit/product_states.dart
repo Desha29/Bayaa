@@ -16,7 +16,10 @@ class ProductErrorState extends ProductStates {
   ProductErrorState(this.message);
 }
 
-class ProductSuccessState extends ProductStates {}
+class ProductSuccessState extends ProductStates {
+  String msg;
+  ProductSuccessState(this.msg);
+}
 
 class CategoryLoadedState extends ProductStates {
   final List<String> categories;

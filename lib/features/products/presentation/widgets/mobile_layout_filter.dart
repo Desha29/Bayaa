@@ -78,8 +78,14 @@ class MobileLayout extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        AddButton(onAddPressed: onAddPressed),
-      ],
+  AddButton(
+    onAddPressed: onAddPressed,
+    text: "إضافة منتج جديد",
+  ),
+            AddButton(
+              onAddPressed: onAddPressed,
+              text: "إضافة صنف جديد",
+            ),      ],
     );
   }
 }

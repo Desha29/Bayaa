@@ -1,6 +1,11 @@
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:crazy_phone_pos/features/products/presentation/widgets/enhanced_add_edit_Dialog.dart'
+    show EnhancedAddEditProductDialog, AddCategories;
 import 'package:flutter/material.dart';
 
+import '../../../../core/di/dependency_injection.dart';
+import '../../data/models/product_model.dart';
+import '../cubit/product_cubit.dart';
 import 'add_button.dart';
 import 'dropdown_filter.dart';
 
@@ -48,7 +53,9 @@ class DesktopLayout extends StatelessWidget {
           ),
           child: TextField(
             controller: searchController,
-            onChanged: (_) => onSearchChanged(),
+            onChanged: (s) {
+              getIt<ProductCubit>().searchProducts(s);
+            },
             decoration: InputDecoration(
               hintText: 'ابحث عن منتج بالاسم، الكود، الباركود أو السعر...',
               hintStyle: TextStyle(color: Colors.grey[500]),
@@ -91,10 +98,29 @@ class DesktopLayout extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(flex: 1, child: AddButton(onAddPressed: onAddPressed)),
+            Expanded(
+                flex: 1,
+                child: AddButton(
+                  onAddPressed: onAddPressed,
+                  text: "إضافة منتج جديد",
+                )),
+            SizedBox(width: 15),
+            Expanded(
+                flex: 1,
+                child: AddButton(
+                  onAddPressed: () {
+                    showAddEditDialog(context);
+                  },
+                  text: "إضافة صنف جديد",
+                  color: Color(0xff8b5cf6),
+                )),
           ],
         ),
       ],
     );
   }
+}
+
+Future<void> showAddEditDialog(context, [Product? product]) async {
+  await showDialog(context: context, builder: (_) => AddCategories());
 }

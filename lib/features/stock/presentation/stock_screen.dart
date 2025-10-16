@@ -51,6 +51,76 @@ class _StockScreenState extends State<StockScreen> {
       min: 5,
       lastRestock: '13/01/2024',
     ),
+    Product(
+      code: 'XM12',
+      name: 'شاومي ريدمي نوت 12',
+      quantity: 0,
+      min: 6,
+      lastRestock: '16/01/2024',
+    ),
+    Product(
+      code: 'OPF5',
+      name: 'أوبو فايند X5',
+      quantity: 2,
+      min: 5,
+      lastRestock: '13/01/2024',
+    ),
+    Product(
+      code: 'XM12',
+      name: 'شاومي ريدمي نوت 12',
+      quantity: 0,
+      min: 6,
+      lastRestock: '16/01/2024',
+    ),
+    Product(
+      code: 'OPF5',
+      name: 'أوبو فايند X5',
+      quantity: 2,
+      min: 5,
+      lastRestock: '13/01/2024',
+    ),
+    Product(
+      code: 'XM12',
+      name: 'شاومي ريدمي نوت 12',
+      quantity: 0,
+      min: 6,
+      lastRestock: '16/01/2024',
+    ),
+    Product(
+      code: 'OPF5',
+      name: 'أوبو فايند X5',
+      quantity: 2,
+      min: 5,
+      lastRestock: '13/01/2024',
+    ),
+    Product(
+      code: 'XM12',
+      name: 'شاومي ريدمي نوت 12',
+      quantity: 0,
+      min: 6,
+      lastRestock: '16/01/2024',
+    ),
+    Product(
+      code: 'OPF5',
+      name: 'أوبو فايند X5',
+      quantity: 2,
+      min: 5,
+      lastRestock: '13/01/2024',
+    ),
+    Product(
+      code: 'XM12',
+      name: 'شاومي ريدمي نوت 12',
+      quantity: 0,
+      min: 6,
+      lastRestock: '16/01/2024',
+    ),
+    Product(
+      code: 'OPF5',
+      name: 'أوبو فايند X5',
+      quantity: 2,
+      min: 5,
+      lastRestock: '13/01/2024',
+    ),
   ];
 
   String filter = 'all';
@@ -85,7 +155,6 @@ class _StockScreenState extends State<StockScreen> {
       return true;
     }).toList();
 
-
     final isTablet = MediaQuery.of(context).size.width >= 600;
     final isDesktop = MediaQuery.of(context).size.width >= 1000;
     double horizontalPadding = 12;
@@ -99,11 +168,9 @@ class _StockScreenState extends State<StockScreen> {
         body: SafeArea(
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
-            
             slivers: [
               // Header + Filter + Title
               SliverToBoxAdapter(
-
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: horizontalPadding,
@@ -115,9 +182,11 @@ class _StockScreenState extends State<StockScreen> {
                       const ScreenHeader(
                         title: 'المنتجات الناقصة',
                         subtitle: 'متابعة المنتجات التي تحتاج إعادة تخزين',
+                        icon: Icons.warning_amber_rounded,
+                        iconColor: AppColors.primaryColor,
+                        titleColor: AppColors.kDarkChip,
                       ),
                       const SizedBox(height: 32),
-
                       FilterButtonsWidget(
                         filter: filter,
                         totalCount: totalCount,
@@ -130,7 +199,6 @@ class _StockScreenState extends State<StockScreen> {
                         },
                       ),
                       const SizedBox(height: 8),
-
                       Row(
                         children: [
                           const Icon(

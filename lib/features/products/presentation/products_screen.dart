@@ -1,5 +1,6 @@
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
+import 'package:crazy_phone_pos/core/functions/messege.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_states.dart';
@@ -100,9 +101,20 @@ class ProductsScreenState extends State<ProductsScreen> {
                       const ScreenHeader(
                         title: 'المنتجات',
                         subtitle: 'إدارة المنتجات وعرض التفاصيل',
+                        icon: Icons.inventory_2_outlined,
+                        iconColor: AppColors.primaryColor,
+                        titleColor: AppColors.kDarkChip,
                       ),
                       const SizedBox(height: 20),
-                      BlocBuilder<ProductCubit, ProductStates>(
+                      BlocConsumer<ProductCubit, ProductStates>(
+                        listener: (context, state) {
+                          if (state is ProductSuccessState) {
+                            MotionSnackBarSuccess(context, state.msg);
+                          }
+                          if (state is ProductErrorState) {
+                            MotionSnackBarError(context, state.message);
+                          }
+                        },
                         buildWhen: (previous, current) =>
                             current is CategoryLoadedState ||
                             current is CategoryErrorState,
@@ -229,10 +241,10 @@ class ProductsScreenState extends State<ProductsScreen> {
                                     borderRadius: BorderRadius.circular(16),
                                     child: ProductsGridView(
                                       products: filteredProducts,
-                                      onDelete: (p) =>
-                                          setState(() => products.remove(p)),
+                                      onDelete: (p) => getIt<ProductCubit>()
+                                          .deleteProduct(p.barcode),
                                       onEdit: (p) {
-                                        showAddEditDialog();
+                                        showAddEditDialog(p);
                                       },
                                       statusColorFn: statusColor,
                                       statusTextFn: statusText,

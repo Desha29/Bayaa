@@ -160,6 +160,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                               cubit.isPasswordVisible;
                                           return CustomTextField(
                                             controller: _passwordController,
+                                            onEditingComplete: (){
+                                              _handleLogin(context);
+                                            },
                                             label: 'كلمة المرور',
                                             prefixIcon: isPasswordVisible
                                                 ? LucideIcons.unlock

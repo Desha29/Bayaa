@@ -1,11 +1,10 @@
-import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:flutter/material.dart';
-import '../../../core/components/anim_wrappers.dart';
+import '../../../core/components/screen_header.dart';
 import '../../../core/constants/app_colors.dart';
+import 'widgets/recent_sales.dart';
 
 import 'widgets/barcode_scan_card.dart';
-import 'widgets/cart_list.dart';
-import 'widgets/recent_sales.dart';
+import 'widgets/cart_section.dart';
 import 'widgets/total_section_card.dart';
 
 class SalesScreen extends StatefulWidget {
@@ -15,208 +14,197 @@ class SalesScreen extends StatefulWidget {
   State<SalesScreen> createState() => _SalesScreenState();
 }
 
-class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStateMixin {
-  final _barcodeController = TextEditingController();
+class _SalesScreenState extends State<SalesScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
-  List<Map<String, dynamic>> cartItems = [
+  // Dummy data
+  final List<Map<String, dynamic>> dummyCartItems = [
     {
-      "id": "P001",
-      "name": "آيفون 14 برو",
-      "price": 4500.0,
-      "qty": 1,
-      "date": DateTime(2025, 9, 1),
+      'id': 'P001',
+      'name': 'آيفون 14 برو',
+      'price': 4500.0,
+      'qty': 2,
+      'date': DateTime(2025, 10, 15),
     },
     {
-      "id": "P002",
-      "name": "سامسونج جالاكسي S23",
-      "price": 3200.0,
-      "qty": 2,
-      "date": DateTime(2025, 9, 10),
+      'id': 'P002',
+      'name': 'سامسونج جالاكسي S23',
+      'price': 3200.0,
+      'qty': 1,
+      'date': DateTime(2025, 10, 14),
+    },
+    {
+      'id': 'P003',
+      'name': 'ايربودز برو',
+      'price': 1200.0,
+      'qty': 3,
+      'date': DateTime(2025, 10, 16),
     },
   ];
 
-  List<Map<String, dynamic>> recentSales = [
-    {"total": 2800.0, "items": 3, "date": DateTime(2025, 9, 23, 14, 30)},
-    {"total": 4500.0, "items": 1, "date": DateTime(2025, 9, 23, 14, 15)},
+  final List<Map<String, dynamic>> dummyRecentSales = [
+    {'total': 8500.0, 'items': 4, 'date': DateTime(2025, 10, 15, 14, 30)},
+    {'total': 12300.0, 'items': 6, 'date': DateTime(2025, 10, 15, 11, 15)},
+    {'total': 5600.0, 'items': 2, 'date': DateTime(2025, 10, 14, 16, 45)},
+    {'total': 9800.0, 'items': 5, 'date': DateTime(2025, 10, 14, 9, 20)},
+    {'total': 9800.0, 'items': 5, 'date': DateTime(2025, 10, 14, 9, 20)},
+    {'total': 9800.0, 'items': 5, 'date': DateTime(2025, 10, 14, 9, 20)},
+    {'total': 9800.0, 'items': 5, 'date': DateTime(2025, 10, 14, 9, 20)},
   ];
+
+  double get totalAmount {
+    return dummyCartItems.fold(
+      0.0,
+      (sum, item) => sum + (item['price'] * item['qty']),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _fadeController.forward();
+    _slideController.forward();
+  }
 
   @override
   void dispose() {
-    _barcodeController.dispose();
+    _fadeController.dispose();
+    _slideController.dispose();
     super.dispose();
-  }
-
-  void _updateQuantity(int index, int change) {
-    setState(() {
-      if (cartItems[index]['qty'] + change > 0) {
-        cartItems[index]['qty'] += change;
-      }
-    });
-  }
-
-  void _removeItem(int index) {
-    setState(() {
-      cartItems.removeAt(index);
-    });
-  }
-
-  void _clearCart() {
-    setState(() {
-      cartItems.clear();
-    });
-  }
-
-  void _addProduct() {
-    final text = _barcodeController.text.trim();
-    if (text.isEmpty) return;
-
-    setState(() {
-      cartItems.add({
-        "id": "P${cartItems.length + 1}".padLeft(4, "0"),
-        "name": text,
-        "price": 1000.0 + cartItems.length * 500,
-        "qty": 1,
-        "date": DateTime.now(),
-      });
-    });
-    _barcodeController.clear();
-  }
-
-  void _checkout() {
-    if (cartItems.isEmpty) return;
-
-    final total = cartItems.fold<double>(
-      0,
-      (sum, item) => sum + (item['qty'] * item['price']),
-    );
-
-    setState(() {
-      recentSales.insert(0, {
-        "total": total,
-        "items": cartItems.length,
-        "date": DateTime.now(),
-      });
-      cartItems.clear();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isDesktop = width > 1000;
+    return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isDesktop = constraints.maxWidth > 1200;
+            final isTablet =
+                constraints.maxWidth >= 768 && constraints.maxWidth <= 1200;
 
-    final totalAmount = cartItems.fold<double>(
-      0,
-      (sum, item) => sum + (item['qty'] * item['price']),
+            return Padding(
+              padding: EdgeInsets.all(isDesktop ? 32 : (isTablet ? 24 : 16)),
+              child: (isDesktop || isTablet)
+                  ? _buildDesktopTabletLayout(isDesktop)
+                  : _buildMobileLayout(),
+            );
+          },
+        ),
+      ),
     );
+  }
 
-    final content = Column(
+  Widget _buildDesktopTabletLayout(bool isDesktop) {
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header subtle slide-in from top
-        const FadeSlideIn(
-          beginOffset: Offset(0, -0.06),
-          child: ScreenHeader(
-            title: "المبيعات",
-            subtitle: "شاشة الكاشير لإدارة عمليات البيع",
+        Expanded(
+          flex: isDesktop ? 7 : 6,
+          child: SingleChildScrollView(
+            child: _buildMainContent(),
           ),
         ),
-
-        const SizedBox(height: 24),
-
-        Column(
-          children: [
-            // Barcode card slide-in from right
-            FadeSlideIn(
-              beginOffset: const Offset(0.06, 0),
-              child: BarcodeScanCard(
-                barcodeController: _barcodeController,
-                onAddProduct: _addProduct,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Cart list with switcher keyed by length
-            SizedBox(
-              height: 300,
-              child: SubtleSwitcher(
-                child: cartItems.isEmpty
-                    ? const Center(
-                        key: ValueKey("empty"),
-                        child: Text("السلة فارغة"),
-                      )
-                    : KeyedSubtree(
-                        key: ValueKey(cartItems.length),
-                        child: CartList(
-                          items: cartItems,
-                          onRemove: _removeItem,
-                          onQtyIncrease: (i) => _updateQuantity(i, 1),
-                          onQtyDecrease: (i) => _updateQuantity(i, -1),
-                        ),
-                      ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Totals fade-scale in
-            FadeScale(
-              child: TotalSectionCard(
-                totalAmount: totalAmount,
-                onClearCart: cartItems.isNotEmpty ? _clearCart : null,
-                onCheckout: _checkout,
-              ),
-            ),
-
-            if (!isDesktop) ...[
-              const SizedBox(height: 24),
-              // Recent sales fade-slide from bottom on mobile
-              const FadeSlideIn(
-                beginOffset: Offset(0, 0.06),
-                child: SizedBox.shrink(), // placeholder, replaced below
-              ),
-            ],
-          ],
+        SizedBox(width: isDesktop ? 32 : 24),
+        Expanded(
+          flex: isDesktop ? 3 : 4,
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: RecentSalesSection(recentSales: dummyRecentSales),
+          ),
         ),
       ],
     );
+  }
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: isDesktop
-            ? Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: SingleChildScrollView(child: content),
-                  ),
-                  const SizedBox(width: 24),
-                  // Right column recent sales with fade-scale
-                  Expanded(
-                    flex: 1,
-                    child: FadeScale(
-                      child: RecentSalesWidget(sales: recentSales),
-                    ),
-                  ),
-                ],
-              )
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    content,
-                    // Actual recent sales on mobile with gentle fade-slide up
-                    const SizedBox(height: 24),
-                    FadeSlideIn(
-                      beginOffset: const Offset(0, 0.06),
-                      child: RecentSalesWidget(sales: recentSales),
-                    ),
-                  ],
-                ),
-              ),
+  Widget _buildMobileLayout() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildMainContent(),
+          const SizedBox(height: 24),
+          SlideTransition(
+            position: _slideAnimation,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: RecentSalesSection(recentSales: dummyRecentSales),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const ScreenHeader(
+          title: 'شاشة المبيعات',
+          subtitle: 'إدارة عمليات البيع والفواتير',
+          fontSize: 32,
+          icon: Icons.point_of_sale,
+          iconColor: AppColors.primaryColor,
+          titleColor: AppColors.kDarkChip,
+        ),
+        const SizedBox(height: 24),
+        BarcodeScanCard(
+          onAddPressed: () {
+            // Add product logic here
+          },
+        ),
+        const SizedBox(height: 20),
+        CartSection(
+          cartItems: dummyCartItems,
+          onRemoveItem: (index) {
+            // Remove item logic here
+          },
+          onIncreaseQty: (index) {
+            // Increase quantity logic here
+          },
+          onDecreaseQty: (index) {
+            // Decrease quantity logic here
+          },
+        ),
+        const SizedBox(height: 20),
+        TotalSectionCard(
+          totalAmount: totalAmount,
+          itemCount: dummyCartItems.length,
+          onCheckout: () {
+            // Checkout logic here
+          },
+          onClearCart: () {
+            // Clear cart logic here
+          },
+        ),
+      ],
     );
   }
 }
