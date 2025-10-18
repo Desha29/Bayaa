@@ -1,3 +1,4 @@
+// lib/features/sales/data/models/cart_item_model.dart
 class CartItemModel {
   final String id;
   final String name;

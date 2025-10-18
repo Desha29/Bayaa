@@ -1,3 +1,4 @@
+// lib/features/sales/data/models/sale_model.dart
 import 'package:hive_flutter/adapters.dart';
 
 part 'sale_model.g.dart';
@@ -19,12 +20,20 @@ class Sale extends HiveObject {
   @HiveField(4)
   final List<SaleItem> saleItems;
 
+  @HiveField(5)
+  final String? cashierName; // NEW: Who made the sale
+
+  @HiveField(6)
+  final String? cashierUsername; // NEW: Username for reference
+
   Sale({
     required this.id,
     required this.total,
     required this.items,
     required this.date,
     required this.saleItems,
+    this.cashierName,
+    this.cashierUsername,
   });
 }
 

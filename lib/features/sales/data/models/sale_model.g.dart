@@ -1,3 +1,4 @@
+// lib/features/sales/data/models/sale_model.g.dart
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'sale_model.dart';
@@ -22,13 +23,15 @@ class SaleAdapter extends TypeAdapter<Sale> {
       items: fields[2] as int,
       date: fields[3] as DateTime,
       saleItems: (fields[4] as List).cast<SaleItem>(),
+      cashierName: fields[5] as String?,
+      cashierUsername: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Sale obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +41,11 @@ class SaleAdapter extends TypeAdapter<Sale> {
       ..writeByte(3)
       ..write(obj.date)
       ..writeByte(4)
-      ..write(obj.saleItems);
+      ..write(obj.saleItems)
+      ..writeByte(5)
+      ..write(obj.cashierName)
+      ..writeByte(6)
+      ..write(obj.cashierUsername);
   }
 
   @override

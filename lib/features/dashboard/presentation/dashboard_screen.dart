@@ -1,12 +1,24 @@
+// lib/features/dashboard/presentation/dashboard_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../products/presentation/products_screen.dart';
+import '../../products/data/models/product_model.dart';
+import '../../sales/data/repository/sales_repository_impl.dart';
 import '../../sales/presentation/sales_screen.dart';
+import '../../sales/data/models/sale_model.dart';
 import '../../settings/presentation/settings_screen.dart';
 import '../../stock/presentation/stock_screen.dart';
+import '../../invoice/presentation/invoices_home.dart';
+
+// ARP imports
+import '../../arp/presentation/arp_screen.dart';
+import '../../arp/presentation/cubit/arp_cubit.dart';
+import '../../arp/data/arp_repository_impl.dart';
 
 import 'widgets/dashboard_home.dart';
 import 'widgets/side_bar.dart';
@@ -22,6 +34,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int selectedIndex = 0;
   bool isSidebarCollapsed = false;
 
+  // Open Hive boxes and create repositories
+  late final Box<Product> _productsBox;
+  late final Box<Sale> _salesBox;
+  late final SalesRepositoryImpl _salesRepository;
+  late final ArpRepositoryImpl _arpRepository;
+
+  @override
+  void initState() {
+    super.initState();
+  _productsBox = Hive.box<Product>('productsBox');
+  _salesBox = Hive.box<Sale>('salesBox');
+  _salesRepository = SalesRepositoryImpl(
+    productsBox: _productsBox,
+    salesBox: _salesBox,
+  );
+  
+  // Only needs sales repository
+  _arpRepository = ArpRepositoryImpl(
+    salesRepository: _salesRepository,
+  );
+  }
+
   late final List<SidebarItem> sidebarItems = [
     SidebarItem(
       icon: LucideIcons.layoutDashboard,
@@ -33,7 +67,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     SidebarItem(
       icon: LucideIcons.shoppingCart,
       title: "المبيعات",
-      screen: const SalesScreen(),
+      screen: SalesScreen(repository: _salesRepository),
+    ),
+    SidebarItem(
+      icon: LucideIcons.fileText,
+      title: "الفواتير",
+      screen: InvoicesHome(repository: _salesRepository),
     ),
     SidebarItem(
       icon: LucideIcons.box,
@@ -44,6 +83,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       icon: LucideIcons.alertTriangle,
       title: "المنتجات الناقصة",
       screen: const StockScreen(),
+    ),
+    // ARP Screen with BlocProvider
+    SidebarItem(
+      icon: LucideIcons.pieChart,
+      title: "التحليلات والتقارير",
+      screen: BlocProvider(
+        create: (context) => ArpCubit(_arpRepository),
+        child: const ArpScreen(),
+      ),
     ),
     SidebarItem(
       icon: LucideIcons.bell,

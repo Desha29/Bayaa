@@ -7,6 +7,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/components/screen_header.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../products/data/models/product_model.dart';
+import '../data/models/sale_model.dart';
+import '../data/repository/sales_repository_impl.dart';
+import '../domain/sales_repository.dart';
+import '../../invoice/data/invoice_models.dart';
+import '../../invoice/presentation/invoice_preview_screen.dart';
 
 import 'widgets/barcode_scan_card.dart';
 import 'widgets/cart_section.dart';
@@ -14,20 +19,22 @@ import 'widgets/total_section_card.dart';
 import 'widgets/recent_sales.dart';
 
 class SalesScreen extends StatefulWidget {
-  const SalesScreen({super.key});
+  final SalesRepository? repository; // optional, create if not passed
+
+  const SalesScreen({super.key, this.repository});
 
   @override
   State<SalesScreen> createState() => _SalesScreenState();
 }
 
 class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin {
-  // Animations (kept from your existing screen)
+  // Animations
   late final AnimationController _fadeController;
   late final AnimationController _slideController;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
 
-  // TextField controller inside your BarcodeScanCard
+  // TextField controller
   final TextEditingController _barcodeController = TextEditingController();
 
   // HID keyboard-wedge listener (scanners that type like a keyboard)
@@ -37,7 +44,10 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
   // Local products box (already opened in main)
   late final Box<Product> _productsBox;
 
-  // Simple in-memory cart; matches your CartSection map shape
+  // Repository for saving sales
+  late final SalesRepository _repository;
+
+  // Simple in-memory cart
   final List<Map<String, dynamic>> _cartItems = [];
   List<Map<String, dynamic>> _recentSales = [];
 
@@ -50,7 +60,13 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
   void initState() {
     super.initState();
 
-    _productsBox = Hive.box<Product>('productsBox'); // already opened at app start
+    _productsBox = Hive.box<Product>('productsBox');
+    _repository = widget.repository ??
+        SalesRepositoryImpl(
+          productsBox: _productsBox,
+          salesBox: Hive.box<Sale>('salesBox'),
+        );
+
     _fadeController = AnimationController(duration: const Duration(milliseconds: 800), vsync: this);
     _slideController = AnimationController(duration: const Duration(milliseconds: 1000), vsync: this);
     _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
@@ -61,6 +77,27 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
 
     // Global HID listener: commits on Enter or brief idle after burst
     RawKeyboard.instance.addListener(_onRawKey);
+
+    // Load recent sales
+    _loadRecentSales();
+  }
+
+  Future<void> _loadRecentSales() async {
+    final result = await _repository.getRecentSales(limit: 10);
+    result.fold(
+      (_) {},
+      (sales) {
+        setState(() {
+          _recentSales = sales
+              .map((s) => {
+                    'total': s.total,
+                    'items': s.items,
+                    'date': s.date,
+                  })
+              .toList();
+        });
+      },
+    );
   }
 
   @override
@@ -115,10 +152,19 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
     // Look up product by barcode in local Hive
     final product = _productsBox.values.firstWhere(
       (p) => p.barcode == code,
-      orElse: () => null as Product, // will be caught below
+      orElse: () => Product(
+        minQuantity: 0,
+
+        barcode: '',
+        name: '',
+        price: 0,
+        quantity: 0,
+        minPrice: 0,
+        category: '',
+      ),
     );
 
-    if (product == null) {
+    if (product.barcode.isEmpty) {
       // Notify when not found
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('المنتج غير موجود: $code')),
@@ -139,7 +185,7 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
         'price': product.price,
         'qty': 1,
         'date': DateTime.now(),
-        'minPrice': product is Product ? product.minPrice : 0.0,
+        'minPrice': product.minPrice,
       });
     }
 
@@ -151,6 +197,103 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
   void _onAddPressed() {
     final code = _barcodeController.text.trim();
     _commitBarcode(code);
+  }
+
+  // Checkout with invoice auto-open
+  Future<void> _onCheckout() async {
+    if (_cartItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('السلة فارغة')),
+      );
+      return;
+    }
+
+    // Create sale record
+    final sale = Sale(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      total: _totalAmount,
+      items: _cartItems.length,
+      date: DateTime.now(),
+      saleItems: _cartItems
+          .map((item) => SaleItem(
+                productId: item['id'] as String,
+                name: item['name'] as String,
+                price: (item['price'] as num).toDouble(),
+                quantity: item['qty'] as int,
+                total: (item['price'] as num).toDouble() * (item['qty'] as int),
+              ))
+          .toList(),
+    );
+
+    // Save to repository
+    final result = await _repository.saveSale(sale);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل حفظ البيع: ${failure.message}')),
+        );
+      },
+      (_) {
+        // Success: show message and open invoice
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م'),
+            backgroundColor: AppColors.kSuccessGreen,
+          ),
+        );
+
+        // Update recent sales
+        _recentSales = [
+          {
+            'total': _totalAmount,
+            'items': _cartItems.length,
+            'date': DateTime.now(),
+          },
+          ..._recentSales,
+        ];
+
+        // Clear cart
+        _cartItems.clear();
+        setState(() {});
+
+        // Auto-open invoice
+        _openInvoice(sale);
+      },
+    );
+  }
+
+  // Open invoice preview screen
+  Future<void> _openInvoice(Sale sale) async {
+    final subtotal = sale.saleItems.fold<double>(0, (s, it) => s + it.total);
+    final data = InvoiceData(
+      invoiceId: sale.id,
+      date: sale.date,
+      storeName: 'Crazy Phone POS',
+      storeAddress: 'شارع رئيسي 123 - القاهرة',
+      storePhone: '0100 123 4567',
+      cashierName: 'الكاشير',
+      lines: sale.saleItems
+          .map((it) => InvoiceLine(
+                name: it.name,
+                barcode: it.productId,
+                price: it.price,
+                qty: it.quantity,
+              ))
+          .toList(),
+      subtotal: subtotal,
+      discount: 0.0,
+      tax: 0.0,
+      grandTotal: sale.total,
+      footerNote: 'شكراً لثقتكم بنا! البضاعة لا تُرد بعد 14 يوماً.',
+      logoAsset: 'assets/logo.png',
+    );
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => InvoicePreviewScreen(data: data, receiptMode: false),
+      ),
+    );
   }
 
   @override
@@ -258,28 +401,11 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
 
         const SizedBox(height: 20),
 
-        // Your existing totals card
+        // Your existing totals card with updated checkout handler
         TotalSectionCard(
           totalAmount: _totalAmount,
           itemCount: _cartItems.length,
-          onCheckout: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م'),
-                backgroundColor: AppColors.kSuccessGreen,
-              ),
-            );
-            _recentSales = [
-              {
-                'total': _totalAmount,
-                'items': _cartItems.length,
-                'date': DateTime.now(),
-              },
-              ..._recentSales,
-            ];
-            _cartItems.clear();
-            setState(() {});
-          },
+          onCheckout: _onCheckout, // now saves and opens invoice
           onClearCart: () {
             _cartItems.clear();
             setState(() {});

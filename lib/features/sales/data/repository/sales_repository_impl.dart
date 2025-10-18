@@ -1,12 +1,11 @@
+// lib/features/sales/data/repository/sales_repository_impl.dart
 import 'package:dartz/dartz.dart';
 import 'package:hive_flutter/adapters.dart';
-
 import '../../../../core/error/failure.dart';
-
 import '../../../products/data/models/product_model.dart';
 import '../../domain/sales_repository.dart';
 import '../models/sale_model.dart';
-
+import '../models/cart_item_model.dart';
 
 class SalesRepositoryImpl implements SalesRepository {
   final Box<Product> productsBox;
@@ -22,11 +21,11 @@ class SalesRepositoryImpl implements SalesRepository {
     try {
       final products = productsBox.values.where((p) => p.barcode == barcode);
       if (products.isEmpty) {
-        return Right(null);
+        return const Right(null);
       }
       return Right(products.first);
     } catch (e) {
-      return Left(CacheFailure( 'Failed to find product: ${e.toString()}'));
+      return Left(CacheFailure('Failed to find product: ${e.toString()}'));
     }
   }
 
@@ -45,7 +44,7 @@ class SalesRepositoryImpl implements SalesRepository {
       await salesBox.put(sale.id, sale);
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure( 'Failed to save sale: ${e.toString()}'));
+      return Left(CacheFailure('Failed to save sale: ${e.toString()}'));
     }
   }
 
@@ -56,7 +55,7 @@ class SalesRepositoryImpl implements SalesRepository {
       sales.sort((a, b) => b.date.compareTo(a.date));
       return Right(sales.take(limit).toList());
     } catch (e) {
-      return Left(CacheFailure( 'Failed to get recent sales: ${e.toString()}'));
+      return Left(CacheFailure('Failed to get recent sales: ${e.toString()}'));
     }
   }
 
@@ -65,16 +64,15 @@ class SalesRepositoryImpl implements SalesRepository {
     try {
       final products = productsBox.values.where((p) => p.barcode == barcode);
       if (products.isEmpty) {
-        return Left(CacheFailure( 'Product not found'));
+        return Left(CacheFailure('Product not found'));
       }
-      
+
       final product = products.first;
       product.quantity = newQuantity;
       await productsBox.put(product.barcode, product);
-      
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure( 'Failed to update quantity: ${e.toString()}'));
+      return Left(CacheFailure('Failed to update quantity: ${e.toString()}'));
     }
   }
 
@@ -91,6 +89,54 @@ class SalesRepositoryImpl implements SalesRepository {
       );
     } catch (e) {
       return Left(CacheFailure('Failed to validate price: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> createSaleWithCashier({
+    required List<CartItemModel> items,
+    required double total,
+    required String cashierName,
+    required String cashierUsername,
+  }) async {
+    try {
+      final saleId = DateTime.now().millisecondsSinceEpoch.toString();
+      
+      final sale = Sale(
+        id: saleId,
+        total: total,
+        items: items.length,
+        date: DateTime.now(),
+        cashierName: cashierName,
+        cashierUsername: cashierUsername,
+        saleItems: items.map((item) => SaleItem(
+          productId: item.id,
+          name: item.name,
+          price: item.salePrice,
+          quantity: item.qty,
+          total: item.total,
+        )).toList(),
+      );
+
+      await salesBox.put(sale.id, sale);
+
+      // Update product quantities
+      for (var item in items) {
+        final productResult = await findProductByBarcode(item.id);
+        await productResult.fold(
+          (failure) => Future.value(),
+          (product) async {
+            if (product != null) {
+              product.quantity -= item.qty;
+              await productsBox.put(product.barcode, product);
+            }
+          },
+        );
+      }
+
+      return const Right(unit);
+    } catch (e) {
+      return Left(CacheFailure('Failed to create sale: ${e.toString()}'));
     }
   }
 }

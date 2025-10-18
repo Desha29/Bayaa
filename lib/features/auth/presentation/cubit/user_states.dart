@@ -6,6 +6,7 @@ class UserLoading extends UserStates {}
 
 class UserSuccess extends UserStates {
   final String message;
+  
   UserSuccess(this.message);
 }
 

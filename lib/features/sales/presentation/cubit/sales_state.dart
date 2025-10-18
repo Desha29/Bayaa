@@ -1,7 +1,4 @@
-
-
 import 'package:equatable/equatable.dart';
-
 import '../../data/models/cart_item_model.dart';
 import '../../data/models/sale_model.dart';
 
@@ -31,20 +28,6 @@ class SalesLoaded extends SalesState {
 
   @override
   List<Object?> get props => [cartItems, recentSales, totalAmount, scannerMessage];
-
-  SalesLoaded copyWith({
-    List<CartItemModel>? cartItems,
-    List<Sale>? recentSales,
-    double? totalAmount,
-    String? scannerMessage,
-  }) {
-    return SalesLoaded(
-      cartItems: cartItems ?? this.cartItems,
-      recentSales: recentSales ?? this.recentSales,
-      totalAmount: totalAmount ?? this.totalAmount,
-      scannerMessage: scannerMessage ?? this.scannerMessage,
-    );
-  }
 }
 
 class SalesError extends SalesState {
@@ -53,26 +36,33 @@ class SalesError extends SalesState {
   const SalesError({required this.message});
 
   @override
-  List<Object> get props => [message];
-}
-
-class ProductAdded extends SalesState {
-  final String message;
-
-  const ProductAdded({required this.message});
-
-  @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message];
 }
 
 class CheckoutSuccess extends SalesState {
   final String message;
   final double total;
 
-  const CheckoutSuccess({required this.message, required this.total});
+  const CheckoutSuccess({
+    required this.message,
+    required this.total,
+  });
 
   @override
-  List<Object> get props => [message, total];
+  List<Object?> get props => [message, total];
+}
+
+class CheckoutSuccessWithSale extends CheckoutSuccess {
+  final Sale sale;
+
+  const CheckoutSuccessWithSale({
+    required super.message,
+    required super.total,
+    required this.sale,
+  });
+
+  @override
+  List<Object?> get props => [message, total, sale];
 }
 
 class PriceValidationError extends SalesState {
@@ -87,5 +77,5 @@ class PriceValidationError extends SalesState {
   });
 
   @override
-  List<Object> get props => [message, minPrice, attemptedPrice];
+  List<Object?> get props => [message, minPrice, attemptedPrice];
 }

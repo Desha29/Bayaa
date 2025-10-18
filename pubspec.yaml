@@ -46,6 +46,11 @@ dependencies:
   motion_toast: ^2.14.0
   equatable: ^2.0.7
   flutter_libserialport: ^0.6.0
+  barcode: ^2.2.9
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  google_fonts: ^6.3.2
+  fl_chart: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -106,10 +111,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
