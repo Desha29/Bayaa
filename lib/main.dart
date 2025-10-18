@@ -13,6 +13,7 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/data/models/user_model.dart';
 
 import 'features/products/data/models/product_model.dart';
+import 'features/sales/data/models/sale_model.dart';
 import 'features/settings/data/models/store_info_model.dart';
 
 void main() async {
@@ -25,11 +26,15 @@ void main() async {
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(StoreInfoAdapter());
   Hive.registerAdapter(ProductAdapter());
+ Hive.registerAdapter(SaleAdapter());
+  Hive.registerAdapter(SaleItemAdapter());
+
   // Open Boxes
   await Hive.openBox<User>('userBox');
   await Hive.openBox<Product>('productsBox');
   await Hive.openBox('categoryBox');
   await Hive.openBox<StoreInfo>('storeBox');
+  await Hive.openBox<Sale>('salesBox');
   Hive.box<User>("userBox").put(
       'admin',
       User(
@@ -39,16 +44,17 @@ void main() async {
           password: 'admin',
           userType: UserType.manager));
 
-  Hive.box<Product>('productsBox').put(
-      '600600',
-      Product(
-        name: 'سماعة ابل',
-        barcode: '600600',
-        price: 500,
-        quantity: 10,
-        minQuantity: 2,
-        category: 'الكل',
-      ));
+  // Hive.box<Product>('productsBox').put(
+  //     '600600',
+  //     Product(
+  //       minPrice: 450,
+  //       name: 'سماعة ابل',
+  //       barcode: '600600',
+  //       price: 500,
+  //       quantity: 10,
+  //       minQuantity: 2,
+  //       category: 'الكل',
+  //     ));
   setup();
 
   runApp(const MyApp());

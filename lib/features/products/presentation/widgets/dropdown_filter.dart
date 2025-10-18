@@ -40,7 +40,8 @@ class DropDownFilter extends StatelessWidget {
           labelText: label,
           prefixIcon: Icon(icon, color: AppColors.primaryColor),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
         items: items
             .map(

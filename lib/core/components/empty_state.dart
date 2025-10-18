@@ -4,14 +4,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
-    this.icon,              // Custom icon (Material or Lucide via IconData)
+    this.icon, // Custom icon (Material or Lucide via IconData)
     this.title,
     this.message,
     this.variant = EmptyStateVariant.notifications,
-    this.background,        // Optional circular bg behind icon
-    this.useCircle = true,  // Wrap icon in circle like products example
-    this.gap = 14,          // Spacing between lines
-    this.center = true,     // Center the whole column
+    this.background, // Optional circular bg behind icon
+    this.useCircle = true, // Wrap icon in circle like products example
+    this.gap = 14, // Spacing between lines
+    this.center = true, // Center the whole column
   });
 
   final IconData? icon;
@@ -36,7 +36,8 @@ class EmptyState extends StatelessWidget {
     final mStyle = defaults.messageStyle;
 
     final content = Column(
-      mainAxisAlignment: center ? MainAxisAlignment.center : MainAxisAlignment.start,
+      mainAxisAlignment:
+          center ? MainAxisAlignment.center : MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (useCircle)
@@ -100,7 +101,7 @@ class EmptyState extends StatelessWidget {
         );
 
       case EmptyStateVariant.notifications:
-      return _EmptyDefaults(
+        return _EmptyDefaults(
           icon: LucideIcons.bell,
           title: 'لا توجد تنبيهات',
           message: 'سيتم عرض التنبيهات هنا عند توفرها',

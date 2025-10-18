@@ -30,16 +30,15 @@ class UsersManagementCard extends StatelessWidget {
         if (state is UserSuccess) {
           MotionSnackBarSuccess(context, state.message);
         } else if (state is UserFailure) {
-          MotionSnackBarError(context, state.error); 
+          MotionSnackBarError(context, state.error);
         }
       },
       builder: (context, state) {
-     
         List<UserRow> userRows = [];
         List<User> usersData = [];
 
         if (state is UsersLoaded) {
-          usersData = state.users as List<User>; 
+          usersData = state.users as List<User>;
           userRows = _convertUsersToRows(usersData);
         }
 
@@ -66,7 +65,10 @@ class UsersManagementCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   FilledButton.icon(
-                    onPressed: getIt<UserCubit>().currentUser.userType==UserType.cashier ? null : () => _showAddUserDialog(context),
+                    onPressed: getIt<UserCubit>().currentUser.userType ==
+                            UserType.cashier
+                        ? null
+                        : () => _showAddUserDialog(context),
                     icon: const Icon(LucideIcons.plus, size: 18),
                     label: Text(isMobile ? 'إضافة' : 'إضافة مستخدم جديد'),
                     style: FilledButton.styleFrom(
@@ -79,8 +81,7 @@ class UsersManagementCard extends StatelessWidget {
                 ],
               ),
               SizedBox(height: isMobile ? 12 : 16),
-            
-               if (userRows.isEmpty)
+              if (userRows.isEmpty)
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(48.0),
@@ -121,17 +122,15 @@ class UsersManagementCard extends StatelessWidget {
 
   List<UserRow> _convertUsersToRows(List<User> users) {
     return users.map((user) {
-      final isManager = user.userType == UserType.manager; // ✅ Fixed: was UserType.manager
+      final isManager =
+          user.userType == UserType.manager; // ✅ Fixed: was UserType.manager
       return UserRow(
         name: user.name,
         email: user.username,
         roleLabel: isManager ? 'مدير النظام' : 'كاشير',
-        roleTint: isManager
-            ? const Color(0xFFFEE2E2)
-            : const Color(0xFFE0F2FE),
-        roleColor: isManager
-            ? const Color(0xFFDC2626)
-            : const Color(0xFF0369A1),
+        roleTint: isManager ? const Color(0xFFFEE2E2) : const Color(0xFFE0F2FE),
+        roleColor:
+            isManager ? const Color(0xFFDC2626) : const Color(0xFF0369A1),
         active: true,
         lastLogin: 'اليوم',
       );

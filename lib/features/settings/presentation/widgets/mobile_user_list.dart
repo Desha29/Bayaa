@@ -118,16 +118,11 @@ class MobileUserList extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context, User user) async {
- await showDialog<User>(
-    context: context,
-    builder: (dialogContext) => AddEditUserDialog(userToEdit: user),
-  );
-
- 
-}
-
-
-
+    await showDialog<User>(
+      context: context,
+      builder: (dialogContext) => AddEditUserDialog(userToEdit: user),
+    );
+  }
 
   void _showDeleteDialog(BuildContext context, User user) {
     showDialog(
@@ -154,7 +149,8 @@ class MobileUserList extends StatelessWidget {
             const Expanded(child: Text('تأكيد الحذف')),
           ],
         ),
-        content: Text('هل أنت متأكد من حذف المستخدم "${user.name}"؟\nلا يمكن التراجع عن هذا الإجراء.'),
+        content: Text(
+            'هل أنت متأكد من حذف المستخدم "${user.name}"؟\nلا يمكن التراجع عن هذا الإجراء.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -204,14 +200,14 @@ class MobileUserList extends StatelessWidget {
                   Text(
                     user.name,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   Text(
                     user.username,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                          color: Colors.grey[600],
+                        ),
                   ),
                 ],
               ),
@@ -275,7 +271,8 @@ class MobileUserList extends StatelessWidget {
             const SizedBox(height: 12),
             _DetailRow(
               label: 'نوع المستخدم',
-              value: user.userType == UserType.manager ? 'مدير النظام' : 'كاشير',
+              value:
+                  user.userType == UserType.manager ? 'مدير النظام' : 'كاشير',
             ),
           ],
         ),
@@ -307,16 +304,16 @@ class _DetailRow extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
         ),
         const SizedBox(height: 4),
         Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+                fontWeight: FontWeight.w600,
+              ),
         ),
       ],
     );

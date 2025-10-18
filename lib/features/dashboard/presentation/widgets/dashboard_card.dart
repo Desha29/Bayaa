@@ -34,9 +34,8 @@ class _DashboardCardState extends State<DashboardCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOut,
-        transform: _isHovered
-            ? (Matrix4.identity()..scale(1.04))
-            : Matrix4.identity(),
+        transform:
+            _isHovered ? (Matrix4.identity()..scale(1.04)) : Matrix4.identity(),
         decoration: BoxDecoration(
           color: AppColors.surfaceColor,
           borderRadius: BorderRadius.circular(18),
@@ -110,7 +109,6 @@ class _DashboardCardState extends State<DashboardCard> {
                         ),
                       ),
                     ),
-
                     Expanded(
                       child: FittedBox(
                         fit: BoxFit.scaleDown,

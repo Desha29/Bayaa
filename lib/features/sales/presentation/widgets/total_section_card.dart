@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
-
 class TotalSectionCard extends StatelessWidget {
   final double totalAmount;
   final int itemCount;

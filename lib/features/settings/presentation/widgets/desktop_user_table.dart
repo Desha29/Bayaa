@@ -50,7 +50,8 @@ class DesktopUserTable extends StatelessWidget {
         ),
         columns: const [
           DataColumn2(label: Center(child: Text('الاسم')), size: ColumnSize.L),
-          DataColumn2(label: Center(child: Text('اسم المستخدم')), size: ColumnSize.L),
+          DataColumn2(
+              label: Center(child: Text('اسم المستخدم')), size: ColumnSize.L),
           DataColumn2(
             label: Center(child: Text('الدور')),
             size: ColumnSize.M,
@@ -211,8 +212,6 @@ class DesktopUserTable extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AddEditUserDialog(userToEdit: user),
     );
-
- 
   }
 
   void _showDeleteDialog(BuildContext context, User user) {

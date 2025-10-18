@@ -60,8 +60,8 @@ class _RestockDialogState extends State<RestockDialog> {
                     child: Text(
                       'إعادة تخزين المنتج',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ),
                   IconButton(

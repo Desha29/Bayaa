@@ -31,7 +31,8 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
     phoneCtrl = TextEditingController(text: widget.storeInfo['phone'] ?? '');
     emailCtrl = TextEditingController(text: widget.storeInfo['email'] ?? '');
     vatCtrl = TextEditingController(text: widget.storeInfo['vat'] ?? '');
-    addressCtrl = TextEditingController(text: widget.storeInfo['address'] ?? '');
+    addressCtrl =
+        TextEditingController(text: widget.storeInfo['address'] ?? '');
   }
 
   @override

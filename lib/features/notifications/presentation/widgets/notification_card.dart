@@ -81,7 +81,8 @@ class NotificationCard extends StatelessWidget {
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.red.shade50,
                         padding: EdgeInsets.all(isMobile ? 6 : 8),
-                        minimumSize: Size(isMobile ? 32 : 40, isMobile ? 32 : 40),
+                        minimumSize:
+                            Size(isMobile ? 32 : 40, isMobile ? 32 : 40),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -96,7 +97,8 @@ class NotificationCard extends StatelessWidget {
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.grey.shade100,
                         padding: EdgeInsets.all(isMobile ? 6 : 8),
-                        minimumSize: Size(isMobile ? 32 : 40, isMobile ? 32 : 40),
+                        minimumSize:
+                            Size(isMobile ? 32 : 40, isMobile ? 32 : 40),
                       ),
                     ),
                   ],
@@ -115,7 +117,8 @@ class NotificationCard extends StatelessWidget {
                           CircleAvatar(
                             radius: 20,
                             backgroundColor: _iconColor().withOpacity(0.12),
-                            child: Icon(item.icon, color: _iconColor(), size: 20),
+                            child:
+                                Icon(item.icon, color: _iconColor(), size: 20),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -248,7 +251,8 @@ class NotificationCard extends StatelessWidget {
                   trailing: IconButton(
                     tooltip: item.read ? 'وضع كغير مقروء' : 'وضع كمقروء',
                     onPressed: onMarkReadToggle,
-                    icon: Icon(item.read ? LucideIcons.eye : LucideIcons.eyeOff),
+                    icon:
+                        Icon(item.read ? LucideIcons.eye : LucideIcons.eyeOff),
                     color: Colors.grey.shade700,
                   ),
                 ),

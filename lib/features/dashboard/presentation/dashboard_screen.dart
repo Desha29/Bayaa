@@ -76,7 +76,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               )
             : null,
-
         drawer: isMobileOrTablet
             ? Drawer(
                 child: CustomSidebar(
@@ -91,7 +90,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               )
             : null,
-
         body: Row(
           children: [
             if (!isMobileOrTablet)
@@ -105,7 +103,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   });
                 },
               ),
-
             Expanded(
               child: Container(
                 color: AppColors.backgroundColor,

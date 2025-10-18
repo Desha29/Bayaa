@@ -47,10 +47,10 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   }
 
   void _submit() {
-    if (nameCtrl.text.trim().isEmpty || 
+    if (nameCtrl.text.trim().isEmpty ||
         usernameCtrl.text.trim().isEmpty ||
         passwordCtrl.text.trim().isEmpty) {
-    MotionSnackBarError(context, 'يرجى ملء الحقول المطلوبة');
+      MotionSnackBarError(context, 'يرجى ملء الحقول المطلوبة');
       return;
     }
 
@@ -65,14 +65,11 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
     if (widget.userToEdit == null) {
       getIt<UserCubit>().saveUser(user);
       MotionSnackBarSuccess(context, 'تم إضافة المستخدم بنجاح');
-      getIt<UserCubit>().getAllUsers(); 
+      getIt<UserCubit>().getAllUsers();
     } else {
       getIt<UserCubit>().updateUser(user);
       MotionSnackBarSuccess(context, 'تم تعديل المستخدم بنجاح');
     }
-
-    
-     
 
     Navigator.of(context).pop(user);
   }
@@ -131,7 +128,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                 ],
               ),
               const SizedBox(height: 24),
-              
+
               // Form
               Flexible(
                 child: SingleChildScrollView(
@@ -139,19 +136,13 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                     children: [
                       _buildTextField(nameCtrl, 'الاسم *', Icons.person),
                       const SizedBox(height: 16),
-                      _buildTextField(
-                        phoneCtrl, 
-                        'رقم الهاتف', 
-                        Icons.phone,
-                        keyboardType: TextInputType.phone,
-                        readOnly: true
-                      ),
+                      _buildTextField(phoneCtrl, 'رقم الهاتف', Icons.phone,
+                          keyboardType: TextInputType.phone, readOnly: true),
                       const SizedBox(height: 16),
                       _buildTextField(
-                        usernameCtrl, 
-                        'اسم المستخدم *', 
+                        usernameCtrl,
+                        'اسم المستخدم *',
                         Icons.account_circle,
-                        
                       ),
                       const SizedBox(height: 16),
                       _buildPasswordField(),
@@ -162,7 +153,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Actions
               Row(
                 children: [
@@ -207,12 +198,8 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   }
 
   Widget _buildTextField(
-    TextEditingController controller,
-    String label,
-    IconData icon, {
-    TextInputType? keyboardType,
-    bool readOnly = false
-  }) {
+      TextEditingController controller, String label, IconData icon,
+      {TextInputType? keyboardType, bool readOnly = false}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -310,11 +297,13 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
             child: const Text('كاشير'),
           ),
         ],
-        onChanged: (v) => setState(() => selectedUserType = v ?? UserType.cashier),
+        onChanged: (v) =>
+            setState(() => selectedUserType = v ?? UserType.cashier),
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: 'نوع المستخدم',
-          prefixIcon: Icon(Icons.admin_panel_settings, color: AppColors.primaryColor),
+          prefixIcon:
+              Icon(Icons.admin_panel_settings, color: AppColors.primaryColor),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 16,

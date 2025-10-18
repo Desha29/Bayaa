@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/constants/app_colors.dart';
 
-
-class CartItemRow extends StatelessWidget {
+class CartItemRow extends StatefulWidget {
   final String name;
   final String id;
   final double price;
   final int quantity;
   final DateTime date;
+  final double minPrice;
   final VoidCallback? onRemove;
   final VoidCallback? onIncrease;
   final VoidCallback? onDecrease;
+  final Function(double)? onEditPrice;
 
   const CartItemRow({
     super.key,
@@ -19,21 +21,108 @@ class CartItemRow extends StatelessWidget {
     required this.price,
     required this.quantity,
     required this.date,
+    required this.minPrice,
     this.onRemove,
     this.onIncrease,
     this.onDecrease,
+    this.onEditPrice,
   });
 
   @override
+  State<CartItemRow> createState() => _CartItemRowState();
+}
+
+class _CartItemRowState extends State<CartItemRow> {
+  bool _isEditingPrice = false;
+  late TextEditingController _priceController;
+
+  @override
+  void initState() {
+    super.initState();
+    _priceController = TextEditingController(text: widget.price.toStringAsFixed(2));
+  }
+
+  @override
+  void dispose() {
+    _priceController.dispose();
+    super.dispose();
+  }
+
+  void _showEditPriceDialog() {
+    _priceController.text = widget.price.toStringAsFixed(2);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تعديل السعر'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'الحد الأدنى للسعر: ${widget.minPrice.toStringAsFixed(2)} ج.م',
+              style: TextStyle(
+                color: AppColors.warningColor,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _priceController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+              ],
+              decoration: InputDecoration(
+                labelText: 'السعر الجديد',
+                suffixText: 'ج.م',
+                border: const OutlineInputBorder(),
+                filled: true,
+                fillColor: AppColors.surfaceColor,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newPrice = double.tryParse(_priceController.text);
+              if (newPrice != null && newPrice >= widget.minPrice) {
+                widget.onEditPrice?.call(newPrice);
+                Navigator.pop(context);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'السعر يجب أن يكون أكبر من أو يساوي ${widget.minPrice.toStringAsFixed(2)} ج.م',
+                    ),
+                    backgroundColor: AppColors.kDangerRed,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.kPrimaryBlue,
+            ),
+            child: const Text('حفظ'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final total = price * quantity;
-    
+    final total = widget.price * widget.quantity;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isWide = constraints.maxWidth > 600;
-
           return Row(
             children: [
               Expanded(
@@ -42,7 +131,7 @@ class CartItemRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '$name (كود: $id)',
+                      '${ widget.name} (كود: ${widget.id})',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -50,7 +139,7 @@ class CartItemRow extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'تاريخ: ${date.year}/${date.month}/${date.day}',
+                      'تاريخ: ${widget.date.year}/${widget.date.month}/${widget.date.day}',
                       style: TextStyle(
                         color: AppColors.mutedColor,
                         fontSize: 12,
@@ -62,10 +151,32 @@ class CartItemRow extends StatelessWidget {
               if (isWide) const SizedBox(width: 12),
               Expanded(
                 flex: isWide ? 2 : 2,
-                child: Text(
-                  '${price.toStringAsFixed(0)} ج.م',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 14),
+                child: GestureDetector(
+                  onTap: _showEditPriceDialog,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceColor,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppColors.borderColor),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${widget.price.toStringAsFixed(0)} ج.م',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.edit,
+                          size: 14,
+                          color: AppColors.primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               Expanded(
@@ -73,18 +184,18 @@ class CartItemRow extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildQtyButton(Icons.remove, onDecrease),
+                    _buildQtyButton(Icons.remove, widget.onDecrease),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        '$quantity',
+                        '${widget.quantity}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
                     ),
-                    _buildQtyButton(Icons.add, onIncrease),
+                    _buildQtyButton(Icons.add, widget.onIncrease),
                   ],
                 ),
               ),
@@ -103,7 +214,7 @@ class CartItemRow extends StatelessWidget {
               const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 20),
-                onPressed: onRemove ?? () {},
+                onPressed: widget.onRemove ?? () {},
                 style: IconButton.styleFrom(
                   backgroundColor: AppColors.kDangerRed,
                   foregroundColor: Colors.white,

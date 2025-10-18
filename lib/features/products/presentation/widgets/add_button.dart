@@ -6,13 +6,14 @@ class AddButton extends StatelessWidget {
   final Color color;
   const AddButton({
     super.key,
-    required this.onAddPressed, required this.text,  this.color=AppColors.primaryColor,
+    required this.onAddPressed,
+    required this.text,
+    this.color = AppColors.primaryColor,
   });
 
   final VoidCallback onAddPressed;
 
   @override
-
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -35,7 +36,7 @@ class AddButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onAddPressed,
         icon: const Icon(Icons.add_rounded, size: 20),
-        label:  FittedBox(
+        label: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             text,

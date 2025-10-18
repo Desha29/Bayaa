@@ -104,8 +104,8 @@ class _CustomSidebarState extends State<CustomSidebar>
                     final bgColor = isSelected
                         ? AppColors.primaryColor.withOpacity(0.95)
                         : isHovered
-                        ? AppColors.primaryColor.withOpacity(0.08)
-                        : Colors.transparent;
+                            ? AppColors.primaryColor.withOpacity(0.08)
+                            : Colors.transparent;
 
                     final fgIcon = isSelected
                         ? AppColors.primaryForeground
@@ -116,9 +116,8 @@ class _CustomSidebarState extends State<CustomSidebar>
                       color: isSelected
                           ? AppColors.primaryForeground
                           : AppColors.secondaryColor,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.w500,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.w500,
                     );
 
                     return MouseRegion(
@@ -220,7 +219,6 @@ class _SidebarHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final radius = compact ? 20.0 : 30.0; // slightly smaller
 
     return Column(
@@ -248,11 +246,11 @@ class _SidebarHeader extends StatelessWidget {
                   child: Text(
                     'Crazy Phone',
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.secondaryColor,
-                      fontSize: 13,
-                      height: 1.2, // tighter line-height
-                    ),
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.secondaryColor,
+                          fontSize: 13,
+                          height: 1.2, // tighter line-height
+                        ),
                   ),
                 ),
               ),

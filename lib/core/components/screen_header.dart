@@ -10,7 +10,6 @@ class ScreenHeader extends StatelessWidget {
   final Color? iconColor;
   final Color? subtitleColor;
 
-
   const ScreenHeader({
     super.key,
     required this.title,
@@ -18,18 +17,19 @@ class ScreenHeader extends StatelessWidget {
     this.fontSize = 32,
     this.icon,
     this.titleColor,
-    this.subtitleColor, this.iconColor,
+    this.subtitleColor,
+    this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
-    
-    final adaptiveFontSize = screenWidth < 600 
-        ? fontSize * 0.75 
-        : screenWidth < 900 
-            ? fontSize * 0.85 
+
+    final adaptiveFontSize = screenWidth < 600
+        ? fontSize * 0.75
+        : screenWidth < 900
+            ? fontSize * 0.85
             : fontSize;
 
     final adaptiveSubtitleSize = screenWidth < 600 ? 14.0 : 16.0;
@@ -48,7 +48,8 @@ class ScreenHeader extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: (titleColor ?? const Color(0xFF1A1A1A)).withOpacity(0.08),
+                  color:
+                      (titleColor ?? const Color(0xFF1A1A1A)).withOpacity(0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(

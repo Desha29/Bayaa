@@ -64,28 +64,39 @@ class MobileLayout extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Filters
         Row(
           children: [
             Expanded(
-              child: DropDownFilter(label: 'الفئة', value: categoryFilter, items: categories, onChanged: onCategoryChanged, icon: Icons.category_outlined),
+              child: DropDownFilter(
+                  label: 'الفئة',
+                  value: categoryFilter,
+                  items: categories,
+                  onChanged: onCategoryChanged,
+                  icon: Icons.category_outlined),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: DropDownFilter(label: 'التوفر', value: availabilityFilter, items: availabilities, onChanged: onAvailabilityChanged, icon: Icons.inventory_outlined),
+              child: DropDownFilter(
+                  label: 'التوفر',
+                  value: availabilityFilter,
+                  items: availabilities,
+                  onChanged: onAvailabilityChanged,
+                  icon: Icons.inventory_outlined),
             ),
           ],
         ),
         const SizedBox(height: 16),
-  AddButton(
-    onAddPressed: onAddPressed,
-    text: "إضافة منتج جديد",
-  ),
-            AddButton(
-              onAddPressed: onAddPressed,
-              text: "إضافة صنف جديد",
-            ),      ],
+        AddButton(
+          onAddPressed: onAddPressed,
+          text: "إضافة منتج جديد",
+        ),
+        AddButton(
+          onAddPressed: onAddPressed,
+          text: "إضافة صنف جديد",
+        ),
+      ],
     );
   }
 }

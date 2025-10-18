@@ -10,7 +10,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/components/logo.dart';
 
-
 import '../../dashboard/presentation/dashboard_screen.dart';
 
 import 'cubit/user_cubit.dart';
@@ -32,22 +31,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   @override
-
   Widget build(BuildContext context) {
     return BlocProvider<UserCubit>.value(
-          value: getIt<UserCubit>(),
-
+      value: getIt<UserCubit>(),
       child: LayoutBuilder(
         builder: (context, c) {
           final isMobile = c.maxWidth < 520;
           final pad = isMobile ? 14.0 : 24.0;
           final cardWidth = isMobile ? c.maxWidth - 28 : 500.0;
-      
+
           return BlocListener<UserCubit, UserStates>(
             listener: (context, state) {
               if (state is UserFailure) {
                 MotionSnackBarError(context, state.error);
-                
               } else if (state is UserSuccess) {
                 MotionSnackBarSuccess(context, state.message);
                 if (state.message == "تم تسجيل الدخول بنجاح") {
@@ -69,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   final avatarRadius = isMobile
                       ? (isShort ? 56.0 : 68.0)
                       : (isShort ? 76.0 : 92.0);
-          
+
                   return SingleChildScrollView(
                     physics: const ClampingScrollPhysics(),
                     child: Center(
@@ -89,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   isMobile: isMobile,
                                   avatarRadius: avatarRadius),
                               SizedBox(height: isShort ? 16 : 24),
-          
+
                               // Form card
                               Container(
                                 width: cardWidth,
@@ -160,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               cubit.isPasswordVisible;
                                           return CustomTextField(
                                             controller: _passwordController,
-                                            onEditingComplete: (){
+                                            onEditingComplete: () {
                                               _handleLogin(context);
                                             },
                                             label: 'كلمة المرور',
@@ -202,9 +198,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
-          
+
                               const SizedBox(height: 16),
-          
+
                               // Footer
                               Padding(
                                 padding:

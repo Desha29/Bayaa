@@ -21,7 +21,7 @@ class StoreInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return BlocConsumer<SettingsCubit, SettingsStates>(
       listener: (context, state) {
         if (state is StoreInfoUpdateSuccess) {
@@ -77,7 +77,6 @@ class StoreInfoCard extends StatelessWidget {
                 ],
               ),
               SizedBox(height: isMobile ? 12 : 16),
-              
               if (isLoading)
                 const Center(
                   child: Padding(

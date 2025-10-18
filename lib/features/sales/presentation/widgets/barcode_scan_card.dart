@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
-
 class BarcodeScanCard extends StatelessWidget {
   final TextEditingController? controller;
   final VoidCallback? onAddPressed;
@@ -75,7 +74,8 @@ class BarcodeScanCard extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.kPrimaryBlue,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

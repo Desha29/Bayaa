@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
-
 class RecentSalesSection extends StatelessWidget {
   final List<Map<String, dynamic>> recentSales;
 
@@ -130,7 +129,8 @@ class RecentSalesSection extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.kDarkChip,
                   borderRadius: BorderRadius.circular(6),

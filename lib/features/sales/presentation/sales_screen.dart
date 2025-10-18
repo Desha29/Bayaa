@@ -1,11 +1,17 @@
+// lib/features/sales/presentation/sales_screen.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import '../../../core/components/screen_header.dart';
 import '../../../core/constants/app_colors.dart';
-import 'widgets/recent_sales.dart';
+import '../../products/data/models/product_model.dart';
 
 import 'widgets/barcode_scan_card.dart';
 import 'widgets/cart_section.dart';
 import 'widgets/total_section_card.dart';
+import 'widgets/recent_sales.dart';
 
 class SalesScreen extends StatefulWidget {
   const SalesScreen({super.key});
@@ -14,89 +20,137 @@ class SalesScreen extends StatefulWidget {
   State<SalesScreen> createState() => _SalesScreenState();
 }
 
-class _SalesScreenState extends State<SalesScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin {
+  // Animations (kept from your existing screen)
+  late final AnimationController _fadeController;
+  late final AnimationController _slideController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
 
-  // Dummy data
-  final List<Map<String, dynamic>> dummyCartItems = [
-    {
-      'id': 'P001',
-      'name': 'آيفون 14 برو',
-      'price': 4500.0,
-      'qty': 2,
-      'date': DateTime(2025, 10, 15),
-    },
-    {
-      'id': 'P002',
-      'name': 'سامسونج جالاكسي S23',
-      'price': 3200.0,
-      'qty': 1,
-      'date': DateTime(2025, 10, 14),
-    },
-    {
-      'id': 'P003',
-      'name': 'ايربودز برو',
-      'price': 1200.0,
-      'qty': 3,
-      'date': DateTime(2025, 10, 16),
-    },
-  ];
+  // TextField controller inside your BarcodeScanCard
+  final TextEditingController _barcodeController = TextEditingController();
 
-  final List<Map<String, dynamic>> dummyRecentSales = [
-    {'total': 8500.0, 'items': 4, 'date': DateTime(2025, 10, 15, 14, 30)},
-    {'total': 12300.0, 'items': 6, 'date': DateTime(2025, 10, 15, 11, 15)},
-    {'total': 5600.0, 'items': 2, 'date': DateTime(2025, 10, 14, 16, 45)},
-    {'total': 9800.0, 'items': 5, 'date': DateTime(2025, 10, 14, 9, 20)},
-    {'total': 9800.0, 'items': 5, 'date': DateTime(2025, 10, 14, 9, 20)},
-    {'total': 9800.0, 'items': 5, 'date': DateTime(2025, 10, 14, 9, 20)},
-    {'total': 9800.0, 'items': 5, 'date': DateTime(2025, 10, 14, 9, 20)},
-  ];
+  // HID keyboard-wedge listener (scanners that type like a keyboard)
+  final StringBuffer _hidBuffer = StringBuffer();
+  Timer? _hidTimer;
 
-  double get totalAmount {
-    return dummyCartItems.fold(
-      0.0,
-      (sum, item) => sum + (item['price'] * item['qty']),
-    );
-  }
+  // Local products box (already opened in main)
+  late final Box<Product> _productsBox;
+
+  // Simple in-memory cart; matches your CartSection map shape
+  final List<Map<String, dynamic>> _cartItems = [];
+  List<Map<String, dynamic>> _recentSales = [];
+
+  double get _totalAmount => _cartItems.fold<double>(
+        0.0,
+        (sum, e) => sum + (e['price'] as double) * (e['qty'] as int),
+      );
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
-
+    _productsBox = Hive.box<Product>('productsBox'); // already opened at app start
+    _fadeController = AnimationController(duration: const Duration(milliseconds: 800), vsync: this);
+    _slideController = AnimationController(duration: const Duration(milliseconds: 1000), vsync: this);
+    _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
     _fadeController.forward();
     _slideController.forward();
+
+    // Global HID listener: commits on Enter or brief idle after burst
+    RawKeyboard.instance.addListener(_onRawKey);
   }
 
   @override
   void dispose() {
+    RawKeyboard.instance.removeListener(_onRawKey);
+    _hidTimer?.cancel();
+    _barcodeController.dispose();
     _fadeController.dispose();
     _slideController.dispose();
     super.dispose();
+  }
+
+  // Capture scanner keystrokes and commit to search
+  void _onRawKey(RawKeyEvent event) {
+    if (event is! RawKeyDownEvent) return;
+
+    // Commit as soon as scanner sends Enter/NumpadEnter
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      _hidTimer?.cancel();
+      final code = _hidBuffer.toString().trim();
+      _hidBuffer.clear();
+      _commitBarcode(code);
+      return;
+    }
+
+    // Prefer character; fallback to keyLabel for digits/letters on Windows
+    String? ch = event.character;
+    if ((ch == null || ch.isEmpty) && event.logicalKey.keyLabel.length == 1) {
+      ch = event.logicalKey.keyLabel;
+    }
+
+    // Accept visible characters only
+    if (ch != null && ch.isNotEmpty && ch.codeUnitAt(0) >= 32) {
+      _hidBuffer.write(ch);
+      _barcodeController.text = _hidBuffer.toString(); // mirror to TextField
+    }
+
+    // If no Enter suffix, commit shortly after the burst ends
+    _hidTimer?.cancel();
+    _hidTimer = Timer(const Duration(milliseconds: 120), () {
+      final code = _hidBuffer.toString().trim();
+      _hidBuffer.clear();
+      _commitBarcode(code);
+    });
+  }
+
+  // Central path: find product by barcode and add to cart
+  void _commitBarcode(String code) {
+    if (code.isEmpty) return;
+
+    // Look up product by barcode in local Hive
+    final product = _productsBox.values.firstWhere(
+      (p) => p.barcode == code,
+      orElse: () => null as Product, // will be caught below
+    );
+
+    if (product == null) {
+      // Notify when not found
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('المنتج غير موجود: $code')),
+      );
+      _barcodeController.clear();
+      setState(() {});
+      return;
+    }
+
+    // Already in cart? increase qty; else add line
+    final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
+    if (idx != -1) {
+      _cartItems[idx]['qty'] = (_cartItems[idx]['qty'] as int) + 1;
+    } else {
+      _cartItems.add({
+        'id': product.barcode,
+        'name': product.name,
+        'price': product.price,
+        'qty': 1,
+        'date': DateTime.now(),
+        'minPrice': product is Product ? product.minPrice : 0.0,
+      });
+    }
+
+    _barcodeController.clear();
+    setState(() {});
+  }
+
+  // Manual add uses the same path (pressing your existing Add button)
+  void _onAddPressed() {
+    final code = _barcodeController.text.trim();
+    _commitBarcode(code);
   }
 
   @override
@@ -107,9 +161,7 @@ class _SalesScreenState extends State<SalesScreen>
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth > 1200;
-            final isTablet =
-                constraints.maxWidth >= 768 && constraints.maxWidth <= 1200;
-
+            final isTablet = constraints.maxWidth >= 768 && constraints.maxWidth <= 1200;
             return Padding(
               padding: EdgeInsets.all(isDesktop ? 32 : (isTablet ? 24 : 16)),
               child: (isDesktop || isTablet)
@@ -128,16 +180,14 @@ class _SalesScreenState extends State<SalesScreen>
       children: [
         Expanded(
           flex: isDesktop ? 7 : 6,
-          child: SingleChildScrollView(
-            child: _buildMainContent(),
-          ),
+          child: SingleChildScrollView(child: _buildMainContent()),
         ),
         SizedBox(width: isDesktop ? 32 : 24),
         Expanded(
           flex: isDesktop ? 3 : 4,
           child: FadeTransition(
             opacity: _fadeAnimation,
-            child: RecentSalesSection(recentSales: dummyRecentSales),
+            child: RecentSalesSection(recentSales: _recentSales),
           ),
         ),
       ],
@@ -154,7 +204,7 @@ class _SalesScreenState extends State<SalesScreen>
             position: _slideAnimation,
             child: FadeTransition(
               opacity: _fadeAnimation,
-              child: RecentSalesSection(recentSales: dummyRecentSales),
+              child: RecentSalesSection(recentSales: _recentSales),
             ),
           ),
         ],
@@ -175,33 +225,64 @@ class _SalesScreenState extends State<SalesScreen>
           titleColor: AppColors.kDarkChip,
         ),
         const SizedBox(height: 24),
+
+        // Your existing barcode card; TextField reads scanner input via HID listener
         BarcodeScanCard(
-          onAddPressed: () {
-            // Add product logic here
-          },
+          controller: _barcodeController,
+          onAddPressed: _onAddPressed,
         ),
+
         const SizedBox(height: 20),
+
+        // Your existing cart section
         CartSection(
-          cartItems: dummyCartItems,
-          onRemoveItem: (index) {
-            // Remove item logic here
+          cartItems: _cartItems,
+          onRemoveItem: (i) {
+            _cartItems.removeAt(i);
+            setState(() {});
           },
-          onIncreaseQty: (index) {
-            // Increase quantity logic here
+          onIncreaseQty: (i) {
+            _cartItems[i]['qty'] = (_cartItems[i]['qty'] as int) + 1;
+            setState(() {});
           },
-          onDecreaseQty: (index) {
-            // Decrease quantity logic here
+          onDecreaseQty: (i) {
+            final q = _cartItems[i]['qty'] as int;
+            if (q > 1) {
+              _cartItems[i]['qty'] = q - 1;
+            } else {
+              _cartItems.removeAt(i);
+            }
+            setState(() {});
           },
         ),
+
         const SizedBox(height: 20),
+
+        // Your existing totals card
         TotalSectionCard(
-          totalAmount: totalAmount,
-          itemCount: dummyCartItems.length,
+          totalAmount: _totalAmount,
+          itemCount: _cartItems.length,
           onCheckout: () {
-            // Checkout logic here
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م'),
+                backgroundColor: AppColors.kSuccessGreen,
+              ),
+            );
+            _recentSales = [
+              {
+                'total': _totalAmount,
+                'items': _cartItems.length,
+                'date': DateTime.now(),
+              },
+              ..._recentSales,
+            ];
+            _cartItems.clear();
+            setState(() {});
           },
           onClearCart: () {
-            // Clear cart logic here
+            _cartItems.clear();
+            setState(() {});
           },
         ),
       ],

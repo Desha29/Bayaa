@@ -55,6 +55,7 @@ class _EnhancedAddEditProductDialogState
 
   void _submit() {
     getIt<ProductCubit>().saveProduct(Product(
+      minPrice: double.tryParse(minCtrl.text.trim()) ?? 0.0,
       name: nameCtrl.text.trim(),
       barcode: barcodeCtrl.text.trim(),
       price: double.tryParse(priceCtrl.text.trim()) ?? 0.0,

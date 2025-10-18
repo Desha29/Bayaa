@@ -117,7 +117,7 @@ class FilterButtonsWidget extends StatelessWidget {
                           totalCount,
                           'all',
                           Icons.inventory_2_outlined,
-                         Color(0xff1b86ff),
+                          Color(0xff1b86ff),
                           'عرض جميع المنتجات',
                         ),
                         const SizedBox(height: 12),

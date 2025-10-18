@@ -5,8 +5,13 @@ import 'package:crazy_phone_pos/features/products/data/data_source/category_data
 import 'package:crazy_phone_pos/features/products/data/data_source/product_data_source.dart';
 import 'package:crazy_phone_pos/features/products/data/repository/product_repository_imp.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
-import 'package:crazy_phone_pos/features/stock/presentation/widgets/product_card.dart';
+import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_flutter/adapters.dart';
+
+import '../../features/sales/data/models/sale_model.dart';
+import '../../features/sales/data/repository/sales_repository_impl.dart';
+import '../../features/sales/presentation/cubit/sales_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -17,4 +22,9 @@ void setup() {
       productRepositoryInt: ProductRepositoryImp(
           productDataSource: ProductDataSource(),
           categoryDataSource: CategoryDataSource())));
+  getIt.registerSingleton<SalesCubit>(SalesCubit(
+      repository: SalesRepositoryImpl(
+          productsBox: Hive.box<Product>('productsBox'),
+          salesBox: Hive.box<Sale>('salesBox'))));
+         
 }

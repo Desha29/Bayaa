@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
-
 import 'cart_item.dart';
-
 
 class CartSection extends StatelessWidget {
   final List<Map<String, dynamic>> cartItems;
   final Function(int)? onRemoveItem;
   final Function(int)? onIncreaseQty;
   final Function(int)? onDecreaseQty;
+  final Function(int, double)? onEditPrice;
 
   const CartSection({
     super.key,
@@ -16,11 +15,12 @@ class CartSection extends StatelessWidget {
     this.onRemoveItem,
     this.onIncreaseQty,
     this.onDecreaseQty,
+    this.onEditPrice,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
+    return TweenAnimationBuilder(
       duration: const Duration(milliseconds: 1000),
       tween: Tween(begin: 0.0, end: 1.0),
       curve: Curves.easeOutCubic,
@@ -111,9 +111,11 @@ class CartSection extends StatelessWidget {
                           price: item['price'],
                           quantity: item['qty'],
                           date: item['date'],
+                          minPrice: item['minPrice'] ?? 0.0,
                           onRemove: () => onRemoveItem?.call(index),
                           onIncrease: () => onIncreaseQty?.call(index),
                           onDecrease: () => onDecreaseQty?.call(index),
+                          onEditPrice: (newPrice) => onEditPrice?.call(index, newPrice),
                         );
                       },
                     ),

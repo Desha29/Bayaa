@@ -13,7 +13,7 @@ class AppTheme {
         onSecondary: Colors.white,
         surface: AppColors.surfaceColor,
         onSurface: Color(0xFF4B5563),
-        error: AppColors. errorColor,
+        error: AppColors.errorColor,
         onError: Colors.white,
       ),
       fontFamily: 'Cairo', // Arabic font
@@ -145,4 +145,4 @@ class AppTheme {
       ),
     );
   }
-} 
+}

@@ -44,6 +44,8 @@ dependencies:
   data_table_2: ^2.6.0
   dartz: ^0.10.1
   motion_toast: ^2.14.0
+  equatable: ^2.0.7
+  flutter_libserialport: ^0.6.0
 
 dev_dependencies:
   flutter_test:

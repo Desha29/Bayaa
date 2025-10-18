@@ -20,8 +20,9 @@ class SummaryRow extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
-        final isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 920;
-        
+        final isTablet =
+            constraints.maxWidth >= 600 && constraints.maxWidth < 920;
+
         final children = [
           SummaryCard(
             label: 'مقروءة',
@@ -113,7 +114,7 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 12 : 16,

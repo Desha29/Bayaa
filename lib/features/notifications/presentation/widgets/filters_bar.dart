@@ -29,7 +29,8 @@ class FiltersBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 700;
-        final isTablet = constraints.maxWidth >= 700 && constraints.maxWidth < 900;
+        final isTablet =
+            constraints.maxWidth >= 700 && constraints.maxWidth < 900;
 
         if (isMobile) {
           return Column(
