@@ -1,5 +1,4 @@
-// lib/features/invoice/domain/invoice_mapper.dart
-// Map your cart + user/store info -> InvoiceData
+
 import '../../invoice/data/invoice_models.dart';
 
 class InvoiceMapper {
@@ -10,7 +9,7 @@ class InvoiceMapper {
     required String storeAddress,
     required String storePhone,
     required String cashierName,
-    required List<Map<String, dynamic>> cartMaps, // id, name, price, qty, date, minPrice...
+    required List<Map<String, dynamic>> cartMaps, 
     double discount = 0.0,
     double tax = 0.0,
     String? footerNote,

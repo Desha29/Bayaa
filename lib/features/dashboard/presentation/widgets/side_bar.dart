@@ -69,7 +69,7 @@ class _CustomSidebarState extends State<CustomSidebar>
         return Container(
           width: w,
           decoration: BoxDecoration(
-            color: AppColors.kCardBackground,
+            color: AppColors.primaryForeground,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),

@@ -51,6 +51,7 @@ dependencies:
   printing: ^5.14.2
   google_fonts: ^6.3.2
   fl_chart: ^1.1.1
+  mobile_scanner: ^7.1.2
 
 dev_dependencies:
   flutter_test:

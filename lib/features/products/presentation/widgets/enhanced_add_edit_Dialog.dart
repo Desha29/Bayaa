@@ -26,7 +26,8 @@ class _EnhancedAddEditProductDialogState
   late final TextEditingController barcodeCtrl;
   late final TextEditingController priceCtrl;
   late final TextEditingController qtyCtrl;
-  late final TextEditingController minCtrl;
+  late final TextEditingController minQtyCtrl;
+  late final TextEditingController minPriceCtrl;
   late String selectedCategory;
 
   @override
@@ -37,7 +38,8 @@ class _EnhancedAddEditProductDialogState
     barcodeCtrl = TextEditingController(text: p?.barcode ?? '');
     priceCtrl = TextEditingController(text: p?.price.toString() ?? '');
     qtyCtrl = TextEditingController(text: p?.quantity.toString() ?? '');
-    minCtrl = TextEditingController(text: p?.minQuantity.toString() ?? '');
+    minQtyCtrl = TextEditingController(text: p?.minQuantity.toString() ?? '');
+    minPriceCtrl = TextEditingController(text: p?.minPrice.toString() ?? '');
     selectedCategory = p?.category ??
         (widget.categories.isNotEmpty ? widget.categories.first : '');
   }
@@ -49,18 +51,19 @@ class _EnhancedAddEditProductDialogState
     barcodeCtrl.dispose();
     priceCtrl.dispose();
     qtyCtrl.dispose();
-    minCtrl.dispose();
+    minQtyCtrl.dispose();
+    minPriceCtrl.dispose();
     super.dispose();
   }
 
   void _submit() {
     getIt<ProductCubit>().saveProduct(Product(
-      minPrice: double.tryParse(minCtrl.text.trim()) ?? 0.0,
+      minPrice: double.tryParse(minPriceCtrl.text.trim()) ?? 0.0,
       name: nameCtrl.text.trim(),
       barcode: barcodeCtrl.text.trim(),
       price: double.tryParse(priceCtrl.text.trim()) ?? 0.0,
       quantity: int.tryParse(qtyCtrl.text.trim()) ?? 0,
-      minQuantity: int.tryParse(minCtrl.text.trim()) ?? 0,
+      minQuantity: int.tryParse(minQtyCtrl.text.trim()) ?? 0,
       category: selectedCategory,
     ));
     Navigator.of(context).pop();
@@ -136,12 +139,12 @@ class _EnhancedAddEditProductDialogState
                             _buildTwoColumnRow([
                               _buildTextField(
                                   nameCtrl, 'اسم المنتج *', Icons.inventory_2),
-                              const SizedBox.shrink(),
+                             _buildTextField(barcodeCtrl, 'رقم الباركود',Icons.qr_code_scanner)
                             ]),
                             const SizedBox(height: 16),
                             _buildTwoColumnRow([
-                              _buildTextField(barcodeCtrl, 'رقم الباركود',
-                                  Icons.qr_code_scanner),
+                              _buildTextField(
+                                  minPriceCtrl, 'الحد الأدنى للسعر *', Icons.price_change, TextInputType.number),
                               _buildTextField(
                                   priceCtrl,
                                   'السعر بالجنيه المصري *',
@@ -152,7 +155,7 @@ class _EnhancedAddEditProductDialogState
                             _buildTwoColumnRow([
                               _buildTextField(qtyCtrl, 'الكمية المتوفرة *',
                                   Icons.inventory, TextInputType.number),
-                              _buildTextField(minCtrl, 'الحد الأدنى للمخزون',
+                              _buildTextField(minQtyCtrl, 'الحد الأدنى للمخزون',
                                   Icons.trending_down, TextInputType.number),
                             ]),
                           ] else ...[
@@ -169,7 +172,7 @@ class _EnhancedAddEditProductDialogState
                             _buildTextField(qtyCtrl, 'الكمية المتوفرة *',
                                 Icons.inventory, TextInputType.number),
                             const SizedBox(height: 16),
-                            _buildTextField(minCtrl, 'الحد الأدنى للمخزون',
+                            _buildTextField(minQtyCtrl, 'الحد الأدنى للمخزون',
                                 Icons.trending_down, TextInputType.number),
                           ],
                           const SizedBox(height: 16),

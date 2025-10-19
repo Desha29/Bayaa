@@ -1,4 +1,4 @@
-// lib/features/invoice/presentation/invoice_preview_screen.dart
+
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
@@ -17,10 +17,7 @@ class InvoicePreviewScreen extends StatelessWidget {
     this.receiptMode = true,
   });
 
-  // Helper to detect if text contains Arabic characters
-  bool _isArabic(String text) {
-    return RegExp(r'[\u0600-\u06FF]').hasMatch(text);
-  }
+
 
   @override
   Widget build(BuildContext context) {

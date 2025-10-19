@@ -1,5 +1,6 @@
 import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:crazy_phone_pos/features/dashboard/presentation/dashboard_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -1,6 +1,9 @@
 // lib/features/invoice/presentation/invoices_home.dart
+import 'dart:async';
+
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -32,6 +35,12 @@ class _InvoicesHomeState extends State<InvoicesHome>
   late Future<List<Sale>> _salesFuture;
   late AnimationController _animationController;
 
+  final TextEditingController _barcodeSearchController =
+      TextEditingController();
+  final StringBuffer _hidBuffer = StringBuffer();
+  Timer? _hidTimer;
+  String _searchQuery = '';
+
   @override
   void initState() {
     super.initState();
@@ -41,12 +50,55 @@ class _InvoicesHomeState extends State<InvoicesHome>
     );
     _loadSales();
     _animationController.forward();
+
+    RawKeyboard.instance.addListener(_onRawKey);
   }
 
   @override
   void dispose() {
+    RawKeyboard.instance.removeListener(_onRawKey);
+    _hidTimer?.cancel();
+    _barcodeSearchController.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+  void _onRawKey(RawKeyEvent event) {
+    if (event is! RawKeyDownEvent) return;
+
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      _hidTimer?.cancel();
+      final code = _hidBuffer.toString().trim();
+      _hidBuffer.clear();
+      _searchByBarcode(code);
+      return;
+    }
+
+    String? ch = event.character;
+    if ((ch == null || ch.isEmpty) && event.logicalKey.keyLabel.length == 1) {
+      ch = event.logicalKey.keyLabel;
+    }
+
+    if (ch != null && ch.isNotEmpty && ch.codeUnitAt(0) >= 32) {
+      _hidBuffer.write(ch);
+      _barcodeSearchController.text = _hidBuffer.toString();
+
+      _hidTimer?.cancel();
+      _hidTimer = Timer(const Duration(milliseconds: 120), () {
+        final code = _hidBuffer.toString().trim();
+        _hidBuffer.clear();
+        _searchByBarcode(code);
+      });
+    }
+  }
+
+  void _searchByBarcode(String barcode) {
+    if (barcode.isEmpty) return;
+    setState(() {
+      _searchQuery = barcode;
+      _loadSales();
+    });
   }
 
   void _loadSales() {
@@ -59,21 +111,34 @@ class _InvoicesHomeState extends State<InvoicesHome>
   }
 
   List<Sale> _filterSales(List<Sale> sales) {
-    if (_startDate == null && _endDate == null) return sales;
+    var filtered = sales;
 
-    return sales.where((sale) {
-      if (_startDate != null && sale.date.isBefore(_startDate!)) {
-        return false;
-      }
-      if (_endDate != null) {
-        final endOfDay = DateTime(
-            _endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59);
-        if (sale.date.isAfter(endOfDay)) {
+    if (_startDate != null || _endDate != null) {
+      filtered = filtered.where((sale) {
+        if (_startDate != null && sale.date.isBefore(_startDate!)) {
           return false;
         }
-      }
-      return true;
-    }).toList();
+        if (_endDate != null) {
+          final endOfDay = DateTime(
+              _endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59);
+          if (sale.date.isAfter(endOfDay)) {
+            return false;
+          }
+        }
+        return true;
+      }).toList();
+    }
+
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered.where((sale) {
+        if (sale.id.contains(_searchQuery)) return true;
+        return sale.saleItems.any((item) =>
+            item.productId.contains(_searchQuery) ||
+            item.name.toLowerCase().contains(_searchQuery.toLowerCase()));
+      }).toList();
+    }
+
+    return filtered;
   }
 
   @override
@@ -287,25 +352,128 @@ class _InvoicesHomeState extends State<InvoicesHome>
       ),
       padding: const EdgeInsets.all(20),
       child: isDesktop
-          ? Row(
+          ? Column(
+              spacing: 20,
               children: [
-                Expanded(child: _buildDateButton('من تاريخ', _startDate, true)),
-                const SizedBox(width: 16),
-                Expanded(child: _buildDateButton('إلى تاريخ', _endDate, false)),
-                const SizedBox(width: 16),
-                ElevatedButton.icon(
-                  onPressed: _clearFilters,
-                  icon: const Icon(Icons.clear_all, size: 20),
-                  label: const Text('مسح الفلاتر'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade100,
-                    foregroundColor: Colors.grey.shade700,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                FadeTransition(
+                  opacity: _animationController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.qr_code_scanner,
+                              color: AppColors.primaryColor, size: 24),
+                          const SizedBox(width: 12),
+                          Text(
+                            'بحث بالباركود',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.kDarkChip,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _barcodeSearchController,
+                              decoration: InputDecoration(
+                                hintText: 'امسح الباركود أو اكتب رقم الفاتورة',
+                                prefixIcon: Icon(Icons.search,
+                                    color: AppColors.primaryColor),
+                                suffixIcon: _searchQuery.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: () {
+                                          _barcodeSearchController.clear();
+                                          setState(() {
+                                            _searchQuery = '';
+                                            _loadSales();
+                                          });
+                                        },
+                                      )
+                                    : null,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade300),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade300),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                      color: AppColors.primaryColor, width: 2),
+                                ),
+                              ),
+                              onSubmitted: (value) {
+                                _searchByBarcode(value);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+                      ),
+                      if (_searchQuery.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.search,
+                                  color: AppColors.primaryColor, size: 16),
+                              const SizedBox(width: 8),
+                              Text(
+                                'البحث عن: $_searchQuery',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: _buildDateButton('من تاريخ', _startDate, true)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                        child: _buildDateButton('إلى تاريخ', _endDate, false)),
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      onPressed: _clearFilters,
+                      icon: const Icon(Icons.clear_all, size: 20),
+                      label: const Text('مسح الفلاتر'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade100,
+                        foregroundColor: Colors.grey.shade700,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             )
@@ -388,8 +556,9 @@ class _InvoicesHomeState extends State<InvoicesHome>
   Future<void> _selectDate(bool isStart) async {
     final picked = await showDatePicker(
       context: context,
-      initialDate:
-          isStart ? (_startDate ?? DateTime.now()) : (_endDate ?? DateTime.now()),
+      initialDate: isStart
+          ? (_startDate ?? DateTime.now())
+          : (_endDate ?? DateTime.now()),
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       builder: (context, child) {
@@ -496,7 +665,7 @@ class _InvoicesHomeState extends State<InvoicesHome>
                   ),
                 ),
                 const SizedBox(width: 16),
-                
+
                 // Invoice Details
                 Expanded(
                   child: Column(
@@ -512,7 +681,7 @@ class _InvoicesHomeState extends State<InvoicesHome>
                         ),
                       ),
                       const SizedBox(height: 4),
-                      
+
                       // Cashier Name and Item Count
                       Row(
                         children: [
@@ -547,7 +716,7 @@ class _InvoicesHomeState extends State<InvoicesHome>
                         ],
                       ),
                       const SizedBox(height: 2),
-                      
+
                       // Date and Time
                       Text(
                         df.format(sale.date),
@@ -559,7 +728,7 @@ class _InvoicesHomeState extends State<InvoicesHome>
                     ],
                   ),
                 ),
-                
+
                 // Price and Print Button
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -602,14 +771,13 @@ class _InvoicesHomeState extends State<InvoicesHome>
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: 'Crazy Phone POS',
-      storeAddress: 'شارع رئيسي 123 - القاهرة',
-      storePhone: '0100 123 4567',
+      storeName: 'Crazy Phone',
+      storeAddress: ' الخانكة امام شارع الحجار   - القليوبية ',
+      storePhone: '01002546124',
       cashierName: cashierName,
       lines: sale.saleItems
           .map((it) => InvoiceLine(
                 name: it.name,
-                barcode: it.productId,
                 price: it.price,
                 qty: it.quantity,
               ))
@@ -618,8 +786,7 @@ class _InvoicesHomeState extends State<InvoicesHome>
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
-      footerNote: 'شكراً لثقتكم بنا! البضاعة لا تُرد بعد 14 يوماً.',
-      logoAsset: 'assets/images/logo.png',
+      logoAsset: 'assets/images/logo1.png',
     );
 
     await Navigator.of(context).push(

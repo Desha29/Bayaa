@@ -1,7 +1,6 @@
-// lib/features/invoice/presentation/invoice_router.dart
-// Helper to navigate to invoice preview after checkout.
+
 import 'package:flutter/material.dart';
-import '../data/invoice_models.dart';
+
 import '../domain/invoice_mapper.dart';
 import 'invoice_preview_screen.dart';
 
