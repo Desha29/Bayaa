@@ -207,64 +207,106 @@ if (idx != -1) {
     _commitBarcode(code);
   }
 
-  // Checkout with invoice auto-open
-  Future<void> _onCheckout() async {
-    if (_cartItems.isEmpty) {
-      MotionSnackBarError(context, 'السلة فارغة');
-
-      return;
-    }
-
-    // Create sale record
-    final sale = Sale(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      total: _totalAmount,
-      items: _cartItems.length,
-      date: DateTime.now(),
-      saleItems: _cartItems
-          .map((item) => SaleItem(
-                productId: item['id'] as String,
-                name: item['name'] as String,
-                price: (item['price'] as num).toDouble(),
-                quantity: item['qty'] as int,
-                total: (item['price'] as num).toDouble() * (item['qty'] as int),
-              ))
-          .toList(),
-    );
-
-    // Save to repository
-    final result = await _repository.saveSale(sale);
-
-    result.fold(
-      (failure) {
-        MotionSnackBarError(context, "فشل حفظ البيع: ${failure.message}");
-        setState(() {});
-      },
-      (_) {
-        // Success: show message and open invoice
-        MotionSnackBarSuccess(context,
-            'تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م');
-      
-
-        // Update recent sales
-        _recentSales = [
-          {
-            'total': _totalAmount,
-            'items': _cartItems.length,
-            'date': DateTime.now(),
-          },
-          ..._recentSales,
-        ];
-
-        // Clear cart
-        _cartItems.clear();
-        setState(() {});
-
-        // Auto-open invoice
-        _openInvoice(sale);
-      },
-    );
+  /// Checkout with invoice auto-open
+Future<void> _onCheckout() async {
+  if (_cartItems.isEmpty) {
+    MotionSnackBarError(context, 'السلة فارغة');
+    return;
   }
+
+  // ✅ STEP 1: Update stock quantities BEFORE creating sale
+  for (final item in _cartItems) {
+    final productBarcode = item['id'] as String;
+    final qtySold = item['qty'] as int;
+
+    // Get current product from Hive
+    final product = _productsBox.values.firstWhere(
+      (p) => p.barcode == productBarcode,
+      orElse: () => Product(
+        minQuantity: 0,
+        wholesalePrice: 0,
+        barcode: '',
+        name: '',
+        price: 0,
+        quantity: 0,
+        minPrice: 0,
+        category: '',
+      ),
+    );
+
+    if (product.barcode.isNotEmpty) {
+      // Calculate new quantity
+      final newQuantity = product.quantity - qtySold;
+      
+      // Update product with new quantity
+      final updatedProduct = Product(
+        barcode: product.barcode,
+        name: product.name,
+        price: product.price,
+        quantity: newQuantity < 0 ? 0 : newQuantity, // Prevent negative
+        minPrice: product.minPrice,
+        category: product.category,
+        minQuantity: product.minQuantity,
+        wholesalePrice: product.wholesalePrice,
+      );
+
+      // Save updated product back to Hive
+      await _productsBox.put(product.barcode, updatedProduct);
+    }
+  }
+
+  // ✅ STEP 2: Create sale record
+  final sale = Sale(
+    id: DateTime.now().millisecondsSinceEpoch.toString(),
+    total: _totalAmount,
+    items: _cartItems.length,
+    date: DateTime.now(),
+    saleItems: _cartItems
+        .map((item) => SaleItem(
+              productId: item['id'] as String,
+              name: item['name'] as String,
+              price: (item['price'] as num).toDouble(),
+              quantity: item['qty'] as int,
+              total: (item['price'] as num).toDouble() * (item['qty'] as int),
+            ))
+        .toList(),
+  );
+
+  // ✅ STEP 3: Save sale to repository
+  final result = await _repository.saveSale(sale);
+  
+  result.fold(
+    (failure) {
+      MotionSnackBarError(context, "فشل حفظ البيع: ${failure.message}");
+      setState(() {});
+    },
+    (_) {
+      // Success: show message and open invoice
+      MotionSnackBarSuccess(
+        context,
+        'تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م',
+      );
+
+      // Update recent sales
+      _recentSales = [
+        {
+          'total': _totalAmount,
+          'items': _cartItems.length,
+          'date': DateTime.now(),
+        },
+        ..._recentSales,
+      ];
+
+      // Clear cart
+      _cartItems.clear();
+      setState(() {});
+
+      // Auto-open invoice
+      _openInvoice(sale);
+    },
+  );
+}
+
 
   // Open invoice preview screen
   Future<void> _openInvoice(Sale sale) async {

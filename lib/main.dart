@@ -33,7 +33,7 @@ void main() async {
       backgroundColor: Colors.transparent,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
-      title: 'Crazy Phone POS',
+      title: 'Crazy Phone',
     );
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
