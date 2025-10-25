@@ -47,32 +47,34 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   }
 
   void _submit() {
-    if (nameCtrl.text.trim().isEmpty ||
-        usernameCtrl.text.trim().isEmpty ||
-        passwordCtrl.text.trim().isEmpty) {
-      MotionSnackBarError(context, 'يرجى ملء الحقول المطلوبة');
-      return;
-    }
-
-    final User user = User(
-      name: nameCtrl.text.trim(),
-      phone: phoneCtrl.text.trim(),
-      username: usernameCtrl.text.trim(),
-      password: passwordCtrl.text.trim(),
-      userType: selectedUserType,
-    );
-
-    if (widget.userToEdit == null) {
-      getIt<UserCubit>().saveUser(user);
-      MotionSnackBarSuccess(context, 'تم إضافة المستخدم بنجاح');
-      getIt<UserCubit>().getAllUsers();
-    } else {
-      getIt<UserCubit>().updateUser(user);
-      MotionSnackBarSuccess(context, 'تم تعديل المستخدم بنجاح');
-    }
-
-    Navigator.of(context).pop(user);
+  if (nameCtrl.text.trim().isEmpty ||
+      usernameCtrl.text.trim().isEmpty ||
+      passwordCtrl.text.trim().isEmpty) {
+    MotionSnackBarError(context, 'يرجى ملء الحقول المطلوبة');
+    return;
   }
+
+  final User user = User(
+    name: nameCtrl.text.trim(),
+    phone: phoneCtrl.text.trim(),
+    username: usernameCtrl.text.trim(),
+    password: passwordCtrl.text.trim(),
+    userType: selectedUserType,
+  );
+
+  if (widget.userToEdit == null) {
+    getIt<UserCubit>().saveUser(user);
+    MotionSnackBarSuccess(context, 'تم إضافة المستخدم بنجاح');
+    getIt<UserCubit>().getAllUsers();
+  } else {
+    getIt<UserCubit>().updateUser(user);
+    MotionSnackBarSuccess(context, 'تم تعديل المستخدم بنجاح');
+    getIt<UserCubit>().getAllUsers(); 
+  }
+
+  Navigator.of(context).pop(user);
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -137,12 +139,13 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                       _buildTextField(nameCtrl, 'الاسم *', Icons.person),
                       const SizedBox(height: 16),
                       _buildTextField(phoneCtrl, 'رقم الهاتف', Icons.phone,
-                          keyboardType: TextInputType.phone, readOnly: true),
+                          keyboardType: TextInputType.phone),
                       const SizedBox(height: 16),
                       _buildTextField(
                         usernameCtrl,
                         'اسم المستخدم *',
                         Icons.account_circle,
+                        readOnly: widget.userToEdit != null,
                       ),
                       const SizedBox(height: 16),
                       _buildPasswordField(),

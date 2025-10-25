@@ -28,6 +28,8 @@ class _EnhancedAddEditProductDialogState
   late final TextEditingController qtyCtrl;
   late final TextEditingController minQtyCtrl;
   late final TextEditingController minPriceCtrl;
+  late final TextEditingController wholesalePriceCtrl;
+
   late String selectedCategory;
 
   @override
@@ -40,6 +42,8 @@ class _EnhancedAddEditProductDialogState
     qtyCtrl = TextEditingController(text: p?.quantity.toString() ?? '');
     minQtyCtrl = TextEditingController(text: p?.minQuantity.toString() ?? '');
     minPriceCtrl = TextEditingController(text: p?.minPrice.toString() ?? '');
+    wholesalePriceCtrl =
+        TextEditingController(text: p?.wholesalePrice.toString() ?? '');
     selectedCategory = p?.category ??
         (widget.categories.isNotEmpty ? widget.categories.first : '');
   }
@@ -53,11 +57,13 @@ class _EnhancedAddEditProductDialogState
     qtyCtrl.dispose();
     minQtyCtrl.dispose();
     minPriceCtrl.dispose();
+    wholesalePriceCtrl.dispose();
     super.dispose();
   }
 
   void _submit() {
     getIt<ProductCubit>().saveProduct(Product(
+      wholesalePrice: double.tryParse(wholesalePriceCtrl.text.trim()) ?? 0.0,
       minPrice: double.tryParse(minPriceCtrl.text.trim()) ?? 0.0,
       name: nameCtrl.text.trim(),
       barcode: barcodeCtrl.text.trim(),
@@ -139,12 +145,19 @@ class _EnhancedAddEditProductDialogState
                             _buildTwoColumnRow([
                               _buildTextField(
                                   nameCtrl, 'اسم المنتج *', Icons.inventory_2),
-                             _buildTextField(barcodeCtrl, 'رقم الباركود',Icons.qr_code_scanner)
+                              _buildTextField(barcodeCtrl, 'رقم الباركود',
+                                  Icons.qr_code_scanner)
                             ]),
+                            const SizedBox(height: 16),
+                            _buildTextField(wholesalePriceCtrl, ' سعر الجملة',
+                                Icons.price_change, TextInputType.number),
                             const SizedBox(height: 16),
                             _buildTwoColumnRow([
                               _buildTextField(
-                                  minPriceCtrl, 'الحد الأدنى للسعر *', Icons.price_change, TextInputType.number),
+                                  minPriceCtrl,
+                                  'الحد الأدنى للسعر *',
+                                  Icons.price_change,
+                                  TextInputType.number),
                               _buildTextField(
                                   priceCtrl,
                                   'السعر بالجنيه المصري *',

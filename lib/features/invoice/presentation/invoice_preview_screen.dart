@@ -91,6 +91,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
                     child: PdfPreview(
+
                       build: (format) => receiptMode
                           ? InvoicePdfService.buildReceipt80mm(data)
                           : InvoicePdfService.buildA4(data, format: format),
@@ -116,29 +117,7 @@ class InvoicePreviewScreen extends StatelessWidget {
             );
           },
         ),
-        // FAB only on mobile
-        floatingActionButton: isMobile
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FloatingActionButton(
-                    heroTag: 'mobile_print',
-                    backgroundColor: AppColors.primaryColor,
-                    tooltip: printText,
-                    child: const Icon(Icons.print, color: Colors.white),
-                    onPressed: _handlePrint,
-                  ),
-                  const SizedBox(height: 12),
-                  FloatingActionButton(
-                    heroTag: 'mobile_share',
-                    backgroundColor: const Color(0xFF10B981),
-                    tooltip: shareText,
-                    child: const Icon(Icons.share, color: Colors.white),
-                    onPressed: _handleShare,
-                  ),
-                ],
-              )
-            : null,
+       
       ),
     );
   }

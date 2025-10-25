@@ -1,5 +1,6 @@
 // lib/features/sales/presentation/sales_screen.dart
 import 'dart:async';
+import 'package:crazy_phone_pos/core/functions/messege.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -27,7 +28,8 @@ class SalesScreen extends StatefulWidget {
   State<SalesScreen> createState() => _SalesScreenState();
 }
 
-class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin {
+class _SalesScreenState extends State<SalesScreen>
+    with TickerProviderStateMixin {
   // Animations
   late final AnimationController _fadeController;
   late final AnimationController _slideController;
@@ -67,11 +69,16 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
           salesBox: Hive.box<Sale>('salesBox'),
         );
 
-    _fadeController = AnimationController(duration: const Duration(milliseconds: 800), vsync: this);
-    _slideController = AnimationController(duration: const Duration(milliseconds: 1000), vsync: this);
-    _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
-    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
+    _fadeController = AnimationController(
+        duration: const Duration(milliseconds: 800), vsync: this);
+    _slideController = AnimationController(
+        duration: const Duration(milliseconds: 1000), vsync: this);
+    _fadeAnimation =
+        CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+            CurvedAnimation(
+                parent: _slideController, curve: Curves.easeOutCubic));
     _fadeController.forward();
     _slideController.forward();
 
@@ -154,7 +161,7 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
       (p) => p.barcode == code,
       orElse: () => Product(
         minQuantity: 0,
-
+        wholesalePrice: 0,
         barcode: '',
         name: '',
         price: 0,
@@ -166,28 +173,29 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
 
     if (product.barcode.isEmpty) {
       // Notify when not found
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('المنتج غير موجود: $code')),
-      );
+      MotionSnackBarError(context, "المنتج غير موجود: $code");
+
       _barcodeController.clear();
       setState(() {});
       return;
     }
 
-    // Already in cart? increase qty; else add line
-    final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
-    if (idx != -1) {
-      _cartItems[idx]['qty'] = (_cartItems[idx]['qty'] as int) + 1;
-    } else {
-      _cartItems.add({
-        'id': product.barcode,
-        'name': product.name,
-        'price': product.price,
-        'qty': 1,
-        'date': DateTime.now(),
-        'minPrice': product.minPrice,
-      });
-    }
+   // Already in cart? increase qty; else add line
+final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
+if (idx != -1) {
+  _cartItems[idx]['qty'] = (_cartItems[idx]['qty'] as int) + 1;
+} else {
+  _cartItems.add({
+    'id': product.barcode,
+    'name': product.name,
+    'price': product.price,
+    'qty': 1,
+    'quantity': product.quantity, 
+    'date': DateTime.now(),
+    'minPrice': product.minPrice,
+  });
+}
+
 
     _barcodeController.clear();
     setState(() {});
@@ -202,9 +210,8 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
   // Checkout with invoice auto-open
   Future<void> _onCheckout() async {
     if (_cartItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('السلة فارغة')),
-      );
+      MotionSnackBarError(context, 'السلة فارغة');
+
       return;
     }
 
@@ -230,18 +237,14 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
 
     result.fold(
       (failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل حفظ البيع: ${failure.message}')),
-        );
+        MotionSnackBarError(context, "فشل حفظ البيع: ${failure.message}");
+        setState(() {});
       },
       (_) {
         // Success: show message and open invoice
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م'),
-            backgroundColor: AppColors.kSuccessGreen,
-          ),
-        );
+        MotionSnackBarSuccess(context,
+            'تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م');
+      
 
         // Update recent sales
         _recentSales = [
@@ -266,17 +269,18 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
   // Open invoice preview screen
   Future<void> _openInvoice(Sale sale) async {
     final subtotal = sale.saleItems.fold<double>(0, (s, it) => s + it.total);
+    final cashierName = sale.cashierName ?? 'الكاشير';
+
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: 'Crazy Phone POS',
-      storeAddress: 'شارع رئيسي 123 - القاهرة',
-      storePhone: '0100 123 4567',
-      cashierName: 'الكاشير',
+      storeName: 'Crazy Phone',
+      storeAddress: ' الخانكة امام شارع الحجار   - القليوبية ',
+      storePhone: '01002546124',
+      cashierName: cashierName,
       lines: sale.saleItems
           .map((it) => InvoiceLine(
                 name: it.name,
-                barcode: it.productId,
                 price: it.price,
                 qty: it.quantity,
               ))
@@ -285,15 +289,31 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
-      footerNote: 'شكراً لثقتكم بنا! البضاعة لا تُرد بعد 14 يوماً.',
-      logoAsset: 'assets/logo.png',
+      logoAsset: 'assets/images/logo1.png',
     );
 
     await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => InvoicePreviewScreen(data: data, receiptMode: false),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            InvoicePreviewScreen(data: data, receiptMode: false),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 0.1),
+                end: Offset.zero,
+              ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              child: child,
+            ),
+          );
+        },
       ),
     );
+  
+  
+    
   }
 
   @override
@@ -304,7 +324,8 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth > 1200;
-            final isTablet = constraints.maxWidth >= 768 && constraints.maxWidth <= 1200;
+            final isTablet =
+                constraints.maxWidth >= 768 && constraints.maxWidth <= 1200;
             return Padding(
               padding: EdgeInsets.all(isDesktop ? 32 : (isTablet ? 24 : 16)),
               child: (isDesktop || isTablet)
@@ -379,25 +400,41 @@ class _SalesScreenState extends State<SalesScreen> with TickerProviderStateMixin
 
         // Your existing cart section
         CartSection(
-          cartItems: _cartItems,
-          onRemoveItem: (i) {
-            _cartItems.removeAt(i);
-            setState(() {});
-          },
-          onIncreaseQty: (i) {
-            _cartItems[i]['qty'] = (_cartItems[i]['qty'] as int) + 1;
-            setState(() {});
-          },
-          onDecreaseQty: (i) {
-            final q = _cartItems[i]['qty'] as int;
-            if (q > 1) {
-              _cartItems[i]['qty'] = q - 1;
-            } else {
-              _cartItems.removeAt(i);
-            }
-            setState(() {});
-          },
-        ),
+  cartItems: _cartItems,
+  onRemoveItem: (i) {
+    _cartItems.removeAt(i);
+    setState(() {});
+  },
+  onIncreaseQty: (i) {
+    final currentQty = _cartItems[i]['qty'] as int;
+    final stockQuantity = _cartItems[i]['quantity'] as int; // Total available in stock
+    
+    // ✅ Check if we can increase (prevent exceeding stock)
+    if (currentQty < stockQuantity) {
+      _cartItems[i]['qty'] = currentQty + 1;
+      setState(() {});
+    } else {
+      MotionSnackBarWarning(context, "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
+      
+    }
+  },
+  onDecreaseQty: (i) {
+    final q = _cartItems[i]['qty'] as int;
+    if (q > 1) {
+      _cartItems[i]['qty'] = q - 1;
+      setState(() {});
+    } else {
+      // Remove item if quantity becomes 0
+      _cartItems.removeAt(i);
+      setState(() {});
+    }
+  },
+  onEditPrice: (i, newPrice) {
+    _cartItems[i]['price'] = newPrice;
+    setState(() {});
+  },
+),
+
 
         const SizedBox(height: 20),
 

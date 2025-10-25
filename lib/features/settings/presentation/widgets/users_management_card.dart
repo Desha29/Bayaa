@@ -103,13 +103,7 @@ class UsersManagementCard extends StatelessWidget {
                     ),
                   ),
                 )
-              else
-                isMobile
-                    ? MobileUserList(
-                        users: userRows,
-                        usersData: usersData,
-                      )
-                    : DesktopUserTable(
+              ,DesktopUserTable(
                         users: userRows,
                         usersData: usersData,
                       ),

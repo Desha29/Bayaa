@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
 import '../../../../core/di/dependency_injection.dart';
-import '../../../../core/functions/messege.dart';
+
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
@@ -170,7 +170,8 @@ class DesktopUserTable extends StatelessWidget {
                         icon: Icon(
                           LucideIcons.edit,
                           size: 18,
-                          color: theme.colorScheme.primary,
+                          color:  getIt<UserCubit>().currentUser.userType ==
+                                UserType.cashier ? Colors.grey : theme.colorScheme.primary,
                         ),
                         tooltip: 'تعديل',
                         padding: const EdgeInsets.all(6),
@@ -184,10 +185,15 @@ class DesktopUserTable extends StatelessWidget {
                                 UserType.cashier
                             ? null
                             : () => _showDeleteDialog(context, userData),
-                        icon: const Icon(
+                        icon:  Icon(
                           LucideIcons.trash2,
                           size: 18,
-                          color: Color(0xFFDC2626),
+                          color:
+                              getIt<UserCubit>().currentUser.userType ==
+                                      UserType.cashier
+                                  ? Colors.grey
+                                  :
+                           Color(0xFFDC2626),
                         ),
                         tooltip: 'حذف',
                         padding: const EdgeInsets.all(6),
@@ -213,30 +219,36 @@ class DesktopUserTable extends StatelessWidget {
       builder: (dialogContext) => AddEditUserDialog(userToEdit: user),
     );
   }
+void _showDeleteDialog(BuildContext context, User user) {
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('تأكيد الحذف'),
+      content: Text('هل أنت متأكد من حذف المستخدم "${user.name}"؟'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext),
+          child: const Text('إلغاء'),
+        ),
+        TextButton(
+          onPressed: ()  {
+            Navigator.pop(dialogContext);
+            // Delete user
+             context.read<UserCubit>().deleteUser( user.username);
+            // Refresh the table
+            if (context.mounted) {
+              context.read<UserCubit>().getAllUsers();
+            }
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.red,
+          ),
+          child: const Text('حذف'),
+        ),
+      ],
+    ),
+  );
+}
 
-  void _showDeleteDialog(BuildContext context, User user) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('تأكيد الحذف'),
-        content: Text('هل أنت متأكد من حذف المستخدم "${user.name}"؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<UserCubit>().deleteUser(user.username);
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
-            child: const Text('حذف'),
-          ),
-        ],
-      ),
-    );
-  }
+  
 }

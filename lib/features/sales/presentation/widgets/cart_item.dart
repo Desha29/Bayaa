@@ -7,6 +7,7 @@ class CartItemRow extends StatefulWidget {
   final String id;
   final double price;
   final int quantity;
+  final int remainingQuantity;
   final DateTime date;
   final double minPrice;
   final VoidCallback? onRemove;
@@ -20,6 +21,7 @@ class CartItemRow extends StatefulWidget {
     required this.id,
     required this.price,
     required this.quantity,
+    required this.remainingQuantity,
     required this.date,
     required this.minPrice,
     this.onRemove,
@@ -115,6 +117,17 @@ class _CartItemRowState extends State<CartItemRow> {
     );
   }
 
+  // Get color for remaining quantity indicator
+  Color _getRemainingQuantityColor() {
+    if (widget.remainingQuantity <= 5) {
+      return AppColors.kDangerRed;
+    } else if (widget.remainingQuantity <= 20) {
+      return AppColors.warningColor;
+    } else {
+      return AppColors.kSuccessGreen;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final total = widget.price * widget.quantity;
@@ -131,23 +144,59 @@ class _CartItemRowState extends State<CartItemRow> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${ widget.name} (كود: ${widget.id})',
+                      '${widget.name} (كود: ${widget.id})',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      'تاريخ: ${widget.date.year}/${widget.date.month}/${widget.date.day}',
-                      style: TextStyle(
-                        color: AppColors.mutedColor,
-                        fontSize: 12,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          'تاريخ: ${widget.date.year}/${widget.date.month}/${widget.date.day}',
+                          style: TextStyle(
+                            color: AppColors.mutedColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Remaining quantity indicator
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: _getRemainingQuantityColor().withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: _getRemainingQuantityColor().withOpacity(0.3),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.inventory_2_outlined,
+                                size: 12,
+                                color: _getRemainingQuantityColor(),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'متبقي: ${widget.remainingQuantity}',
+                                style: TextStyle(
+                                  color: _getRemainingQuantityColor(),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
+              
               if (isWide) const SizedBox(width: 12),
               Expanded(
                 flex: isWide ? 2 : 2,

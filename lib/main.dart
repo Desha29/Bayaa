@@ -1,60 +1,48 @@
 import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'package:window_manager/window_manager.dart';
+import 'package:screen_retriever/screen_retriever.dart';
+import 'dart:io' show Platform;
 
 import 'core/constants/bloc_observer.dart';
 import 'core/di/dependency_injection.dart';
 import 'core/theme/app_theme.dart';
-
-import 'features/auth/data/models/user_model.dart';
-
-import 'features/products/data/models/product_model.dart';
-import 'features/sales/data/models/sale_model.dart';
-import 'features/settings/data/models/store_info_model.dart';
+import 'core/utils/hive_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   Bloc.observer = MyBlocObserver();
-  await Hive.initFlutter();
 
-  // Register Adapters
-  Hive.registerAdapter(UserTypeAdapter());
-  Hive.registerAdapter(UserAdapter());
-  Hive.registerAdapter(StoreInfoAdapter());
-  Hive.registerAdapter(ProductAdapter());
-  Hive.registerAdapter(SaleAdapter());
-  Hive.registerAdapter(SaleItemAdapter());
+ 
+  await HiveHelper.initialize();
+ 
+  if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    await windowManager.ensureInitialized();
 
-  // Open Boxes
-  await Hive.openBox<User>('userBox');
-  await Hive.openBox<Product>('productsBox');
-  await Hive.openBox('categoryBox');
-  await Hive.openBox<StoreInfo>('storeBox');
-  await Hive.openBox<Sale>('salesBox');
-  Hive.box<User>("userBox").put(
-      'admin',
-      User(
-          name: "Mostafa",
-          phone: "01000000000",
-          username: 'admin',
-          password: 'admin',
-          userType: UserType.manager));
+    final primaryDisplay = await screenRetriever.getPrimaryDisplay();
+    final screenWidth = primaryDisplay.size.width;
+    final screenHeight = primaryDisplay.size.height;
 
-  // Hive.box<Product>('productsBox').put(
-  //     '600600',
-  //     Product(
-  //       minPrice: 450,
-  //       name: 'سماعة ابل',
-  //       barcode: '600600',
-  //       price: 500,
-  //       quantity: 10,
-  //       minQuantity: 2,
-  //       category: 'الكل',
-  //     ));
+    WindowOptions windowOptions = WindowOptions(
+      size: Size(screenWidth, screenHeight - 60),
+      minimumSize: Size(screenWidth, screenHeight - 60),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.normal,
+      title: 'Crazy Phone POS',
+    );
+
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+      await windowManager.maximize();
+    });
+  }
+
   setup();
 
   runApp(const MyApp());
@@ -69,11 +57,11 @@ class MyApp extends StatelessWidget {
       title: 'Crazy Phone POS',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const LoginScreen(),
+      home: const LoginScreen(), // Direct to LoginScreen (no custom top bar)
       locale: const Locale('ar'),
       supportedLocales: const [
-        Locale('ar'), // العربية
-        Locale('en'), // الإنجليزية
+        Locale('ar'),
+        Locale('en'),
       ],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

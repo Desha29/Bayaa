@@ -1,5 +1,8 @@
+import 'package:crazy_phone_pos/core/functions/messege.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
+import 'package:crazy_phone_pos/core/utils/hive_helper.dart';
 
 class LogoutWarningBanner extends StatelessWidget {
   const LogoutWarningBanner({
@@ -49,36 +52,160 @@ class LogoutWarningBanner extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (!isMobile) ...[
-                  OutlinedButton.icon(
-                    icon: const Icon(LucideIcons.logOut, size: 18),
-                    label: const Text('تسجيل الخروج'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red.shade700,
-                      side: BorderSide(color: Colors.red.shade300),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                    onPressed: () {},
-                  ),
-                  const SizedBox(width: 12),
-                ],
                 FilledButton.icon(
                   icon: const Icon(LucideIcons.logOut, size: 18),
-                  label: Text(isMobile ? 'خروج' : 'تسجيل الخروج من النظام'),
+                  label: Text(isMobile ? 'خروج' : 'تسجيل الخروج'),
                   style: FilledButton.styleFrom(
+                    backgroundColor: Colors.red.shade700,
                     padding: EdgeInsets.symmetric(
                       horizontal: isMobile ? 12 : 16,
                       vertical: 12,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () => _handleLogout(context),
                 ),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleLogout(BuildContext context) async {
+    final shouldLogout = await _showLogoutConfirmation(context);
+
+    if (shouldLogout == true && context.mounted) {
+      _showLoadingDialog(context);
+
+      try {
+        if (context.mounted) {
+          Navigator.pop(context);
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+            (route) => false,
+          );
+
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (context.mounted) {
+              MotionSnackBarSuccess(context, "تم تسجيل الخروج بنجاح");
+            }
+          });
+        }
+      } catch (e) {
+        if (context.mounted) {
+          Navigator.pop(context);
+
+          MotionSnackBarError(context, "فشل تسجيل الخروج: $e");
+        }
+      }
+    }
+  }
+
+  Future<bool?> _showLogoutConfirmation(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.logOut,
+                color: Colors.red.shade700,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Text(
+                'تأكيد تسجيل الخروج',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'هل أنت متأكد من تسجيل الخروج؟',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'سيتم إنهاء جلسة العمل الحالية والعودة إلى شاشة تسجيل الدخول.',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+          ],
+        ),
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actions: [
+          OutlinedButton.icon(
+            onPressed: () => Navigator.pop(context, false),
+            icon: const Icon(LucideIcons.x),
+            label: const Text('إلغاء'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              textStyle:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.pop(context, true),
+            icon: const Icon(LucideIcons.logOut),
+            label: const Text('تسجيل الخروج'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              textStyle:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => PopScope(
+        canPop: false,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(
+                  'جاري تسجيل الخروج...',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

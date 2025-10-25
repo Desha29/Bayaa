@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
-
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:barcode/barcode.dart';
@@ -9,6 +8,7 @@ import '../data/invoice_models.dart';
 class InvoicePdfService {
   static pw.Font? _cachedArabicFont;
   static pw.Font? _cachedBoldFont;
+  static pw.ImageProvider? _cachedLogo; // ✅ Cache logo
 
   // Load fonts
   static Future<pw.Font> _loadArabicFont() async {
@@ -29,6 +29,39 @@ class InvoicePdfService {
     return _cachedBoldFont!;
   }
 
+  // ✅ Load and cache logo
+  static Future<pw.ImageProvider?> _loadLogo(InvoiceData data) async {
+    // Return cached logo if available
+    if (_cachedLogo != null) return _cachedLogo;
+
+    // Priority 1: Use provided logo bytes
+    if (data.logoBytes != null) {
+      _cachedLogo = pw.MemoryImage(data.logoBytes!);
+      return _cachedLogo;
+    }
+
+    // Priority 2: Load from asset path
+    if (data.logoAsset != null && data.logoAsset!.isNotEmpty) {
+      try {
+        final bytes = await rootBundle.load(data.logoAsset!);
+        _cachedLogo = pw.MemoryImage(bytes.buffer.asUint8List());
+        return _cachedLogo;
+      } catch (e) {
+        print('❌ Error loading logo from ${data.logoAsset}: $e');
+        // Try default path
+        try {
+          final bytes = await rootBundle.load('assets/images/logo1.png');
+          _cachedLogo = pw.MemoryImage(bytes.buffer.asUint8List());
+          return _cachedLogo;
+        } catch (e2) {
+          print('❌ Error loading default logo: $e2');
+        }
+      }
+    }
+
+    return null;
+  }
+
   static Future<Uint8List> buildReceipt80mm(InvoiceData data) async {
     final doc = pw.Document();
     final pageFormat = const PdfPageFormat(
@@ -36,18 +69,10 @@ class InvoicePdfService {
       double.infinity,
       marginAll: 2,
     );
+
     final arabicFont = await _loadArabicFont();
     final boldFont = await _loadBoldFont();
-
-    pw.ImageProvider? logoProvider;
-    if (data.logoBytes != null) {
-      logoProvider = pw.MemoryImage(data.logoBytes!);
-    } else if (data.logoAsset != null) {
-      try {
-        final bytes = await rootBundle.load(data.logoAsset!);
-        logoProvider = pw.MemoryImage(bytes.buffer.asUint8List());
-      } catch (_) {}
-    }
+    final logoProvider = await _loadLogo(data); // ✅ Load logo properly
 
     // Color theme suitable for thermal printing and clear display
     final primaryColor = PdfColors.black;
@@ -159,19 +184,21 @@ class InvoicePdfService {
                 padding: const pw.EdgeInsets.symmetric(vertical: 4),
                 child: pw.Column(
                   children: [
-                    if (logoProvider != null) ...[
+                    if (logoProvider != null) ...[ // ✅ Check if logo loaded
                       pw.Container(
                         width: 45,
                         height: 45,
                         decoration: pw.BoxDecoration(
-                          border:
-                              pw.Border.all(color: dividerColor, width: 1.5),
+                          border: pw.Border.all(color: dividerColor, width: 1.5),
                           borderRadius: pw.BorderRadius.circular(8),
                         ),
                         child: pw.ClipRRect(
                           horizontalRadius: 6,
                           verticalRadius: 6,
-                          child: pw.Image(logoProvider, fit: pw.BoxFit.contain),
+                          child: pw.Image(
+                            logoProvider, 
+                            fit: pw.BoxFit.contain,
+                          ),
                         ),
                       ),
                       pw.SizedBox(height: 3),
@@ -196,7 +223,6 @@ class InvoicePdfService {
                   ],
                 ),
               ),
-
               pw.SizedBox(height: 4),
 
               // Dotted divider
@@ -215,7 +241,6 @@ class InvoicePdfService {
                   ),
                 ),
               ),
-
               pw.SizedBox(height: 4),
 
               // Invoice information
@@ -230,25 +255,20 @@ class InvoicePdfService {
                   children: [
                     pw.Text('فاتورة بيع', style: invoiceTitleStyle),
                     pw.SizedBox(height: 3),
-                    _infoRow(
-                        'رقم الفاتورة', data.invoiceId, labelStyle, valueStyle),
+                    _infoRow('رقم الفاتورة', data.invoiceId, labelStyle, valueStyle),
                     pw.SizedBox(height: 1.5),
-                    _infoRow(
-                        'التاريخ', _fmt(data.date), labelStyle, valueStyle),
+                    _infoRow('التاريخ', _fmt(data.date), labelStyle, valueStyle),
                     pw.SizedBox(height: 1.5),
-                    _infoRow(
-                        'الكاشير', data.cashierName, labelStyle, valueStyle),
+                    _infoRow('الكاشير', data.cashierName, labelStyle, valueStyle),
                   ],
                 ),
               ),
-
               pw.SizedBox(height: 4),
 
               // Items header
               pw.Container(
                 width: double.infinity,
-                padding:
-                    const pw.EdgeInsets.symmetric(vertical: 2, horizontal: 1),
+                padding: const pw.EdgeInsets.symmetric(vertical: 2, horizontal: 1),
                 decoration: pw.BoxDecoration(
                   color: PdfColor.fromHex('#f3f4f6'),
                   borderRadius: pw.BorderRadius.circular(3),
@@ -259,38 +279,32 @@ class InvoicePdfService {
                     pw.Expanded(
                       flex: 2,
                       child: pw.Text('المجموع',
-                          style: tableHeaderStyle,
-                          textAlign: pw.TextAlign.left),
+                          style: tableHeaderStyle, textAlign: pw.TextAlign.left),
                     ),
                     pw.Expanded(
                       flex: 1,
                       child: pw.Text('الكمية',
-                          style: tableHeaderStyle,
-                          textAlign: pw.TextAlign.center),
+                          style: tableHeaderStyle, textAlign: pw.TextAlign.center),
                     ),
                     pw.Expanded(
                       flex: 2,
                       child: pw.Text('السعر',
-                          style: tableHeaderStyle,
-                          textAlign: pw.TextAlign.center),
+                          style: tableHeaderStyle, textAlign: pw.TextAlign.center),
                     ),
                     pw.Expanded(
                       flex: 3,
                       child: pw.Text('الصنف',
-                          style: tableHeaderStyle,
-                          textAlign: pw.TextAlign.right),
+                          style: tableHeaderStyle, textAlign: pw.TextAlign.right),
                     ),
                   ],
                 ),
               ),
-
               pw.SizedBox(height: 2),
 
-              // Items list (spacing optimized)
+              // Items list
               ...data.lines.map((item) => pw.Container(
                     width: double.infinity,
-                    padding: const pw.EdgeInsets.symmetric(
-                        vertical: 3, horizontal: 1),
+                    padding: const pw.EdgeInsets.symmetric(vertical: 3, horizontal: 1),
                     child: pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -324,8 +338,7 @@ class InvoicePdfService {
                         pw.Expanded(
                           flex: 2,
                           child: pw.Text(item.price.toStringAsFixed(2),
-                              style: itemDetailsStyle,
-                              textAlign: pw.TextAlign.center),
+                              style: itemDetailsStyle, textAlign: pw.TextAlign.center),
                         ),
                         pw.Expanded(
                           flex: 3,
@@ -337,13 +350,10 @@ class InvoicePdfService {
                       ],
                     ),
                   )),
-
               pw.SizedBox(height: 4),
 
               // Divider
-              pw.Container(
-                  width: double.infinity, height: 1, color: dividerColor),
-
+              pw.Container(width: double.infinity, height: 1, color: dividerColor),
               pw.SizedBox(height: 3),
 
               // Summary section
@@ -361,20 +371,18 @@ class InvoicePdfService {
                     ],
                     if (data.tax != 0) ...[
                       pw.SizedBox(height: 1.5),
-                      _summaryRow('الضريبة', data.tax, summaryLabelStyle,
-                          summaryValueStyle),
+                      _summaryRow(
+                          'الضريبة', data.tax, summaryLabelStyle, summaryValueStyle),
                     ],
                   ],
                 ),
               ),
-
               pw.SizedBox(height: 4),
 
-              // Total section with gradient
+              // Total section
               pw.Container(
                 width: double.infinity,
-                padding:
-                    const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                 decoration: pw.BoxDecoration(
                   color: PdfColor.fromHex('#f3f4f6'),
                   borderRadius: pw.BorderRadius.circular(4),
@@ -388,10 +396,9 @@ class InvoicePdfService {
                   ],
                 ),
               ),
-
               pw.SizedBox(height: 5),
 
-              // Barcode section added for scanning
+              // Barcode section
               pw.Container(
                 width: double.infinity,
                 padding: const pw.EdgeInsets.symmetric(vertical: 6),
@@ -403,9 +410,7 @@ class InvoicePdfService {
                   height: 20,
                   drawText: true,
                   textStyle: pw.TextStyle(
-                      fontSize: 7,
-                      fontWeight: pw.FontWeight.bold,
-                      font: boldFont),
+                      fontSize: 7, fontWeight: pw.FontWeight.bold, font: boldFont),
                 ),
               ),
 
@@ -453,8 +458,7 @@ class InvoicePdfService {
                 width: 30,
                 height: 2,
                 decoration: pw.BoxDecoration(
-                    color: accentColor,
-                    borderRadius: pw.BorderRadius.circular(1)),
+                    color: accentColor, borderRadius: pw.BorderRadius.circular(1)),
               ),
               pw.SizedBox(height: 2),
             ],
@@ -498,6 +502,6 @@ class InvoicePdfService {
   }
 
   static String _fmt(DateTime d) =>
-      '${d.year}/${_2(d.month)}/${_2(d.day)}  ${_2(d.hour)}:${_2(d.minute)}';
+      '${d.year}/${_2(d.month)}/${_2(d.day)} ${_2(d.hour)}:${_2(d.minute)}';
   static String _2(int x) => x.toString().padLeft(2, '0');
 }

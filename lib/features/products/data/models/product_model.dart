@@ -5,6 +5,7 @@ class Product {
   final String barcode;
   double price;
   double minPrice;
+  double wholesalePrice;
   int quantity;
   final int minQuantity;
   final String category;
@@ -14,11 +15,13 @@ class Product {
     required this.barcode,
     required this.price,
     required this.minPrice,
+    required this.wholesalePrice,
     required this.quantity,
     required this.minQuantity,
     required this.category,
   });
-   String get status {
+
+  String get status {
     if (quantity == 0) return 'غير متوفر';
     if (quantity < minQuantity) return 'مخزون منخفض';
     return 'متوفر';
@@ -39,25 +42,52 @@ class ProductAdapter extends TypeAdapter<Product> {
 
   @override
   Product read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    
     return Product(
-      name: reader.readString(),        // 1st
-      barcode: reader.readString(),     // 2nd
-      price: reader.readDouble(),       // 3rd
-      minPrice: reader.readDouble(),    // 4th - MOVED HERE
-      quantity: reader.readInt(),       // 5th
-      minQuantity: reader.readInt(),    // 6th
-      category: reader.readString(),    // 7th
+      name: fields[0] as String,
+      barcode: fields[1] as String,
+      price: fields[2] as double,
+      minPrice: fields[3] as double,
+      wholesalePrice: fields[4] as double? ?? 0.0, // Default value for old data
+      quantity: fields[5] as int,
+      minQuantity: fields[6] as int,
+      category: fields[7] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Product obj) {
-    writer.writeString(obj.name);       // 1st
-    writer.writeString(obj.barcode);    // 2nd
-    writer.writeDouble(obj.price);      // 3rd
-    writer.writeDouble(obj.minPrice);   // 4th
-    writer.writeInt(obj.quantity);      // 5th
-    writer.writeInt(obj.minQuantity);   // 6th
-    writer.writeString(obj.category);   // 7th
+    writer
+      ..writeByte(8) // Number of fields
+      ..writeByte(0)
+      ..write(obj.name)
+      ..writeByte(1)
+      ..write(obj.barcode)
+      ..writeByte(2)
+      ..write(obj.price)
+      ..writeByte(3)
+      ..write(obj.minPrice)
+      ..writeByte(4)
+      ..write(obj.wholesalePrice)
+      ..writeByte(5)
+      ..write(obj.quantity)
+      ..writeByte(6)
+      ..write(obj.minQuantity)
+      ..writeByte(7)
+      ..write(obj.category);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProductAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }

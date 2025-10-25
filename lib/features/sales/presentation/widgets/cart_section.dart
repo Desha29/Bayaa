@@ -18,6 +18,13 @@ class CartSection extends StatelessWidget {
     this.onEditPrice,
   });
 
+ int _calculateRemainingQuantity(Map<String, dynamic> item) {
+  final quantityInStock = item['quantity'] ?? 0;      
+  final currentQuantityInCart = item['qty'] ?? 0;   
+  return quantityInStock - currentQuantityInCart;     
+}
+
+
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder(
@@ -110,6 +117,7 @@ class CartSection extends StatelessWidget {
                           id: item['id'],
                           price: item['price'],
                           quantity: item['qty'],
+                          remainingQuantity: _calculateRemainingQuantity(item), 
                           date: item['date'],
                           minPrice: item['minPrice'] ?? 0.0,
                           onRemove: () => onRemoveItem?.call(index),
