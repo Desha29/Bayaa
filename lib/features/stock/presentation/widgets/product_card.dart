@@ -4,39 +4,12 @@ import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/responsive_helper.dart';
+import '../../../products/data/models/product_model.dart';
 import 'priorty_chip.dart';
 import 'status_chip.dart';
 
 /// ---------------- Product Model ----------------
-class Product {
-  String code;
-  String name;
-  int quantity;
-  int min;
-  String lastRestock;
 
-  Product({
-    required this.code,
-    required this.name,
-    required this.quantity,
-    required this.min,
-    required this.lastRestock,
-  });
-
-  String get status {
-    if (quantity == 0) return 'غير متوفر';
-    if (quantity < min) return 'مخزون منخفض';
-    return 'متوفر';
-  }
-
-  String get priority {
-    if (quantity == 0) return 'عاجل جداً';
-    final diff = min - quantity;
-    if (diff >= 3) return 'عاجل';
-    if (diff == 1 || diff == 2) return 'متوسط';
-    return 'منخفض';
-  }
-}
 
 /// ---------------- Product Card ----------------
 
@@ -61,7 +34,7 @@ class _ProductCardState extends State<ProductCard> {
   Widget build(BuildContext context) {
     final product = widget.product;
     final isOut = product.quantity == 0;
-    final isLow = product.quantity > 0 && product.quantity < product.min;
+    final isLow = product.quantity > 0 && product.quantity < product.minQuantity;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -139,7 +112,7 @@ class _ProductCardState extends State<ProductCard> {
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
-                                'كود: ${product.code}',
+                                'كود: ${product.minQuantity}',
                                 style: TextStyle(
                                   fontSize: ResponsiveHelper.fontSize(
                                     context,
@@ -191,7 +164,7 @@ class _ProductCardState extends State<ProductCard> {
                             child: _buildInfoRow(
                               context,
                               'الحد الأدنى:',
-                              product.min.toString(),
+                              product.minQuantity.toString(),
                               Colors.black,
                             ),
                           ),
@@ -199,7 +172,7 @@ class _ProductCardState extends State<ProductCard> {
                             child: _buildInfoRow(
                               context,
                               'آخر تخزين:',
-                              product.lastRestock,
+                              "",
                               Colors.grey[600]!,
                               valueSize: 13,
                             ),

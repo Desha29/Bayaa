@@ -2,7 +2,7 @@
 
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/core/functions/messege.dart';
-import 'package:crazy_phone_pos/features/auth/data/repository/user_repository_imp.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -141,6 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       CustomTextField(
                                         controller: _usernameController,
                                         label: 'اسم المستخدم',
+                                        autoFocus: true,
                                         prefixIcon: LucideIcons.user,
                                         textDirection: TextDirection.rtl,
                                         validator: (v) =>

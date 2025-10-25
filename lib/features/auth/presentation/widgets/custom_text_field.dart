@@ -20,6 +20,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final int? maxLength;
   final void Function()? onEditingComplete;
+  final bool autoFocus;
   const CustomTextField({
     super.key,
     required this.controller,
@@ -38,6 +39,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLines = 1,
     this.maxLength,
     this.onEditingComplete,
+    this.autoFocus=false
   });
 
   @override
@@ -58,6 +60,7 @@ class CustomTextField extends StatelessWidget {
         const SizedBox(height: 8),
         TextFormField(
           cursorColor: theme.colorScheme.primary,
+          autofocus: autoFocus,
           cursorWidth: 2,
           controller: controller,
           obscureText: obscureText,

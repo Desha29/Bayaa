@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../products/data/models/product_model.dart';
 import 'product_card.dart';
 
 class RestockDialog extends StatefulWidget {
@@ -98,13 +99,13 @@ class _RestockDialogState extends State<RestockDialog> {
                           ),
                         ),
                         Expanded(
-                          child: Text('الحد الأدنى: ${widget.product.min}'),
+                          child: Text('الحد الأدنى: ${widget.product.minQuantity}'),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'الكمية المطلوبة: ${(widget.product.min - widget.product.quantity) > 0 ? (widget.product.min - widget.product.quantity).toString() : '0'}',
+                      'الكمية المطلوبة: ${(widget.product.minQuantity - widget.product.quantity) > 0 ? (widget.product.minQuantity - widget.product.quantity).toString() : '0'}',
                     ),
                   ],
                 ),

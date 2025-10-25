@@ -18,6 +18,19 @@ class Product {
     required this.minQuantity,
     required this.category,
   });
+   String get status {
+    if (quantity == 0) return 'غير متوفر';
+    if (quantity < minQuantity) return 'مخزون منخفض';
+    return 'متوفر';
+  }
+
+  String get priority {
+    if (quantity == 0) return 'عاجل جداً';
+    final diff = minQuantity - quantity;
+    if (diff >= 3) return 'عاجل';
+    if (diff == 1 || diff == 2) return 'متوسط';
+    return 'منخفض';
+  }
 }
 
 class ProductAdapter extends TypeAdapter<Product> {

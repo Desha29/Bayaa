@@ -1,10 +1,12 @@
 // lib/features/dashboard/presentation/dashboard_screen.dart
+import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/di/dependency_injection.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../products/presentation/products_screen.dart';
 import '../../products/data/models/product_model.dart';
@@ -109,55 +111,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final isMobileOrTablet = MediaQuery.of(context).size.width < 1000;
 
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        appBar: isMobileOrTablet
-            ? AppBar(
-                backgroundColor: AppColors.primaryColor,
-                title: const Text("Crazy Phone"),
-                leading: Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(LucideIcons.menu),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
+    return BlocProvider<StockCubit>.value(
+      value:  getIt<StockCubit>()..loadData(),
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          appBar: isMobileOrTablet
+              ? AppBar(
+                  backgroundColor: AppColors.primaryColor,
+                  title: const Text("Crazy Phone"),
+                  leading: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(LucideIcons.menu),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
                   ),
-                ),
-              )
-            : null,
-        drawer: isMobileOrTablet
-            ? Drawer(
-                child: CustomSidebar(
+                )
+              : null,
+          drawer: isMobileOrTablet
+              ? Drawer(
+                  child: CustomSidebar(
+                    items: sidebarItems,
+                    selectedIndex: selectedIndex,
+                    onItemSelected: (index) {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                )
+              : null,
+          body: Row(
+            children: [
+              if (!isMobileOrTablet)
+                CustomSidebar(
                   items: sidebarItems,
                   selectedIndex: selectedIndex,
+                  isCollapsed: isSidebarCollapsed,
                   onItemSelected: (index) {
                     setState(() {
                       selectedIndex = index;
                     });
-                    Navigator.pop(context);
                   },
                 ),
-              )
-            : null,
-        body: Row(
-          children: [
-            if (!isMobileOrTablet)
-              CustomSidebar(
-                items: sidebarItems,
-                selectedIndex: selectedIndex,
-                isCollapsed: isSidebarCollapsed,
-                onItemSelected: (index) {
-                  setState(() {
-                    selectedIndex = index;
-                  });
-                },
+              Expanded(
+                child: Container(
+                  color: AppColors.backgroundColor,
+                  child: sidebarItems[selectedIndex].screen,
+                ),
               ),
-            Expanded(
-              child: Container(
-                color: AppColors.backgroundColor,
-                child: sidebarItems[selectedIndex].screen,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

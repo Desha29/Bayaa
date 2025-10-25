@@ -6,6 +6,7 @@ import 'package:crazy_phone_pos/features/products/data/data_source/product_data_
 import 'package:crazy_phone_pos/features/products/data/repository/product_repository_imp.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
+import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
 
@@ -26,5 +27,9 @@ void setup() {
       repository: SalesRepositoryImpl(
           productsBox: Hive.box<Product>('productsBox'),
           salesBox: Hive.box<Sale>('salesBox'))));
+          getIt.registerSingleton<StockCubit>(StockCubit(
+      productRepository: ProductRepositoryImp(
+          productDataSource: ProductDataSource(),
+          categoryDataSource: CategoryDataSource())));
          
 }

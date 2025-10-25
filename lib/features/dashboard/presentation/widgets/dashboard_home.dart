@@ -166,11 +166,11 @@ class _DashboardHomeState extends State<DashboardHome>
   int _getTargetScreenIndex(int cardIndex) {
     switch (cardIndex) {
       case 0:
-        return 4; // التنبيهات
+        return 6; // التنبيهات
       case 1:
-        return 3; // المنتجات الناقصة
+        return 4; // المنتجات الناقصة
       case 2:
-        return 2; // المنتجات
+        return 3; // المنتجات
       case 3:
         return 1; // المبيعات
       default:
