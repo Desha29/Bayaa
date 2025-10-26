@@ -18,7 +18,7 @@ import '../../stock/presentation/stock_screen.dart';
 import '../../invoice/presentation/invoices_home.dart';
 
 // ARP imports
-import '../../arp/presentation/arp_screen.dart';
+import '../../arp/presentation/screens/arp_screen.dart';
 import '../../arp/presentation/cubit/arp_cubit.dart';
 import '../../arp/data/arp_repository_impl.dart';
 

@@ -60,9 +60,13 @@ class ArpRepositoryImpl implements ArpRepository {
 
   @override
   Future<Either<Failure, List<ProductPerformanceModel>>> getTopProducts(
-      int limit) async {
+      int limit, DateTime start, DateTime end) async {
     try {
-      final salesResult = await salesRepository.getRecentSales(limit: 10000);
+      final salesResult = await salesRepository.getRecentSales(
+        limit: 10000,
+        startDate: start,
+        endDate: end,
+      );
       return salesResult.fold(
         (failure) => Left(failure),
         (sales) {

@@ -9,10 +9,16 @@ abstract class SalesRepository {
   Future<Either<Failure, Product?>> findProductByBarcode(String barcode);
   Future<Either<Failure, List<Product>>> getAllProducts();
   Future<Either<Failure, Unit>> saveSale(Sale sale);
-  Future<Either<Failure, List<Sale>>> getRecentSales({int limit = 10});
-  Future<Either<Failure, Unit>> updateProductQuantity(String barcode, int newQuantity);
-  Future<Either<Failure, bool>> validateMinPrice(String barcode, double salePrice);
-  
+  Future<Either<Failure, List<Sale>>> getRecentSales({
+    int limit = 10,
+    DateTime? startDate,
+    DateTime? endDate,
+  });
+  Future<Either<Failure, Unit>> updateProductQuantity(
+      String barcode, int newQuantity);
+  Future<Either<Failure, bool>> validateMinPrice(
+      String barcode, double salePrice);
+
   // NEW: Method to create sale with cashier info
   Future<Either<Failure, Unit>> createSaleWithCashier({
     required List<CartItemModel> items,

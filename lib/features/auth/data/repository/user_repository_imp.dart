@@ -7,13 +7,14 @@ import 'package:either_dart/src/either.dart';
 class UserRepositoryImp extends UserRepositoryInt {
   UserDataSource userDataSource;
   UserRepositoryImp({required this.userDataSource});
+
   @override
   Either<Failure, void> deleteUser(String username) {
     try {
       userDataSource.deleteUser(username);
       return Right(null);
     } on Exception catch (e) {
-      return Left(CacheFailure("Failed to delete user"));
+      return Left(CacheFailure("فشل في حذف المستخدم"));
     }
   }
 
@@ -26,7 +27,7 @@ class UserRepositoryImp extends UserRepositoryInt {
       }
       return Right(users);
     } on Exception catch (e) {
-      return Left(CacheFailure("Failed to get users"));
+      return Left(CacheFailure("فشل في جلب المستخدمين"));
     }
   }
 
@@ -37,10 +38,10 @@ class UserRepositoryImp extends UserRepositoryInt {
       if (user != null) {
         return Right(user);
       } else {
-        return Left(CacheFailure("User not found"));
+        return Left(CacheFailure("المستخدم غير موجود"));
       }
     } on Exception catch (e) {
-      return Left(CacheFailure("Failed to get user"));
+      return Left(CacheFailure("فشل في جلب المستخدم"));
     }
   }
 
@@ -50,17 +51,17 @@ class UserRepositoryImp extends UserRepositoryInt {
       userDataSource.saveUser(user);
       return Right(null);
     } on Exception catch (e) {
-      return Left(CacheFailure("Failed to save user"));
+      return Left(CacheFailure("فشل في حفظ المستخدم"));
     }
   }
-  @override
-Either<Failure, void> updateUser(User user) {
-  try {
-    userDataSource.updateUser(user);
-    return const Right(null); 
-  } on Exception catch (e) {
-    return Left(CacheFailure("Failed to update user: ${e.toString()}"));
-  }
-}
 
+  @override
+  Either<Failure, void> updateUser(User user) {
+    try {
+      userDataSource.updateUser(user);
+      return const Right(null);
+    } on Exception catch (e) {
+      return Left(CacheFailure("فشل في تحديث المستخدم: ${e.toString()}"));
+    }
+  }
 }

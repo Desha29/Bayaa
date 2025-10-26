@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 
-import 'cubit/arp_cubit.dart';
-import 'cubit/arp_state.dart';
+import '../cubit/arp_cubit.dart';
+import '../cubit/arp_state.dart';
 
 import 'dialy_report_screen.dart';
-import 'widgets/arp_summary_cards.dart';
-import 'widgets/arp_chart_section.dart';
-import 'widgets/arp_top_products.dart';
+import '../widgets/arp_summary_cards.dart';
+import '../widgets/arp_chart_section.dart';
+import '../widgets/arp_top_products.dart';
 
 class ArpScreen extends StatefulWidget {
   const ArpScreen({super.key});
@@ -48,86 +48,85 @@ class _ArpScreenState extends State<ArpScreen> {
                 color: AppColors.primaryColor,
                 child: CustomScrollView(
                   slivers: [
-                   SliverToBoxAdapter(
-  child: Padding(
-    padding: EdgeInsets.all(isDesktop ? 32 : isTablet ? 24 : 16),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.analytics_outlined,
-                color: AppColors.primaryColor,
-                size: 28,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'التحليلات والتقارير',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.kDarkChip,
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(isDesktop ? 32 : isTablet ? 24 : 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.analytics_outlined,
+                                    color: AppColors.primaryColor,
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'التحليلات والتقارير',
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.kDarkChip,
+                                        ),
+                                      ),
+                                      Text(
+                                        _getDateRangeText(),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.date_range, color: Colors.white),
+                                    onPressed: () => _selectDateRange(context),
+                                    tooltip: 'اختيار الفترة',
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.picture_as_pdf),
+                                  label: const Text('تقرير يومي'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryColor,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => const DailyReportScreen(),
+                                      ),
+                                    );
+                                  },
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  Text(
-                    _getDateRangeText(),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.date_range, color: Colors.white),
-                onPressed: () => _selectDateRange(context),
-                tooltip: 'اختيار الفترة',
-              ),
-            ),
-            const SizedBox(width: 8),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.picture_as_pdf),
-              label: const Text('تقرير يومي'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const DailyReportScreen(),
-                  ),
-                );
-              },
-            )
-          ],
-        ),
-      ],
-    ),
-  ),
-),
-
                     if (state is ArpLoading)
                       const SliverFillRemaining(
                         child: Center(
@@ -239,6 +238,7 @@ class _ArpScreenState extends State<ArpScreen> {
         endDate = picked.end;
       });
       context.read<ArpCubit>().loadAnalytics(start: picked.start, end: picked.end);
+
     }
   }
 }

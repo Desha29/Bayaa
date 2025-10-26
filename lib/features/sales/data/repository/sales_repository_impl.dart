@@ -24,7 +24,7 @@ class SalesRepositoryImpl implements SalesRepository {
       }
       return Right(products.first);
     } catch (e) {
-      return Left(CacheFailure('Failed to find product: ${e.toString()}'));
+      return Left(CacheFailure('فشل في العثور على المنتج: ${e.toString()}'));
     }
   }
 
@@ -33,7 +33,7 @@ class SalesRepositoryImpl implements SalesRepository {
     try {
       return Right(productsBox.values.toList());
     } catch (e) {
-      return Left(CacheFailure('Failed to get products: ${e.toString()}'));
+      return Left(CacheFailure('فشل في جلب المنتجات: ${e.toString()}'));
     }
   }
 
@@ -43,18 +43,33 @@ class SalesRepositoryImpl implements SalesRepository {
       await salesBox.put(sale.id, sale);
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure('Failed to save sale: ${e.toString()}'));
+      return Left(CacheFailure('فشل في حفظ البيع: ${e.toString()}'));
     }
   }
 
   @override
-  Future<Either<Failure, List<Sale>>> getRecentSales({int limit = 10}) async {
+  Future<Either<Failure, List<Sale>>> getRecentSales({
+    int limit = 10,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     try {
-      final sales = salesBox.values.toList();
+      var sales = salesBox.values.toList();
+
+      // Filter by date range if provided
+      if (startDate != null) {
+        sales = sales.where((sale) => !sale.date.isBefore(startDate)).toList();
+      }
+      if (endDate != null) {
+        sales = sales.where((sale) => !sale.date.isAfter(endDate)).toList();
+      }
+
+      // Sort by descending date
       sales.sort((a, b) => b.date.compareTo(a.date));
+
       return Right(sales.take(limit).toList());
     } catch (e) {
-      return Left(CacheFailure('Failed to get recent sales: ${e.toString()}'));
+      return Left(CacheFailure('فشل في جلب آخر المبيعات: ${e.toString()}'));
     }
   }
 
@@ -64,14 +79,14 @@ class SalesRepositoryImpl implements SalesRepository {
     try {
       final products = productsBox.values.where((p) => p.barcode == barcode);
       if (products.isEmpty) {
-        return Left(CacheFailure('Product not found'));
+        return Left(CacheFailure('المنتج غير موجود'));
       }
       final product = products.first;
       product.quantity = newQuantity;
       await productsBox.put(product.barcode, product);
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure('Failed to update quantity: ${e.toString()}'));
+      return Left(CacheFailure('فشل في تحديث الكمية: ${e.toString()}'));
     }
   }
 
@@ -88,7 +103,7 @@ class SalesRepositoryImpl implements SalesRepository {
         },
       );
     } catch (e) {
-      return Left(CacheFailure('Failed to validate price: ${e.toString()}'));
+      return Left(CacheFailure('فشل في التحقق من السعر: ${e.toString()}'));
     }
   }
 
@@ -116,7 +131,7 @@ class SalesRepositoryImpl implements SalesRepository {
                   price: item.salePrice,
                   quantity: item.qty,
                   total: item.total,
-                  wholesalePrice: item.wholesalePrice
+                  wholesalePrice: item.wholesalePrice,
                 ))
             .toList(),
       );
@@ -139,7 +154,7 @@ class SalesRepositoryImpl implements SalesRepository {
 
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure('Failed to create sale: ${e.toString()}'));
+      return Left(CacheFailure('فشل في إنشاء البيع: ${e.toString()}'));
     }
   }
 }
