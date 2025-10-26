@@ -1,4 +1,4 @@
-// lib/features/arp/data/models/arp_summary_model.dart
+
 import 'package:hive/hive.dart';
 
 part 'arp_summary_model.g.dart';
@@ -41,23 +41,3 @@ class ArpSummaryModel {
   double get averageSaleValue => totalSales > 0 ? totalRevenue / totalSales : 0;
 }
 
-// lib/features/arp/data/models/product_performance_model.dart
-class ProductPerformanceModel {
-  final String productId;
-  final String productName;
-  final int quantitySold;
-  final double revenue;
-  final double cost;
-  final double profit;
-  final double profitMargin;
-
-  ProductPerformanceModel({
-    required this.productId,
-    required this.productName,
-    required this.quantitySold,
-    required this.revenue,
-    required this.cost,
-    required this.profit,
-    required this.profitMargin,
-  });
-}

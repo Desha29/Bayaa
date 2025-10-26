@@ -1,4 +1,4 @@
-// lib/features/arp/data/models/arp_summary_model.g.dart
+
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'arp_summary_model.dart';

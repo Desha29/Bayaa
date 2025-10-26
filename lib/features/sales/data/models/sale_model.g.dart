@@ -1,4 +1,3 @@
-// lib/features/sales/data/models/sale_model.g.dart
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'sale_model.dart';
@@ -75,13 +74,14 @@ class SaleItemAdapter extends TypeAdapter<SaleItem> {
       price: fields[2] as double,
       quantity: fields[3] as int,
       total: fields[4] as double,
+      wholesalePrice: (fields[5] as double?) ?? 0.0,
     );
   }
 
   @override
   void write(BinaryWriter writer, SaleItem obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.productId)
       ..writeByte(1)
@@ -91,7 +91,9 @@ class SaleItemAdapter extends TypeAdapter<SaleItem> {
       ..writeByte(3)
       ..write(obj.quantity)
       ..writeByte(4)
-      ..write(obj.total);
+      ..write(obj.total)
+      ..writeByte(5)
+      ..write(obj.wholesalePrice);
   }
 
   @override

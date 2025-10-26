@@ -29,7 +29,7 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) {
-        emit(ProductSuccessState("تم التعديل بنجاح"));
+        emit(ProductSuccessState("تم العملية بنجاح"));
         getAllProducts();
       },
     );

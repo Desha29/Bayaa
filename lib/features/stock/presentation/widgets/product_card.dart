@@ -112,7 +112,7 @@ class _ProductCardState extends State<ProductCard> {
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
-                                'كود: ${product.minQuantity}',
+                                'كود: ${product.barcode}',
                                 style: TextStyle(
                                   fontSize: ResponsiveHelper.fontSize(
                                     context,
@@ -168,15 +168,7 @@ class _ProductCardState extends State<ProductCard> {
                               Colors.black,
                             ),
                           ),
-                          Flexible(
-                            child: _buildInfoRow(
-                              context,
-                              'آخر تخزين:',
-                              "",
-                              Colors.grey[600]!,
-                              valueSize: 13,
-                            ),
-                          ),
+                          
                         ],
                       ),
                     ),

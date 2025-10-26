@@ -1,68 +1,68 @@
-// lib/features/arp/data/arp_repository_impl.dart
 import 'package:dartz/dartz.dart';
+
 import '../../../core/error/failure.dart';
-import '../domain/arp_repository.dart';
 import '../../sales/domain/sales_repository.dart';
+import '../domain/arp_repository.dart';
 import '../data/models/arp_summary_model.dart';
 
+import 'models/dialy_report_model.dart';
+import 'models/product_performance_model.dart';
 
 class ArpRepositoryImpl implements ArpRepository {
   final SalesRepository salesRepository;
 
-  ArpRepositoryImpl({
-    required this.salesRepository,
-  });
+  ArpRepositoryImpl({required this.salesRepository});
 
   @override
   Future<Either<Failure, ArpSummaryModel>> getSummary(
-    DateTime start,
-    DateTime end,
-  ) async {
+      DateTime start, DateTime end) async {
     try {
       final salesResult = await salesRepository.getRecentSales(limit: 10000);
-      
       return salesResult.fold(
         (failure) => Left(failure),
         (sales) {
-          final filteredSales = sales.where((sale) {
-            return sale.date.isAfter(start.subtract(const Duration(days: 1))) &&
-                sale.date.isBefore(end.add(const Duration(days: 1)));
-          }).toList();
+          final filteredSales = sales
+              .where((sale) =>
+                  sale.date.isAfter(start.subtract(const Duration(days: 1))) &&
+                  sale.date.isBefore(end.add(const Duration(days: 1))))
+              .toList();
 
-          double totalRevenue = 0;
-          double totalCost = 0;
+          double totalRevenue = 0.0;
+          double totalCost = 0.0;
 
           for (var sale in filteredSales) {
             totalRevenue += sale.total;
             for (var item in sale.saleItems) {
-              totalCost += item.price * 0.6 * item.quantity;
+              final wholesalePrice = item.wholesalePrice;
+              totalCost += wholesalePrice * item.quantity;
             }
           }
 
           final profit = totalRevenue - totalCost;
-          final margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0.0;
+          final profitMargin =
+              totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0.0;
 
           return Right(ArpSummaryModel(
+            startDate: start,
+            endDate: end,
             totalRevenue: totalRevenue,
             totalCost: totalCost,
             totalProfit: profit,
-            profitMargin: margin,
+            profitMargin: profitMargin,
             totalSales: filteredSales.length,
-            startDate: start,
-            endDate: end,
           ));
         },
       );
     } catch (e) {
-      return Left(CacheFailure("Error fetching summary: ${e.toString()}"));
+      return Left(CacheFailure(":خطأ في تحميل الملخص]: ${e.toString()}"));
     }
   }
 
   @override
-  Future<Either<Failure, List<ProductPerformanceModel>>> getTopProducts(int limit) async {
+  Future<Either<Failure, List<ProductPerformanceModel>>> getTopProducts(
+      int limit) async {
     try {
       final salesResult = await salesRepository.getRecentSales(limit: 10000);
-      
       return salesResult.fold(
         (failure) => Left(failure),
         (sales) {
@@ -70,27 +70,23 @@ class ArpRepositoryImpl implements ArpRepository {
 
           for (var sale in sales) {
             for (var item in sale.saleItems) {
-              final productName = item.name; // Changed from item.productName to item.name
-              final cost = item.price * 0.6 * item.quantity;
-              
-              if (productStats.containsKey(productName)) {
-                final existing = productStats[productName]!;
-                productStats[productName] = ProductPerformanceModel(
-                  productId: existing.productId,
-                  productName: productName,
+              final wholesalePrice = item.wholesalePrice;
+              final revenue = (item.price) * item.quantity;
+
+              if (productStats.containsKey(item.name)) {
+                final existing = productStats[item.name]!;
+                productStats[item.name] = existing.copyWith(
                   quantitySold: existing.quantitySold + item.quantity,
-                  revenue: existing.revenue + item.total,
-                  cost: existing.cost + cost,
-                  profit: 0.0,
-                  profitMargin: 0.0,
+                  revenue: existing.revenue + revenue,
+                  cost: existing.cost + (wholesalePrice * item.quantity),
                 );
               } else {
-                productStats[productName] = ProductPerformanceModel(
+                productStats[item.name] = ProductPerformanceModel(
                   productId: item.productId,
-                  productName: productName,
+                  productName: item.name,
                   quantitySold: item.quantity,
-                  revenue: item.total,
-                  cost: cost,
+                  revenue: revenue,
+                  cost: wholesalePrice * item.quantity,
                   profit: 0.0,
                   profitMargin: 0.0,
                 );
@@ -101,15 +97,7 @@ class ArpRepositoryImpl implements ArpRepository {
           final products = productStats.values.map((p) {
             final profit = p.revenue - p.cost;
             final margin = p.revenue > 0 ? (profit / p.revenue) * 100 : 0.0;
-            return ProductPerformanceModel(
-              productId: p.productId,
-              productName: p.productName,
-              quantitySold: p.quantitySold,
-              revenue: p.revenue,
-              cost: p.cost,
-              profit: profit,
-              profitMargin: margin,
-            );
+            return p.copyWith(profit: profit, profitMargin: margin);
           }).toList();
 
           products.sort((a, b) => b.revenue.compareTo(a.revenue));
@@ -117,36 +105,121 @@ class ArpRepositoryImpl implements ArpRepository {
         },
       );
     } catch (e) {
-      return Left(CacheFailure("Error fetching top products: ${e.toString()}"));
+      return Left(CacheFailure("خطأ في تحميل أفضل المنتجات ${e.toString()}"));
+    }
+  }
+
+  Future<Either<Failure, DailyReportModel>> getDailyReport(
+      DateTime date) async {
+    try {
+      final salesResult = await salesRepository.getRecentSales(limit: 10000);
+      return salesResult.fold(
+        (failure) => Left(failure),
+        (sales) {
+          final filteredSales = sales
+              .where((sale) =>
+                  sale.date.year == date.year &&
+                  sale.date.month == date.month &&
+                  sale.date.day == date.day)
+              .toList();
+
+          double totalRevenue = 0.0;
+          double totalCost = 0.0;
+          final Map<String, ProductPerformanceModel> productStats = {};
+
+          for (var sale in filteredSales) {
+            totalRevenue += sale.total;
+            for (var item in sale.saleItems) {
+              final wholesalePrice = item.wholesalePrice;
+              final revenue = (item.price) * item.quantity;
+              final cost = wholesalePrice * item.quantity;
+              totalCost += cost;
+
+              if (productStats.containsKey(item.name)) {
+                final existing = productStats[item.name]!;
+                productStats[item.name] = existing.copyWith(
+                  quantitySold: existing.quantitySold + item.quantity,
+                  revenue: existing.revenue + revenue,
+                  cost: existing.cost + cost,
+                );
+              } else {
+                productStats[item.name] = ProductPerformanceModel(
+                  productId: item.productId,
+                  productName: item.name,
+                  quantitySold: item.quantity,
+                  revenue: revenue,
+                  cost: cost,
+                  profit: 0.0,
+                  profitMargin: 0.0,
+                );
+              }
+            }
+          }
+
+          final profit = totalRevenue - totalCost;
+          final profitMargin =
+              totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0.0;
+
+          final topProducts = productStats.values.map((p) {
+            final profit = p.revenue - p.cost;
+            final margin = p.revenue > 0 ? (profit / p.revenue) * 100 : 0.0;
+            return p.copyWith(profit: profit, profitMargin: margin);
+          }).toList();
+
+          topProducts.sort((a, b) => b.revenue.compareTo(a.revenue));
+
+          return Right(DailyReportModel(
+            date: date,
+            totalRevenue: totalRevenue,
+            totalCost: totalCost,
+            totalProfit: profit,
+            profitMargin: profitMargin,
+            topProducts: topProducts,
+          ));
+        },
+      );
+    } catch (e) {
+      return Left(CacheFailure("خطأ في تحميل التقرير اليومي: ${e.toString()}"));
     }
   }
 
   @override
-  Future<Either<Failure, Map<String, double>>> getDailySales(DateTime start, DateTime end) async {
+  Future<Either<Failure, Map<String, double>>> getDailySales(
+      DateTime start, DateTime end) async {
     try {
       final salesResult = await salesRepository.getRecentSales(limit: 10000);
-      
       return salesResult.fold(
         (failure) => Left(failure),
         (sales) {
-          final filteredSales = sales.where((sale) {
-            return sale.date.isAfter(start.subtract(const Duration(days: 1))) &&
-                sale.date.isBefore(end.add(const Duration(days: 1)));
-          }).toList();
+          final filteredSales = sales
+              .where((sale) =>
+                  sale.date.isAfter(start.subtract(const Duration(days: 1))) &&
+                  sale.date.isBefore(end.add(const Duration(days: 1))))
+              .toList();
 
-          final Map<String, double> dailySales = {};
+          double totalRevenue = 0.0;
+          double totalCost = 0.0;
 
           for (var sale in filteredSales) {
-            final dateKey = '${sale.date.year}-${sale.date.month.toString().padLeft(2, '0')}-${sale.date.day.toString().padLeft(2, '0')}';
-            dailySales[dateKey] = (dailySales[dateKey] ?? 0) + sale.total;
+            totalRevenue += sale.total;
+            for (var item in sale.saleItems) {
+              final wholesalePrice = item.wholesalePrice;
+              totalCost += wholesalePrice * item.quantity;
+            }
           }
 
-          final sortedKeys = dailySales.keys.toList()..sort();
-          return Right({for (var key in sortedKeys) key: dailySales[key]!});
+          final totalProfit = totalRevenue - totalCost;
+
+          return Right({
+            'اجمالي المبيعات': totalRevenue,
+            'التكلفة الكلية': totalCost,
+            'صافي الربح': totalProfit,
+          });
         },
       );
     } catch (e) {
-      return Left(CacheFailure("Error fetching daily sales: ${e.toString()}"));
+      return Left(CacheFailure(
+          ":خطأ في تحميل بيانات المبيعات اليومية ${e.toString()}"));
     }
   }
 }

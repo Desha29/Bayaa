@@ -1,4 +1,3 @@
-// lib/features/sales/data/models/cart_item_model.dart
 class CartItemModel {
   final String id;
   final String name;
@@ -7,6 +6,7 @@ class CartItemModel {
   int qty;
   final DateTime date;
   final double minPrice;
+  final double wholesalePrice;  // Added wholesalePrice field
 
   CartItemModel({
     required this.id,
@@ -16,6 +16,7 @@ class CartItemModel {
     required this.qty,
     required this.date,
     required this.minPrice,
+    required this.wholesalePrice,  // Add to constructor
   });
 
   double get total => salePrice * qty;
@@ -31,6 +32,7 @@ class CartItemModel {
       'date': date,
       'minPrice': minPrice,
       'originalPrice': originalPrice,
+      'wholesalePrice': wholesalePrice,  // Include wholesalePrice in map
     };
   }
 }

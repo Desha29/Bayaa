@@ -10,15 +10,15 @@ import 'core/constants/bloc_observer.dart';
 import 'core/di/dependency_injection.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/hive_helper.dart';
+import 'core/components/message_overlay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Bloc.observer = MyBlocObserver();
 
- 
   await HiveHelper.initialize();
- 
+
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     await windowManager.ensureInitialized();
 
@@ -53,27 +53,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Crazy Phone POS',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const LoginScreen(), // Direct to LoginScreen (no custom top bar)
-      locale: const Locale('ar'),
-      supportedLocales: const [
-        Locale('ar'),
-        Locale('en'),
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child!,
-        );
-      },
+    return MessageOverlay(
+      child: MaterialApp(
+        title: 'Crazy Phone',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        home: const LoginScreen(),
+        locale: const Locale('ar'),
+        supportedLocales: const [
+          Locale('ar'),
+          Locale('en'),
+        ],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        builder: (context, child) {
+          // Initialize global message context
+          GlobalMessage.initialize(context);
+
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: child!,
+          );
+        },
+      ),
     );
   }
 }

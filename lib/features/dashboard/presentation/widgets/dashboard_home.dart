@@ -74,7 +74,9 @@ class _DashboardHomeState extends State<DashboardHome>
 
     Future.forEach(List.generate(cards.length, (i) => i), (i) async {
       await Future.delayed(Duration(milliseconds: i * 150));
-      _controllers[i].forward();
+      if (mounted && i < _controllers.length) {
+        _controllers[i].forward();
+      }
     });
   }
 

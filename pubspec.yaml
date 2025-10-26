@@ -118,7 +118,7 @@ flutter:
     - family: Amiri
       fonts:
         - asset: assets/fonts/Amiri-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
+        - asset: assets/fonts/Amiri-Bold.ttf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

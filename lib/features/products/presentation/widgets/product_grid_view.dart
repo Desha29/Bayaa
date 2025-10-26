@@ -2,7 +2,6 @@ import 'package:crazy_phone_pos/features/products/data/models/product_model.dart
 import 'package:flutter/material.dart';
 import '../../../../core/components/empty_state.dart';
 import '../../../../core/utils/responsive_helper.dart';
-
 import 'enhanced_product_card.dart';
 
 class ProductsGridView extends StatelessWidget {
@@ -28,24 +27,19 @@ class ProductsGridView extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cross = ResponsiveHelper.gridCount(context);
-        final gridPadding = ResponsiveHelper.padding(context);
+        int crossCount = ResponsiveHelper.isDesktop(context)
+            ? 4
+            : ResponsiveHelper.isTablet(context)
+                ? 3
+                : 2;
+
         return GridView.builder(
-          padding: gridPadding.copyWith(
-            left: gridPadding.left.clamp(8.0, 24.0),
-            right: gridPadding.right.clamp(8.0, 24.0),
-            top: gridPadding.top.clamp(8.0, 24.0),
-            bottom: gridPadding.bottom.clamp(8.0, 24.0),
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: cross,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: getChildAspectRatio(
-              context,
-              constraints.maxWidth,
-              cross,
-            ),
+            crossAxisCount: crossCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: _getChildAspectRatio(context),
           ),
           itemCount: products.length,
           itemBuilder: (context, index) {
@@ -65,9 +59,9 @@ class ProductsGridView extends StatelessWidget {
     );
   }
 
-  double getChildAspectRatio(BuildContext context, double maxWidth, int cross) {
-    if (ResponsiveHelper.isDesktop(context)) return 0.80;
-    if (ResponsiveHelper.isTablet(context)) return 0.68;
-    return maxWidth / cross < 180 ? 0.58 : 0.64;
+  double _getChildAspectRatio(BuildContext context) {
+    if (ResponsiveHelper.isDesktop(context)) return 1;
+    if (ResponsiveHelper.isTablet(context)) return 0.85;
+    return 0.75;
   }
 }

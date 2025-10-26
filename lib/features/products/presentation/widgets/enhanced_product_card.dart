@@ -1,6 +1,9 @@
-import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/utils/responsive_helper.dart';
+import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
+import 'package:crazy_phone_pos/core/utils/responsive_helper.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../auth/data/models/user_model.dart';
+import '../../../auth/presentation/cubit/user_cubit.dart';
 
 class EnhancedProductCard extends StatelessWidget {
   final Product product;
@@ -24,161 +27,111 @@ class EnhancedProductCard extends StatelessWidget {
     final min = product.minQuantity;
     final isLowStock = qty > 0 && qty <= min;
     final isOutOfStock = qty == 0;
+    final userType = getIt<UserCubit>().currentUser.userType;
 
-    final pad = ResponsiveHelper.padding(context);
-    final titleSize = ResponsiveHelper.fontSize(
-      context,
-      mobile: 13,
-      tablet: 15,
-      desktop: 17,
-    );
-    final small = ResponsiveHelper.fontSize(
-      context,
-      mobile: 10,
-      tablet: 11,
-      desktop: 12,
-    );
-    final value = ResponsiveHelper.fontSize(
-      context,
-      mobile: 12,
-      tablet: 13,
-      desktop: 14,
-    );
+    final titleSize =
+        ResponsiveHelper.fontSize(context, mobile: 15, tablet: 17, desktop: 19);
+    final small =
+        ResponsiveHelper.fontSize(context, mobile: 11, tablet: 12, desktop: 13);
+    final value =
+        ResponsiveHelper.fontSize(context, mobile: 13, tablet: 14, desktop: 15);
 
     return Container(
       margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isOutOfStock
-              ? Colors.red.withOpacity(0.25)
+              ? Colors.redAccent.withOpacity(0.3)
               : isLowStock
-                  ? Colors.orange.withOpacity(0.25)
+                  ? Colors.orangeAccent.withOpacity(0.25)
                   : Colors.grey.withOpacity(0.15),
-          width: 3,
+          width: 1.4,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
         ],
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey.shade50],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
       ),
-      child: Padding(
-        padding: EdgeInsetsDirectional.fromSTEB(
-          pad.left.clamp(6.0, 12.0),
-          pad.top.clamp(6.0, 12.0),
-          pad.right.clamp(6.0, 12.0),
-          pad.bottom.clamp(6.0, 12.0),
-        ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final tightW = constraints.maxWidth < 180;
-            final tightH = constraints.maxHeight < 240;
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Top image
-                Flexible(
-                  flex: 2,
-                  child: _CategoryImage(tightH: tightH, tightW: tightW),
-                ),
-
-                SizedBox(height: tightH ? 4 : 6),
-
-                // Header row
-                Flexible(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            product.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: titleSize,
-                              color: const Color(0xff1e293b),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: tightW ? 4 : 6),
-                      _StatusChip(
-                        text: statusText,
-                        color: statusColor,
-                        font: small,
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: tightH ? 2 : 4),
-
-                SizedBox(height: tightH ? 4 : 6),
-
-                Flexible(
-                  flex: 2,
-                  child: _InfoGrid(
-                    small: small,
-                    value: value,
-                    qty: qty,
-                    product: product,
-                    tightW: tightW,
-                  ),
-                ),
-                SizedBox(height: tightH ? 12 : 18),
-                Expanded(
-                  child: _ActionsBar(
-                    edit: onEdit,
-                    del: onDelete,
-                    value: value,
-                    tightH: tightH,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _CategoryImage extends StatelessWidget {
-  final bool tightH;
-  final bool tightW;
-  const _CategoryImage({required this.tightH, required this.tightW});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        color: Colors.grey.shade100,
-        child: Padding(
-          padding: EdgeInsets.all(tightW ? 4 : 6),
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: Image.asset(
-              'assets/images/p_image.png',
-              errorBuilder: (_, __, ___) =>
-                  Icon(Icons.image_outlined, size: 36, color: Colors.grey[400]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 🔹 Product Name
+          Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 4),
+            child: Text(
+              product.name,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: titleSize,
+                color: const Color(0xff1e293b),
+              ),
             ),
           ),
-        ),
+
+          // 🔹 Category
+          if (product.category != null && product.category!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 2, bottom: 8),
+              child: Text(
+                product.category!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: small + 0.3,
+                  color: Colors.blueGrey[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 8),
+
+          // 🔹 Price + Status
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "السعر: ${product.price.toStringAsFixed(2)}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: value,
+                  color: const Color(0xff059669),
+                ),
+              ),
+              _StatusChip(
+                text: statusText,
+                color: statusColor,
+                font: small + 1,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // 🔹 Info Row (qty, min, optional wholesale)
+          _InfoRow(
+            small: small,
+            value: value,
+            qty: qty,
+            min: min,
+            product: product,
+            isManager: userType == UserType.manager,
+          ),
+
+          const SizedBox(height: 10),
+
+          // 🔹 Actions
+          _ActionsBar(edit: onEdit, del: onDelete, value: value),
+        ],
       ),
     );
   }
@@ -199,124 +152,90 @@ class _StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.16),
-        borderRadius: BorderRadius.circular(12),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: FittedBox(
-        child: Text(
-          text,
-          style: TextStyle(
-            color: color,
-            fontSize: font,
-            fontWeight: FontWeight.w600,
-          ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: font,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
   }
 }
 
-class _InfoGrid extends StatelessWidget {
+class _InfoRow extends StatelessWidget {
   final double small;
   final double value;
   final int qty;
+  final int min;
   final Product product;
-  final bool tightW;
-  const _InfoGrid({
+  final bool isManager;
+
+  const _InfoRow({
     required this.small,
     required this.value,
     required this.qty,
+    required this.min,
     required this.product,
-    required this.tightW,
+    required this.isManager,
   });
+
+  Widget infoItem(String label, String val, IconData icon, Color color) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: value + 2),
+            const SizedBox(height: 2),
+            Text(label,
+                style: TextStyle(
+                    fontSize: small, color: Colors.grey[700], height: 1.2)),
+            Text(val,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: value + 1,
+                    color: color)),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    Widget chip(String label, String val, IconData icon, Color color) {
-      // Remove Flexible; Wrap children must not be Flexible
-      return ConstrainedBox(
-        constraints: BoxConstraints(minWidth: tightW ? 60 : 68, maxWidth: 120),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Icon(icon, color: color, size: value + 2),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    label,
-                    style: TextStyle(fontSize: small, color: Colors.grey[700]),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    val,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: value,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     return Row(
-      spacing: 10,
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Flexible(
-          child: FittedBox(
-            child: chip(
-              'السعر',
-              '${product.price.toStringAsFixed(2)} ',
-              Icons.attach_money_rounded,
-              const Color(0xff059669),
-            ),
-          ),
+        infoItem(
+          'المتوفر',
+          qty.toString(),
+          Icons.inventory_2_rounded,
+          qty == 0 ? Colors.redAccent : const Color(0xff0fa2a9),
         ),
-        Flexible(
-          child: FittedBox(
-            child: chip(
-              'المتوفر',
-              qty.toString(),
-              Icons.inventory_2_rounded,
-              qty == 0 ? Colors.red : const Color(0xff0fa2a9),
-            ),
-          ),
+        infoItem(
+          'الحد الأدنى',
+          min.toString(),
+          Icons.trending_down_rounded,
+          Colors.orangeAccent,
         ),
-        Flexible(
-          child: FittedBox(
-            child: chip(
-              'التصنيف',
-              (product.category).toString(),
-              Icons.category_rounded,
-              const Color(0xff8b5cf6),
-            ),
+        if (isManager)
+          infoItem(
+            'جملة',
+            product.wholesalePrice != null
+                ? product.wholesalePrice!.toStringAsFixed(2)
+                : '-',
+            Icons.local_offer_rounded,
+            Colors.teal,
           ),
-        ),
       ],
     );
   }
@@ -326,41 +245,34 @@ class _ActionsBar extends StatelessWidget {
   final VoidCallback edit;
   final VoidCallback del;
   final double value;
-  final bool tightH;
+
   const _ActionsBar({
     required this.edit,
     required this.del,
     required this.value,
-    required this.tightH,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Flexible(
-          child: FittedBox(
-            child: ActionButton(
-              text: 'تعديل',
-              icon: Icons.edit_rounded,
-              baseColor: Colors.blueAccent,
-              onPressed: edit,
-              fontSize: value,
-              compact: tightH,
-            ),
+        Expanded(
+          child: ActionButton(
+            text: 'تعديل',
+            icon: Icons.edit_rounded,
+            baseColor: Colors.blueAccent,
+            onPressed: edit,
+            fontSize: value + 1,
           ),
         ),
-        const Spacer(),
-        Flexible(
-          child: FittedBox(
-            child: ActionButton(
-              text: 'حذف',
-              icon: Icons.delete_rounded,
-              baseColor: Colors.redAccent,
-              onPressed: del,
-              fontSize: value,
-              compact: tightH,
-            ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: ActionButton(
+            text: 'حذف',
+            icon: Icons.delete_rounded,
+            baseColor: Colors.redAccent,
+            onPressed: del,
+            fontSize: value + 1,
           ),
         ),
       ],
@@ -374,7 +286,6 @@ class ActionButton extends StatefulWidget {
   final Color baseColor;
   final VoidCallback onPressed;
   final double? fontSize;
-  final bool compact;
 
   const ActionButton({
     super.key,
@@ -383,7 +294,6 @@ class ActionButton extends StatefulWidget {
     required this.baseColor,
     required this.onPressed,
     this.fontSize,
-    this.compact = false,
   });
 
   @override
@@ -395,74 +305,40 @@ class _ActionButtonState extends State<ActionButton> {
 
   @override
   Widget build(BuildContext context) {
-    final f = (widget.fontSize ?? 13).clamp(10, 14).toDouble();
-    final bgColor =
-        hovering ? widget.baseColor : widget.baseColor.withOpacity(0.10);
-    final borderColor = hovering
-        ? widget.baseColor.withOpacity(0.00)
-        : widget.baseColor.withOpacity(0.28);
+    final f = (widget.fontSize ?? 13).clamp(11, 15).toDouble();
+    final bgColor = hovering
+        ? widget.baseColor.withOpacity(0.9)
+        : widget.baseColor.withOpacity(0.12);
     final fgColor = hovering ? Colors.white : widget.baseColor;
-    final scale = hovering ? 1.02 : 1.0;
-    final elevation = hovering ? 3.0 : 0.0;
-    const duration = Duration(milliseconds: 140);
 
     return MouseRegion(
       onEnter: (_) => setState(() => hovering = true),
       onExit: (_) => setState(() => hovering = false),
-      child: AnimatedScale(
-        scale: scale,
-        duration: duration,
-        curve: Curves.easeOut,
-        child: Material(
-          color: Colors.transparent,
-          elevation: elevation,
-          borderRadius: BorderRadius.circular(12),
-          child: InkWell(
-            onTap: widget.onPressed,
-            borderRadius: BorderRadius.circular(12),
-            hoverColor: widget.baseColor.withOpacity(0.08),
-            splashColor: widget.baseColor.withOpacity(0.18),
-            child: AnimatedContainer(
-              duration: duration,
-              curve: Curves.easeOut,
-              padding: EdgeInsets.symmetric(
-                vertical: widget.compact ? 6 : 8,
-                horizontal: 8,
-              ),
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: borderColor, width: 1),
-                boxShadow: hovering
-                    ? [
-                        BoxShadow(
-                          color: widget.baseColor.withOpacity(0.22),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : const [],
-              ),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(widget.icon, color: fgColor, size: f + 3),
-                    const SizedBox(width: 4),
-                    Text(
-                      widget.text,
-                      maxLines: 1,
-                      style: TextStyle(
-                        color: fgColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: f,
-                      ),
-                    ),
-                  ],
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 130),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: InkWell(
+          onTap: widget.onPressed,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(widget.icon, color: fgColor, size: f + 2),
+                const SizedBox(width: 5),
+                Text(
+                  widget.text,
+                  style: TextStyle(
+                    color: fgColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: f,
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),

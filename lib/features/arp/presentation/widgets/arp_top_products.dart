@@ -1,8 +1,9 @@
-// lib/features/arp/presentation/widgets/arp_top_products.dart
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../data/models/arp_summary_model.dart';
 
+import '../../data/models/product_performance_model.dart';
 
 class ArpTopProducts extends StatelessWidget {
   final List<ProductPerformanceModel> products;
@@ -17,7 +18,11 @@ class ArpTopProducts extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 32 : isTablet ? 24 : 16,
+        horizontal: isDesktop
+            ? 32
+            : isTablet
+                ? 24
+                : 16,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -77,7 +82,8 @@ class ArpTopProducts extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: products.length,
-                  separatorBuilder: (context, index) => const Divider(height: 24),
+                  separatorBuilder: (context, index) =>
+                      const Divider(height: 24),
                   itemBuilder: (context, index) {
                     final product = products[index];
                     return _buildProductItem(product, index + 1);
@@ -170,7 +176,9 @@ class ArpTopProducts extends StatelessWidget {
                   Icon(
                     isProfit ? Icons.arrow_upward : Icons.arrow_downward,
                     size: 12,
-                    color: isProfit ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                    color: isProfit
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFFEF4444),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -178,7 +186,9 @@ class ArpTopProducts extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: isProfit ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                      color: isProfit
+                          ? const Color(0xFF10B981)
+                          : const Color(0xFFEF4444),
                     ),
                   ),
                 ],

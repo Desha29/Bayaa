@@ -1,6 +1,7 @@
-// lib/features/arp/presentation/cubit/arp_state.dart
+
 import 'package:equatable/equatable.dart';
 import '../../data/models/arp_summary_model.dart';
+import '../../data/models/product_performance_model.dart';
 
 
 abstract class ArpState extends Equatable {

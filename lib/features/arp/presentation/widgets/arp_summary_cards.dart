@@ -1,4 +1,3 @@
-// lib/features/arp/presentation/widgets/arp_summary_cards.dart
 import 'package:flutter/material.dart';
 
 import '../../data/models/arp_summary_model.dart';
@@ -11,6 +10,7 @@ class ArpSummaryCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
 

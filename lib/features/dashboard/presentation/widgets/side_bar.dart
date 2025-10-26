@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use
+import 'package:crazy_phone_pos/core/functions/messege.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -193,7 +194,7 @@ class _CustomSidebarState extends State<CustomSidebar>
                       )
                     : null,
                 onTap: () {
-                  // TODO: Logout Logic
+                  handleLogout(context);
                 },
               ),
               const SizedBox(height: 12),

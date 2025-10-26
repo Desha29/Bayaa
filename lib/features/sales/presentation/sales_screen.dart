@@ -57,7 +57,7 @@ class _SalesScreenState extends State<SalesScreen>
         0.0,
         (sum, e) => sum + (e['price'] as double) * (e['qty'] as int),
       );
-
+Timer? _searchDebounce;
   @override
   void initState() {
     super.initState();
@@ -84,10 +84,26 @@ class _SalesScreenState extends State<SalesScreen>
 
     // Global HID listener: commits on Enter or brief idle after burst
     RawKeyboard.instance.addListener(_onRawKey);
-
+_barcodeController.addListener(_onSearchTextChanged);
     // Load recent sales
     _loadRecentSales();
   }
+void _onSearchTextChanged() {
+  _searchDebounce?.cancel();
+  _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+    final text = _barcodeController.text.trim();
+    if (text.isEmpty) return;
+
+    final productFound = _productsBox.values.any((p) =>
+      p.barcode == text || p.name.toLowerCase().contains(text.toLowerCase()));
+
+    if (!productFound) {
+      MotionSnackBarError(context, "المنتج غير موجود: $text");
+      _barcodeController.clear();
+      setState(() {});
+    }
+  });
+}
 
   Future<void> _loadRecentSales() async {
     final result = await _repository.getRecentSales(limit: 10);
@@ -108,14 +124,17 @@ class _SalesScreenState extends State<SalesScreen>
   }
 
   @override
-  void dispose() {
-    RawKeyboard.instance.removeListener(_onRawKey);
-    _hidTimer?.cancel();
-    _barcodeController.dispose();
-    _fadeController.dispose();
-    _slideController.dispose();
-    super.dispose();
-  }
+void dispose() {
+  RawKeyboard.instance.removeListener(_onRawKey);
+  _hidTimer?.cancel();
+  _searchDebounce?.cancel();
+  _barcodeController.removeListener(_onSearchTextChanged);  
+  _barcodeController.dispose();
+  _fadeController.dispose();
+  _slideController.dispose();
+  super.dispose();
+}
+
 
   // Capture scanner keystrokes and commit to search
   void _onRawKey(RawKeyEvent event) {
@@ -180,22 +199,22 @@ class _SalesScreenState extends State<SalesScreen>
       return;
     }
 
-   // Already in cart? increase qty; else add line
-final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
-if (idx != -1) {
-  _cartItems[idx]['qty'] = (_cartItems[idx]['qty'] as int) + 1;
-} else {
-  _cartItems.add({
-    'id': product.barcode,
-    'name': product.name,
-    'price': product.price,
-    'qty': 1,
-    'quantity': product.quantity, 
-    'date': DateTime.now(),
-    'minPrice': product.minPrice,
-  });
-}
-
+    // Already in cart? increase qty; else add line
+    final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
+    if (idx != -1) {
+      _cartItems[idx]['qty'] = (_cartItems[idx]['qty'] as int) + 1;
+    } else {
+      _cartItems.add({
+        'id': product.barcode,
+        'name': product.name,
+        'price': product.price,
+        'qty': 1,
+        'quantity': product.quantity,
+        'wholesalePrice': product.wholesalePrice,
+        'date': DateTime.now(),
+        'minPrice': product.minPrice,
+      });
+    }
 
     _barcodeController.clear();
     setState(() {});
@@ -208,105 +227,98 @@ if (idx != -1) {
   }
 
   /// Checkout with invoice auto-open
-Future<void> _onCheckout() async {
-  if (_cartItems.isEmpty) {
-    MotionSnackBarError(context, 'السلة فارغة');
-    return;
-  }
+  Future<void> _onCheckout() async {
+    if (_cartItems.isEmpty) {
+      MotionSnackBarError(context, 'السلة فارغة');
+      return;
+    }
 
-  // ✅ STEP 1: Update stock quantities BEFORE creating sale
-  for (final item in _cartItems) {
-    final productBarcode = item['id'] as String;
-    final qtySold = item['qty'] as int;
+    for (final item in _cartItems) {
+      final productBarcode = item['id'] as String;
+      final qtySold = item['qty'] as int;
 
-    // Get current product from Hive
-    final product = _productsBox.values.firstWhere(
-      (p) => p.barcode == productBarcode,
-      orElse: () => Product(
-        minQuantity: 0,
-        wholesalePrice: 0,
-        barcode: '',
-        name: '',
-        price: 0,
-        quantity: 0,
-        minPrice: 0,
-        category: '',
-      ),
+      final product = _productsBox.values.firstWhere(
+        (p) => p.barcode == productBarcode,
+        orElse: () => Product(
+          minQuantity: 0,
+          wholesalePrice: 0,
+          barcode: '',
+          name: '',
+          price: 0,
+          quantity: 0,
+          minPrice: 0,
+          category: '',
+        ),
+      );
+
+      if (product.barcode.isNotEmpty) {
+        final newQuantity = product.quantity - qtySold;
+
+        final updatedProduct = Product(
+          barcode: product.barcode,
+          name: product.name,
+          price: product.price,
+          quantity: newQuantity < 0 ? 0 : newQuantity,
+          minPrice: product.minPrice,
+          category: product.category,
+          minQuantity: product.minQuantity,
+          wholesalePrice: product.wholesalePrice,
+        );
+
+        await _productsBox.put(product.barcode, updatedProduct);
+      }
+    }
+
+    final sale = Sale(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      total: _totalAmount,
+      items: _cartItems.length,
+      date: DateTime.now(),
+      saleItems: _cartItems
+          .map((item) => SaleItem(
+                productId: item['id'] as String,
+                name: item['name'] as String,
+                price: (item['price'] as num).toDouble(),
+                quantity: item['qty'] as int,
+                total: (item['price'] as num).toDouble() * (item['qty'] as int),
+                wholesalePrice:
+                    (item['wholesalePrice'] as num?)?.toDouble() ?? 0.0,
+              ))
+          .toList(),
     );
 
-    if (product.barcode.isNotEmpty) {
-      // Calculate new quantity
-      final newQuantity = product.quantity - qtySold;
-      
-      // Update product with new quantity
-      final updatedProduct = Product(
-        barcode: product.barcode,
-        name: product.name,
-        price: product.price,
-        quantity: newQuantity < 0 ? 0 : newQuantity, // Prevent negative
-        minPrice: product.minPrice,
-        category: product.category,
-        minQuantity: product.minQuantity,
-        wholesalePrice: product.wholesalePrice,
-      );
+    final result = await _repository.saveSale(sale);
 
-      // Save updated product back to Hive
-      await _productsBox.put(product.barcode, updatedProduct);
-    }
+    result.fold(
+      (failure) {
+        MotionSnackBarError(context, "فشل حفظ البيع: ${failure.message}");
+        setState(() {});
+      },
+      (_) {
+        MotionSnackBarSuccess(
+          context,
+          'تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م',
+        );
+
+        // Update recent sales
+        _recentSales = [
+          {
+            'total': _totalAmount,
+            'items': _cartItems.length,
+            'date': DateTime.now(),
+          },
+          ..._recentSales,
+        ];
+
+        // Clear cart
+        _cartItems.clear();
+        setState(() {});
+
+        // Auto-open invoice
+        _openInvoice(sale);
+      },
+    );
   }
-
-  // ✅ STEP 2: Create sale record
-  final sale = Sale(
-    id: DateTime.now().millisecondsSinceEpoch.toString(),
-    total: _totalAmount,
-    items: _cartItems.length,
-    date: DateTime.now(),
-    saleItems: _cartItems
-        .map((item) => SaleItem(
-              productId: item['id'] as String,
-              name: item['name'] as String,
-              price: (item['price'] as num).toDouble(),
-              quantity: item['qty'] as int,
-              total: (item['price'] as num).toDouble() * (item['qty'] as int),
-            ))
-        .toList(),
-  );
-
-  // ✅ STEP 3: Save sale to repository
-  final result = await _repository.saveSale(sale);
-  
-  result.fold(
-    (failure) {
-      MotionSnackBarError(context, "فشل حفظ البيع: ${failure.message}");
-      setState(() {});
-    },
-    (_) {
-      // Success: show message and open invoice
-      MotionSnackBarSuccess(
-        context,
-        'تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م',
-      );
-
-      // Update recent sales
-      _recentSales = [
-        {
-          'total': _totalAmount,
-          'items': _cartItems.length,
-          'date': DateTime.now(),
-        },
-        ..._recentSales,
-      ];
-
-      // Clear cart
-      _cartItems.clear();
-      setState(() {});
-
-      // Auto-open invoice
-      _openInvoice(sale);
-    },
-  );
-}
-
 
   // Open invoice preview screen
   Future<void> _openInvoice(Sale sale) async {
@@ -353,9 +365,6 @@ Future<void> _onCheckout() async {
         },
       ),
     );
-  
-  
-    
   }
 
   @override
@@ -431,60 +440,49 @@ Future<void> _onCheckout() async {
           titleColor: AppColors.kDarkChip,
         ),
         const SizedBox(height: 24),
-
-        // Your existing barcode card; TextField reads scanner input via HID listener
         BarcodeScanCard(
           controller: _barcodeController,
           onAddPressed: _onAddPressed,
         ),
-
         const SizedBox(height: 20),
-
-        // Your existing cart section
         CartSection(
-  cartItems: _cartItems,
-  onRemoveItem: (i) {
-    _cartItems.removeAt(i);
-    setState(() {});
-  },
-  onIncreaseQty: (i) {
-    final currentQty = _cartItems[i]['qty'] as int;
-    final stockQuantity = _cartItems[i]['quantity'] as int; // Total available in stock
-    
-    // ✅ Check if we can increase (prevent exceeding stock)
-    if (currentQty < stockQuantity) {
-      _cartItems[i]['qty'] = currentQty + 1;
-      setState(() {});
-    } else {
-      MotionSnackBarWarning(context, "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
-      
-    }
-  },
-  onDecreaseQty: (i) {
-    final q = _cartItems[i]['qty'] as int;
-    if (q > 1) {
-      _cartItems[i]['qty'] = q - 1;
-      setState(() {});
-    } else {
-      // Remove item if quantity becomes 0
-      _cartItems.removeAt(i);
-      setState(() {});
-    }
-  },
-  onEditPrice: (i, newPrice) {
-    _cartItems[i]['price'] = newPrice;
-    setState(() {});
-  },
-),
+          cartItems: _cartItems,
+          onRemoveItem: (i) {
+            _cartItems.removeAt(i);
+            setState(() {});
+          },
+          onIncreaseQty: (i) {
+            final currentQty = _cartItems[i]['qty'] as int;
+            final stockQuantity = _cartItems[i]['quantity'] as int;
 
-
+            if (currentQty < stockQuantity) {
+              _cartItems[i]['qty'] = currentQty + 1;
+              setState(() {});
+            } else {
+              MotionSnackBarWarning(context,
+                  "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
+            }
+          },
+          onDecreaseQty: (i) {
+            final q = _cartItems[i]['qty'] as int;
+            if (q > 1) {
+              _cartItems[i]['qty'] = q - 1;
+              setState(() {});
+            } else {
+              _cartItems.removeAt(i);
+              setState(() {});
+            }
+          },
+          onEditPrice: (i, newPrice) {
+            _cartItems[i]['price'] = newPrice;
+            setState(() {});
+          },
+        ),
         const SizedBox(height: 20),
-
-        // Your existing totals card with updated checkout handler
         TotalSectionCard(
           totalAmount: _totalAmount,
           itemCount: _cartItems.length,
-          onCheckout: _onCheckout, // now saves and opens invoice
+          onCheckout: _onCheckout,
           onClearCart: () {
             _cartItems.clear();
             setState(() {});

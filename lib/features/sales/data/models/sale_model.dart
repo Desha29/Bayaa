@@ -1,5 +1,5 @@
-// lib/features/sales/data/models/sale_model.dart
-import 'package:hive_flutter/adapters.dart';
+// sale_model.dart
+import 'package:hive_flutter/hive_flutter.dart';
 
 part 'sale_model.g.dart';
 
@@ -54,11 +54,15 @@ class SaleItem {
   @HiveField(4)
   final double total;
 
+  @HiveField(5)
+  final double wholesalePrice; // Add this field with Hive annotation
+
   SaleItem({
     required this.productId,
     required this.name,
     required this.price,
     required this.quantity,
     required this.total,
+    required this.wholesalePrice, // Add this to constructor
   });
 }

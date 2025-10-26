@@ -31,7 +31,7 @@ class ProductsScreenState extends State<ProductsScreen> {
   List<Product> get filteredProducts {
     final q = searchController.text.trim();
     return products.where((p) {
-      if (categoryFilter != 'الكل' && (p.category ?? '') != categoryFilter) {
+      if (categoryFilter != 'الكل' && (p.category) != categoryFilter) {
         return false;
       }
       final qty = p.quantity;

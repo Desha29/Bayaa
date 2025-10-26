@@ -1,4 +1,3 @@
-// lib/features/sales/data/repository/sales_repository_impl.dart
 import 'package:dartz/dartz.dart';
 import 'package:hive_flutter/adapters.dart';
 import '../../../../core/error/failure.dart';
@@ -60,13 +59,13 @@ class SalesRepositoryImpl implements SalesRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> updateProductQuantity(String barcode, int newQuantity) async {
+  Future<Either<Failure, Unit>> updateProductQuantity(
+      String barcode, int newQuantity) async {
     try {
       final products = productsBox.values.where((p) => p.barcode == barcode);
       if (products.isEmpty) {
         return Left(CacheFailure('Product not found'));
       }
-
       final product = products.first;
       product.quantity = newQuantity;
       await productsBox.put(product.barcode, product);
@@ -77,7 +76,8 @@ class SalesRepositoryImpl implements SalesRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> validateMinPrice(String barcode, double salePrice) async {
+  Future<Either<Failure, bool>> validateMinPrice(
+      String barcode, double salePrice) async {
     try {
       final productResult = await findProductByBarcode(barcode);
       return productResult.fold(
@@ -101,7 +101,7 @@ class SalesRepositoryImpl implements SalesRepository {
   }) async {
     try {
       final saleId = DateTime.now().millisecondsSinceEpoch.toString();
-      
+
       final sale = Sale(
         id: saleId,
         total: total,
@@ -109,13 +109,16 @@ class SalesRepositoryImpl implements SalesRepository {
         date: DateTime.now(),
         cashierName: cashierName,
         cashierUsername: cashierUsername,
-        saleItems: items.map((item) => SaleItem(
-          productId: item.id,
-          name: item.name,
-          price: item.salePrice,
-          quantity: item.qty,
-          total: item.total,
-        )).toList(),
+        saleItems: items
+            .map((item) => SaleItem(
+                  productId: item.id,
+                  name: item.name,
+                  price: item.salePrice,
+                  quantity: item.qty,
+                  total: item.total,
+                  wholesalePrice: item.wholesalePrice
+                ))
+            .toList(),
       );
 
       await salesBox.put(sale.id, sale);
