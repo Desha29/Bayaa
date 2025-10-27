@@ -2,6 +2,7 @@ import 'package:crazy_phone_pos/features/products/data/models/product_model.dart
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
+import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../cubit/product_cubit.dart';
 
 class EnhancedAddEditProductDialog extends StatefulWidget {
@@ -21,7 +22,7 @@ class EnhancedAddEditProductDialog extends StatefulWidget {
 
 class _EnhancedAddEditProductDialogState
     extends State<EnhancedAddEditProductDialog> {
-  late final TextEditingController codeCtrl;
+  late final TextEditingController? codeCtrl;
   late final TextEditingController nameCtrl;
   late final TextEditingController barcodeCtrl;
   late final TextEditingController priceCtrl;
@@ -50,7 +51,6 @@ class _EnhancedAddEditProductDialogState
 
   @override
   void dispose() {
-    codeCtrl.dispose();
     nameCtrl.dispose();
     barcodeCtrl.dispose();
     priceCtrl.dispose();
@@ -62,7 +62,7 @@ class _EnhancedAddEditProductDialogState
   }
 
   void _submit() {
-    getIt<ProductCubit>().saveProduct(Product(
+    final productSave = Product(
       wholesalePrice: double.tryParse(wholesalePriceCtrl.text.trim()) ?? 0.0,
       minPrice: double.tryParse(minPriceCtrl.text.trim()) ?? 0.0,
       name: nameCtrl.text.trim(),
@@ -71,7 +71,10 @@ class _EnhancedAddEditProductDialogState
       quantity: int.tryParse(qtyCtrl.text.trim()) ?? 0,
       minQuantity: int.tryParse(minQtyCtrl.text.trim()) ?? 0,
       category: selectedCategory,
-    ));
+    );
+    getIt<ProductCubit>().saveProduct(productSave);
+    getIt<NotificationsCubit>().addItem(productSave);
+
     Navigator.of(context).pop();
   }
 

@@ -13,6 +13,11 @@ class StockCubit extends Cubit<StockStates> {
   int lowStockCount = 0;
   int outOfStockCount = 0;
   int totalCount = 0;
+  List<Product> sendData() {
+    loadData();
+    return products.where((p) => p.quantity <= p.minQuantity).toList();
+  }
+
   void loadData() {
     productRepository
         .getAllProduct()
@@ -32,9 +37,9 @@ class StockCubit extends Cubit<StockStates> {
     final List<Product> filtered = products.where((p) {
       if (filter == 'all' && totalCount > 0)
         return (p.quantity < p.minQuantity);
-      if (filter == 'low' && lowStockCount>0)
+      if (filter == 'low' && lowStockCount > 0)
         return (p.quantity > 0 && p.quantity < p.minQuantity);
-      if (filter == 'out' && outOfStockCount>0) return p.quantity == 0;
+      if (filter == 'out' && outOfStockCount > 0) return p.quantity == 0;
       return false;
     }).toList();
     emit(StockSucssesState(products: filtered));

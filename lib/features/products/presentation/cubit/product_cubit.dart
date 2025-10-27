@@ -2,6 +2,8 @@ import 'package:crazy_phone_pos/features/products/data/models/product_model.dart
 import 'package:crazy_phone_pos/features/products/domain/product_repository_int.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/di/dependency_injection.dart';
+import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import 'product_states.dart';
 
 class ProductCubit extends Cubit<ProductStates> {

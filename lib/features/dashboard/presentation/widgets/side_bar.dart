@@ -1,8 +1,12 @@
 // ignore_for_file: deprecated_member_use
 import 'package:crazy_phone_pos/core/functions/messege.dart';
+import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 
 class SidebarItem {
   final IconData icon;
@@ -144,20 +148,46 @@ class _CustomSidebarState extends State<CustomSidebar>
                           ),
                           leading: Icon(item.icon, size: 22, color: fgIcon),
                           title: w > 100
-                              ? Row(
-                                  children: [
-                                    // Fitted text to avoid overflow at tight widths
-                                    Flexible(
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          item.title,
-                                          style: titleStyle,
+                              ? BlocBuilder<NotificationsCubit,
+                                  NotificationsStates>(
+                                  builder: (context, state) {
+                                    return Row(
+                                      children: [
+                                        // Fitted text to avoid overflow at tight widths
+                                        Flexible(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              item.title,
+                                              style: titleStyle,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
+                                        SizedBox(width: 8),
+                                        (item.title == 'التنبيهات')
+                                            ? Container(
+                                                padding: EdgeInsets.all(6),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: AppColors.errorColor,
+                                                ),
+                                                child: Text(
+                                                  getIt<NotificationsCubit>()
+                                                      .total
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    color: AppColors
+                                                        .backgroundColor,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              )
+                                            : SizedBox()
+                                      ],
+                                    );
+                                  },
                                 )
                               : null,
                           onTap: () => widget.onItemSelected(index),

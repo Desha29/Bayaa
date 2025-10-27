@@ -219,8 +219,6 @@ class SalesCubit extends Cubit<SalesState> {
         final total = _total();
         _cartItems.clear();
 
-    
-
         // Emit with sale data to open invoice immediately
         emit(CheckoutSuccessWithSale(
           message: 'تمت عملية البيع بنجاح',
