@@ -56,7 +56,10 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
         emit(NotificationsLoaded(_notifications));
         return;
       } else {
-        return;
+        _notifications.removeWhere((item) => item.id == product.barcode);
+        total = _notifications.length;
+        unread = _notifications.where((e) => !e.read).length;
+        opened = total - unread;
       }
     }
     if (product.quantity > product.minQuantity) return;
