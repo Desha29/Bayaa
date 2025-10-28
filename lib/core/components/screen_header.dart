@@ -1,4 +1,8 @@
+import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import 'package:flutter/material.dart';
+import '../../features/auth/presentation/cubit/user_cubit.dart';
+import '../constants/app_colors.dart';
+import '../di/dependency_injection.dart';
 import 'anim_wrappers.dart';
 
 class ScreenHeader extends StatelessWidget {
@@ -10,22 +14,21 @@ class ScreenHeader extends StatelessWidget {
   final Color? iconColor;
   final Color? subtitleColor;
 
-  const ScreenHeader({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    this.fontSize = 32,
-    this.icon,
-    this.titleColor,
-    this.subtitleColor,
-    this.iconColor,
-  });
+  const ScreenHeader(
+      {super.key,
+      required this.title,
+      required this.subtitle,
+      this.fontSize = 32,
+      this.icon,
+      this.titleColor,
+      this.subtitleColor,
+      this.iconColor});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
-
+    final currentUser = getIt<UserCubit>().currentUser;
     final adaptiveFontSize = screenWidth < 600
         ? fontSize * 0.75
         : screenWidth < 900
@@ -90,6 +93,83 @@ class ScreenHeader extends StatelessWidget {
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.primaryColor.withOpacity(0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'المستخدم الحالي',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        currentUser.name,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.kDarkChip,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: currentUser.userType == UserType.manager
+                          ? Colors.orange.shade100
+                          : Colors.blue.shade100,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                    currentUser.userType == UserType.manager
+                          ? 'مدير'
+                          : 'كاشير',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: currentUser.userType == UserType.manager
+                            ? Colors.orange.shade900
+                            : Colors.blue.shade900,
+                      ),
+                    ),
                   ),
                 ],
               ),

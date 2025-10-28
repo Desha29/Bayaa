@@ -6,8 +6,10 @@ import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cub
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/components/anim_wrappers.dart';
 import '../../../core/constants/app_colors.dart';
+import 'widgets/dropdown_filter.dart';
 import 'widgets/enhanced_add_edit_dialog.dart';
 import 'widgets/product_filter_section.dart';
 import 'widgets/product_grid_view.dart';
@@ -109,6 +111,11 @@ class ProductsScreenState extends State<ProductsScreen> {
                       BlocConsumer<ProductCubit, ProductStates>(
                         listener: (context, state) {
                           if (state is ProductSuccessState) {
+                            showCategoryActionDialog(
+                              categories: categories,
+                              categoryFilter: categoryFilter,
+                              context: context,
+                            );
                             MotionSnackBarSuccess(context, state.msg);
                           }
                           if (state is ProductErrorState) {
@@ -266,4 +273,161 @@ class ProductsScreenState extends State<ProductsScreen> {
       ),
     );
   }
+}
+
+Future<Map<String, String>?> showCategoryActionDialog({
+  required BuildContext context,
+  required String categoryFilter,
+  required List<String> categories,
+}) {
+  categories.removeAt(0);
+  categoryFilter = categories[0];
+  return showDialog<Map<String, String>>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      String selectedCategory = categoryFilter;
+      String? errorText;
+
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    LucideIcons.alertTriangle,
+                    color: Colors.orange.shade700,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Text(
+                    'تحديد الفئة قبل تنفيذ الإجراء',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DropDownFilter(
+                  label: 'اختر الفئة',
+                  value: selectedCategory,
+                  items: categories,
+                  onChanged: (v) {
+                    setState(() {
+                      selectedCategory = v;
+                      errorText = null; // إزالة رسالة الخطأ عند الاختيار
+                    });
+                  },
+                  icon: Icons.category_outlined,
+                  iconRemove: Icons.cancel,
+                ),
+                if (errorText != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, right: 8),
+                    child: Text(
+                      errorText!,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            actionsAlignment: MainAxisAlignment.spaceEvenly,
+            actions: [
+              // ❌ زر الإلغاء
+              OutlinedButton.icon(
+                onPressed: () => Navigator.pop(context,
+                    {'action': 'cancel', 'category': selectedCategory}),
+                icon: const Icon(LucideIcons.x),
+                label: const Text('إلغاء'),
+                style: OutlinedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  textStyle: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+
+              // 🔄 زر نقل المنتجات
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (selectedCategory.isEmpty) {
+                    setState(() {
+                      errorText = 'يجب اختيار فئة قبل المتابعة';
+                    });
+                    return;
+                  }
+                  Navigator.pop(context, {
+                    'action': 'move',
+                    'category': selectedCategory,
+                  });
+                },
+                icon: const Icon(LucideIcons.arrowRightLeft),
+                label: const Text('نقل المنتجات'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange.shade700,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  textStyle: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              // 🗑️ زر الحذف النهائي
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (selectedCategory.isEmpty) {
+                    setState(() {
+                      errorText = 'يجب اختيار فئة قبل المتابعة';
+                    });
+                    return;
+                  }
+                  Navigator.pop(context, {
+                    'action': 'remove',
+                    'category': selectedCategory,
+                  });
+                },
+                icon: const Icon(LucideIcons.trash2),
+                label: const Text('حذف نهائي'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade700,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  textStyle: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
 }

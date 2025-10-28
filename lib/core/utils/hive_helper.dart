@@ -15,7 +15,7 @@ class HiveHelper {
 
     // Open all boxes with error handling
     await _openBoxesSafely();
-   //await clearAllData();
+    await clearAllData();
     // Initialize default data
     await _initializeDefaultData();
   }
@@ -125,10 +125,10 @@ class HiveHelper {
     await closeAllBoxes();
 
     await Future.wait([
-      Hive.deleteBoxFromDisk('userBox'),
-      Hive.deleteBoxFromDisk('productsBox'),
-      Hive.deleteBoxFromDisk('categoryBox'),
-      Hive.deleteBoxFromDisk('storeBox'),
+      // Hive.deleteBoxFromDisk('userBox'),
+      // Hive.deleteBoxFromDisk('productsBox'),
+      // Hive.deleteBoxFromDisk('categoryBox'),
+      // Hive.deleteBoxFromDisk('storeBox'),
       Hive.deleteBoxFromDisk('salesBox'),
     ]);
   }
@@ -136,10 +136,10 @@ class HiveHelper {
   /// Clear all data from all boxes (keeps boxes open)
   static Future<void> clearAllData() async {
     await Future.wait([
-      userBox.clear(),
-      productsBox.clear(),
-      categoryBox.clear(),
-      storeBox.clear(),
+      // userBox.clear(),
+      // productsBox.clear(),
+      // categoryBox.clear(),
+      // storeBox.clear(),
       salesBox.clear(),
     ]);
   }

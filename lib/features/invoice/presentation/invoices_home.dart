@@ -16,12 +16,12 @@ import 'invoice_preview_screen.dart';
 
 class InvoicesHome extends StatefulWidget {
   final SalesRepository repository;
-  final User? currentUser;
+  final User currentUser;
 
   const InvoicesHome({
     super.key,
     required this.repository,
-    this.currentUser,
+    required this.currentUser,
   });
 
   @override
@@ -165,100 +165,12 @@ class _InvoicesHomeState extends State<InvoicesHome>
                     parent: _animationController,
                     curve: Curves.easeOut,
                   )),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ScreenHeader(
-                        title: 'الفواتير',
-                        icon: Icons.receipt_long,
-                        subtitle: 'عرض وطباعة الفواتير الصادرة',
-                        subtitleColor: Colors.grey.shade600,
-                        iconColor: AppColors.primaryColor,
-                      ),
-                      if (widget.currentUser != null) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.primaryColor.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.person,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'المستخدم الحالي',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.grey.shade600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    widget.currentUser!.name,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.kDarkChip,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: widget.currentUser!.userType ==
-                                          UserType.manager
-                                      ? Colors.orange.shade100
-                                      : Colors.blue.shade100,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  widget.currentUser!.userType ==
-                                          UserType.manager
-                                      ? 'مدير'
-                                      : 'كاشير',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: widget.currentUser!.userType ==
-                                            UserType.manager
-                                        ? Colors.orange.shade900
-                                        : Colors.blue.shade900,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
+                  child: ScreenHeader(
+                    title: 'الفواتير',
+                    icon: Icons.receipt_long,
+                    subtitle: 'عرض وطباعة الفواتير الصادرة',
+                    subtitleColor: Colors.grey.shade600,
+                    iconColor: AppColors.primaryColor,
                   ),
                 ),
               ),
@@ -466,6 +378,21 @@ class _InvoicesHomeState extends State<InvoicesHome>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade100,
                         foregroundColor: Colors.grey.shade700,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      onPressed: _clearFilters,
+                      icon: const Icon(Icons.clear, size: 20),
+                      label: const Text('مسح الفواتير'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.grey.shade100,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 16),
                         shape: RoundedRectangleBorder(
