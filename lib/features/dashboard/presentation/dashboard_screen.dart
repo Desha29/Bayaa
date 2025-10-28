@@ -46,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late final Box<Sale> _salesBox;
   late final SalesRepositoryImpl _salesRepository;
   late final ArpRepositoryImpl _arpRepository;
-  late final User curUser= getIt<UserCubit>().currentUser;
+  late final User curUser = getIt<UserCubit>().currentUser;
 
   @override
   void initState() {
@@ -80,7 +80,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     SidebarItem(
       icon: LucideIcons.fileText,
       title: "الفواتير",
-      screen: InvoicesHome(repository: _salesRepository, currentUser: curUser,),
+      screen: InvoicesHome(
+        repository: _salesRepository,
+        currentUser: curUser,
+      ),
     ),
     SidebarItem(
       icon: LucideIcons.box,
@@ -153,9 +156,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       items: sidebarItems,
                       selectedIndex: selectedIndex,
                       onItemSelected: (index) {
-                        setState(() {
+                        if (curUser.userType == UserType.cashier) {
+                          if (index == 5) {
+                            MotionSnackBarError(context,
+                                "ليس لديك صلاحية الوصول إلى هذه الصفحة.");
+                            return;
+                          } else {
+                            selectedIndex = index;
+                            setState(() {});
+                          }
+                        } else {
                           selectedIndex = index;
-                        });
+                          setState(() {});
+                        }
+
                         Navigator.pop(context);
                       },
                     ),
@@ -169,9 +183,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     selectedIndex: selectedIndex,
                     isCollapsed: isSidebarCollapsed,
                     onItemSelected: (index) {
-                      setState(() {
+                      if (curUser.userType == UserType.cashier) {
+                        if (index == 5) {
+                          MotionSnackBarError(context,
+                              "ليس لديك صلاحية الوصول إلى هذه الصفحة.");
+                          return;
+                        } else {
+                          selectedIndex = index;
+                          setState(() {});
+                        }
+                      } else {
                         selectedIndex = index;
-                      });
+                        setState(() {});
+                      }
                     },
                   ),
                 Expanded(
@@ -190,9 +214,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// Handles tap on a card in the dashboard screen.
   void handleCardTap(int targetIndex) {
-    setState(() {
+    print(targetIndex);
+    if (curUser.userType == UserType.cashier) {
+      if (targetIndex == 5) {
+        MotionSnackBarError(context, "ليس لديك صلاحية الوصول إلى هذه الصفحة.");
+      } else {
+        selectedIndex = targetIndex;
+        setState(() {});
+      }
+    } else {
       selectedIndex = targetIndex;
-    });
+      setState(() {});
+    }
     final scaffoldState = Scaffold.maybeOf(context);
     if (scaffoldState != null && scaffoldState.isDrawerOpen) {
       Navigator.of(context).pop();
