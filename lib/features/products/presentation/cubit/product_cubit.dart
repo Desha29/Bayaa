@@ -1,3 +1,4 @@
+import 'package:crazy_phone_pos/core/error/failure.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:crazy_phone_pos/features/products/domain/product_repository_int.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -91,19 +92,29 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(CategoryErrorState(failure.message)),
       (_) {
-        emit(CategorySuccessState());
+        emit(CategorySuccessState("تمت الإضافة بنجاح"));
         getAllCategories();
       },
     );
   }
 
-  void deleteCategory(String category) {
+  void deleteCategory(
+      {required String category,
+      bool forceDelete = false,
+      String? newCategory}) {
     emit(ProductLoadingState());
-    final result = productRepositoryInt.deleteCategory(category);
+    final result = productRepositoryInt.deleteCategory(
+        category: category, forceDelete: forceDelete, newCategory: newCategory);
     result.fold(
-      (failure) => emit(CategoryErrorState(failure.message)),
+      (failure) {
+        if (failure is CacheFailure) {
+          emit(CategoryErrorDeleteState(failure.message));
+        } else {
+          emit(CategoryErrorState(failure.message));
+        }
+      },
       (_) {
-        emit(CategorySuccessState());
+        emit(CategorySuccessState("تم الحذف  بنجاح"));
         getAllCategories();
       },
     );
