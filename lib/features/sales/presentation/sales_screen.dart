@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/components/screen_header.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../auth/presentation/cubit/user_cubit.dart';
 import '../../products/data/models/product_model.dart';
 import '../data/models/sale_model.dart';
 import '../data/repository/sales_repository_impl.dart';
@@ -259,12 +260,13 @@ class _SalesScreenState extends State<SalesScreen>
         );
 
         await _productsBox.put(product.barcode, updatedProduct);
-        getIt<NotificationsCubit>().addItem(updatedProduct);
+        await getIt<NotificationsCubit>().addItem(updatedProduct);
       }
     }
 
     final sale = Sale(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
+      cashierName: getIt<UserCubit>().currentUser.name,
       total: _totalAmount,
       items: _cartItems.length,
       date: DateTime.now(),

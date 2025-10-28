@@ -32,7 +32,7 @@ class Sale extends HiveObject {
     required this.items,
     required this.date,
     required this.saleItems,
-    this.cashierName,
+    required this.cashierName,
     this.cashierUsername,
   });
 }

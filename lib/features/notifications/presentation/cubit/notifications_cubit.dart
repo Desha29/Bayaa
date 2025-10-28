@@ -52,7 +52,7 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
         total = _notifications.length;
         unread = _notifications.where((e) => !e.read).length;
         opened = total - unread;
-        await Future.delayed(const Duration(milliseconds: 500));
+        await Future.delayed(const Duration(seconds: 1));
         emit(NotificationsLoaded(_notifications));
         return;
       } else {
@@ -68,7 +68,7 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
     total = _notifications.length;
     unread = _notifications.where((e) => !e.read).length;
     opened = total - unread;
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(seconds: 1));
     emit(NotificationsError(
       product.quantity == 0
           ? 'المنتج نفد من المخزون'

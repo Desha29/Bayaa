@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
+import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -195,6 +197,7 @@ class SalesCubit extends Cubit<SalesState> {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       total: _total(),
       items: _cartItems.length,
+      cashierName: getIt<UserCubit>().currentUser.name,
       date: DateTime.now(),
       saleItems: _cartItems
           .map((x) => SaleItem(
