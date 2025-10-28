@@ -33,7 +33,8 @@ class CategoryErrorState extends ProductStates {
 
 class CategoryErrorDeleteState extends ProductStates {
   final String message;
-  CategoryErrorDeleteState(this.message);
+  final String category;
+  CategoryErrorDeleteState(this.message, this.category);
 }
 
 class CategorySuccessState extends ProductStates {

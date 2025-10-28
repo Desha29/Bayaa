@@ -14,6 +14,7 @@ class ProductCubit extends Cubit<ProductStates> {
   ProductRepositoryInt productRepositoryInt;
   List<Product> products = [];
   List<String> categories = [];
+  String selectedCategory = 'الكل';
   void getAllProducts() {
     emit(ProductLoadingState());
     final result = productRepositoryInt.getAllProduct();
@@ -55,6 +56,7 @@ class ProductCubit extends Cubit<ProductStates> {
       getAllProducts();
       return;
     }
+    selectedCategory = category;
     final filteredProducts =
         products.where((product) => product.category == category).toList();
     emit(ProductLoadedState(filteredProducts));
@@ -108,7 +110,7 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) {
         if (failure is CacheFailure) {
-          emit(CategoryErrorDeleteState(failure.message));
+          emit(CategoryErrorDeleteState(failure.message, category));
         } else {
           emit(CategoryErrorState(failure.message));
         }
@@ -116,6 +118,7 @@ class ProductCubit extends Cubit<ProductStates> {
       (_) {
         emit(CategorySuccessState("تم الحذف  بنجاح"));
         getAllCategories();
+        getAllProducts();
       },
     );
   }

@@ -1,7 +1,9 @@
+import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
+import '../cubit/product_cubit.dart';
 
 class DropDownFilter extends StatefulWidget {
   const DropDownFilter({
@@ -75,7 +77,7 @@ class _DropDownFilterState extends State<DropDownFilter> {
                       (widget.iconRemove != null)
                           ? IconButton(
                               onPressed: () {
-                                showDeleteCategoryConfirmation(context);
+                                showDeleteCategoryConfirmation(context, item);
                               },
                               icon: Icon(
                                 widget.iconRemove,
@@ -97,78 +99,84 @@ class _DropDownFilterState extends State<DropDownFilter> {
       ),
     );
   }
-  Future<bool?> showDeleteCategoryConfirmation(BuildContext context) {
-  return showDialog<bool>(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      title: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.red.shade100,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              LucideIcons.trash2, // أيقونة الحذف
-              color: Colors.red.shade700,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Text(
-              'تأكيد حذف الفئة',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+
+  Future<bool?> showDeleteCategoryConfirmation(
+      BuildContext context, String category) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.trash2, // أيقونة الحذف
+                color: Colors.red.shade700,
+                size: 28,
               ),
             ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Text(
+                'تأكيد حذف الفئة',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'هل أنت متأكد من حذف هذه الفئة؟',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 8),
+          ],
+        ),
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actions: [
+          OutlinedButton.icon(
+            onPressed: () => Navigator.pop(context, false),
+            icon: const Icon(LucideIcons.x),
+            label: const Text('إلغاء'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              textStyle:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              getIt<ProductCubit>().deleteCategory(
+                category: category,
+              );
+              Navigator.pop(context, true);
+            },
+            icon: const Icon(LucideIcons.trash2),
+            label: const Text('حذف'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              textStyle:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
-      content: const Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'هل أنت متأكد من حذف هذه الفئة؟',
-            style: TextStyle(fontSize: 16),
-          ),
-          SizedBox(height: 8),
-      
-        ],
-      ),
-      actionsAlignment: MainAxisAlignment.spaceEvenly,
-      actions: [
-        OutlinedButton.icon(
-          onPressed: () => Navigator.pop(context, false),
-          icon: const Icon(LucideIcons.x),
-          label: const Text('إلغاء'),
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            textStyle:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-          ),
-        ),
-        ElevatedButton.icon(
-          onPressed: () => Navigator.pop(context, true),
-          icon: const Icon(LucideIcons.trash2),
-          label: const Text('حذف'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red.shade700,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            textStyle:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
-    ),
-  );
-}
+    );
+  }
 }

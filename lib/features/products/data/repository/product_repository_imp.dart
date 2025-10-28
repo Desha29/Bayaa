@@ -44,38 +44,36 @@ class ProductRepositoryImp extends ProductRepositoryInt {
   }
 
   @override
-  Either<Failure, void> deleteCategory({
-    required String category,
-    bool forceDelete = false,
-    String? newCategory,
-  }) {
+  Either<Failure, void> deleteCategory(
+      {required String category,
+      bool forceDelete = false,
+      String? newCategory}) {
+    List<Product> productsList = [];
     try {
-      return getAllProduct().fold(
-        (failure) => Left(NetworkFailure("خطأ في جلب المنتجات")),
-        (products) {
-          final affectedProducts =
-              products.where((p) => p.category == category).toList();
-
-          if (affectedProducts.isEmpty) {
-            categoryDataSource.deleteCategory(category);
-            return const Right(null);
-          }
-
-          if (forceDelete) {
-            for (final product in affectedProducts) {
-              productDataSource.deleteUser(product.barcode);
-            }
-            categoryDataSource.deleteCategory(category);
-            return const Right(null);
-          }
-
-          if (newCategory == null || newCategory.trim().isEmpty) {
+      if (category == newCategory) {
+        return Left(
+            NetworkFailure("لا يمكن إعادة تعيين المنتجات إلى نفس الفئة."));
+      }
+      getAllProduct().fold(
+          (failure) => Left(NetworkFailure("خطأ في جلب المنتجات")),
+          (products) => productsList = products);
+      var filteredProducts = productsList
+          .where((product) => product.category == category)
+          .toList();
+      if (forceDelete) {
+        for (var product in filteredProducts) {
+          productDataSource.deleteUser(product.barcode);
+        }
+        categoryDataSource.deleteCategory(category);
+        return const Right(null);
+      } else {
+        if (filteredProducts.isNotEmpty) {
+          if (newCategory == null || newCategory.isEmpty) {
             return Left(CacheFailure(
                 "لا يمكنك حذف الفئة لأنها تحتوي على منتجات. الرجاء اختيار فئة جديدة لإعادة تعيين المنتجات أو استخدام الحذف القسري."));
           }
-
-          for (final product in affectedProducts) {
-            final updatedProduct = Product(
+          for (var product in filteredProducts) {
+            var updatedProduct = Product(
               barcode: product.barcode,
               name: product.name,
               price: product.price,
@@ -87,11 +85,12 @@ class ProductRepositoryImp extends ProductRepositoryInt {
             );
             productDataSource.saveUser(updatedProduct);
           }
-
           categoryDataSource.deleteCategory(category);
           return const Right(null);
-        },
-      );
+        }
+      }
+      categoryDataSource.deleteCategory(category);
+      return const Right(null);
     } on Exception catch (e) {
       return Left(NetworkFailure("خطأ في حذف الفئة"));
     }

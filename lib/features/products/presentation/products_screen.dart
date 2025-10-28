@@ -111,15 +111,25 @@ class ProductsScreenState extends State<ProductsScreen> {
                       BlocConsumer<ProductCubit, ProductStates>(
                         listener: (context, state) {
                           if (state is ProductSuccessState) {
-                            showCategoryActionDialog(
-                              categories: categories,
-                              categoryFilter: categoryFilter,
-                              context: context,
-                            );
                             MotionSnackBarSuccess(context, state.msg);
                           }
                           if (state is ProductErrorState) {
                             MotionSnackBarError(context, state.message);
+                          }
+                          if (state is CategorySuccessState) {
+                            MotionSnackBarSuccess(context, state.msg);
+                          }
+                          if (state is CategoryErrorState) {
+                            MotionSnackBarError(context, state.message);
+                          }
+                          if (state is CategoryErrorDeleteState) {
+                            MotionSnackBarError(context, state.message);
+                            showCategoryActionDialog(
+                              categorie: categories,
+                              category: state.category,
+                              categoryFilter: categoryFilter,
+                              context: context,
+                            );
                           }
                         },
                         buildWhen: (previous, current) =>
@@ -277,11 +287,18 @@ class ProductsScreenState extends State<ProductsScreen> {
 
 Future<Map<String, String>?> showCategoryActionDialog({
   required BuildContext context,
+  required String category,
   required String categoryFilter,
-  required List<String> categories,
+  required List<String> categorie,
 }) {
-  categories.removeAt(0);
+  List<String> categories =
+      categorie.where((c) => (c != category && c != "الكل")).toList();
+  if (categories.isEmpty) {
+    MotionSnackBarInfo(context, "لا توجد فئات أخرى لنقل المنتجات إليها.");
+    return Future.value(null);
+  }
   categoryFilter = categories[0];
+
   return showDialog<Map<String, String>>(
     context: context,
     barrierDismissible: false,
@@ -378,6 +395,10 @@ Future<Map<String, String>?> showCategoryActionDialog({
                     });
                     return;
                   }
+                  getIt<ProductCubit>().deleteCategory(
+                      category: category,
+                      forceDelete: false,
+                      newCategory: selectedCategory);
                   Navigator.pop(context, {
                     'action': 'move',
                     'category': selectedCategory,
@@ -406,6 +427,8 @@ Future<Map<String, String>?> showCategoryActionDialog({
                     });
                     return;
                   }
+                  getIt<ProductCubit>().deleteCategory(
+                      category: selectedCategory, forceDelete: true);
                   Navigator.pop(context, {
                     'action': 'remove',
                     'category': selectedCategory,
