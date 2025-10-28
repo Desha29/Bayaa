@@ -157,4 +157,27 @@ class SalesRepositoryImpl implements SalesRepository {
       return Left(CacheFailure('فشل في إنشاء البيع: ${e.toString()}'));
     }
   }
+
+@override
+Future<Either<Failure, Unit>> deleteSale(String saleId) async {
+  try {
+
+    if (!salesBox.containsKey(saleId)) {
+      return Left(CacheFailure('عملية الحذف فشلت: لم يتم العثور على هذا البيع.'));
+    }
+
+
+    await salesBox.delete(saleId);
+
+    if (salesBox.containsKey(saleId)) {
+      return Left(CacheFailure('حدث خطأ أثناء الحذف، لم يتم حذف البيع بشكل صحيح.'));
+    }
+
+    return const Right(unit);
+  } catch (e) {
+  
+    return Left(CacheFailure('فشل في حذف البيع: ${e.toString()}'));
+  }
+}
+
 }

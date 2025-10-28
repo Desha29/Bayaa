@@ -130,6 +130,7 @@ class EnhancedProductCard extends StatelessWidget {
           const SizedBox(height: 10),
 
           // 🔹 Actions
+          userType==UserType.cashier?SizedBox():
           _ActionsBar(edit: onEdit, del: onDelete, value: value),
         ],
       ),

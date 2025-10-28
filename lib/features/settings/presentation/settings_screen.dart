@@ -8,6 +8,7 @@ import 'package:crazy_phone_pos/features/settings/data/data_source/store_info_da
 import 'package:crazy_phone_pos/features/settings/presentation/cubit/settings_cubit.dart';
 import '../../../core/di/dependency_injection.dart';
 
+import '../../auth/data/models/user_model.dart';
 import '../data/repository/settings_repository_imp.dart';
 import 'widgets/logout_warning_banner.dart';
 import 'widgets/store_info_card.dart';
@@ -70,6 +71,7 @@ class _SettingsScreenContent extends StatelessWidget {
                         children: [
                           StoreInfoCard(isMobile: isMobile),
                           SizedBox(height: isMobile ? 12 : 16),
+                            getIt<UserCubit>().currentUser.userType==UserType.cashier? SizedBox():
                           UsersManagementCard(isMobile: isMobile),
                         ],
                       ),

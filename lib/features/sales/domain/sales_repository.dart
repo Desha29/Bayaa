@@ -9,6 +9,7 @@ abstract class SalesRepository {
   Future<Either<Failure, Product?>> findProductByBarcode(String barcode);
   Future<Either<Failure, List<Product>>> getAllProducts();
   Future<Either<Failure, Unit>> saveSale(Sale sale);
+  Future<Either<Failure, Unit>> deleteSale(String saleId );
   Future<Either<Failure, List<Sale>>> getRecentSales({
     int limit = 10,
     DateTime? startDate,

@@ -1,4 +1,6 @@
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
+import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:crazy_phone_pos/features/products/presentation/widgets/enhanced_add_edit_Dialog.dart'
     show EnhancedAddEditProductDialog, AddCategories;
 import 'package:flutter/material.dart';
@@ -75,6 +77,7 @@ class DesktopLayout extends StatelessWidget {
 
         // Filters Row
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               flex: 2,
@@ -99,22 +102,32 @@ class DesktopLayout extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-                flex: 1,
-                child: AddButton(
-                  onAddPressed: onAddPressed,
-                  text: "إضافة منتج جديد",
-                )),
+            getIt<UserCubit>().currentUser.userType == UserType.cashier
+                ? SizedBox()
+                : Expanded(
+                    flex: 1,
+                    child: AddButton(
+                      onAddPressed: getIt<UserCubit>().currentUser.userType ==
+                              UserType.cashier
+                          ? () {}
+                          : onAddPressed,
+                      text: "إضافة منتج جديد",
+                    )),
             SizedBox(width: 15),
-            Expanded(
-                flex: 1,
-                child: AddButton(
-                  onAddPressed: () {
-                    showAddEditDialog(context);
-                  },
-                  text: "إضافة صنف جديد",
-                  color: Color(0xff8b5cf6),
-                )),
+            getIt<UserCubit>().currentUser.userType == UserType.cashier
+                ? SizedBox()
+                : Expanded(
+                    flex: 1,
+                    child: AddButton(
+                      onAddPressed: getIt<UserCubit>().currentUser.userType ==
+                              UserType.cashier
+                          ? () {}
+                          : () {
+                              showAddEditDialog(context);
+                            },
+                      text: "إضافة صنف جديد",
+                      color: Color(0xff8b5cf6),
+                    )),
           ],
         ),
       ],
