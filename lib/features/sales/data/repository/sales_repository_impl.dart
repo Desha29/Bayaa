@@ -18,11 +18,11 @@ class SalesRepositoryImpl implements SalesRepository {
   @override
   Future<Either<Failure, Product?>> findProductByBarcode(String barcode) async {
     try {
-      final products = productsBox.values.where((p) => p.barcode == barcode);
-      if (products.isEmpty) {
+      final product = productsBox.get(barcode);
+      if (product == null) {
         return const Right(null);
       }
-      return Right(products.first);
+      return Right(product);
     } catch (e) {
       return Left(CacheFailure('فشل في العثور على المنتج: ${e.toString()}'));
     }

@@ -1,6 +1,8 @@
 // lib/features/sales/presentation/sales_screen.dart
 import 'dart:async';
+import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/core/functions/messege.dart';
+import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -57,7 +59,7 @@ class _SalesScreenState extends State<SalesScreen>
         0.0,
         (sum, e) => sum + (e['price'] as double) * (e['qty'] as int),
       );
-Timer? _searchDebounce;
+  Timer? _searchDebounce;
   @override
   void initState() {
     super.initState();
@@ -84,26 +86,28 @@ Timer? _searchDebounce;
 
     // Global HID listener: commits on Enter or brief idle after burst
     RawKeyboard.instance.addListener(_onRawKey);
-_barcodeController.addListener(_onSearchTextChanged);
+    _barcodeController.addListener(_onSearchTextChanged);
     // Load recent sales
     _loadRecentSales();
   }
-void _onSearchTextChanged() {
-  _searchDebounce?.cancel();
-  _searchDebounce = Timer(const Duration(milliseconds: 300), () {
-    final text = _barcodeController.text.trim();
-    if (text.isEmpty) return;
 
-    final productFound = _productsBox.values.any((p) =>
-      p.barcode == text || p.name.toLowerCase().contains(text.toLowerCase()));
+  void _onSearchTextChanged() {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      final text = _barcodeController.text.trim();
+      if (text.isEmpty) return;
 
-    if (!productFound) {
-      MotionSnackBarError(context, "المنتج غير موجود: $text");
-      _barcodeController.clear();
-      setState(() {});
-    }
-  });
-}
+      final productFound = _productsBox.values.any((p) =>
+          p.barcode == text ||
+          p.name.toLowerCase().contains(text.toLowerCase()));
+
+      if (!productFound) {
+        MotionSnackBarError(context, "المنتج غير موجود: $text");
+        _barcodeController.clear();
+        setState(() {});
+      }
+    });
+  }
 
   Future<void> _loadRecentSales() async {
     final result = await _repository.getRecentSales(limit: 10);
@@ -124,17 +128,16 @@ void _onSearchTextChanged() {
   }
 
   @override
-void dispose() {
-  RawKeyboard.instance.removeListener(_onRawKey);
-  _hidTimer?.cancel();
-  _searchDebounce?.cancel();
-  _barcodeController.removeListener(_onSearchTextChanged);  
-  _barcodeController.dispose();
-  _fadeController.dispose();
-  _slideController.dispose();
-  super.dispose();
-}
-
+  void dispose() {
+    RawKeyboard.instance.removeListener(_onRawKey);
+    _hidTimer?.cancel();
+    _searchDebounce?.cancel();
+    _barcodeController.removeListener(_onSearchTextChanged);
+    _barcodeController.dispose();
+    _fadeController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
 
   // Capture scanner keystrokes and commit to search
   void _onRawKey(RawKeyEvent event) {
@@ -237,21 +240,11 @@ void dispose() {
       final productBarcode = item['id'] as String;
       final qtySold = item['qty'] as int;
 
-      final product = _productsBox.values.firstWhere(
-        (p) => p.barcode == productBarcode,
-        orElse: () => Product(
-          minQuantity: 0,
-          wholesalePrice: 0,
-          barcode: '',
-          name: '',
-          price: 0,
-          quantity: 0,
-          minPrice: 0,
-          category: '',
-        ),
+      final product = _productsBox.get(
+        productBarcode,
       );
 
-      if (product.barcode.isNotEmpty) {
+      if (product!.barcode.isNotEmpty) {
         final newQuantity = product.quantity - qtySold;
 
         final updatedProduct = Product(
@@ -266,6 +259,7 @@ void dispose() {
         );
 
         await _productsBox.put(product.barcode, updatedProduct);
+        getIt<NotificationsCubit>().addItem(updatedProduct);
       }
     }
 
