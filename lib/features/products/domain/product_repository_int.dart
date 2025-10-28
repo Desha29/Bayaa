@@ -9,5 +9,8 @@ abstract class ProductRepositoryInt {
   Either<Failure, void> deleteProduct(String barcode);
   Either<Failure, List<String>> getAllCategory();
   Either<Failure, void> saveCategory(String category);
-  Either<Failure, void> deleteCategory(String category);
+  Either<Failure, void> deleteCategory(
+      {required String category,
+      bool forceDelete = false,
+      String? newCategory});
 }

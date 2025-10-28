@@ -44,22 +44,55 @@ class ProductRepositoryImp extends ProductRepositoryInt {
   }
 
   @override
-  Either<Failure, void> deleteCategory(String category) {
+  Either<Failure, void> deleteCategory(
+      {required String category,
+      bool forceDelete = false,
+      String? newCategory}) {
     List<Product> productsList = [];
     try {
-      getAllProduct().fold(
-          (failure) => Left(CacheFailure("خطأ في جلب المنتجات")),
-          (products) => productsList = products);
-      if (productsList
-          .where((element) => element.category == category)
-          .isNotEmpty) {
+      if (category == newCategory) {
         return Left(
-            CacheFailure("لا يمكن حذف هذه الفئة لوجود منتجات مرتبطة بها"));
+            NetworkFailure("لا يمكن إعادة تعيين المنتجات إلى نفس الفئة."));
+      }
+      getAllProduct().fold(
+          (failure) => Left(NetworkFailure("خطأ في جلب المنتجات")),
+          (products) => productsList = products);
+      var filteredProducts = productsList
+          .where((product) => product.category == category)
+          .toList();
+      if (forceDelete) {
+        for (var product in filteredProducts) {
+          productDataSource.deleteUser(product.barcode);
+        }
+        categoryDataSource.deleteCategory(category);
+        return const Right(null);
+      } else {
+        if (filteredProducts.isNotEmpty) {
+          if (newCategory == null || newCategory.isEmpty) {
+            return Left(CacheFailure(
+                "لا يمكنك حذف الفئة لأنها تحتوي على منتجات. الرجاء اختيار فئة جديدة لإعادة تعيين المنتجات أو استخدام الحذف القسري."));
+          }
+          for (var product in filteredProducts) {
+            var updatedProduct = Product(
+              barcode: product.barcode,
+              name: product.name,
+              price: product.price,
+              category: newCategory,
+              quantity: product.quantity,
+              minPrice: product.minPrice,
+              minQuantity: product.minQuantity,
+              wholesalePrice: product.wholesalePrice,
+            );
+            productDataSource.saveUser(updatedProduct);
+          }
+          categoryDataSource.deleteCategory(category);
+          return const Right(null);
+        }
       }
       categoryDataSource.deleteCategory(category);
       return const Right(null);
     } on Exception catch (e) {
-      return Left(CacheFailure("خطأ في حذف الفئة"));
+      return Left(NetworkFailure("خطأ في حذف الفئة"));
     }
   }
 
