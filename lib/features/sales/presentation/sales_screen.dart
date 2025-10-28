@@ -206,7 +206,12 @@ class _SalesScreenState extends State<SalesScreen>
     // Already in cart? increase qty; else add line
     final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
     if (idx != -1) {
-      _cartItems[idx]['qty'] = (_cartItems[idx]['qty'] as int) + 1;
+      if (_cartItems[idx]["qty"] == product.quantity) {
+        MotionSnackBarError(
+            context, "لقد وصلت إلى الحد الأقصى للكمية المتاحة من هذا المنتج");
+      } else {
+        _cartItems[idx]['qty'] = (_cartItems[idx]['qty'] as int) + 1;
+      }
     } else {
       _cartItems.add({
         'id': product.barcode,

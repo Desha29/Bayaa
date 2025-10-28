@@ -84,6 +84,7 @@ class DesktopLayout extends StatelessWidget {
                 items: categories,
                 onChanged: onCategoryChanged,
                 icon: Icons.category_outlined,
+                iconRemove: Icons.cancel,
               ),
             ),
             const SizedBox(width: 16),

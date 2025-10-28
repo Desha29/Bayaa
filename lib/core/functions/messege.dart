@@ -27,7 +27,7 @@ void MotionSnackBarError(BuildContext context, String message) {
       style: TextStyle(fontWeight: FontWeight.w700),
     ),
     toastDuration: Duration(seconds: 2),
-    toastAlignment: Alignment.bottomRight,
+    toastAlignment: Alignment.topRight,
     animationType: AnimationType.slideInFromLeft,
     description: SizedBox(),
     animationDuration: Duration(seconds: 400),
@@ -176,7 +176,10 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
       ],
     ),
   );
+  
 }
+
+
 
 void _showLoadingDialog(BuildContext context) {
   showDialog(

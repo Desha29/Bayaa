@@ -72,7 +72,7 @@ class InvoicePdfService {
 
     final arabicFont = await _loadArabicFont();
     final boldFont = await _loadBoldFont();
-    final logoProvider = await _loadLogo(data); // ✅ Load logo properly
+    final logoProvider = await _loadLogo(data); 
 
     // Color theme suitable for thermal printing and clear display
     final primaryColor = PdfColors.black;

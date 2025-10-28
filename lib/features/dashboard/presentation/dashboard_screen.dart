@@ -1,4 +1,5 @@
 // lib/features/dashboard/presentation/dashboard_screen.dart
+import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
@@ -10,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/di/dependency_injection.dart';
 import '../../../core/functions/messege.dart';
+import '../../auth/presentation/cubit/user_cubit.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../products/presentation/products_screen.dart';
 import '../../products/data/models/product_model.dart';
@@ -44,6 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late final Box<Sale> _salesBox;
   late final SalesRepositoryImpl _salesRepository;
   late final ArpRepositoryImpl _arpRepository;
+  late final User curUser= getIt<UserCubit>().currentUser;
 
   @override
   void initState() {
@@ -77,7 +80,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     SidebarItem(
       icon: LucideIcons.fileText,
       title: "الفواتير",
-      screen: InvoicesHome(repository: _salesRepository),
+      screen: InvoicesHome(repository: _salesRepository, currentUser: curUser,),
     ),
     SidebarItem(
       icon: LucideIcons.box,

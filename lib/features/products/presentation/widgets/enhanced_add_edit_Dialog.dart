@@ -32,6 +32,7 @@ class _EnhancedAddEditProductDialogState
   late final TextEditingController wholesalePriceCtrl;
 
   late String selectedCategory;
+  final _formKey = GlobalKey<FormState>(); // ✅ مفتاح النموذج للتحقق
 
   @override
   void initState() {
@@ -62,6 +63,9 @@ class _EnhancedAddEditProductDialogState
   }
 
   void _submit() {
+    // ✅ تحقق من جميع الحقول قبل الحفظ
+    if (!_formKey.currentState!.validate()) return;
+
     final productSave = Product(
       wholesalePrice: double.tryParse(wholesalePriceCtrl.text.trim()) ?? 0.0,
       minPrice: double.tryParse(minPriceCtrl.text.trim()) ?? 0.0,
@@ -142,58 +146,69 @@ class _EnhancedAddEditProductDialogState
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final isWide = constraints.maxWidth > 500;
-                      return Column(
-                        children: [
-                          if (isWide) ...[
-                            _buildTwoColumnRow([
-                              _buildTextField(
-                                  nameCtrl, 'اسم المنتج *', Icons.inventory_2),
-                              _buildTextField(barcodeCtrl, 'رقم الباركود',
-                                  Icons.qr_code_scanner)
-                            ]),
-                            const SizedBox(height: 16),
-                            _buildTextField(wholesalePriceCtrl, ' سعر الجملة',
-                                Icons.price_change, TextInputType.number),
-                            const SizedBox(height: 16),
-                            _buildTwoColumnRow([
-                              _buildTextField(
-                                  minPriceCtrl,
-                                  'الحد الأدنى للسعر *',
+                      return Form(
+                        key: _formKey, // ✅ مفتاح التحقق
+                        child: Column(
+                          children: [
+                            if (isWide) ...[
+                              _buildTwoColumnRow([
+                                _buildTextField(
+                                    nameCtrl, 'اسم المنتج', Icons.inventory_2),
+                                _buildTextField(
+                                  barcodeCtrl,
+                                  'رقم الباركود',
+                                  readOnly: (widget.productToEdit == null)
+                                      ? false
+                                      : true,
+                                  Icons.qr_code_scanner,
+                                )
+                              ]),
+                              const SizedBox(height: 16),
+                              _buildTextField(wholesalePriceCtrl, 'سعر الجملة',
                                   Icons.price_change,
-                                  TextInputType.number),
+                                  keyboardType: TextInputType.number),
+                              const SizedBox(height: 16),
+                              _buildTwoColumnRow([
+                                _buildTextField(minPriceCtrl, 'الحد الأدنى للسعر',
+                                    Icons.price_change,
+                                    keyboardType: TextInputType.number),
+                                _buildTextField(priceCtrl, 'السعر بالجنيه المصري',
+                                    Icons.attach_money,
+                                    keyboardType: TextInputType.number),
+                              ]),
+                              const SizedBox(height: 16),
+                              _buildTwoColumnRow([
+                                _buildTextField(qtyCtrl, 'الكمية المتوفرة',
+                                    Icons.inventory,
+                                    keyboardType: TextInputType.number),
+                                _buildTextField(minQtyCtrl, 'الحد الأدنى للمخزون',
+                                    Icons.trending_down,
+                                    keyboardType: TextInputType.number),
+                              ]),
+                            ] else ...[
+                              const SizedBox(height: 16),
                               _buildTextField(
-                                  priceCtrl,
-                                  'السعر بالجنيه المصري *',
+                                  nameCtrl, 'اسم المنتج', Icons.inventory_2),
+                              const SizedBox(height: 16),
+                              _buildTextField(barcodeCtrl, 'رقم الباركود',
+                                  Icons.qr_code_scanner),
+                              const SizedBox(height: 16),
+                              _buildTextField(priceCtrl, 'السعر بالجنيه المصري',
                                   Icons.attach_money,
-                                  TextInputType.number),
-                            ]),
-                            const SizedBox(height: 16),
-                            _buildTwoColumnRow([
-                              _buildTextField(qtyCtrl, 'الكمية المتوفرة *',
-                                  Icons.inventory, TextInputType.number),
+                                  keyboardType: TextInputType.number),
+                              const SizedBox(height: 16),
+                              _buildTextField(qtyCtrl, 'الكمية المتوفرة',
+                                  Icons.inventory,
+                                  keyboardType: TextInputType.number),
+                              const SizedBox(height: 16),
                               _buildTextField(minQtyCtrl, 'الحد الأدنى للمخزون',
-                                  Icons.trending_down, TextInputType.number),
-                            ]),
-                          ] else ...[
+                                  Icons.trending_down,
+                                  keyboardType: TextInputType.number),
+                            ],
                             const SizedBox(height: 16),
-                            _buildTextField(
-                                nameCtrl, 'اسم المنتج *', Icons.inventory_2),
-                            const SizedBox(height: 16),
-                            _buildTextField(barcodeCtrl, 'رقم الباركود',
-                                Icons.qr_code_scanner),
-                            const SizedBox(height: 16),
-                            _buildTextField(priceCtrl, 'السعر بالجنيه المصري *',
-                                Icons.attach_money, TextInputType.number),
-                            const SizedBox(height: 16),
-                            _buildTextField(qtyCtrl, 'الكمية المتوفرة *',
-                                Icons.inventory, TextInputType.number),
-                            const SizedBox(height: 16),
-                            _buildTextField(minQtyCtrl, 'الحد الأدنى للمخزون',
-                                Icons.trending_down, TextInputType.number),
+                            _buildCategoryDropdown(),
                           ],
-                          const SizedBox(height: 16),
-                          _buildCategoryDropdown(),
-                        ],
+                        ),
                       );
                     },
                   ),
@@ -279,6 +294,12 @@ class _EnhancedAddEditProductDialogState
             vertical: 16,
           ),
         ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'يجب اختيار فئة';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -287,6 +308,7 @@ class _EnhancedAddEditProductDialogState
 class AddCategories extends StatelessWidget {
   AddCategories({super.key});
   final TextEditingController nameCtrl = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // ✅ للتحقق
 
   @override
   Widget build(BuildContext context) {
@@ -326,9 +348,9 @@ class AddCategories extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerRight,
-                      child: Text(
+                      child: const Text(
                         'إضافة صنف جديد',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -345,16 +367,19 @@ class AddCategories extends StatelessWidget {
               // Form
               Flexible(
                 child: SingleChildScrollView(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isWide = constraints.maxWidth > 500;
-                      return Column(children: [
-                        if (isWide) ...[
-                          _buildTextField(
-                              nameCtrl, 'اسم الصنف *', Icons.inventory_2),
-                        ],
-                      ]);
-                    },
+                  child: Form(
+                    key: _formKey, // ✅ للتحقق
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isWide = constraints.maxWidth > 500;
+                        return Column(children: [
+                          if (isWide) ...[
+                            _buildTextField(
+                                nameCtrl, 'اسم الصنف', Icons.inventory_2),
+                          ],
+                        ]);
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -378,6 +403,7 @@ class AddCategories extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
+                        if (!_formKey.currentState!.validate()) return;
                         getIt<ProductCubit>().saveCategory(nameCtrl.text);
                         Navigator.pop(context);
                       },
@@ -389,7 +415,7 @@ class AddCategories extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: FittedBox(
+                      child: const FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text('إضافة صنف'),
                       ),
@@ -415,37 +441,36 @@ Widget _buildTwoColumnRow(List<Widget> children) {
   );
 }
 
+
 Widget _buildTextField(
   TextEditingController controller,
   String label,
-  IconData icon, [
+  IconData icon, {
   TextInputType? keyboardType,
-]) {
-  return Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AppColors.borderColor),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.1),
-          blurRadius: 4,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: AppColors.primaryColor),
-        border: InputBorder.none,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
+  bool readOnly = false,
+}) {
+  return TextFormField(
+    readOnly: readOnly,
+    controller: controller,
+    keyboardType: keyboardType,
+    decoration: InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: AppColors.primaryColor),
+      border: InputBorder.none,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 16,
       ),
     ),
+    validator: (value) {
+      if (value == null || value.trim().isEmpty) {
+        return 'هذا الحقل مطلوب';
+      }
+      if (keyboardType == TextInputType.number &&
+          double.tryParse(value.trim()) == null) {
+        return 'يجب إدخال رقم صالح';
+      }
+      return null;
+    },
   );
 }

@@ -79,11 +79,11 @@ class EnhancedProductCard extends StatelessWidget {
           ),
 
           // 🔹 Category
-          if (product.category != null && product.category!.isNotEmpty)
+          if (product.category.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 2, bottom: 8),
               child: Text(
-                product.category!,
+                product.category,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: small + 0.3,
@@ -230,9 +230,7 @@ class _InfoRow extends StatelessWidget {
         if (isManager)
           infoItem(
             'جملة',
-            product.wholesalePrice != null
-                ? product.wholesalePrice!.toStringAsFixed(2)
-                : '-',
+            product.wholesalePrice.toStringAsFixed(2),
             Icons.local_offer_rounded,
             Colors.teal,
           ),
