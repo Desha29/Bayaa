@@ -15,7 +15,7 @@ class HiveHelper {
 
     // Open all boxes with error handling
     await _openBoxesSafely();
-    await clearAllData();
+    //await clearAllData();
     // Initialize default data
     await _initializeDefaultData();
   }

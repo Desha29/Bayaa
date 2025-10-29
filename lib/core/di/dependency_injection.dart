@@ -10,9 +10,11 @@ import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.da
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
 
+
 import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
 import '../../features/sales/data/models/sale_model.dart';
 import '../../features/sales/data/repository/sales_repository_impl.dart';
+
 import '../../features/sales/presentation/cubit/sales_cubit.dart';
 
 final getIt = GetIt.instance;
@@ -33,4 +35,5 @@ void setup() {
           productDataSource: ProductDataSource(),
           categoryDataSource: CategoryDataSource())));
   getIt.registerSingleton<NotificationsCubit>(NotificationsCubit());
+
 }

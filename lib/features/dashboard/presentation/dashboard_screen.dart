@@ -12,15 +12,17 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/di/dependency_injection.dart';
 import '../../../core/functions/messege.dart';
 import '../../auth/presentation/cubit/user_cubit.dart';
+import '../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../products/presentation/products_screen.dart';
 import '../../products/data/models/product_model.dart';
 import '../../sales/data/repository/sales_repository_impl.dart';
+import '../../sales/domain/sales_repository.dart';
 import '../../sales/presentation/sales_screen.dart';
 import '../../sales/data/models/sale_model.dart';
 import '../../settings/presentation/settings_screen.dart';
 import '../../stock/presentation/stock_screen.dart';
-import '../../invoice/presentation/invoices_home.dart';
+import '../../invoice/presentation/invoices_screen.dart';
 
 // ARP imports
 import '../../arp/presentation/screens/arp_screen.dart';
@@ -80,11 +82,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     SidebarItem(
       icon: LucideIcons.fileText,
       title: "الفواتير",
-      screen: InvoicesHome(
-        repository: _salesRepository,
-        currentUser: curUser,
+      screen: BlocProvider<InvoiceCubit>(
+        create: (_) => InvoiceCubit(_salesRepository),
+        child: InvoiceScreen(
+            repository: _salesRepository, currentUser: curUser),
       ),
     ),
+
     SidebarItem(
       icon: LucideIcons.box,
       title: "المنتجات",

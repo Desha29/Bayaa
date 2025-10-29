@@ -159,25 +159,55 @@ class SalesRepositoryImpl implements SalesRepository {
   }
 
 @override
-Future<Either<Failure, Unit>> deleteSale(String saleId) async {
+Future<Either<Failure, Unit>> deleteSalesInRange(DateTime start, DateTime end) async {
   try {
+    final salesToDelete = salesBox.values.where(
+      (sale) => !sale.date.isBefore(start) && !sale.date.isAfter(end)
+    ).toList();
 
-    if (!salesBox.containsKey(saleId)) {
-      return Left(CacheFailure('عملية الحذف فشلت: لم يتم العثور على هذا البيع.'));
-    }
-
-
-    await salesBox.delete(saleId);
-
-    if (salesBox.containsKey(saleId)) {
-      return Left(CacheFailure('حدث خطأ أثناء الحذف، لم يتم حذف البيع بشكل صحيح.'));
+    for (var sale in salesToDelete) {
+      await salesBox.delete(sale.id);
     }
 
     return const Right(unit);
   } catch (e) {
-  
+    return Left(CacheFailure('فشل في حذف الفواتير خلال الفترة: ${e.toString()}'));
+  }
+}
+@override
+Future<Either<Failure, Unit>> deleteSalesByQuery(String query) async {
+  try {
+    final matchingSales = salesBox.values.where((sale) {
+      if (sale.id.contains(query)) return true;
+      return sale.saleItems.any((item) =>
+        item.productId.contains(query) || item.name.toLowerCase().contains(query.toLowerCase())
+      );
+    }).toList();
+
+    for (var sale in matchingSales) {
+      await salesBox.delete(sale.id);
+    }
+
+    return const Right(unit);
+  } catch (e) {
+    return Left(CacheFailure('فشل في حذف الفواتير المطابقة: ${e.toString()}'));
+  }
+}
+@override
+Future<Either<Failure, Unit>> deleteSale(String saleId) async {
+  try {
+    if (!salesBox.containsKey(saleId)) {
+      return Left(CacheFailure('عملية الحذف فشلت: لم يتم العثور على هذا البيع.'));
+    }
+    await salesBox.delete(saleId);
+    if (salesBox.containsKey(saleId)) {
+      return Left(CacheFailure('حدث خطأ أثناء الحذف، لم يتم حذف البيع بشكل صحيح.'));
+    }
+    return const Right(unit);
+  } catch (e) {
     return Left(CacheFailure('فشل في حذف البيع: ${e.toString()}'));
   }
 }
+
 
 }
