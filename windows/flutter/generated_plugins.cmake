@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   flutter_libserialport
+  flutter_secure_storage_windows
   printing
   screen_retriever_windows
   window_manager
