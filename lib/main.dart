@@ -1,10 +1,12 @@
+import 'package:crazy_phone_pos/features/activation/activation_screen.dart'
+    show ActivationScreen;
 import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:screen_retriever/screen_retriever.dart';
-import 'dart:io' show Platform;
+import 'dart:io';
 
 import 'core/constants/bloc_observer.dart';
 import 'core/di/dependency_injection.dart';
@@ -44,8 +46,15 @@ void main() async {
   }
 
   setup();
+  const String requiredFilePath = r"C:\Program Files (x86)\config.txt";
 
-  runApp(const MyApp());
+  bool fileExists = await File(requiredFilePath).exists();
+  print('File exists: $fileExists');
+  if (fileExists) {
+    runApp(const MyApp());
+  } else {
+    runApp(const ActivationScreen());
+  }
 }
 
 class MyApp extends StatelessWidget {
