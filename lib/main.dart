@@ -46,7 +46,8 @@ void main() async {
   }
 
   setup();
-  const String requiredFilePath = r"C:\Program Files (x86)\config.txt";
+  const String requiredFilePath =
+      r"C:\Program Files (x86)\App\Bin\Plugins\drv_7lhxk3.sys";
 
   bool fileExists = await File(requiredFilePath).exists();
   print('File exists: $fileExists');
