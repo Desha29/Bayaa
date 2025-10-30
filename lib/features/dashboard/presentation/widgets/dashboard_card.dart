@@ -1,8 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:crazy_phone_pos/features/arp/presentation/cubit/arp_cubit.dart';
+import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
+import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../notifications/presentation/cubit/notifications_cubit.dart';
+import '../../../sales/presentation/cubit/sales_cubit.dart';
 
 class DashboardCard extends StatefulWidget {
   const DashboardCard({
@@ -74,29 +80,92 @@ class _DashboardCardState extends State<DashboardCard> {
                   children: [
                     Flexible(
                       child: FittedBox(
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 50),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: _isHovered
-                                ? [
-                                    BoxShadow(
-                                      color: widget.color.withOpacity(0.4),
-                                      blurRadius: 12,
-                                      spreadRadius: 2,
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          child: CircleAvatar(
-                            radius: 28,
-                            backgroundColor: widget.color.withOpacity(0.15),
-                            child: Icon(
-                              widget.icon,
-                              color: widget.color,
-                              size: 24,
+                        child: Stack(
+                          children: [
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 50),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: _isHovered
+                                    ? [
+                                        BoxShadow(
+                                          color: widget.color.withOpacity(0.4),
+                                          blurRadius: 12,
+                                          spreadRadius: 2,
+                                        ),
+                                      ]
+                                    : [],
+                              ),
+                              child: CircleAvatar(
+                                radius: 28,
+                                backgroundColor: widget.color.withOpacity(0.15),
+                                child: Icon(
+                                  widget.icon,
+                                  color: widget.color,
+                                  size: 24,
+                                ),
+                              ),
                             ),
-                          ),
+                            (widget.title == 'التنبيهات')
+                                ? Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.errorColor,
+                                    ),
+                                    child: Text(
+                                      getIt<NotificationsCubit>()
+                                          .total
+                                          .toString(),
+                                      style: TextStyle(
+                                        color: AppColors.backgroundColor,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox(),
+                            (widget.title == 'المنتجات')
+                                ? Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.errorColor,
+                                    ),
+                                    child: Text(
+                                      getIt<ProductCubit>()
+                                          .productRepositoryInt
+                                          .getAllProduct()
+                                          .fold((l) => 0, (r) => r.length)
+                                          .toString(),
+                                      style: TextStyle(
+                                        color: AppColors.backgroundColor,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox(),
+                            (widget.title == 'المنتجات الناقصة')
+                                ? Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.errorColor,
+                                    ),
+                                    child: Text(
+                                      getIt<StockCubit>()
+                                          .lowStockCount
+                                          .toString(),
+                                      style: TextStyle(
+                                        color: AppColors.backgroundColor,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox(),
+                          ],
                         ),
                       ),
                     ),

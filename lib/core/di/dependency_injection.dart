@@ -11,6 +11,8 @@ import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
 
 
+import '../../features/arp/data/arp_repository_impl.dart';
+import '../../features/arp/presentation/cubit/arp_cubit.dart';
 import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
 import '../../features/sales/data/models/sale_model.dart';
 import '../../features/sales/data/repository/sales_repository_impl.dart';
@@ -35,5 +37,12 @@ void setup() {
           productDataSource: ProductDataSource(),
           categoryDataSource: CategoryDataSource())));
   getIt.registerSingleton<NotificationsCubit>(NotificationsCubit());
+  getIt.registerSingleton<ArpCubit>(ArpCubit( ArpRepositoryImpl(
+    salesRepository: SalesRepositoryImpl(
+        productsBox: Hive.box<Product>('productsBox'),
+        salesBox: Hive.box<Sale>('salesBox')),
+  ),
+
+  ));
 
 }

@@ -209,5 +209,16 @@ Future<Either<Failure, Unit>> deleteSale(String saleId) async {
   }
 }
 
+ @override
+Future<Either<Failure, List<Sale>>> getAllSales() async {
+  try {
+    final sales = salesBox.values.toList();
+    return Right(sales);
+  } catch (e) {
+    return Left(CacheFailure('فشل في جلب البيعات: ${e.toString()}'));
+  }
+}
+
+
 
 }

@@ -8,6 +8,7 @@ import '../data/models/sale_model.dart';
 abstract class SalesRepository {
   Future<Either<Failure, Product?>> findProductByBarcode(String barcode);
   Future<Either<Failure, List<Product>>> getAllProducts();
+  Future<Either<Failure, List<Sale>>> getAllSales();
   Future<Either<Failure, Unit>> saveSale(Sale sale);
   Future<Either<Failure, Unit>> deleteSale(String saleId);
   Future<Either<Failure, Unit>> deleteSalesInRange(

@@ -9,6 +9,7 @@ class StockCubit extends Cubit<StockStates> {
   StockCubit({required this.productRepository}) : super(StockLoadingState());
   ProductRepositoryInt productRepository;
   List<Product> products = [];
+  
   String filter = 'all';
   int lowStockCount = 0;
   int outOfStockCount = 0;
