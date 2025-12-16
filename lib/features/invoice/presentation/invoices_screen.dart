@@ -196,7 +196,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: 'Crazy Phone',
+      storeName: 'Amr Store',
       storeAddress: ' الخانكة امام شارع الحجار   - القليوبية ',
       storePhone: '01002546124',
       cashierName: cashierName,

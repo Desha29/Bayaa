@@ -8,7 +8,7 @@ import '../data/invoice_models.dart';
 class InvoicePdfService {
   static pw.Font? _cachedArabicFont;
   static pw.Font? _cachedBoldFont;
-  static pw.ImageProvider? _cachedLogo; // ✅ Cache logo
+  static pw.ImageProvider? _cachedLogo; 
 
   // Load fonts
   static Future<pw.Font> _loadArabicFont() async {

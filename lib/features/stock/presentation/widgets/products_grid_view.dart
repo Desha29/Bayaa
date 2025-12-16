@@ -16,38 +16,23 @@ class ProductsGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossAxisCount;
-        double aspectRatio;
-
-        if (ResponsiveHelper.isDesktop(context)) {
-          crossAxisCount = 3;
-          aspectRatio = 1.4;
-        } else if (ResponsiveHelper.isTablet(context)) {
-          crossAxisCount = 3;
-          aspectRatio = 1.2;
-        } else {
-          crossAxisCount = 2;
-          aspectRatio = 1;
-        }
-
-        return GridView.builder(
-          padding: EdgeInsets.all(ResponsiveHelper.isMobile(context) ? 6 : 12),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            childAspectRatio: aspectRatio,
-            crossAxisSpacing: ResponsiveHelper.isMobile(context) ? 6 : 12,
-            mainAxisSpacing: ResponsiveHelper.isMobile(context) ? 6 : 12,
+    // Determine responsive width constraints if needed, but for a vertical list 
+    // we typically want it to fill the width (with some max constraint on very large screens).
+    
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveHelper.isMobile(context) ? 8 : 12, 
+        vertical: 10
+      ),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: ProductCard(
+            product: product,
+            onRestock: () => onRestock(index),
           ),
-          itemCount: products.length,
-          itemBuilder: (context, index) {
-            final product = products[index];
-            return ProductCard(
-              product: product,
-              onRestock: () => onRestock(index),
-            );
-          },
         );
       },
     );

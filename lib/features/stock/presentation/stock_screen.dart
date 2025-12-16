@@ -44,73 +44,68 @@ class StockScreen extends StatelessWidget {
         body: SafeArea(child: BlocBuilder<StockCubit, StockStates>(
           builder: (context, state) {
             if (state is StockSucssesState) {
-              return CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  // Header + Filter + Title
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                        vertical: 24,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const ScreenHeader(
-                            title: 'المنتجات الناقصة',
-                            subtitle: 'متابعة المنتجات التي تحتاج إعادة تخزين',
-                            icon: Icons.warning_amber_rounded,
-                            iconColor: AppColors.primaryColor,
-                            titleColor: AppColors.kDarkChip,
-                          ),
-                          const SizedBox(height: 32),
-                          FilterButtonsWidget(
-                            filter: getIt<StockCubit>().filter,
-                            totalCount: getIt<StockCubit>().totalCount,
-                            lowStockCount: getIt<StockCubit>().lowStockCount,
-                            outOfStockCount: getIt<StockCubit>().outOfStockCount,
-                            onFilterChanged: (newFilter) {
-                              getIt<StockCubit>().filter = newFilter;
-                              getIt<StockCubit>().filterProducts();
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.warning_amber_rounded,
-                                color: Color(0xFFF59E0B),
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    'المنتجات التي تحتاج إعادة تخزين (${state.products.length})',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
+              return Column(
+                children: [
+                  // Header + Filter + Title (Fixed)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                      vertical: 24,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const ScreenHeader(
+                          title: 'المنتجات الناقصة',
+                          subtitle: 'متابعة المنتجات التي تحتاج إعادة تخزين',
+                          icon: Icons.warning_amber_rounded,
+                          iconColor: AppColors.primaryColor,
+                          titleColor: AppColors.kDarkChip,
+                        ),
+                        const SizedBox(height: 32),
+                        FilterButtonsWidget(
+                          filter: getIt<StockCubit>().filter,
+                          totalCount: getIt<StockCubit>().totalCount,
+                          lowStockCount: getIt<StockCubit>().lowStockCount,
+                          outOfStockCount: getIt<StockCubit>().outOfStockCount,
+                          onFilterChanged: (newFilter) {
+                            getIt<StockCubit>().filter = newFilter;
+                            getIt<StockCubit>().filterProducts();
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              color: Color(0xFFF59E0B),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  'المنتجات التي تحتاج إعادة تخزين (${state.products.length})',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
                   ),
 
-                  // Products Grid or Empty State
-                  SliverPadding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    sliver: SliverFillRemaining(
-                      hasScrollBody: true,
+                  // Products List (Scrollable)
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                       child: state.products.isEmpty
                           ? Center(
                               child: Column(

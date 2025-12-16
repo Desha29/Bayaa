@@ -145,7 +145,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             appBar: isMobileOrTablet
                 ? AppBar(
                     backgroundColor: AppColors.primaryColor,
-                    title: const Text("Crazy Phone"),
+                    title: const Text("Amr Store"),
                     leading: Builder(
                       builder: (context) => IconButton(
                         icon: const Icon(LucideIcons.menu),

@@ -110,7 +110,8 @@ class ProductsScreenState extends State<ProductsScreen> {
                         titleColor: AppColors.kDarkChip,
                       ),
                       const SizedBox(height: 20),
-                      BlocConsumer<ProductCubit, ProductStates>(
+                      Expanded(
+                        child: BlocConsumer<ProductCubit, ProductStates>(
                         listener: (context, state) {
                           if (state is ProductSuccessState) {
                             MotionSnackBarSuccess(context, state.msg);
@@ -133,14 +134,22 @@ class ProductsScreenState extends State<ProductsScreen> {
                               context: context,
                             );
                           }
+                          if (state is ProductLoadedState) {
+                            products = state.products;
+                          }
                         },
                         buildWhen: (previous, current) =>
                             current is CategoryLoadedState ||
-                            current is CategoryErrorState,
+                            current is CategoryErrorState ||
+                            current is ProductLoadedState,
                         builder: (context, state) {
                           if (state is CategoryLoadedState) {
                             categories = ['الكل', ...state.categories];
                           }
+                          
+                          // Optimization: Calculate filtered products once
+                          final currentFilteredProducts = filteredProducts;
+                          
                           return Column(
                             children: [
                               FadeSlideIn(
@@ -152,7 +161,6 @@ class ProductsScreenState extends State<ProductsScreen> {
                                   categories: categories,
                                   availabilities: availabilities,
                                   onCategoryChanged: (v) {
-                                    print(v);
                                     ProductCubit.get(context)
                                         .filterByCategory(v);
                                   },
@@ -216,7 +224,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                                           child: FittedBox(
                                             fit: BoxFit.scaleDown,
                                             child: Text(
-                                              '${filteredProducts.length}',
+                                              '${currentFilteredProducts.length}',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 14,
@@ -231,51 +239,42 @@ class ProductsScreenState extends State<ProductsScreen> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-                            ],
-                          );
-                        },
-                      ),
-                      BlocBuilder<ProductCubit, ProductStates>(
-                        buildWhen: (previous, current) =>
-                            current is ProductLoadingState ||
-                            current is ProductLoadedState ||
-                            current is ProductErrorState,
-                        builder: (context, state) {
-                          if (state is ProductLoadedState) {
-                            products = state.products;
-                          }
-                          return Expanded(
-                            child: SubtleSwitcher(
-                              child: KeyedSubtree(
-                                key: ValueKey(filteredProducts.length),
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                    side: const BorderSide(
-                                      color: AppColors.borderColor,
-                                    ),
-                                  ),
-                                  color: Colors.white,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: ProductsGridView(
-                                      products: filteredProducts,
-                                      onDelete: (p) => getIt<ProductCubit>()
-                                          .deleteProduct(p.barcode),
-                                      onEdit: (p) {
-                                        showAddEditDialog(p);
-                                      },
-                                      statusColorFn: statusColor,
-                                      statusTextFn: statusText,
+                              Expanded(
+                                child: SubtleSwitcher(
+                                  child: KeyedSubtree(
+                                    key: ValueKey(currentFilteredProducts.length),
+                                    child: Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        side: const BorderSide(
+                                          color: AppColors.borderColor,
+                                        ),
+                                      ),
+                                      color: Colors.white,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: ProductsGridView(
+                                          products: currentFilteredProducts,
+                                          onDelete: (p) => getIt<ProductCubit>()
+                                              .deleteProduct(p.barcode),
+                                          onEdit: (p) {
+                                            showAddEditDialog(p);
+                                          },
+                                          statusColorFn: statusColor,
+                                          statusTextFn: statusText,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                           );
                         },
                       ),
+                    ),
                     ],
+                    
                   ),
                 );
               },

@@ -329,7 +329,7 @@ class _SalesScreenState extends State<SalesScreen>
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: 'Crazy Phone',
+      storeName: 'Amr Store',
       storeAddress: ' الخانكة امام شارع الحجار   - القليوبية ',
       storePhone: '01002546124',
       cashierName: cashierName,
@@ -344,7 +344,7 @@ class _SalesScreenState extends State<SalesScreen>
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
-      logoAsset: 'assets/images/logo1.png',
+      logoAsset: 'assets/images/logo.jpg',
     );
 
     await Navigator.of(context).push(

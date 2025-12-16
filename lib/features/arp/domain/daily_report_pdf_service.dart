@@ -86,7 +86,7 @@ class DailyReportPdfService {
             ),
             pw.SizedBox(height: 6),
             pw.Text(
-              'نظام نقاط البيع المتطور - Crazy Phone',
+              'نظام نقاط البيع المتطور - Amr Store',
               style: pw.TextStyle(
                 font: boldFont,
                 fontSize: 13,
@@ -311,7 +311,7 @@ class DailyReportPdfService {
         ),
         pw.SizedBox(height: 3),
         pw.Text(
-          '© 2025 Crazy Phone POS - جميع الحقوق محفوظة',
+          '© 2025 Amr Store POS - جميع الحقوق محفوظة',
           style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
       ]),

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
-
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
-
 class InvoiceFilterSection extends StatelessWidget {
   final bool isDesktop;
   final TextEditingController barcodeSearchController;
@@ -71,8 +68,8 @@ class InvoiceFilterSection extends StatelessWidget {
                         controller: barcodeSearchController,
                         decoration: InputDecoration(
                           hintText: 'امسح الباركود أو اكتب رقم الفاتورة',
-                          prefixIcon: Icon(Icons.search,
-                              color: AppColors.primaryColor),
+                          prefixIcon:
+                              Icon(Icons.search, color: AppColors.primaryColor),
                           suffixIcon: searchQuery.isNotEmpty
                               ? IconButton(
                                   icon: const Icon(Icons.clear),
@@ -81,13 +78,13 @@ class InvoiceFilterSection extends StatelessWidget {
                               : null,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                BorderSide(color: AppColors.mutedColor.withOpacity(0.4)),
+                            borderSide: BorderSide(
+                                color: AppColors.mutedColor.withOpacity(0.4)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                BorderSide(color: AppColors.mutedColor.withOpacity(0.4)),
+                            borderSide: BorderSide(
+                                color: AppColors.mutedColor.withOpacity(0.4)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -104,7 +101,8 @@ class InvoiceFilterSection extends StatelessWidget {
                 if (searchQuery.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppColors.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -127,6 +125,7 @@ class InvoiceFilterSection extends StatelessWidget {
                     ),
                   ),
                 ],
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(

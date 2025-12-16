@@ -214,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: FittedBox(
                                         fit: BoxFit.scaleDown,
                                         child: Text(
-                                          '© 2025 Crazy Phone. جميع الحقوق محفوظة',
+                                          '© 2025 Amr Store. جميع الحقوق محفوظة',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodySmall

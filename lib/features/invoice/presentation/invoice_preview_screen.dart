@@ -39,7 +39,7 @@ class InvoicePreviewScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl, // Default RTL for Arabic
       child: Scaffold(
-        backgroundColor: AppColors.mutedColor.withOpacity(0.15),
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
           centerTitle: true,
           title: Text(
@@ -96,6 +96,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                           ? InvoicePdfService.buildReceipt80mm(data)
                           : InvoicePdfService.buildA4(data, format: format),
                       allowPrinting: true,
+                      
                       allowSharing: true,
                       canChangeOrientation: false,
                       canChangePageFormat: false,

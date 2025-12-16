@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 
 class EditStoreInfoDialog extends StatefulWidget {
   final Map<String, String> storeInfo;

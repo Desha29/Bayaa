@@ -1,8 +1,8 @@
-# 📂 Crazy Phone POS
+# 📂 Amr Store POS
 
 **Local POS System for Mobile Store (Flutter Desktop)**  
 A fast, offline-first, and feature-rich Point of Sale (POS) system built with **Flutter** for desktop environments.  
-Crazy Phone POS helps mobile-phone shops manage **sales**, **stock**, **invoicing**, and **analytics** — all without requiring an internet connection.
+Amr Store POS helps mobile-phone shops manage **sales**, **stock**, **invoicing**, and **analytics** — all without requiring an internet connection.
 
 ---
 
@@ -91,7 +91,7 @@ flutter run -d windows   # or -d macos / -d linux depending on your OS
 
 ## 🧠 Keywords
 
-`desktop-app` `hive` `offline-first` `local-database` `flutter` `inventory-management` `barcode-scanner` `pos-system` `crazy-phone`
+`desktop-app` `hive` `offline-first` `local-database` `flutter` `inventory-management` `barcode-scanner` `pos-system` `amr-store`
 
 ---
 

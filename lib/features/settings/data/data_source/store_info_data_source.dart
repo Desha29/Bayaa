@@ -36,9 +36,9 @@ class StoreInfoDataSource {
 
   StoreInfo getDefaultStoreInfo() {
     return StoreInfo(
-      name: 'Crazy Phone',
+      name: 'Amr Store',
       phone: '01000000000',
-      email: 'info@crazyphone.com',
+      email: 'info@amrstore.com',
       address: "امام شارع الحجار - الخانكة - القليوبية",
       vat: '123456789',
     );

@@ -35,7 +35,7 @@ void main() async {
       backgroundColor: Colors.transparent,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
-      title: 'Crazy Phone',
+      title: 'Amr Store',
     );
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MessageOverlay(
       child: MaterialApp(
-        title: 'Crazy Phone',
+        title: 'Amr Store',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         home: const LoginScreen(),

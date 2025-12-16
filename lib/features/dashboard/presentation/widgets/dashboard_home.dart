@@ -100,7 +100,7 @@ class _DashboardHomeState extends State<DashboardHome>
           aspectRatio = 1.6;
         } else if (constraints.maxWidth < 1000) {
           crossAxisCount = 2;
-          aspectRatio = 0.55;
+          aspectRatio = 1.1;
         }
 
         return Padding(
@@ -110,7 +110,7 @@ class _DashboardHomeState extends State<DashboardHome>
             children: [
               ScreenHeader(
                 title: "لوحة التحكم",
-                subtitle: "مرحباً بك في نظام Crazy Phone لإدارة نقاط البيع",
+                subtitle: "مرحباً بك في نظام Amr Store لإدارة نقاط البيع",
                 icon: LucideIcons.layoutDashboard,
                 titleColor: AppColors.kDarkChip,
                 iconColor: AppColors.primaryColor,

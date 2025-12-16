@@ -25,43 +25,21 @@ class ProductsGridView extends StatelessWidget {
     if (products.isEmpty)
       return const EmptyState(variant: EmptyStateVariant.products);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossCount = ResponsiveHelper.isDesktop(context)
-            ? 4
-            : ResponsiveHelper.isTablet(context)
-                ? 3
-                : 2;
-
-        return GridView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossCount,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: _getChildAspectRatio(context),
-          ),
-          itemCount: products.length,
-          itemBuilder: (context, index) {
-            final product = products[index];
-            final qty = product.quantity;
-            final min = product.minQuantity;
-            return EnhancedProductCard(
-              product: product,
-              onDelete: () => onDelete(product),
-              onEdit: () => onEdit(product),
-              statusColor: statusColorFn(qty, min),
-              statusText: statusTextFn(qty, min),
-            );
-          },
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+        final qty = product.quantity;
+        final min = product.minQuantity;
+        return EnhancedProductCard(
+          product: product,
+          onDelete: () => onDelete(product),
+          onEdit: () => onEdit(product),
+          statusColor: statusColorFn(qty, min),
+          statusText: statusTextFn(qty, min),
         );
       },
     );
-  }
-
-  double _getChildAspectRatio(BuildContext context) {
-    if (ResponsiveHelper.isDesktop(context)) return 0.8;
-    if (ResponsiveHelper.isTablet(context)) return 0.85;
-    return 0.75;
   }
 }

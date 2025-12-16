@@ -51,6 +51,9 @@ void updateUser(User user) async {
   result.fold(
     (failure) => emit(UserFailure(failure.message)),
     (_) {
+      if (currentUser.username == user.username) {
+        currentUser = user;
+      }
       emit(UserSuccess("تم تحديث المستخدم بنجاح"));
       getAllUsers(); 
     },
