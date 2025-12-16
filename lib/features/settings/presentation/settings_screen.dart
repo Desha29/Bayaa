@@ -22,14 +22,7 @@ class SettingsScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<UserCubit>.value(value: getIt<UserCubit>()..getAllUsers()),
-        BlocProvider(
-          create: (context) => SettingsCubit(
-            userCubit: getIt<UserCubit>(),
-            storeRepository: StoreInfoRepository(
-              dataSource: StoreInfoDataSource(),
-            ),
-          ),
-        )
+        BlocProvider.value(value: getIt<SettingsCubit>()),
       ],
       child: const _SettingsScreenContent(),
     );

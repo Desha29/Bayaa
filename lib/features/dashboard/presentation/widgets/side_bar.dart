@@ -4,6 +4,7 @@ import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifi
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/components/app_logo.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
@@ -87,7 +88,7 @@ class _CustomSidebarState extends State<CustomSidebar>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              // Responsive header with logo and labels
+        
               SizedBox(
                 height: 96,
                 child: Center(
@@ -250,11 +251,11 @@ class _SidebarHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = compact ? 20.0 : 30.0; // slightly smaller
+    final radius = compact ? 20.0 : 30.0; 
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min, // important: shrink to fit
+      mainAxisSize: MainAxisSize.min, 
       children: [
         Flexible(
           child: FittedBox(
@@ -262,7 +263,7 @@ class _SidebarHeader extends StatelessWidget {
               height: radius * 3,
               width: radius * 3,
               child: ClipOval(
-                child: Image.asset('assets/images/logo.jpg', fit: BoxFit.cover),
+                child: AppLogo(width: 160, height: 160, fit: BoxFit.cover),
               ),
             ),
           ),
@@ -280,7 +281,7 @@ class _SidebarHeader extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                           color: AppColors.secondaryColor,
                           fontSize: 13,
-                          height: 1.2, // tighter line-height
+                          height: 1.2,
                         ),
                   ),
                 ),

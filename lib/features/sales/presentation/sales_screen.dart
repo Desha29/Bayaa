@@ -41,6 +41,7 @@ class _SalesScreenState extends State<SalesScreen>
 
   // TextField controller
   final TextEditingController _barcodeController = TextEditingController();
+  final FocusNode _barcodeFocusNode = FocusNode();
 
   // HID keyboard-wedge listener (scanners that type like a keyboard)
   final StringBuffer _hidBuffer = StringBuffer();
@@ -87,7 +88,7 @@ class _SalesScreenState extends State<SalesScreen>
 
     // Global HID listener: commits on Enter or brief idle after burst
     RawKeyboard.instance.addListener(_onRawKey);
-    _barcodeController.addListener(_onSearchTextChanged);
+    // _barcodeController.addListener(_onSearchTextChanged); // Removed debounce
     // Load recent sales
     _loadRecentSales();
   }
@@ -133,8 +134,9 @@ class _SalesScreenState extends State<SalesScreen>
     RawKeyboard.instance.removeListener(_onRawKey);
     _hidTimer?.cancel();
     _searchDebounce?.cancel();
-    _barcodeController.removeListener(_onSearchTextChanged);
+    // _barcodeController.removeListener(_onSearchTextChanged);
     _barcodeController.dispose();
+    _barcodeFocusNode.dispose();
     _fadeController.dispose();
     _slideController.dispose();
     super.dispose();
@@ -143,6 +145,9 @@ class _SalesScreenState extends State<SalesScreen>
   // Capture scanner keystrokes and commit to search
   void _onRawKey(RawKeyEvent event) {
     if (event is! RawKeyDownEvent) return;
+    
+    // If the text field has focus, let the system/TextField handle the input.
+    if (_barcodeFocusNode.hasFocus) return;
 
     // Commit as soon as scanner sends Enter/NumpadEnter
     if (event.logicalKey == LogicalKeyboardKey.enter ||
@@ -200,17 +205,28 @@ class _SalesScreenState extends State<SalesScreen>
 
       _barcodeController.clear();
       setState(() {});
+      _barcodeFocusNode.requestFocus();
+      return;
+    }
+
+    // Check strict availability
+    if (product.quantity <= 0) {
+      MotionSnackBarError(context, "الكمية نفذت من المخزن لهذا المنتج");
+      _barcodeController.clear();
+      setState(() {});
+      _barcodeFocusNode.requestFocus();
       return;
     }
 
     // Already in cart? increase qty; else add line
     final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
     if (idx != -1) {
-      if (_cartItems[idx]["qty"] == product.quantity) {
-        MotionSnackBarError(
-            context, "لقد وصلت إلى الحد الأقصى للكمية المتاحة من هذا المنتج");
+      final currentQty = _cartItems[idx]['qty'] as int;
+      if (currentQty >= product.quantity) {
+        MotionSnackBarWarning(
+            context, "لقد وصلت إلى الحد الأقصى للكمية المتاحة (${product.quantity})");
       } else {
-        _cartItems[idx]['qty'] = (_cartItems[idx]['qty'] as int) + 1;
+        _cartItems[idx]['qty'] = currentQty + 1;
       }
     } else {
       _cartItems.add({
@@ -227,6 +243,7 @@ class _SalesScreenState extends State<SalesScreen>
 
     _barcodeController.clear();
     setState(() {});
+    _barcodeFocusNode.requestFocus();
   }
 
   // Manual add uses the same path (pressing your existing Add button)
@@ -443,6 +460,8 @@ class _SalesScreenState extends State<SalesScreen>
         const SizedBox(height: 24),
         BarcodeScanCard(
           controller: _barcodeController,
+          focusNode: _barcodeFocusNode,
+          onSubmitted: (val) => _commitBarcode(val),
           onAddPressed: _onAddPressed,
         ),
         const SizedBox(height: 20),

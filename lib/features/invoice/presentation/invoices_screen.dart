@@ -93,7 +93,6 @@ class _InvoiceScreenState extends State<InvoiceScreen>
   }
 
   void _searchByBarcode(String barcode) {
-    if (barcode.isEmpty) return;
     context.read<InvoiceCubit>().setSearchQuery(barcode);
   }
 

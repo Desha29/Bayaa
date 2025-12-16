@@ -41,6 +41,7 @@ class StoreInfoDataSource {
       email: 'info@amrstore.com',
       address: "امام شارع الحجار - الخانكة - القليوبية",
       vat: '123456789',
+      logoPath: '',
     );
   }
 }

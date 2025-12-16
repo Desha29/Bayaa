@@ -18,6 +18,9 @@ import '../../features/sales/data/models/sale_model.dart';
 import '../../features/sales/data/repository/sales_repository_impl.dart';
 
 import '../../features/sales/presentation/cubit/sales_cubit.dart';
+import '../../features/settings/data/data_source/store_info_data_source.dart';
+import '../../features/settings/data/repository/settings_repository_imp.dart';
+import '../../features/settings/presentation/cubit/settings_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -45,4 +48,9 @@ void setup() {
 
   ));
 
+  getIt.registerSingleton<SettingsCubit>(SettingsCubit(
+      userCubit: getIt<UserCubit>(),
+      storeRepository: StoreInfoRepository(
+        dataSource: StoreInfoDataSource(),
+      )));
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:crazy_phone_pos/core/components/app_logo.dart';
 
 class Logo extends StatefulWidget {
   const Logo({
@@ -63,14 +64,10 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
                     backgroundColor: Colors.white,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(avatarRadius),
-                      child: Image.asset(
-                        'assets/images/logo.jpg',
+                      child: AppLogo(
+                        width: avatarRadius * 2,
+                        height: avatarRadius * 2,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.broken_image_outlined,
-                          size: 48,
-                          color: Colors.grey,
-                        ),
                       ),
                     ),
                   ),

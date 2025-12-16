@@ -3,6 +3,7 @@ import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:crazy_phone_pos/core/components/app_logo.dart';
 import 'dashboard_card.dart';
 
 class DashboardHome extends StatefulWidget {
@@ -124,15 +125,7 @@ class _DashboardHomeState extends State<DashboardHome>
                     backgroundColor: AppColors.surfaceColor,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(80),
-                      child: Image.asset(
-                        'assets/images/logo.jpg',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.broken_image_outlined,
-                          size: 48,
-                          color: AppColors.mutedColor,
-                        ),
-                      ),
+                      child: const AppLogo(width: 160, height: 160, fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -141,8 +134,8 @@ class _DashboardHomeState extends State<DashboardHome>
               Expanded(
                 child: GridView.count(
                   crossAxisCount: crossAxisCount,
-                  mainAxisSpacing: 4, // Reduced spacing
-                  crossAxisSpacing: 8, // Reduced spacing
+                  mainAxisSpacing: 4, 
+                  crossAxisSpacing: 8, 
                   childAspectRatio: aspectRatio,
                   children: List.generate(cards.length, (index) {
                     final card = cards[index];

@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:crazy_phone_pos/features/arp/presentation/cubit/arp_cubit.dart';
+
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
-import '../../../sales/presentation/cubit/sales_cubit.dart';
 
 class DashboardCard extends StatefulWidget {
   const DashboardCard({

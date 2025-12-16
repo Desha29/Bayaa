@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:crazy_phone_pos/core/components/app_logo.dart';
 import '../../../../core/components/section_card.dart';
 
 import '../../../../core/functions/messege.dart';
@@ -90,60 +92,57 @@ class StoreInfoCard extends StatelessWidget {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final isWide = constraints.maxWidth > 700;
-                    final infoList = [
-                      _StoreInfoRow(
-                        icon: LucideIcons.store,
-                        label: 'اسم المتجر',
-                        value: store!.name,
-                        theme: theme,
-                      ),
-                      _StoreInfoRow(
-                        icon: LucideIcons.mapPin,
-                        label: 'العنوان',
-                        value: store.address,
-                        theme: theme,
-                      ),
-                      _StoreInfoRow(
-                        icon: LucideIcons.phone,
-                        label: 'رقم الهاتف',
-                        value: store.phone,
-                        theme: theme,
-                      ),
-                      _StoreInfoRow(
-                        icon: LucideIcons.mail,
-                        label: 'البريد الإلكتروني',
-                        value: store.email,
-                        theme: theme,
-                      ),
-                      _StoreInfoRow(
-                        icon: LucideIcons.fileText,
-                        label: 'الرقم الضريبي',
-                        value: store.vat,
-                        theme: theme,
-                      ),
-                    ];
-
-                    if (isWide) {
-                      return Wrap(
-                        spacing: 16,
-                        runSpacing: 12,
-                        children: infoList.map((row) {
-                          return SizedBox(
-                            width: (constraints.maxWidth - 16) / 2,
-                            child: row,
-                          );
-                        }).toList(),
-                      );
-                    } else {
-                      return Column(
-                        children: infoList
-                            .map((row) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: row,
-                                ))
-                            .toList(),
-                      );
-                    }
+                    return Column(
+                      children: [
+                        Center(
+                          child: Stack(
+                            alignment: Alignment.bottomRight,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: const AppLogo(width: 100, height: 100, fit: BoxFit.cover),
+                              ),
+                              if (cubit.isAdmin())
+                                GestureDetector(
+                                  onTap: () => _pickImage(context, store!),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: const Icon(LucideIcons.camera, size: 16, color: Colors.white),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        if (isWide)
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 12,
+                            children: [
+                              _StoreInfoRow(icon: LucideIcons.store, label: 'اسم المتجر', value: store!.name, theme: theme),
+                              _StoreInfoRow(icon: LucideIcons.mapPin, label: 'العنوان', value: store.address, theme: theme),
+                              _StoreInfoRow(icon: LucideIcons.phone, label: 'رقم الهاتف', value: store.phone, theme: theme),
+                              _StoreInfoRow(icon: LucideIcons.mail, label: 'البريد الإلكتروني', value: store.email, theme: theme),
+                              _StoreInfoRow(icon: LucideIcons.fileText, label: 'الرقم الضريبي', value: store.vat, theme: theme),
+                            ].map((row) => SizedBox(width: (constraints.maxWidth - 16) / 2, child: row)).toList(),
+                          )
+                        else
+                          Column(
+                            children: [
+                              _StoreInfoRow(icon: LucideIcons.store, label: 'اسم المتجر', value: store!.name, theme: theme),
+                              _StoreInfoRow(icon: LucideIcons.mapPin, label: 'العنوان', value: store.address, theme: theme),
+                              _StoreInfoRow(icon: LucideIcons.phone, label: 'رقم الهاتف', value: store.phone, theme: theme),
+                              _StoreInfoRow(icon: LucideIcons.mail, label: 'البريد الإلكتروني', value: store.email, theme: theme),
+                              _StoreInfoRow(icon: LucideIcons.fileText, label: 'الرقم الضريبي', value: store.vat, theme: theme),
+                            ].map((row) => Padding(padding: const EdgeInsets.only(bottom: 12), child: row)).toList(),
+                          ),
+                      ],
+                    );
                   },
                 )
               else
@@ -168,6 +167,29 @@ class StoreInfoCard extends StatelessWidget {
 
     if (result != null && context.mounted) {
       SettingsCubit.get(context).updateStoreInfo(result);
+    }
+  }
+
+  void _pickImage(BuildContext context, StoreInfo currentInfo) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+      );
+
+      if (result != null && result.files.single.path != null) {
+        final newPath = result.files.single.path!;
+        
+        final updatedMap = currentInfo.toMap();
+        updatedMap['logoPath'] = newPath;
+        
+        if (context.mounted) {
+          SettingsCubit.get(context).updateStoreInfo(updatedMap);
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        MotionSnackBarError(context, "حدث خطأ أثناء اختيار الصورة");
+      }
     }
   }
 }

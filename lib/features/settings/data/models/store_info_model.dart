@@ -7,6 +7,7 @@ class StoreInfo {
   String phone;
   String email;
   String vat;
+  String? logoPath;
 
   StoreInfo({
     required this.name,
@@ -14,6 +15,7 @@ class StoreInfo {
     required this.phone,
     required this.email,
     required this.vat,
+    this.logoPath,
   });
 
   Map<String, String> toMap() {
@@ -23,6 +25,7 @@ class StoreInfo {
       'phone': phone,
       'email': email,
       'vat': vat,
+      'logoPath': logoPath ?? '',
     };
   }
 
@@ -33,6 +36,7 @@ class StoreInfo {
       phone: map['phone']?.toString() ?? '',
       email: map['email']?.toString() ?? '',
       vat: map['vat']?.toString() ?? '',
+      logoPath: map['logoPath']?.toString(),
     );
   }
 }
@@ -50,6 +54,7 @@ class StoreInfoAdapter extends TypeAdapter<StoreInfo> {
       phone: reader.readString(),
       email: reader.readString(),
       vat: reader.readString(),
+      logoPath: reader.readString(),  // Added logoPath read
     );
   }
 
@@ -60,5 +65,6 @@ class StoreInfoAdapter extends TypeAdapter<StoreInfo> {
     writer.writeString(obj.phone);
     writer.writeString(obj.email);
     writer.writeString(obj.vat);
+    writer.writeString(obj.logoPath ?? ''); // Added logoPath write
   }
 }
