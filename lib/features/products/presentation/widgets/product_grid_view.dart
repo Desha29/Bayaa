@@ -60,7 +60,7 @@ class ProductsGridView extends StatelessWidget {
   }
 
   double _getChildAspectRatio(BuildContext context) {
-    if (ResponsiveHelper.isDesktop(context)) return 1;
+    if (ResponsiveHelper.isDesktop(context)) return 0.8;
     if (ResponsiveHelper.isTablet(context)) return 0.85;
     return 0.75;
   }

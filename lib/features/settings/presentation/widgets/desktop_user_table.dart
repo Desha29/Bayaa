@@ -10,6 +10,8 @@ import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
 import 'add_edit_user_dialog.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class DesktopUserTable extends StatelessWidget {
   const DesktopUserTable({
     super.key,
@@ -32,9 +34,9 @@ class DesktopUserTable extends StatelessWidget {
         minWidth: 900,
         headingRowHeight: 48,
         dataRowHeight: 64,
-        headingRowColor: WidgetStateProperty.all(Colors.grey[100]),
+        headingRowColor: WidgetStateProperty.all(AppColors.primaryColor),
         headingTextStyle: theme.textTheme.labelLarge?.copyWith(
-          color: Colors.grey[700],
+          color: Colors.white,
           fontWeight: FontWeight.w700,
         ),
         dataRowColor: WidgetStateProperty.resolveWith(
@@ -46,7 +48,7 @@ class DesktopUserTable extends StatelessWidget {
           },
         ),
         border: TableBorder(
-          horizontalInside: BorderSide(color: Colors.grey[200]!, width: 1),
+          horizontalInside: BorderSide(color: AppColors.mutedColor!, width: 1),
         ),
         columns: const [
           DataColumn2(label: Center(child: Text('الاسم')), size: ColumnSize.L),
@@ -171,7 +173,7 @@ class DesktopUserTable extends StatelessWidget {
                           LucideIcons.edit,
                           size: 18,
                           color:  getIt<UserCubit>().currentUser.userType ==
-                                UserType.cashier ? Colors.grey : theme.colorScheme.primary,
+                                UserType.cashier ? AppColors.mutedColor : theme.colorScheme.primary,
                         ),
                         tooltip: 'تعديل',
                         padding: const EdgeInsets.all(6),
@@ -191,7 +193,7 @@ class DesktopUserTable extends StatelessWidget {
                           color:
                               getIt<UserCubit>().currentUser.userType ==
                                       UserType.cashier
-                                  ? Colors.grey
+                                  ? AppColors.mutedColor
                                   :
                            Color(0xFFDC2626),
                         ),
@@ -241,7 +243,7 @@ void _showDeleteDialog(BuildContext context, User user) {
             }
           },
           style: TextButton.styleFrom(
-            foregroundColor: Colors.red,
+            foregroundColor: AppColors.errorColor,
           ),
           child: const Text('حذف'),
         ),

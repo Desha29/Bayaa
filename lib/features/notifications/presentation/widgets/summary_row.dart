@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class SummaryRow extends StatelessWidget {
   const SummaryRow({
     super.key,
@@ -28,24 +30,24 @@ class SummaryRow extends StatelessWidget {
             label: 'مقروءة',
             value: opened,
             icon: LucideIcons.eye,
-            bg: Colors.green.shade50,
-            fg: Colors.green.shade700,
+            bg: AppColors.successColor.withOpacity(0.1),
+            fg: AppColors.successColor,
             isMobile: isMobile,
           ),
           SummaryCard(
             label: 'عاجلة',
             value: urgent,
             icon: LucideIcons.alertTriangle,
-            bg: Colors.red.shade50,
-            fg: Colors.red.shade700,
+            bg: AppColors.errorColor.withOpacity(0.1),
+            fg: AppColors.errorColor,
             isMobile: isMobile,
           ),
           SummaryCard(
             label: 'غير مقروءة',
             value: unread,
             icon: LucideIcons.eyeOff,
-            bg: Colors.amber.shade50,
-            fg: Colors.amber.shade800,
+            bg: AppColors.warningColor.withOpacity(0.1),
+            fg: AppColors.warningColor,
             isMobile: isMobile,
           ),
         ];

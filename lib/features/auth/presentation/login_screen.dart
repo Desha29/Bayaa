@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/core/functions/messege.dart';
 
@@ -58,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             },
             child: Scaffold(
-              backgroundColor: const Color(0xFFF8FAFC),
+              backgroundColor: AppColors.backgroundColor,
               body: LayoutBuilder(
                 builder: (context, c2) {
                   final isShort = c2.maxHeight < 680;
@@ -131,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               .textTheme
                                               .bodyMedium
                                               ?.copyWith(
-                                                color: Colors.grey[600],
+                                                color: AppColors.mutedColor,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                           textAlign: TextAlign.center,
@@ -218,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               .textTheme
                                               .bodySmall
                                               ?.copyWith(
-                                                  color: Colors.grey[600]),
+                                                  color: AppColors.mutedColor),
                                           textAlign: TextAlign.center,
                                         ),
                                       ),

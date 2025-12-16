@@ -5,6 +5,17 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../data/models/dialy_report_model.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
+// PDF Color helpers based on AppColors
+class PdfAppColors {
+  static const mutedColor = PdfColors.grey600;
+  static const mutedColor200 = PdfColor.fromInt(0xFFE5E7EB);
+  static const mutedColor600 = PdfColors.grey600;
+  static const mutedColor700 = PdfColors.grey700;
+  static const mutedColor800 = PdfColors.grey800;
+}
+
 class DailyReportPdfService {
   static Future<Uint8List> generateDailyReportPDF(
     DailyReportModel report, {
@@ -22,7 +33,7 @@ class DailyReportPdfService {
     final arabicBoldFont = pw.Font.ttf(arabicBoldFontData);
 
     // تحميل اللوجو
-    final logoData = await rootBundle.load('assets/images/logo1.png');
+    final logoData = await rootBundle.load('assets/images/logo.jpg');
     final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
 
     // إعداد الصفحة (A4 عمودي أو أفقي)
@@ -79,7 +90,7 @@ class DailyReportPdfService {
               style: pw.TextStyle(
                 font: boldFont,
                 fontSize: 13,
-                color: PdfColors.grey700,
+                color: PdfAppColors.mutedColor700,
               ),
             ),
           ],
@@ -89,7 +100,7 @@ class DailyReportPdfService {
           height: 70,
           decoration: pw.BoxDecoration(
             shape: pw.BoxShape.circle,
-            border: pw.Border.all(color: PdfColors.grey600, width: 1),
+            border: pw.Border.all(color: PdfAppColors.mutedColor600, width: 1),
           ),
           child: pw.ClipOval(child: pw.Image(logo)),
         ),
@@ -102,7 +113,7 @@ class DailyReportPdfService {
     return pw.Container(
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.grey600, width: 0.8),
+        border: pw.Border.all(color: PdfAppColors.mutedColor600, width: 0.8),
         borderRadius: pw.BorderRadius.circular(10),
       ),
       child: pw.Row(
@@ -126,7 +137,7 @@ class DailyReportPdfService {
           style: pw.TextStyle(
             font: boldFont,
             fontSize: 12,
-            color: PdfColors.grey800,
+            color: PdfAppColors.mutedColor800,
             fontWeight: pw.FontWeight.bold,
           ),
         ),
@@ -186,7 +197,7 @@ class DailyReportPdfService {
       width: 160,
       padding: const pw.EdgeInsets.all(12),
       decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.grey700, width: 0.8),
+        border: pw.Border.all(color: PdfAppColors.mutedColor700, width: 0.8),
         borderRadius: pw.BorderRadius.circular(8),
         color: PdfColors.white,
       ),
@@ -198,7 +209,7 @@ class DailyReportPdfService {
             style: pw.TextStyle(
               font: boldFont,
               fontSize: 12,
-              color: PdfColors.grey800,
+              color: PdfAppColors.mutedColor800,
               fontWeight: pw.FontWeight.bold,
             ),
           ),
@@ -260,7 +271,8 @@ class DailyReportPdfService {
           ),
         ),
         pw.SizedBox(height: 10),
-        pw.Table.fromTextArray(
+        // Using TableHelper instead of deprecated Table.fromTextArray
+        pw.TableHelper.fromTextArray(
           headers: headers,
           data: data,
           headerStyle: pw.TextStyle(
@@ -268,14 +280,14 @@ class DailyReportPdfService {
             fontWeight: pw.FontWeight.bold,
             color: PdfColors.black,
           ),
-          headerDecoration: const pw.BoxDecoration(color: PdfColors.grey200),
+          headerDecoration: const pw.BoxDecoration(color: PdfAppColors.mutedColor200),
           cellStyle: pw.TextStyle(
             font: boldFont,
             fontSize: 11,
             color: PdfColors.black,
             fontWeight: pw.FontWeight.bold,
           ),
-          border: pw.TableBorder.all(color: PdfColors.grey700, width: 0.5),
+          border: pw.TableBorder.all(color: PdfAppColors.mutedColor700, width: 0.5),
           cellAlignment: pw.Alignment.center,
           headerAlignment: pw.Alignment.center,
           cellHeight: 26,
@@ -290,17 +302,17 @@ class DailyReportPdfService {
       alignment: pw.Alignment.center,
       padding: const pw.EdgeInsets.all(10),
       decoration: pw.BoxDecoration(
-        border: pw.Border(top: pw.BorderSide(color: PdfColors.grey600, width: 0.5)),
+        border: pw.Border(top: pw.BorderSide(color: PdfAppColors.mutedColor600, width: 0.5)),
       ),
       child: pw.Column(children: [
         pw.Text(
           'تم إنشاء التقرير في: ${_formatDateTime(DateTime.now())}',
-          style: pw.TextStyle(font: font, fontSize: 10, color: PdfColors.grey700),
+          style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
         pw.SizedBox(height: 3),
         pw.Text(
           '© 2025 Crazy Phone POS - جميع الحقوق محفوظة',
-          style: pw.TextStyle(font: font, fontSize: 10, color: PdfColors.grey700),
+          style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
       ]),
     );

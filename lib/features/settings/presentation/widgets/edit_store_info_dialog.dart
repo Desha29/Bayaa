@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class EditStoreInfoDialog extends StatefulWidget {
   final Map<String, String> storeInfo;
 
@@ -252,7 +254,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.mutedColor.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

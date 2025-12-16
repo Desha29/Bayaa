@@ -11,6 +11,8 @@ import '../widgets/arp_summary_cards.dart';
 import '../widgets/arp_chart_section.dart';
 import '../widgets/arp_top_products.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class ArpScreen extends StatefulWidget {
   const ArpScreen({super.key});
 
@@ -85,7 +87,7 @@ class _ArpScreenState extends State<ArpScreen> {
                                         _getDateRangeText(),
                                         style: const TextStyle(
                                           fontSize: 14,
-                                          color: Colors.grey,
+                                          color: AppColors.mutedColor,
                                         ),
                                       ),
                                     ],
@@ -137,7 +139,7 @@ class _ArpScreenState extends State<ArpScreen> {
                               SizedBox(height: 16),
                               Text(
                                 'جاري تحميل البيانات...',
-                                style: TextStyle(fontSize: 16, color: Colors.grey),
+                                style: TextStyle(fontSize: 16, color: AppColors.mutedColor),
                               ),
                             ],
                           ),
@@ -149,11 +151,11 @@ class _ArpScreenState extends State<ArpScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+                              Icon(Icons.error_outline, size: 64, color: AppColors.errorColor.withOpacity(0.4)),
                               const SizedBox(height: 16),
                               Text(
                                 state.message,
-                                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                                style: const TextStyle(fontSize: 16, color: AppColors.mutedColor),
                               ),
                               const SizedBox(height: 24),
                               ElevatedButton.icon(
@@ -186,7 +188,7 @@ class _ArpScreenState extends State<ArpScreen> {
                         child: Center(
                           child: Text(
                             'لا توجد بيانات للعرض',
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                            style: TextStyle(fontSize: 16, color: AppColors.mutedColor),
                           ),
                         ),
                       ),

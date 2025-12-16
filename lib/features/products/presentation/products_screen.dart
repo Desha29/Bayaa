@@ -14,6 +14,8 @@ import 'widgets/enhanced_add_edit_dialog.dart';
 import 'widgets/product_filter_section.dart';
 import 'widgets/product_grid_view.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
 
@@ -317,12 +319,12 @@ Future<Map<String, String>?> showCategoryActionDialog({
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade100,
+                    color: AppColors.warningColor.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     LucideIcons.alertTriangle,
-                    color: Colors.orange.shade700,
+                    color: AppColors.warningColor,
                     size: 28,
                   ),
                 ),
@@ -361,7 +363,7 @@ Future<Map<String, String>?> showCategoryActionDialog({
                     child: Text(
                       errorText!,
                       style: const TextStyle(
-                        color: Colors.red,
+                        color: AppColors.errorColor,
                         fontSize: 14,
                       ),
                     ),
@@ -407,7 +409,7 @@ Future<Map<String, String>?> showCategoryActionDialog({
                 icon: const Icon(LucideIcons.arrowRightLeft),
                 label: const Text('نقل المنتجات'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange.shade700,
+                  backgroundColor: AppColors.warningColor,
                   foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -437,7 +439,7 @@ Future<Map<String, String>?> showCategoryActionDialog({
                 icon: const Icon(LucideIcons.trash2),
                 label: const Text('حذف نهائي'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade700,
+                  backgroundColor: AppColors.errorColor,
                   foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 14),

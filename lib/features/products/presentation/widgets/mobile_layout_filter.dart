@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'add_button.dart';
 import 'dropdown_filter.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class MobileLayout extends StatelessWidget {
   const MobileLayout({
     super.key,
@@ -36,10 +38,10 @@ class MobileLayout extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: AppColors.mutedColor.withOpacity(0.4)),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: AppColors.mutedColor.withOpacity(0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -50,7 +52,7 @@ class MobileLayout extends StatelessWidget {
             onChanged: (_) => onSearchChanged(),
             decoration: InputDecoration(
               hintText: 'ابحث عن منتج...',
-              hintStyle: TextStyle(color: Colors.grey[500]),
+              hintStyle: TextStyle(color: AppColors.mutedColor),
               prefixIcon: const Icon(
                 Icons.search,
                 color: Color(0xff0fa2a9),

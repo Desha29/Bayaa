@@ -50,7 +50,7 @@ class InvoicePdfService {
         print('❌ Error loading logo from ${data.logoAsset}: $e');
         // Try default path
         try {
-          final bytes = await rootBundle.load('assets/images/logo1.png');
+          final bytes = await rootBundle.load('assets/images/logo.jpg');
           _cachedLogo = pw.MemoryImage(bytes.buffer.asUint8List());
           return _cachedLogo;
         } catch (e2) {

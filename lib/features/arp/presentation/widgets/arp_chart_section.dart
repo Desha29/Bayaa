@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/constants/app_colors.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class ArpChartSection extends StatelessWidget {
   final Map<String, double> dailySales;
 
@@ -67,7 +69,7 @@ class ArpChartSection extends StatelessWidget {
                     ? const Center(
                         child: Text(
                           'لا توجد بيانات للعرض',
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(color: AppColors.mutedColor),
                         ),
                       )
                     : LineChart(
@@ -78,7 +80,7 @@ class ArpChartSection extends StatelessWidget {
                             horizontalInterval: 1,
                             getDrawingHorizontalLine: (value) {
                               return FlLine(
-                                color: Colors.grey.shade200,
+                                color: AppColors.mutedColor.withOpacity(0.3),
                                 strokeWidth: 1,
                               );
                             },
@@ -104,7 +106,7 @@ class ArpChartSection extends StatelessWidget {
                                       child: Text(
                                         date.split('-').last,
                                         style: const TextStyle(
-                                          color: Colors.grey,
+                                          color: AppColors.mutedColor,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -122,7 +124,7 @@ class ArpChartSection extends StatelessWidget {
                                   return Text(
                                     '${value.toInt()}',
                                     style: const TextStyle(
-                                      color: Colors.grey,
+                                      color: AppColors.mutedColor,
                                       fontSize: 12,
                                     ),
                                   );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class PriorityChip extends StatelessWidget {
   final String priority;
 
@@ -11,20 +13,20 @@ class PriorityChip extends StatelessWidget {
     Color textColor;
     switch (priority) {
       case "عاجل جداً":
-        bg = Colors.red.shade100;
-        textColor = Colors.red.shade800;
+        bg = AppColors.errorColor.withOpacity(0.15);
+        textColor = AppColors.errorColor;
         break;
       case "عاجل":
-        bg = Colors.orange.shade100;
-        textColor = Colors.orange.shade800;
+        bg = AppColors.warningColor.withOpacity(0.15);
+        textColor = AppColors.warningColor;
         break;
       case "متوسط":
-        bg = Colors.blue.shade100;
-        textColor = Colors.blue.shade800;
+        bg = AppColors.primaryColor.withOpacity(0.15);
+        textColor = AppColors.primaryColor;
         break;
       default:
-        bg = Colors.green.shade100;
-        textColor = Colors.green.shade800;
+        bg = AppColors.successColor.withOpacity(0.15);
+        textColor = AppColors.successColor;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

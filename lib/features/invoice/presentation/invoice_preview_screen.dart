@@ -39,7 +39,7 @@ class InvoicePreviewScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl, // Default RTL for Arabic
       child: Scaffold(
-        backgroundColor: Colors.grey.shade100,
+        backgroundColor: AppColors.mutedColor.withOpacity(0.15),
         appBar: AppBar(
           centerTitle: true,
           title: Text(
@@ -105,7 +105,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                       dpi: isDesktop ? 200 : 150,
                       useActions: false,
                       scrollViewDecoration: BoxDecoration(
-                        color: Colors.grey.shade50,
+                        color: AppColors.mutedColor.withOpacity(0.1),
                       ),
                       previewPageMargin: EdgeInsets.all(
                         isMobile ? 4 : isTablet ? 8 : 12,

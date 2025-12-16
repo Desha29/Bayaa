@@ -6,6 +6,8 @@ import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class AddEditUserDialog extends StatefulWidget {
   final User? userToEdit;
 
@@ -210,7 +212,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.mutedColor.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -241,7 +243,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.mutedColor.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -256,7 +258,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
           suffixIcon: IconButton(
             icon: Icon(
               _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-              color: Colors.grey[600],
+              color: AppColors.mutedColor,
             ),
             onPressed: () {
               setState(() {
@@ -282,7 +284,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.mutedColor.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

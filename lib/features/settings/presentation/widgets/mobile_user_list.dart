@@ -32,7 +32,7 @@
 //           elevation: 0,
 //           shape: RoundedRectangleBorder(
 //             borderRadius: BorderRadius.circular(8),
-//             side: BorderSide(color: Colors.grey.shade300),
+//             side: BorderSide(color: AppColors.mutedColor.withOpacity(0.4)),
 //           ),
 //           child: Padding(
 //             padding: const EdgeInsets.all(12),
@@ -56,7 +56,7 @@
 //                 Text(
 //                   user.email,
 //                   style: theme.textTheme.bodySmall?.copyWith(
-//                     color: Colors.grey[600],
+//                     color: AppColors.mutedColor,
 //                   ),
 //                 ),
 //                 const SizedBox(height: 8),
@@ -72,7 +72,7 @@
 //                       child: Text(
 //                         'آخر دخول: ${user.lastLogin}',
 //                         style: theme.textTheme.bodySmall?.copyWith(
-//                           color: Colors.grey[600],
+//                           color: AppColors.mutedColor,
 //                         ),
 //                       ),
 //                     ),
@@ -187,7 +187,7 @@
 //               width: 40,
 //               height: 4,
 //               decoration: BoxDecoration(
-//                 color: Colors.grey[300],
+//                 color: AppColors.mutedColor[300],
 //                 borderRadius: BorderRadius.circular(2),
 //               ),
 //             ),
@@ -206,7 +206,7 @@
 //                   Text(
 //                     user.username,
 //                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-//                           color: Colors.grey[600],
+//                           color: AppColors.mutedColor,
 //                         ),
 //                   ),
 //                 ],
@@ -304,7 +304,7 @@
 //         Text(
 //           label,
 //           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-//                 color: Colors.grey[600],
+//                 color: AppColors.mutedColor,
 //                 fontWeight: FontWeight.w500,
 //               ),
 //         ),

@@ -8,6 +8,8 @@ import '../../../products/data/models/product_model.dart';
 import 'priorty_chip.dart';
 import 'status_chip.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 /// ---------------- Product Model ----------------
 
 
@@ -56,12 +58,12 @@ class _ProductCardState extends State<ProductCard> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: _isHovered
-                    ? Colors.blueAccent.withOpacity(0.5)
+                    ? AppColors.primaryColor.withOpacity(0.5)
                     : isOut
-                        ? Colors.red.withOpacity(0.3)
+                        ? AppColors.errorColor.withOpacity(0.3)
                         : isLow
-                            ? Colors.orange.withOpacity(0.3)
-                            : Colors.grey.withOpacity(0.2),
+                            ? AppColors.warningColor.withOpacity(0.3)
+                            : AppColors.mutedColor.withOpacity(0.2),
                 width: 2,
               ),
               boxShadow: [
@@ -120,7 +122,7 @@ class _ProductCardState extends State<ProductCard> {
                                     tablet: 13,
                                     desktop: 13,
                                   ),
-                                  color: Colors.grey[600],
+                                  color: AppColors.mutedColor,
                                 ),
                               ),
                             ),
@@ -140,7 +142,7 @@ class _ProductCardState extends State<ProductCard> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
+                        color: AppColors.mutedColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(

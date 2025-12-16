@@ -5,6 +5,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
 import '../cubit/product_cubit.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class DropDownFilter extends StatefulWidget {
   const DropDownFilter({
     super.key,
@@ -45,7 +47,7 @@ class _DropDownFilterState extends State<DropDownFilter> {
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.mutedColor.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -81,7 +83,7 @@ class _DropDownFilterState extends State<DropDownFilter> {
                               },
                               icon: Icon(
                                 widget.iconRemove,
-                                color: Colors.red,
+                                color: AppColors.errorColor,
                               ),
                             )
                           : SizedBox()
@@ -114,12 +116,12 @@ class _DropDownFilterState extends State<DropDownFilter> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.shade100,
+                color: AppColors.errorColor.withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 LucideIcons.trash2, // أيقونة الحذف
-                color: Colors.red.shade700,
+                color: AppColors.errorColor,
                 size: 28,
               ),
             ),
@@ -168,7 +170,7 @@ class _DropDownFilterState extends State<DropDownFilter> {
             icon: const Icon(LucideIcons.trash2),
             label: const Text('حذف'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade700,
+              backgroundColor: AppColors.errorColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               textStyle:

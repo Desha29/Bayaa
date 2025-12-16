@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../sales/data/models/sale_model.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class InvoiceCard extends StatelessWidget {
   final Sale sale;
   final VoidCallback onOpen;
@@ -32,7 +34,7 @@ class InvoiceCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -79,14 +81,14 @@ class InvoiceCard extends StatelessWidget {
                           Icon(
                             Icons.person_outline,
                             size: 14,
-                            color: Colors.grey.shade600,
+                            color: AppColors.mutedColor,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             cashierName,
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey.shade600,
+                              color: AppColors.mutedColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -94,14 +96,14 @@ class InvoiceCard extends StatelessWidget {
                             ' • ',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey.shade600,
+                              color: AppColors.mutedColor,
                             ),
                           ),
                           Text(
                             '${sale.items} صنف',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey.shade600,
+                              color: AppColors.mutedColor,
                             ),
                           ),
                         ],
@@ -111,7 +113,7 @@ class InvoiceCard extends StatelessWidget {
                         df.format(sale.date),
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade500,
+                          color: AppColors.mutedColor.withOpacity(0.1),
                         ),
                       ),
                     ],
@@ -148,11 +150,11 @@ class InvoiceCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.1),
+                              color: AppColors.errorColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                              icon: const Icon(Icons.delete, color: AppColors.errorColor, size: 20),
                               tooltip: 'حذف الفاتورة',
                               onPressed: onDelete,
                             ),

@@ -4,6 +4,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
 import 'package:crazy_phone_pos/core/utils/hive_helper.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class LogoutWarningBanner extends StatelessWidget {
   const LogoutWarningBanner({
     super.key,
@@ -21,7 +23,7 @@ class LogoutWarningBanner extends StatelessWidget {
       color: const Color(0xFFFEF2F2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.red.shade200),
+        side: BorderSide(color: AppColors.errorColor.withOpacity(0.3)),
       ),
       child: Padding(
         padding: EdgeInsets.all(isMobile ? 12 : 16),
@@ -33,7 +35,7 @@ class LogoutWarningBanner extends StatelessWidget {
               children: [
                 Icon(
                   LucideIcons.alertOctagon,
-                  color: Colors.red.shade700,
+                  color: AppColors.errorColor,
                   size: isMobile ? 20 : 24,
                 ),
                 const SizedBox(width: 12),
@@ -41,7 +43,7 @@ class LogoutWarningBanner extends StatelessWidget {
                   child: Text(
                     'سيتم إنهاء جلسة العمل الحالية والعودة إلى شاشة تسجيل الدخول',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.red.shade700,
+                      color: AppColors.errorColor,
                       fontSize: isMobile ? 13 : null,
                     ),
                   ),
@@ -56,7 +58,7 @@ class LogoutWarningBanner extends StatelessWidget {
                   icon: const Icon(LucideIcons.logOut, size: 18),
                   label: Text(isMobile ? 'خروج' : 'تسجيل الخروج'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.red.shade700,
+                    backgroundColor: AppColors.errorColor,
                     padding: EdgeInsets.symmetric(
                       horizontal: isMobile ? 12 : 16,
                       vertical: 12,

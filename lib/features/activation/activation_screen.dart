@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class ActivationScreen extends StatelessWidget {
   const ActivationScreen({super.key});
 
@@ -57,11 +59,11 @@ class ActivationScreen extends StatelessWidget {
                   // Logo (نفس فكرة صفحة الوجن)
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: Colors.blueAccent.withOpacity(0.1),
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
                     child: Icon(
                       LucideIcons.lock,
                       size: 50,
-                      color: Colors.blueAccent,
+                      color: AppColors.primaryColor,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -108,7 +110,7 @@ class ActivationScreen extends StatelessWidget {
                                 .textTheme
                                 .bodyMedium
                                 ?.copyWith(
-                                  color: Colors.grey[600],
+                                  color: AppColors.mutedColor,
                                   fontWeight: FontWeight.w500,
                                 ),
                             textAlign: TextAlign.center,
@@ -120,7 +122,7 @@ class ActivationScreen extends StatelessWidget {
                           icon: const Icon(LucideIcons.phone),
                           label: const Text("اتصل بي"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
+                            backgroundColor: AppColors.primaryColor,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -139,7 +141,7 @@ class ActivationScreen extends StatelessWidget {
                           icon: const Icon(LucideIcons.mail),
                           label: const Text("راسلني عبر البريد"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
+                            backgroundColor: AppColors.successColor,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -152,7 +154,7 @@ class ActivationScreen extends StatelessWidget {
                           icon: const Icon(LucideIcons.messageCircle),
                           label: const Text("تواصل عبر واتساب"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
+                            backgroundColor: AppColors.accentGold,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -170,7 +172,7 @@ class ActivationScreen extends StatelessWidget {
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
-                        ?.copyWith(color: Colors.grey[600]),
+                        ?.copyWith(color: AppColors.mutedColor),
                     textAlign: TextAlign.center,
                   ),
                 ],

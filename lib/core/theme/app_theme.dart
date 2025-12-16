@@ -9,10 +9,10 @@ class AppTheme {
       colorScheme: const ColorScheme.light(
         primary: AppColors.primaryColor,
         onPrimary: AppColors.primaryForeground,
-        secondary: AppColors.secondaryColor,
+        secondary: AppColors.accentGold,
         onSecondary: Colors.white,
         surface: AppColors.surfaceColor,
-        onSurface: Color(0xFF4B5563),
+        onSurface: AppColors.textPrimary,
         error: AppColors.errorColor,
         onError: Colors.white,
       ),
@@ -21,62 +21,62 @@ class AppTheme {
         displayLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
         displayMedium: TextStyle(
           fontSize: 28,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
         displaySmall: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
         headlineLarge: TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
         headlineMedium: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
         headlineSmall: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
         titleLarge: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
         titleMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF4B5563),
+          color: AppColors.textSecondary,
         ),
         titleSmall: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF4B5563),
+          color: AppColors.textSecondary,
         ),
         bodyLarge: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.normal,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
         bodyMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.normal,
-          color: Color(0xFF4B5563),
+          color: AppColors.textSecondary,
         ),
         bodySmall: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.normal,
-          color: Color(0xFF6B7280),
+          color: AppColors.mutedColor,
         ),
       ),
       cardTheme: CardThemeData(
@@ -96,7 +96,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryColor,
-          side: const BorderSide(color: AppColors.borderColor),
+          side: const BorderSide(color: AppColors.primaryColor),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
@@ -134,13 +134,13 @@ class AppTheme {
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.backgroundColor,
-        foregroundColor: Color(0xFF4B5563),
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF4B5563),
+          color: AppColors.textPrimary,
         ),
       ),
     );

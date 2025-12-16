@@ -13,6 +13,8 @@ import 'mobile_user_list.dart';
 import 'desktop_user_table.dart';
 import 'add_edit_user_dialog.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class UsersManagementCard extends StatelessWidget {
   const UsersManagementCard({
     super.key,
@@ -51,7 +53,7 @@ class UsersManagementCard extends StatelessWidget {
                   Icon(
                     LucideIcons.users,
                     size: 18,
-                    color: Colors.grey[700],
+                    color: AppColors.mutedColor,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -90,13 +92,13 @@ class UsersManagementCard extends StatelessWidget {
                         Icon(
                           LucideIcons.users,
                           size: 48,
-                          color: Colors.grey[400],
+                          color: AppColors.mutedColor,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'لا يوجد مستخدمين',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
+                            color: AppColors.mutedColor,
                           ),
                         ),
                       ],

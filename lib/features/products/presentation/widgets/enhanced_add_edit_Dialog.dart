@@ -5,6 +5,8 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../cubit/product_cubit.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class EnhancedAddEditProductDialog extends StatefulWidget {
   final List<String> categories;
   final Product? productToEdit;
@@ -269,7 +271,7 @@ class _EnhancedAddEditProductDialogState
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.mutedColor.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

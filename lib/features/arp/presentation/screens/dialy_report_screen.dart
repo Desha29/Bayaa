@@ -13,6 +13,8 @@ import '../../domain/daily_report_pdf_service.dart';
 import 'daily_report_preview_screen.dart';
 import '../../../../core/components/message_overlay.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class DailyReportScreen extends StatefulWidget {
   const DailyReportScreen({Key? key}) : super(key: key);
 
@@ -186,7 +188,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                 title: 'تقرير المبيعات اليومية',
                 icon: Icons.analytics,
                 subtitle: 'عرض وطباعة تقارير المبيعات اليومية',
-                subtitleColor: Colors.grey.shade600,
+                subtitleColor: AppColors.mutedColor,
                 iconColor: AppColors.primaryColor,
               ),
             ),
@@ -228,13 +230,13 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.analytics_outlined,
-                                      size: 80, color: Colors.grey.shade300),
+                                      size: 80, color: AppColors.mutedColor.withOpacity(0.4)),
                                   const SizedBox(height: 16),
                                   Text(
                                     'لا توجد بيانات متاحة لهذا التاريخ',
                                     style: TextStyle(
                                         fontSize: 18,
-                                        color: Colors.grey.shade600,
+                                        color: AppColors.mutedColor,
                                         fontWeight: FontWeight.w600),
                                   ),
                                 ],
@@ -287,7 +289,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(color: AppColors.mutedColor.withOpacity(0.4)),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -301,7 +303,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                       children: [
                         Text('التاريخ المحدد',
                             style: TextStyle(
-                                fontSize: 12, color: Colors.grey.shade600)),
+                                fontSize: 12, color: AppColors.mutedColor)),
                         const SizedBox(height: 4),
                         Text(DateFormat('yyyy-MM-dd').format(selectedDate),
                             style: const TextStyle(
@@ -371,7 +373,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               'إجمالي الإيرادات',
               '${report!.totalRevenue.toStringAsFixed(2)} ج.م',
               Icons.attach_money,
-              Colors.green),
+              AppColors.successColor),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -379,7 +381,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               'إجمالي التكاليف',
               '${report!.totalCost.toStringAsFixed(2)} ج.م',
               Icons.money_off,
-              Colors.red),
+              AppColors.errorColor),
         ),
       ],
     );
@@ -416,7 +418,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                   child: Text(title,
                       style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade600,
+                          color: AppColors.mutedColor,
                           fontWeight: FontWeight.w600))),
             ],
           ),
@@ -455,7 +457,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                 icon: const Icon(Icons.print, size: 20),
                 label: const Text('طباعة مباشرة'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColors.successColor,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -473,8 +475,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             icon: const Icon(Icons.share, size: 20),
             label: const Text('مشاركة PDF'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey.shade100,
-              foregroundColor: Colors.grey.shade700,
+              backgroundColor: AppColors.mutedColor.withOpacity(0.15),
+              foregroundColor: AppColors.mutedColor,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -489,7 +491,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     if (report?.topProducts.isEmpty ?? true) {
       return Center(
           child: Text('لا توجد منتجات مباعة لهذا التاريخ',
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 16)));
+              style: TextStyle(color: AppColors.mutedColor.withOpacity(0.1), fontSize: 16)));
     }
     return Container(
       decoration: BoxDecoration(
@@ -565,9 +567,9 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: AppColors.mutedColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: AppColors.mutedColor.withOpacity(0.3)),
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -596,12 +598,12 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                     Row(
                       children: [
                         Icon(Icons.shopping_cart_outlined,
-                            size: 14, color: Colors.grey.shade600),
+                            size: 14, color: AppColors.mutedColor),
                         const SizedBox(width: 4),
                         Text('${product.quantitySold} وحدة',
                             style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey.shade600,
+                                color: AppColors.mutedColor,
                                 fontWeight: FontWeight.w600)),
                       ],
                     ),
@@ -619,10 +621,10 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                   const SizedBox(height: 2),
                   Text('ربح: ${product.profit.toStringAsFixed(2)} ج.م',
                       style:
-                          TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                          TextStyle(fontSize: 12, color: AppColors.mutedColor)),
                   Text('هامش: ${product.profitMargin.toStringAsFixed(1)}%',
                       style:
-                          TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                          TextStyle(fontSize: 12, color: AppColors.mutedColor)),
                 ],
               ),
             ],

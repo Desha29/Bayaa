@@ -64,7 +64,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(avatarRadius),
                       child: Image.asset(
-                        'assets/images/logo.png',
+                        'assets/images/logo.jpg',
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => const Icon(
                           Icons.broken_image_outlined,
@@ -83,7 +83,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            'Crazy Phone',
+            'Amr Store',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,

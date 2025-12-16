@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class InvoiceFilterSection extends StatelessWidget {
   final bool isDesktop;
   final TextEditingController barcodeSearchController;
@@ -36,7 +38,7 @@ class InvoiceFilterSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -80,17 +82,17 @@ class InvoiceFilterSection extends StatelessWidget {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                BorderSide(color: Colors.grey.shade300),
+                                BorderSide(color: AppColors.mutedColor.withOpacity(0.4)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                BorderSide(color: Colors.grey.shade300),
+                                BorderSide(color: AppColors.mutedColor.withOpacity(0.4)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: AppColors.primaryColor, width: 2),
+                                color: AppColors.primaryColor, width: 2),
                           ),
                         ),
                         onSubmitted: onSearch,
@@ -138,8 +140,8 @@ class InvoiceFilterSection extends StatelessWidget {
                       icon: const Icon(Icons.clear_all, size: 20),
                       label: const Text('مسح الفلاتر'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade100,
-                        foregroundColor: Colors.grey.shade700,
+                        backgroundColor: AppColors.mutedColor.withOpacity(0.15),
+                        foregroundColor: AppColors.kDarkChip,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -153,8 +155,8 @@ class InvoiceFilterSection extends StatelessWidget {
                       icon: const Icon(Icons.clear, size: 20),
                       label: const Text('مسح الفواتير'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.grey.shade100,
+                        backgroundColor: AppColors.errorColor,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -179,8 +181,8 @@ class InvoiceFilterSection extends StatelessWidget {
                     icon: const Icon(Icons.clear_all, size: 20),
                     label: const Text('مسح الفلاتر'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade100,
-                      foregroundColor: Colors.grey.shade700,
+                      backgroundColor: AppColors.mutedColor.withOpacity(0.15),
+                      foregroundColor: AppColors.mutedColor,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -200,7 +202,7 @@ class InvoiceFilterSection extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: AppColors.mutedColor.withOpacity(0.4)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -219,7 +221,7 @@ class InvoiceFilterSection extends StatelessWidget {
                     label,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: AppColors.mutedColor,
                     ),
                   ),
                   const SizedBox(height: 4),

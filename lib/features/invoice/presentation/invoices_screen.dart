@@ -16,6 +16,8 @@ import 'invoice_preview_screen.dart';
 import 'widgets/invoice_filter_section.dart';
 import 'widgets/invoice_list_section.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class InvoiceScreen extends StatefulWidget {
   final SalesRepository repository;
   final User currentUser;
@@ -209,7 +211,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
-      logoAsset: 'assets/images/logo1.png',
+      logoAsset: 'assets/images/logo.jpg',
     );
 
     await Navigator.of(context).push(PageRouteBuilder(
@@ -257,7 +259,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
                         title: 'الفواتير',
                         icon: Icons.receipt_long,
                         subtitle: 'عرض وطباعة الفواتير الصادرة',
-                        subtitleColor: Colors.grey.shade600,
+                        subtitleColor: AppColors.mutedColor,
                         iconColor: AppColors.primaryColor,
                       ),
                     ),

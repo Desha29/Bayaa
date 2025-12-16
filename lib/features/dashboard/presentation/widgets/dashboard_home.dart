@@ -23,37 +23,37 @@ class _DashboardHomeState extends State<DashboardHome>
       "icon": LucideIcons.shoppingCart,
       "title": "المبيعات",
       "subtitle": "إدارة عمليات البيع",
-      "color": Colors.purple,
+      "color": AppColors.primaryColor,
     },
     {
       "icon": LucideIcons.fileText,
       "title": "الفواتير",
       "subtitle": "إدارة الفواتير",
-      "color": Colors.pink,
+      "color": AppColors.accentGold,
     },
     {
       "icon": LucideIcons.bell,
       "title": "التنبيهات",
       "subtitle": "الإشعارات والتنبيهات",
-      "color": Colors.blue,
+      "color": AppColors.darkGold,
     },
     {
       "icon": LucideIcons.alertTriangle,
       "title": "المنتجات الناقصة",
       "subtitle": "تنبيهات المخزون",
-      "color": Colors.orange,
+      "color": AppColors.warningColor,
     },
     {
       "icon": LucideIcons.package,
       "title": "المنتجات",
       "subtitle": "إدارة المخزون",
-      "color": Colors.green,
+      "color": AppColors.successColor,
     },
     {
       "icon": LucideIcons.barChart2,
       "title": "التحديلات و التقارير",
       "subtitle": "ادارة تقارير النظام",
-      "color": Colors.grey,
+      "color": AppColors.primaryColor,
     },
   ];
 
@@ -121,15 +121,16 @@ class _DashboardHomeState extends State<DashboardHome>
                   enabled: true,
                   child: CircleAvatar(
                     radius: 80,
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.surfaceColor,
                     child: ClipRRect(
+                      borderRadius: BorderRadius.circular(80),
                       child: Image.asset(
-                        'assets/images/logo1.png',
+                        'assets/images/logo.jpg',
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => const Icon(
                           Icons.broken_image_outlined,
                           size: 48,
-                          color: Colors.grey,
+                          color: AppColors.mutedColor,
                         ),
                       ),
                     ),

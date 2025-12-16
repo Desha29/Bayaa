@@ -3,6 +3,8 @@ import '../../../sales/data/models/sale_model.dart';
 import 'invoice_card.dart';
 
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class InvoiceListSection extends StatelessWidget {
   final bool loading;
   final List<Sale> sales;
@@ -40,7 +42,7 @@ class InvoiceListSection extends StatelessWidget {
             Icon(
               Icons.receipt_long_outlined,
               size: 80,
-              color: Colors.grey.shade300,
+              color: AppColors.mutedColor.withOpacity(0.4),
             ),
             const SizedBox(height: 16),
             Text(
@@ -49,7 +51,7 @@ class InvoiceListSection extends StatelessWidget {
                   : 'لا توجد فواتير حديثة',
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.grey.shade600,
+                color: AppColors.mutedColor,
                 fontWeight: FontWeight.w600,
               ),
             ),

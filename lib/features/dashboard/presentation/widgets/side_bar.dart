@@ -262,7 +262,7 @@ class _SidebarHeader extends StatelessWidget {
               height: radius * 3,
               width: radius * 3,
               child: ClipOval(
-                child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+                child: Image.asset('assets/images/logo.jpg', fit: BoxFit.cover),
               ),
             ),
           ),
@@ -275,7 +275,7 @@ class _SidebarHeader extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    'Crazy Phone',
+                    'Amr Store',
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.secondaryColor,

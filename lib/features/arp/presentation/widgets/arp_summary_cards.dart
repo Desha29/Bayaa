@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/arp_summary_model.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class ArpSummaryCards extends StatelessWidget {
   final ArpSummaryModel summary;
 
@@ -99,7 +101,7 @@ class ArpSummaryCards extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Colors.grey,
+                      color: AppColors.mutedColor,
                       fontWeight: FontWeight.w500,
                     ),
                     maxLines: 1,
@@ -132,7 +134,7 @@ class ArpSummaryCards extends StatelessWidget {
               subtitle,
               style: const TextStyle(
                 fontSize: 12,
-                color: Colors.grey,
+                color: AppColors.mutedColor,
               ),
             ),
           ],

@@ -119,14 +119,14 @@ class StockScreen extends StatelessWidget {
                                   Icon(
                                     Icons.inventory_2_outlined,
                                     size: 64,
-                                    color: Colors.grey[400],
+                                    color: AppColors.mutedColor,
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
                                     'لا توجد منتجات تطابق الفلتر المحدد',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: Colors.grey[600],
+                                      color: AppColors.mutedColor,
                                     ),
                                   ),
                                 ],

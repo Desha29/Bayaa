@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import '../../../products/data/models/product_model.dart';
 import 'product_card.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class RestockDialog extends StatefulWidget {
   final Product product;
 
@@ -74,9 +76,9 @@ class _RestockDialogState extends State<RestockDialog> {
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: AppColors.mutedColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: AppColors.mutedColor.withOpacity(0.3)),
                 ),
                 padding: const EdgeInsets.all(12),
                 child: Column(
@@ -163,7 +165,7 @@ class _RestockDialogState extends State<RestockDialog> {
                         Navigator.of(context).pop(v);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
+                        backgroundColor: AppColors.accentGold,
                       ),
                       child: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12),

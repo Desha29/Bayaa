@@ -5,6 +5,8 @@ import '../../../../core/constants/app_colors.dart';
 
 import '../../data/models/product_performance_model.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class ArpTopProducts extends StatelessWidget {
   final List<ProductPerformanceModel> products;
 
@@ -73,7 +75,7 @@ class ArpTopProducts extends StatelessWidget {
                     padding: EdgeInsets.all(32),
                     child: Text(
                       'لا توجد منتجات',
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: AppColors.mutedColor),
                     ),
                   ),
                 )
@@ -108,7 +110,7 @@ class ArpTopProducts extends StatelessWidget {
           decoration: BoxDecoration(
             color: rank <= 3
                 ? AppColors.primaryColor.withOpacity(0.1)
-                : Colors.grey.shade100,
+                : AppColors.mutedColor.withOpacity(0.15),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
@@ -117,7 +119,7 @@ class ArpTopProducts extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: rank <= 3 ? AppColors.primaryColor : Colors.grey,
+                color: rank <= 3 ? AppColors.primaryColor : AppColors.mutedColor,
               ),
             ),
           ),
@@ -142,7 +144,7 @@ class ArpTopProducts extends StatelessWidget {
                 'الكمية: ${product.quantitySold} • التكلفة: ${product.cost.toStringAsFixed(2)} ج.م',
                 style: TextStyle(
                   fontSize: 13,
-                  color: Colors.grey.shade600,
+                  color: AppColors.mutedColor,
                 ),
               ),
             ],

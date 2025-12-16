@@ -26,7 +26,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.grey.shade100,
+        backgroundColor: AppColors.mutedColor.withOpacity(0.15),
         appBar: AppBar(
           centerTitle: true,
           title: Text(titleText, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
@@ -70,7 +70,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
                       maxPageWidth: maxPageWidth,
                       dpi: isDesktop ? 200 : 150,
                       useActions: false,
-                      scrollViewDecoration: BoxDecoration(color: Colors.grey.shade50),
+                      scrollViewDecoration: BoxDecoration(color: AppColors.mutedColor.withOpacity(0.1)),
                       previewPageMargin: EdgeInsets.all(isMobile ? 4 : isTablet ? 8 : 12),
                     ),
                   ),

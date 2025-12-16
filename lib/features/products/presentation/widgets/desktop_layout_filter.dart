@@ -44,10 +44,10 @@ class DesktopLayout extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: AppColors.mutedColor.withOpacity(0.4)),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: AppColors.mutedColor.withOpacity(0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -60,7 +60,7 @@ class DesktopLayout extends StatelessWidget {
             },
             decoration: InputDecoration(
               hintText: 'ابحث عن منتج بالاسم، الكود، الباركود أو السعر...',
-              hintStyle: TextStyle(color: Colors.grey[500]),
+              hintStyle: TextStyle(color: AppColors.mutedColor),
               prefixIcon: const Icon(
                 Icons.search,
                 color: AppColors.primaryColor,

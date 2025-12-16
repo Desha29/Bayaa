@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
     super.key,
@@ -21,27 +23,27 @@ class NotificationCard extends StatelessWidget {
   Color _priorityTint() {
     switch (item.priority) {
       case NotifyPriority.high:
-        return Colors.red.shade50;
+        return AppColors.errorColor.withOpacity(0.1);
       case NotifyPriority.medium:
-        return Colors.amber.shade50;
+        return AppColors.warningColor.withOpacity(0.1);
     }
   }
 
   Color _priorityBorder() {
     switch (item.priority) {
       case NotifyPriority.high:
-        return Colors.red.shade200;
+        return AppColors.errorColor.withOpacity(0.3);
       case NotifyPriority.medium:
-        return Colors.amber.shade200;
+        return AppColors.warningColor.withOpacity(0.3);
     }
   }
 
   Color _iconColor() {
     switch (item.priority) {
       case NotifyPriority.high:
-        return Colors.red.shade700;
+        return AppColors.errorColor;
       case NotifyPriority.medium:
-        return Colors.amber.shade800;
+        return AppColors.warningColor;
     }
   }
 
@@ -77,9 +79,9 @@ class NotificationCard extends StatelessWidget {
                         LucideIcons.trash2,
                         size: isMobile ? 16 : 18,
                       ),
-                      color: Colors.red.shade700,
+                      color: AppColors.errorColor,
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.red.shade50,
+                        backgroundColor: AppColors.errorColor.withOpacity(0.1),
                         padding: EdgeInsets.all(isMobile ? 6 : 8),
                         minimumSize:
                             Size(isMobile ? 32 : 40, isMobile ? 32 : 40),
@@ -93,9 +95,9 @@ class NotificationCard extends StatelessWidget {
                         checked ? LucideIcons.checkSquare : LucideIcons.square,
                         size: isMobile ? 16 : 18,
                       ),
-                      color: Colors.grey.shade700,
+                      color: AppColors.mutedColor,
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.grey.shade100,
+                        backgroundColor: AppColors.mutedColor.withOpacity(0.15),
                         padding: EdgeInsets.all(isMobile ? 6 : 8),
                         minimumSize:
                             Size(isMobile ? 32 : 40, isMobile ? 32 : 40),
@@ -189,7 +191,7 @@ class NotificationCard extends StatelessWidget {
                             item.read ? LucideIcons.eye : LucideIcons.eyeOff,
                             size: 18,
                           ),
-                          color: Colors.grey.shade700,
+                          color: AppColors.mutedColor,
                         ),
                       ),
                     ],
@@ -253,7 +255,7 @@ class NotificationCard extends StatelessWidget {
                     onPressed: onMarkReadToggle,
                     icon:
                         Icon(item.read ? LucideIcons.eye : LucideIcons.eyeOff),
-                    color: Colors.grey.shade700,
+                    color: AppColors.mutedColor,
                   ),
                 ),
             ],
@@ -323,7 +325,7 @@ class _MetaChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: AppColors.mutedColor.withOpacity(0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -331,14 +333,14 @@ class _MetaChip extends StatelessWidget {
           Icon(
             icon,
             size: compact ? 12 : 14,
-            color: Colors.grey.shade700,
+            color: AppColors.mutedColor,
           ),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
               text,
               style: TextStyle(
-                color: Colors.grey.shade800,
+                color: AppColors.mutedColor,
                 fontSize: compact ? 11 : 12,
               ),
               overflow: TextOverflow.ellipsis,

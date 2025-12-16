@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:crazy_phone_pos/core/utils/responsive_helper.dart';
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
@@ -40,14 +41,14 @@ class EnhancedProductCard extends StatelessWidget {
       margin: const EdgeInsets.all(8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isOutOfStock
-              ? Colors.redAccent.withOpacity(0.3)
+              ? AppColors.errorColor.withOpacity(0.5)
               : isLowStock
-                  ? Colors.orangeAccent.withOpacity(0.25)
-                  : Colors.grey.withOpacity(0.15),
+                  ? AppColors.warningColor.withOpacity(0.5)
+                  : AppColors.borderColor,
           width: 1.4,
         ),
         boxShadow: [
@@ -59,7 +60,6 @@ class EnhancedProductCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 🔹 Product Name
@@ -73,7 +73,7 @@ class EnhancedProductCard extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 fontSize: titleSize,
-                color: const Color(0xff1e293b),
+                color: AppColors.textPrimary,
               ),
             ),
           ),
@@ -87,13 +87,13 @@ class EnhancedProductCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: small + 0.3,
-                  color: Colors.blueGrey[600],
+                  color: AppColors.mutedColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
 
           // 🔹 Price + Status
           Row(
@@ -104,7 +104,7 @@ class EnhancedProductCard extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: value,
-                  color: const Color(0xff059669),
+                  color: AppColors.successColor,
                 ),
               ),
               _StatusChip(
@@ -130,8 +130,10 @@ class EnhancedProductCard extends StatelessWidget {
           const SizedBox(height: 10),
 
           // 🔹 Actions
-          userType==UserType.cashier?SizedBox():
-          _ActionsBar(edit: onEdit, del: onDelete, value: value),
+          userType == UserType.cashier
+              ? SizedBox()
+              : _ActionsBar(edit: onEdit, del: onDelete, value: value),
+              
         ],
       ),
     );
@@ -200,7 +202,7 @@ class _InfoRow extends StatelessWidget {
             const SizedBox(height: 2),
             Text(label,
                 style: TextStyle(
-                    fontSize: small, color: Colors.grey[700], height: 1.2)),
+                    fontSize: small, color: AppColors.mutedColor, height: 1.2)),
             Text(val,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -220,20 +222,20 @@ class _InfoRow extends StatelessWidget {
           'المتوفر',
           qty.toString(),
           Icons.inventory_2_rounded,
-          qty == 0 ? Colors.redAccent : const Color(0xff0fa2a9),
+          qty == 0 ? AppColors.errorColor : AppColors.primaryColor,
         ),
         infoItem(
           'الحد الأدنى',
           min.toString(),
           Icons.trending_down_rounded,
-          Colors.orangeAccent,
+          AppColors.warningColor,
         ),
         if (isManager)
           infoItem(
             'جملة',
             product.wholesalePrice.toStringAsFixed(2),
             Icons.local_offer_rounded,
-            Colors.teal,
+            AppColors.accentGold,
           ),
       ],
     );
@@ -259,7 +261,7 @@ class _ActionsBar extends StatelessWidget {
           child: ActionButton(
             text: 'تعديل',
             icon: Icons.edit_rounded,
-            baseColor: Colors.blueAccent,
+            baseColor: AppColors.primaryColor,
             onPressed: edit,
             fontSize: value + 1,
           ),
@@ -269,7 +271,7 @@ class _ActionsBar extends StatelessWidget {
           child: ActionButton(
             text: 'حذف',
             icon: Icons.delete_rounded,
-            baseColor: Colors.redAccent,
+            baseColor: AppColors.errorColor,
             onPressed: del,
             fontSize: value + 1,
           ),

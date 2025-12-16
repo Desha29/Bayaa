@@ -10,6 +10,8 @@ import '../cubit/settings_cubit.dart';
 import '../cubit/settings_states.dart';
 import 'edit_store_info_dialog.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class StoreInfoCard extends StatelessWidget {
   const StoreInfoCard({
     super.key,
@@ -54,7 +56,7 @@ class StoreInfoCard extends StatelessWidget {
                   Icon(
                     LucideIcons.store,
                     size: 18,
-                    color: Colors.grey[700],
+                    color: AppColors.mutedColor,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -190,7 +192,7 @@ class _StoreInfoRow extends StatelessWidget {
         Icon(
           icon,
           size: 16,
-          color: Colors.grey[600],
+          color: AppColors.mutedColor,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -200,7 +202,7 @@ class _StoreInfoRow extends StatelessWidget {
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
+                  color: AppColors.mutedColor,
                   fontSize: 11,
                 ),
               ),

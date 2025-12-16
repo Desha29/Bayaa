@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class FiltersBar extends StatelessWidget {
   const FiltersBar({
     super.key,
@@ -93,7 +95,7 @@ class FiltersBar extends StatelessWidget {
                     onTap: () => onFilterChanged(NotifyFilter.unread),
                     label: 'غير مقروءة',
                     count: unread,
-                    color: Colors.amber.shade800,
+                    color: AppColors.warningColor,
                     compact: true,
                   ),
                   _FilterChip(
@@ -101,7 +103,7 @@ class FiltersBar extends StatelessWidget {
                     onTap: () => onFilterChanged(NotifyFilter.urgent),
                     label: 'عاجلة',
                     count: urgent,
-                    color: Colors.red.shade700,
+                    color: AppColors.errorColor,
                     compact: true,
                   ),
                 ],
@@ -147,7 +149,7 @@ class FiltersBar extends StatelessWidget {
               onTap: () => onFilterChanged(NotifyFilter.unread),
               label: 'غير مقروءة',
               count: unread,
-              color: Colors.amber.shade800,
+              color: AppColors.warningColor,
               compact: isTablet,
             ),
             const SizedBox(width: 8),
@@ -156,7 +158,7 @@ class FiltersBar extends StatelessWidget {
               onTap: () => onFilterChanged(NotifyFilter.urgent),
               label: 'عاجلة',
               count: urgent,
-              color: Colors.red.shade700,
+              color: AppColors.errorColor,
               compact: isTablet,
             ),
           ],

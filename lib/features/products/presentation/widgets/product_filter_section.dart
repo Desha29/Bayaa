@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'desktop_layout_filter.dart';
 import 'mobile_layout_filter.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class ProductsFilterSection extends StatelessWidget {
   final TextEditingController searchController;
   final String categoryFilter;
@@ -35,7 +37,7 @@ class ProductsFilterSection extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey.shade50],
+            colors: [Colors.white, AppColors.mutedColor.withOpacity(0.1)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

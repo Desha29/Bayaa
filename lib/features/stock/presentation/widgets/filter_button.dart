@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/components/hover_wrapper.dart';
 import '../../../../core/constants/app_colors.dart';
 
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 class FilterButtonsWidget extends StatelessWidget {
   final String filter;
   final int totalCount;
@@ -190,7 +192,7 @@ class FilterButtonsWidget extends StatelessWidget {
                       ]
                     : [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(
+                          color: AppColors.mutedColor.withOpacity(
                             hovering ? 0.16 : 0.10,
                           ),
                           blurRadius: hovering ? 6 : 4,

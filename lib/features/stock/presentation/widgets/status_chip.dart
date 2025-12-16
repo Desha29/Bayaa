@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class StatusChip extends StatelessWidget {
   final bool isOut;
@@ -12,14 +13,14 @@ class StatusChip extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.red.shade50,
+          color: AppColors.errorColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const FittedBox(
+        child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             'غير متوفر',
-            style: TextStyle(color: Color(0xFFDC2626), fontSize: 13),
+            style: TextStyle(color: AppColors.errorColor, fontSize: 13),
           ),
         ),
       );
@@ -27,14 +28,14 @@ class StatusChip extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.yellow.shade50,
+          color: AppColors.warningColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const FittedBox(
+        child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             'مخزون منخفض',
-            style: TextStyle(color: Color(0xFFCA8A04), fontSize: 13),
+            style: TextStyle(color: AppColors.warningColor, fontSize: 13),
           ),
         ),
       );
@@ -42,14 +43,14 @@ class StatusChip extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.green.shade50,
+          color: AppColors.successColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const FittedBox(
+        child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             'متوفر',
-            style: TextStyle(color: Color(0xFF059669), fontSize: 13),
+            style: TextStyle(color: AppColors.successColor, fontSize: 13),
           ),
         ),
       );
