@@ -7,6 +7,7 @@ import '../cubit/arp_cubit.dart';
 import '../cubit/arp_state.dart';
 
 import 'dialy_report_screen.dart';
+import 'session_history_screen.dart';
 import '../widgets/arp_summary_cards.dart';
 import '../widgets/arp_chart_section.dart';
 import '../widgets/arp_top_products.dart';
@@ -106,10 +107,10 @@ class _ArpScreenState extends State<ArpScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 ElevatedButton.icon(
-                                  icon: const Icon(Icons.picture_as_pdf),
-                                  label: const Text('تقرير يومي'),
+                                  icon: const Icon(Icons.history),
+                                  label: const Text('السجل'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryColor,
+                                    backgroundColor: Colors.orange.shade700,
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -118,11 +119,12 @@ class _ArpScreenState extends State<ArpScreen> {
                                   onPressed: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder: (context) => const DailyReportScreen(),
+                                        builder: (context) => const SessionHistoryScreen(),
                                       ),
                                     );
                                   },
-                                )
+                                ),
+
                               ],
                             ),
                           ],

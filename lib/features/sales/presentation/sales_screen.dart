@@ -70,7 +70,7 @@ class _SalesScreenState extends State<SalesScreen>
     _repository = widget.repository ??
         SalesRepositoryImpl(
           productsBox: _productsBox,
-          salesBox: Hive.box<Sale>('salesBox'),
+          salesBox: Hive.lazyBox<Sale>('salesBox'),
         );
 
     _fadeController = AnimationController(
@@ -346,9 +346,9 @@ class _SalesScreenState extends State<SalesScreen>
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: 'Amr Store',
-      storeAddress: ' الخانكة امام شارع الحجار   - القليوبية ',
-      storePhone: '01002546124',
+      storeName: '',
+      storeAddress: '',
+      storePhone: '',
       cashierName: cashierName,
       lines: sale.saleItems
           .map((it) => InvoiceLine(
@@ -361,13 +361,12 @@ class _SalesScreenState extends State<SalesScreen>
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
-      logoAsset: 'assets/images/logo.jpg',
     );
 
     await Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            InvoicePreviewScreen(data: data, receiptMode: false),
+            InvoicePreviewScreen(data: data, receiptMode: true),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,
@@ -413,7 +412,73 @@ class _SalesScreenState extends State<SalesScreen>
       children: [
         Expanded(
           flex: isDesktop ? 7 : 6,
-          child: SingleChildScrollView(child: _buildMainContent()),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const ScreenHeader(
+                title: 'شاشة المبيعات',
+                subtitle: 'إدارة عمليات البيع والفواتير',
+                fontSize: 32,
+                icon: Icons.point_of_sale,
+                iconColor: AppColors.primaryColor,
+                titleColor: AppColors.kDarkChip,
+              ),
+              const SizedBox(height: 16),
+              TotalSectionCard(
+                totalAmount: _totalAmount,
+                itemCount: _cartItems.length,
+                onCheckout: _onCheckout,
+                onClearCart: () {
+                  _cartItems.clear();
+                  setState(() {});
+                },
+              ),
+              const SizedBox(height: 12),
+              BarcodeScanCard(
+                controller: _barcodeController,
+                focusNode: _barcodeFocusNode,
+                onSubmitted: (val) => _commitBarcode(val),
+                onAddPressed: _onAddPressed,
+              ),
+              const SizedBox(height: 16),
+              // Only the cart section scrolls
+              Expanded(
+                child: CartSection(
+                  cartItems: _cartItems,
+                  onRemoveItem: (i) {
+                    _cartItems.removeAt(i);
+                    setState(() {});
+                  },
+                  onIncreaseQty: (i) {
+                    final currentQty = _cartItems[i]['qty'] as int;
+                    final stockQuantity = _cartItems[i]['quantity'] as int;
+
+                    if (currentQty < stockQuantity) {
+                      _cartItems[i]['qty'] = currentQty + 1;
+                      setState(() {});
+                    } else {
+                      MotionSnackBarWarning(context,
+                          "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
+                    }
+                  },
+                  onDecreaseQty: (i) {
+                    final q = _cartItems[i]['qty'] as int;
+                    if (q > 1) {
+                      _cartItems[i]['qty'] = q - 1;
+                      setState(() {});
+                    } else {
+                      _cartItems.removeAt(i);
+                      setState(() {});
+                    }
+                  },
+                  onEditPrice: (i, newPrice) {
+                    _cartItems[i]['price'] = newPrice;
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
         SizedBox(width: isDesktop ? 32 : 24),
         Expanded(
@@ -428,85 +493,83 @@ class _SalesScreenState extends State<SalesScreen>
   }
 
   Widget _buildMobileLayout() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildMainContent(),
-          const SizedBox(height: 24),
-          SlideTransition(
-            position: _slideAnimation,
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: RecentSalesSection(recentSales: _recentSales),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMainContent() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const ScreenHeader(
-          title: 'شاشة المبيعات',
-          subtitle: 'إدارة عمليات البيع والفواتير',
-          fontSize: 32,
-          icon: Icons.point_of_sale,
-          iconColor: AppColors.primaryColor,
-          titleColor: AppColors.kDarkChip,
-        ),
-        const SizedBox(height: 24),
-        BarcodeScanCard(
-          controller: _barcodeController,
-          focusNode: _barcodeFocusNode,
-          onSubmitted: (val) => _commitBarcode(val),
-          onAddPressed: _onAddPressed,
-        ),
-        const SizedBox(height: 20),
-        CartSection(
-          cartItems: _cartItems,
-          onRemoveItem: (i) {
-            _cartItems.removeAt(i);
-            setState(() {});
-          },
-          onIncreaseQty: (i) {
-            final currentQty = _cartItems[i]['qty'] as int;
-            final stockQuantity = _cartItems[i]['quantity'] as int;
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const ScreenHeader(
+                title: 'شاشة المبيعات',
+                subtitle: 'إدارة عمليات البيع والفواتير',
+                fontSize: 28,
+                icon: Icons.point_of_sale,
+                iconColor: AppColors.primaryColor,
+                titleColor: AppColors.kDarkChip,
+              ),
+              const SizedBox(height: 12),
+              TotalSectionCard(
+                totalAmount: _totalAmount,
+                itemCount: _cartItems.length,
+                onCheckout: _onCheckout,
+                onClearCart: () {
+                  _cartItems.clear();
+                  setState(() {});
+                },
+              ),
+              const SizedBox(height: 12),
+              BarcodeScanCard(
+                controller: _barcodeController,
+                focusNode: _barcodeFocusNode,
+                onSubmitted: (val) => _commitBarcode(val),
+                onAddPressed: _onAddPressed,
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: CartSection(
+                  cartItems: _cartItems,
+                  onRemoveItem: (i) {
+                    _cartItems.removeAt(i);
+                    setState(() {});
+                  },
+                  onIncreaseQty: (i) {
+                    final currentQty = _cartItems[i]['qty'] as int;
+                    final stockQuantity = _cartItems[i]['quantity'] as int;
 
-            if (currentQty < stockQuantity) {
-              _cartItems[i]['qty'] = currentQty + 1;
-              setState(() {});
-            } else {
-              MotionSnackBarWarning(context,
-                  "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
-            }
-          },
-          onDecreaseQty: (i) {
-            final q = _cartItems[i]['qty'] as int;
-            if (q > 1) {
-              _cartItems[i]['qty'] = q - 1;
-              setState(() {});
-            } else {
-              _cartItems.removeAt(i);
-              setState(() {});
-            }
-          },
-          onEditPrice: (i, newPrice) {
-            _cartItems[i]['price'] = newPrice;
-            setState(() {});
-          },
+                    if (currentQty < stockQuantity) {
+                      _cartItems[i]['qty'] = currentQty + 1;
+                      setState(() {});
+                    } else {
+                      MotionSnackBarWarning(context,
+                          "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
+                    }
+                  },
+                  onDecreaseQty: (i) {
+                    final q = _cartItems[i]['qty'] as int;
+                    if (q > 1) {
+                      _cartItems[i]['qty'] = q - 1;
+                      setState(() {});
+                    } else {
+                      _cartItems.removeAt(i);
+                      setState(() {});
+                    }
+                  },
+                  onEditPrice: (i, newPrice) {
+                    _cartItems[i]['price'] = newPrice;
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 20),
-        TotalSectionCard(
-          totalAmount: _totalAmount,
-          itemCount: _cartItems.length,
-          onCheckout: _onCheckout,
-          onClearCart: () {
-            _cartItems.clear();
-            setState(() {});
-          },
+        const SizedBox(height: 16),
+        SlideTransition(
+          position: _slideAnimation,
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: RecentSalesSection(recentSales: _recentSales),
+          ),
         ),
       ],
     );

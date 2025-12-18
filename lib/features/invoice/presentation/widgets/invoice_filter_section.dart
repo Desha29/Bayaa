@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
+import '../cubit/invoice_state.dart';
+
 class InvoiceFilterSection extends StatelessWidget {
   final bool isDesktop;
   final TextEditingController barcodeSearchController;
@@ -12,6 +14,8 @@ class InvoiceFilterSection extends StatelessWidget {
   final Function(bool) onSelectDate;
   final VoidCallback onClearFilters;
   final VoidCallback onDeleteInvoices;
+  final InvoiceFilterType filterType;
+  final Function(InvoiceFilterType) onFilterTypeChanged;
 
   const InvoiceFilterSection({
     Key? key,
@@ -25,6 +29,8 @@ class InvoiceFilterSection extends StatelessWidget {
     required this.onSelectDate,
     required this.onClearFilters,
     required this.onDeleteInvoices,
+    required this.filterType,
+    required this.onFilterTypeChanged,
   }) : super(key: key);
 
   @override
@@ -125,7 +131,9 @@ class InvoiceFilterSection extends StatelessWidget {
                     ),
                   ),
                 ],
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
+                _buildFilterTypeSelector(),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
@@ -169,6 +177,8 @@ class InvoiceFilterSection extends StatelessWidget {
             )
           : Column(
               children: [
+                _buildFilterTypeSelector(),
+                const SizedBox(height: 16),
                 _buildDateButton('من تاريخ', startDate, true),
                 const SizedBox(height: 12),
                 _buildDateButton('إلى تاريخ', endDate, false),
@@ -191,6 +201,58 @@ class InvoiceFilterSection extends StatelessWidget {
                 ),
               ],
             ),
+    );
+  }
+
+  Widget _buildFilterTypeSelector() {
+    return Row(
+      children: [
+        const Text(
+          'تصفية حسب:',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: AppColors.kDarkChip,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Wrap(
+          spacing: 8,
+          children: [
+            _buildFilterChip('الكل', InvoiceFilterType.all),
+            _buildFilterChip('مبيعات', InvoiceFilterType.sales),
+            _buildFilterChip('مرتجعات', InvoiceFilterType.refunded),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChip(String label, InvoiceFilterType type) {
+    final isSelected = filterType == type;
+    return InkWell(
+      onTap: () => onFilterTypeChanged(type),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primaryColor
+                : AppColors.mutedColor.withOpacity(0.3),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppColors.mutedColor,
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+        ),
+      ),
     );
   }
 

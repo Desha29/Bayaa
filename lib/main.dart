@@ -13,6 +13,8 @@ import 'core/di/dependency_injection.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/hive_helper.dart';
 import 'core/components/message_overlay.dart';
+import 'features/auth/presentation/cubit/user_cubit.dart';
+import 'features/auth/presentation/cubit/user_states.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,36 +60,55 @@ void main() async {
   }
 }
 
+
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MessageOverlay(
-      child: MaterialApp(
-        title: 'Amr Store',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        home: const LoginScreen(),
-        locale: const Locale('ar'),
-        supportedLocales: const [
-          Locale('ar'),
-          Locale('en'),
-        ],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        builder: (context, child) {
-          // Initialize global message context
-          GlobalMessage.initialize(context);
+    return BlocProvider<UserCubit>.value(
+      value: getIt<UserCubit>(),
+      child: MessageOverlay(
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          title: 'Amr Store',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          home: const LoginScreen(),
+          locale: const Locale('ar'),
+          supportedLocales: const [
+            Locale('ar'),
+            Locale('en'),
+          ],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+             // Initialize global message context
+            GlobalMessage.initialize(context);
 
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: child!,
-          );
-        },
+            return BlocListener<UserCubit, UserStates>(
+              listener: (context, state) {
+                if (state is UserInitial) {
+                  // Global logout handler
+                  navigatorKey.currentState?.pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
+              },
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: child!,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

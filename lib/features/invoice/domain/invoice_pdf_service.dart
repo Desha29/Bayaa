@@ -4,13 +4,15 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:barcode/barcode.dart';
 import '../data/invoice_models.dart';
+import '../../settings/data/models/store_info_model.dart';
+import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
+import '../../settings/data/repository/settings_repository_imp.dart';
 
 class InvoicePdfService {
   static pw.Font? _cachedArabicFont;
   static pw.Font? _cachedBoldFont;
   static pw.ImageProvider? _cachedLogo; 
 
-  // Load fonts
   static Future<pw.Font> _loadArabicFont() async {
     if (_cachedArabicFont != null) return _cachedArabicFont!;
     final fontData = await rootBundle.load('assets/fonts/Amiri-Regular.ttf');
@@ -29,146 +31,58 @@ class InvoicePdfService {
     return _cachedBoldFont!;
   }
 
-  // ✅ Load and cache logo
-  static Future<pw.ImageProvider?> _loadLogo(InvoiceData data) async {
-    // Return cached logo if available
+  static Future<pw.ImageProvider?> _loadLogo(String? logoPath) async {
     if (_cachedLogo != null) return _cachedLogo;
 
-    // Priority 1: Use provided logo bytes
-    if (data.logoBytes != null) {
-      _cachedLogo = pw.MemoryImage(data.logoBytes!);
-      return _cachedLogo;
-    }
-
-    // Priority 2: Load from asset path
-    if (data.logoAsset != null && data.logoAsset!.isNotEmpty) {
+    if (logoPath != null && logoPath.isNotEmpty) {
       try {
-        final bytes = await rootBundle.load(data.logoAsset!);
+        final bytes = await rootBundle.load(logoPath);
         _cachedLogo = pw.MemoryImage(bytes.buffer.asUint8List());
         return _cachedLogo;
       } catch (e) {
-        print('❌ Error loading logo from ${data.logoAsset}: $e');
-        // Try default path
-        try {
-          final bytes = await rootBundle.load('assets/images/logo.jpg');
-          _cachedLogo = pw.MemoryImage(bytes.buffer.asUint8List());
-          return _cachedLogo;
-        } catch (e2) {
-          print('❌ Error loading default logo: $e2');
-        }
+        print('❌ Error loading logo from $logoPath: $e');
       }
     }
-
-    return null;
+    
+    // Fallback
+    try {
+      final bytes = await rootBundle.load('assets/images/logo.jpg');
+      _cachedLogo = pw.MemoryImage(bytes.buffer.asUint8List());
+      return _cachedLogo;
+    } catch (e) {
+       return null;
+    }
   }
 
   static Future<Uint8List> buildReceipt80mm(InvoiceData data) async {
     final doc = pw.Document();
+    
+    // 80mm thermal paper is usually around 72mm printable width
     final pageFormat = const PdfPageFormat(
-      57 * PdfPageFormat.mm,
+      80 * PdfPageFormat.mm,
       double.infinity,
-      marginAll: 2,
+      marginAll: 5 * PdfPageFormat.mm,
     );
 
     final arabicFont = await _loadArabicFont();
     final boldFont = await _loadBoldFont();
-    final logoProvider = await _loadLogo(data); 
 
-    // Color theme suitable for thermal printing and clear display
+    // Get dynamic store info
+    final storeRepo = getIt<StoreInfoRepository>();
+    final storeInfoResult = await storeRepo.getStoreInfo();
+    final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
+          name: 'كرزي فون',
+          address: 'غزة - شارع الجلاء',
+          phone: '0599000000',
+          vat: '', email: '',
+        ));
+    
+    final logoProvider = await _loadLogo(storeInfo.logoPath); 
+
+    // Styles...
     final primaryColor = PdfColors.black;
-    final accentColor = PdfColor.fromHex('#1a73e8');
-    final lightGray = PdfColor.fromHex('#757575');
-    final dividerColor = PdfColor.fromHex('#cfcfcf');
-
-    // Typography styles
-    final storeTitleStyle = pw.TextStyle(
-      fontSize: 11,
-      fontWeight: pw.FontWeight.bold,
-      font: boldFont,
-      color: primaryColor,
-      letterSpacing: 0.3,
-    );
-
-    final storeInfoStyle = pw.TextStyle(
-      fontSize: 7,
-      font: arabicFont,
-      color: primaryColor,
-      height: 1.4,
-    );
-
-    final invoiceTitleStyle = pw.TextStyle(
-      fontSize: 10,
-      fontWeight: pw.FontWeight.bold,
-      font: boldFont,
-      color: accentColor,
-    );
-
-    final labelStyle = pw.TextStyle(
-      fontSize: 6.5,
-      font: arabicFont,
-      color: lightGray,
-    );
-
-    final valueStyle = pw.TextStyle(
-      fontSize: 7,
-      fontWeight: pw.FontWeight.bold,
-      font: boldFont,
-      color: primaryColor,
-    );
-
-    final tableHeaderStyle = pw.TextStyle(
-      fontSize: 6.5,
-      fontWeight: pw.FontWeight.bold,
-      font: boldFont,
-      color: primaryColor,
-    );
-
-    final itemNameStyle = pw.TextStyle(
-      fontSize: 7.5,
-      fontWeight: pw.FontWeight.bold,
-      font: boldFont,
-      color: primaryColor,
-    );
-
-    final itemDetailsStyle = pw.TextStyle(
-      fontSize: 6.5,
-      font: arabicFont,
-      color: primaryColor,
-    );
-
-    final summaryLabelStyle = pw.TextStyle(
-      fontSize: 7,
-      font: arabicFont,
-      color: primaryColor,
-    );
-
-    final summaryValueStyle = pw.TextStyle(
-      fontSize: 7,
-      fontWeight: pw.FontWeight.bold,
-      font: boldFont,
-      color: primaryColor,
-    );
-
-    final totalLabelStyle = pw.TextStyle(
-      fontSize: 9,
-      fontWeight: pw.FontWeight.bold,
-      font: boldFont,
-      color: PdfColors.black,
-    );
-
-    final totalValueStyle = pw.TextStyle(
-      fontSize: 10,
-      fontWeight: pw.FontWeight.bold,
-      font: boldFont,
-      color: PdfColors.black,
-    );
-
-    final footerStyle = pw.TextStyle(
-      fontSize: 6,
-      font: arabicFont,
-      color: lightGray,
-      height: 1.3,
-    );
+    final accentColor = PdfColors.black; // Standard thermal black
+    final dividerColor = PdfColors.grey400;
 
     doc.addPage(
       pw.Page(
@@ -178,289 +92,80 @@ class InvoicePdfService {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.center,
             children: [
-              // Header Section with logo and store info
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                child: pw.Column(
-                  children: [
-                    if (logoProvider != null) ...[ // ✅ Check if logo loaded
-                      pw.Container(
-                        width: 45,
-                        height: 45,
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border.all(color: dividerColor, width: 1.5),
-                          borderRadius: pw.BorderRadius.circular(8),
-                        ),
-                        child: pw.ClipRRect(
-                          horizontalRadius: 6,
-                          verticalRadius: 6,
-                          child: pw.Image(
-                            logoProvider, 
-                            fit: pw.BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                      pw.SizedBox(height: 3),
-                    ],
-                    pw.Text(
-                      data.storeName,
-                      style: storeTitleStyle,
-                      textAlign: pw.TextAlign.center,
-                    ),
-                    pw.SizedBox(height: 2),
-                    pw.Text(
-                      data.storeAddress,
-                      style: storeInfoStyle,
-                      textAlign: pw.TextAlign.center,
-                    ),
-                    pw.SizedBox(height: 1),
-                    pw.Text(
-                      'هاتف: ${data.storePhone}',
-                      style: storeInfoStyle,
-                      textAlign: pw.TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              pw.SizedBox(height: 4),
-
-              // Dotted divider
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.center,
-                children: List.generate(
-                  20,
-                  (index) => pw.Container(
-                    width: 2,
-                    height: 2,
-                    margin: const pw.EdgeInsets.symmetric(horizontal: 1),
-                    decoration: pw.BoxDecoration(
-                      color: dividerColor,
-                      shape: pw.BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ),
-              pw.SizedBox(height: 4),
-
-              // Invoice information
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.all(4),
-                decoration: pw.BoxDecoration(
-                  color: PdfColor.fromHex('#f9fafb'),
-                  borderRadius: pw.BorderRadius.circular(4),
-                ),
-                child: pw.Column(
-                  children: [
-                    pw.Text('فاتورة بيع', style: invoiceTitleStyle),
-                    pw.SizedBox(height: 3),
-                    _infoRow('رقم الفاتورة', data.invoiceId, labelStyle, valueStyle),
-                    pw.SizedBox(height: 1.5),
-                    _infoRow('التاريخ', _fmt(data.date), labelStyle, valueStyle),
-                    pw.SizedBox(height: 1.5),
-                    _infoRow('الكاشير', data.cashierName, labelStyle, valueStyle),
-                  ],
-                ),
-              ),
-              pw.SizedBox(height: 4),
-
-              // Items header
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(vertical: 2, horizontal: 1),
-                decoration: pw.BoxDecoration(
-                  color: PdfColor.fromHex('#f3f4f6'),
-                  borderRadius: pw.BorderRadius.circular(3),
-                ),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Expanded(
-                      flex: 2,
-                      child: pw.Text('المجموع',
-                          style: tableHeaderStyle, textAlign: pw.TextAlign.left),
-                    ),
-                    pw.Expanded(
-                      flex: 1,
-                      child: pw.Text('الكمية',
-                          style: tableHeaderStyle, textAlign: pw.TextAlign.center),
-                    ),
-                    pw.Expanded(
-                      flex: 2,
-                      child: pw.Text('السعر',
-                          style: tableHeaderStyle, textAlign: pw.TextAlign.center),
-                    ),
-                    pw.Expanded(
-                      flex: 3,
-                      child: pw.Text('الصنف',
-                          style: tableHeaderStyle, textAlign: pw.TextAlign.right),
-                    ),
-                  ],
-                ),
-              ),
-              pw.SizedBox(height: 2),
-
-              // Items list
-              ...data.lines.map((item) => pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.symmetric(vertical: 3, horizontal: 1),
-                    child: pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: pw.CrossAxisAlignment.center,
-                      children: [
-                        pw.Expanded(
-                          flex: 2,
-                          child: pw.Text(item.total.toStringAsFixed(2),
-                              style: valueStyle, textAlign: pw.TextAlign.left),
-                        ),
-                        pw.Expanded(
-                          flex: 1,
-                          child: pw.Center(
-                            child: pw.Container(
-                              padding: const pw.EdgeInsets.symmetric(
-                                  horizontal: 3, vertical: 1.5),
-                              decoration: pw.BoxDecoration(
-                                color: PdfColor.fromHex('#e0e7ff'),
-                                borderRadius: pw.BorderRadius.circular(3),
-                              ),
-                              child: pw.Text(item.qty.toString(),
-                                  style: pw.TextStyle(
-                                    fontSize: 7,
-                                    fontWeight: pw.FontWeight.bold,
-                                    font: boldFont,
-                                    color: accentColor,
-                                  ),
-                                  textAlign: pw.TextAlign.center),
-                            ),
-                          ),
-                        ),
-                        pw.Expanded(
-                          flex: 2,
-                          child: pw.Text(item.price.toStringAsFixed(2),
-                              style: itemDetailsStyle, textAlign: pw.TextAlign.center),
-                        ),
-                        pw.Expanded(
-                          flex: 3,
-                          child: pw.Text(item.name,
-                              style: itemNameStyle,
-                              textAlign: pw.TextAlign.right,
-                              maxLines: 2),
-                        ),
-                      ],
-                    ),
-                  )),
-              pw.SizedBox(height: 4),
-
-              // Divider
-              pw.Container(width: double.infinity, height: 1, color: dividerColor),
-              pw.SizedBox(height: 3),
-
-              // Summary section
-              pw.Container(
-                width: double.infinity,
-                child: pw.Column(
-                  children: [
-                    _summaryRow('الإجمالي الفرعي', data.subtotal,
-                        summaryLabelStyle, summaryValueStyle),
-                    if (data.discount != 0) ...[
-                      pw.SizedBox(height: 1.5),
-                      _summaryRow('الخصم', -data.discount, summaryLabelStyle,
-                          summaryValueStyle,
-                          isDiscount: true),
-                    ],
-                    if (data.tax != 0) ...[
-                      pw.SizedBox(height: 1.5),
-                      _summaryRow(
-                          'الضريبة', data.tax, summaryLabelStyle, summaryValueStyle),
-                    ],
-                  ],
-                ),
-              ),
-              pw.SizedBox(height: 4),
-
-              // Total section
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                decoration: pw.BoxDecoration(
-                  color: PdfColor.fromHex('#f3f4f6'),
-                  borderRadius: pw.BorderRadius.circular(4),
-                ),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text('${data.grandTotal.toStringAsFixed(2)} ج.م',
-                        style: totalValueStyle),
-                    pw.Text('الإجمالي النهائي', style: totalLabelStyle),
-                  ],
-                ),
-              ),
-              pw.SizedBox(height: 5),
-
-              // Barcode section
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(vertical: 6),
-                alignment: pw.Alignment.center,
-                child: pw.BarcodeWidget(
-                  barcode: Barcode.code128(),
-                  data: data.invoiceId,
-                  width: 100,
-                  height: 20,
-                  drawText: true,
-                  textStyle: pw.TextStyle(
-                      fontSize: 7, fontWeight: pw.FontWeight.bold, font: boldFont),
-                ),
-              ),
-
-              // Footer note if any
-              if (data.footerNote != null) ...[
+              if (logoProvider != null) 
                 pw.Container(
-                  width: double.infinity,
-                  padding: const pw.EdgeInsets.all(4),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColor.fromHex('#fffbeb'),
-                    border: pw.Border.all(
-                        color: PdfColor.fromHex('#fbbf24'), width: 0.5),
-                    borderRadius: pw.BorderRadius.circular(4),
-                  ),
-                  child: pw.Text(data.footerNote!,
-                      style: footerStyle, textAlign: pw.TextAlign.center),
+                  width: 50,
+                  height: 50,
+                  child: pw.Image(logoProvider),
                 ),
-                pw.SizedBox(height: 4),
-              ],
-
-              // Thank you note
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(vertical: 3),
-                child: pw.Column(
-                  children: [
-                    pw.Text('شكراً لزيارتكم',
-                        style: pw.TextStyle(
-                          fontSize: 8,
-                          fontWeight: pw.FontWeight.bold,
-                          font: boldFont,
-                          color: primaryColor,
-                        ),
-                        textAlign: pw.TextAlign.center),
-                    pw.SizedBox(height: 1),
-                    pw.Text('نتمنى رؤيتكم مرة أخرى',
-                        style: footerStyle, textAlign: pw.TextAlign.center)
-                  ],
-                ),
+              pw.Text(storeInfo.name, 
+                  style: pw.TextStyle(font: boldFont, fontSize: 16, fontWeight: pw.FontWeight.bold)),
+              pw.Text(storeInfo.address, 
+                  style: pw.TextStyle(font: arabicFont, fontSize: 8), textAlign: pw.TextAlign.center),
+              pw.Text('هاتف: ${storeInfo.phone}', 
+                  style: pw.TextStyle(font: arabicFont, fontSize: 8)),
+              if (storeInfo.vat.isNotEmpty)
+                pw.Text('الرقم الضريبي: ${storeInfo.vat}', 
+                    style: pw.TextStyle(font: arabicFont, fontSize: 7)),
+              
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                child: pw.Divider(color: dividerColor, thickness: 0.5),
               ),
 
-              // Decorative bottom border
-              pw.SizedBox(height: 3),
-              pw.Container(
-                width: 30,
-                height: 2,
-                decoration: pw.BoxDecoration(
-                    color: accentColor, borderRadius: pw.BorderRadius.circular(1)),
+              pw.Text('فاتورة مبيعات', style: pw.TextStyle(font: boldFont, fontSize: 12)),
+              pw.SizedBox(height: 4),
+              _row('رقم الفاتورة:', data.invoiceId, arabicFont, boldFont),
+              _row('التاريخ:', _fmt(data.date), arabicFont, boldFont),
+              _row('الكاشير:', data.cashierName, arabicFont, boldFont),
+              
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                child: pw.Divider(color: dividerColor, thickness: 0.5),
               ),
-              pw.SizedBox(height: 2),
+
+              // Items Table
+              pw.TableHelper.fromTextArray(
+                context: null,
+                headers: ['المنتج', 'ق', 'س', 'ج'],
+                data: data.lines.map((l) => [
+                  l.name,
+                  l.qty.toString(),
+                  l.price.toStringAsFixed(0),
+                  l.total.toStringAsFixed(0),
+                ]).toList(),
+                headerStyle: pw.TextStyle(font: boldFont, fontSize: 9),
+                cellStyle: pw.TextStyle(font: arabicFont, fontSize: 9),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(3),
+                  1: const pw.FlexColumnWidth(1),
+                  2: const pw.FlexColumnWidth(1.5),
+                  3: const pw.FlexColumnWidth(1.5),
+                },
+                headerDecoration: const pw.BoxDecoration(color: PdfColors.grey100),
+                border: null,
+                cellAlignment: pw.Alignment.centerRight,
+              ),
+
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                child: pw.Divider(color: dividerColor, thickness: 0.5),
+              ),
+
+              _row('الإجمالي:', '${data.grandTotal.toStringAsFixed(2)} ج.م', arabicFont, boldFont, fontSize: 12),
+              
+              pw.SizedBox(height: 10),
+              pw.Text('شكراً لزيارتكم!', style: pw.TextStyle(font: arabicFont, fontSize: 10)),
+              
+              pw.SizedBox(height: 10),
+              pw.BarcodeWidget(
+                barcode: Barcode.code128(),
+                data: data.invoiceId,
+                width: 120,
+                height: 30,
+                drawText: false,
+              ),
+              pw.Text(data.invoiceId, style: pw.TextStyle(font: arabicFont, fontSize: 7)),
             ],
           ),
         ),
@@ -470,34 +175,131 @@ class InvoicePdfService {
     return doc.save();
   }
 
-  static Future<Uint8List> buildA4(InvoiceData data,
-      {PdfPageFormat? format}) async {
-    return buildReceipt80mm(data);
-  }
-
-  static pw.Widget _infoRow(String label, String value, pw.TextStyle labelStyle,
-      pw.TextStyle valueStyle) {
+  static pw.Widget _row(String label, String value, pw.Font font, pw.Font bold, {double fontSize = 9}) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
-        pw.Text(value, style: valueStyle),
-        pw.Text(label, style: labelStyle),
+        pw.Text(label, style: pw.TextStyle(font: font, fontSize: fontSize)),
+        pw.Text(value, style: pw.TextStyle(font: bold, fontSize: fontSize)),
       ],
     );
   }
 
-  static pw.Widget _summaryRow(String label, double value,
-      pw.TextStyle labelStyle, pw.TextStyle valueStyle,
-      {bool isDiscount = false}) {
+  static Future<Uint8List> buildA4(InvoiceData data, {PdfPageFormat? format}) async {
+    // For A4 we can use a more elaborate layout
+    final doc = pw.Document();
+    
+    final arabicFont = await _loadArabicFont();
+    final boldFont = await _loadBoldFont();
+    final storeRepo = getIt<StoreInfoRepository>();
+    final storeInfoResult = await storeRepo.getStoreInfo();
+    final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
+          name: 'كرزي فون',
+          address: 'غزة - شارع الجلاء',
+          phone: '0599000000',
+          vat: '', email: '',
+        ));
+    final logoProvider = await _loadLogo(storeInfo.logoPath);
+
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(1 * PdfPageFormat.cm),
+        textDirection: pw.TextDirection.rtl,
+        theme: pw.ThemeData.withFont(base: arabicFont, bold: boldFont),
+        build: (context) => [
+          _buildA4Header(storeInfo, logoProvider, boldFont),
+          pw.Divider(),
+          _buildA4InvoiceInfo(data, boldFont),
+          pw.SizedBox(height: 20),
+          _buildA4ItemsTable(data, boldFont, arabicFont),
+          pw.SizedBox(height: 20),
+          _buildA4Summary(data, boldFont),
+          pw.Spacer(),
+          _buildA4Footer(arabicFont),
+        ],
+      ),
+    );
+
+    return doc.save();
+  }
+
+  static pw.Widget _buildA4Header(StoreInfo store, pw.ImageProvider? logo, pw.Font bold) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
-        pw.Text('${value.toStringAsFixed(2)}${isDiscount ? '-' : ''}',
-            style: isDiscount
-                ? valueStyle.copyWith(color: PdfColor.fromHex('#dc2626'))
-                : valueStyle),
-        pw.Text(label, style: labelStyle),
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(store.name, style: pw.TextStyle(font: bold, fontSize: 24)),
+            pw.Text(store.address),
+            pw.Text('هاتف: ${store.phone}'),
+            if (store.vat.isNotEmpty) pw.Text('الرقم الضريبي: ${store.vat}'),
+          ],
+        ),
+        if (logo != null)
+          pw.Container(width: 80, height: 80, child: pw.Image(logo)),
       ],
+    );
+  }
+
+  static pw.Widget _buildA4InvoiceInfo(InvoiceData data, pw.Font bold) {
+    return pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      children: [
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('فاتورة رقم: ${data.invoiceId}', style: pw.TextStyle(font: bold)),
+            pw.Text('التاريخ: ${_fmt(data.date)}'),
+          ],
+        ),
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.end,
+          children: [
+            pw.Text('الكاشير: ${data.cashierName}'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  static pw.Widget _buildA4ItemsTable(InvoiceData data, pw.Font bold, pw.Font regular) {
+     return pw.TableHelper.fromTextArray(
+      headers: ['المنتج', 'الكمية', 'السعر', 'الإجمالي'],
+      data: data.lines.map((l) => [
+        l.name,
+        l.qty.toString(),
+        l.price.toStringAsFixed(2),
+        l.total.toStringAsFixed(2),
+      ]).toList(),
+      headerStyle: pw.TextStyle(font: bold),
+      cellStyle: pw.TextStyle(font: regular),
+      headerDecoration: const pw.BoxDecoration(color: PdfColors.grey200),
+      cellAlignment: pw.Alignment.center,
+    );
+  }
+
+  static pw.Widget _buildA4Summary(InvoiceData data, pw.Font bold) {
+    return pw.Align(
+      alignment: pw.Alignment.centerLeft,
+      child: pw.Container(
+        width: 200,
+        child: pw.Column(
+          children: [
+            _row('الإجمالي الفرعي:', data.subtotal.toStringAsFixed(2), bold, bold),
+            pw.Divider(),
+            _row('الإجمالي الكلي:', '${data.grandTotal.toStringAsFixed(2)} ج.م', bold, bold, fontSize: 14),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static pw.Widget _buildA4Footer(pw.Font regular) {
+    return pw.Container(
+      alignment: pw.Alignment.center,
+      child: pw.Text('شكراً لتعاملكم معنا', style: pw.TextStyle(font: regular, fontSize: 10)),
     );
   }
 

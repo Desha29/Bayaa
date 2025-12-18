@@ -39,10 +39,15 @@ class UsersManagementCard extends StatelessWidget {
         List<UserRow> userRows = [];
         List<User> usersData = [];
 
+        // Use state data if available, otherwise fallback to cached data in Cubit
+        // This persists the list even if state changes to UserSuccess etc.
         if (state is UsersLoaded) {
           usersData = state.users as List<User>;
-          userRows = _convertUsersToRows(usersData);
+        } else {
+          usersData = context.read<UserCubit>().users;
         }
+        
+        userRows = _convertUsersToRows(usersData);
 
         return SectionCard(
           child: Column(
@@ -105,10 +110,11 @@ class UsersManagementCard extends StatelessWidget {
                     ),
                   ),
                 )
-              ,DesktopUserTable(
-                        users: userRows,
-                        usersData: usersData,
-                      ),
+              else
+                DesktopUserTable(
+                  users: userRows,
+                  usersData: usersData,
+                ),
             ],
           ),
         );

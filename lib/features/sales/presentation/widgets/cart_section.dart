@@ -41,7 +41,6 @@ class CartSection extends StatelessWidget {
         );
       },
       child: Container(
-        height: 450,
         decoration: BoxDecoration(
           color: AppColors.kCardBackground,
           borderRadius: BorderRadius.circular(16),

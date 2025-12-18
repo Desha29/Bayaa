@@ -23,6 +23,8 @@ abstract class SalesRepository {
       String barcode, int newQuantity);
   Future<Either<Failure, bool>> validateMinPrice(
       String barcode, double salePrice);
+  Future<Either<Failure, List<Sale>>> getSalesByIds(List<String> ids);
+  Future<Either<Failure, List<Sale>>> getRefundsForInvoice(String originalInvoiceId);
 
   // NEW: Method to create sale with cashier info
   Future<Either<Failure, Unit>> createSaleWithCashier({

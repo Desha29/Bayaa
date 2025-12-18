@@ -5,21 +5,19 @@ import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifi
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/di/dependency_injection.dart';
 import '../../../core/functions/messege.dart';
+import '../../../core/security/permission_guard.dart';
 import '../../auth/presentation/cubit/user_cubit.dart';
 import '../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../products/presentation/products_screen.dart';
-import '../../products/data/models/product_model.dart';
 import '../../sales/data/repository/sales_repository_impl.dart';
-import '../../sales/domain/sales_repository.dart';
+import '../../sales/presentation/cubit/sales_cubit.dart';
 import '../../sales/presentation/sales_screen.dart';
-import '../../sales/data/models/sale_model.dart';
 import '../../settings/presentation/settings_screen.dart';
 import '../../stock/presentation/stock_screen.dart';
 import '../../invoice/presentation/invoices_screen.dart';
@@ -43,85 +41,76 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int selectedIndex = 0;
   bool isSidebarCollapsed = false;
 
-  // Open Hive boxes and create repositories
-  late final Box<Product> _productsBox;
-  late final Box<Sale> _salesBox;
   late final SalesRepositoryImpl _salesRepository;
   late final ArpRepositoryImpl _arpRepository;
   late final User curUser = getIt<UserCubit>().currentUser;
+  late final List<SidebarItem> sidebarItems;
 
   @override
   void initState() {
     super.initState();
-    _productsBox = Hive.box<Product>('productsBox');
-    _salesBox = Hive.box<Sale>('salesBox');
-    _salesRepository = SalesRepositoryImpl(
-      productsBox: _productsBox,
-      salesBox: _salesBox,
-    );
 
-    // Only needs sales repository
-    _arpRepository = ArpRepositoryImpl(
-      salesRepository: _salesRepository,
-    );
+    // Resolve repositories once via DI
+    _salesRepository = getIt<SalesRepositoryImpl>();
+    _arpRepository = ArpRepositoryImpl();
+
+    // Build sidebar items once
+    sidebarItems = [
+      SidebarItem(
+        icon: LucideIcons.layoutDashboard,
+        title: "لوحة التحكم",
+        screen: DashboardHome(
+          onCardTap: (selectedIndex) => handleCardTap(selectedIndex),
+        ),
+      ),
+      SidebarItem(
+        icon: LucideIcons.shoppingCart,
+        title: "المبيعات",
+        screen: SalesScreen(repository: _salesRepository),
+      ),
+      SidebarItem(
+        icon: LucideIcons.fileText,
+        title: "الفواتير",
+        screen: BlocProvider<InvoiceCubit>(
+          create: (_) => InvoiceCubit(_salesRepository),
+          child:
+              InvoiceScreen(repository: _salesRepository, currentUser: curUser),
+        ),
+      ),
+      SidebarItem(
+        icon: LucideIcons.box,
+        title: "المنتجات",
+        screen: const ProductsScreen(),
+      ),
+      SidebarItem(
+        icon: LucideIcons.alertTriangle,
+        title: "المنتجات الناقصة",
+        screen: const StockScreen(),
+      ),
+      SidebarItem(
+        icon: LucideIcons.pieChart,
+        title: "التحليلات والتقارير",
+        screen: BlocProvider(
+          create: (context) => ArpCubit(_arpRepository),
+          child: const ArpScreen(),
+        ),
+      ),
+      SidebarItem(
+        icon: LucideIcons.bell,
+        title: "التنبيهات",
+        screen: const NotificationsScreen(),
+      ),
+      SidebarItem(
+        icon: LucideIcons.settings,
+        title: "الإعدادات",
+        screen: const SettingsScreen(),
+      ),
+    ];
   }
-
-  late final List<SidebarItem> sidebarItems = [
-    SidebarItem(
-      icon: LucideIcons.layoutDashboard,
-      title: "لوحة التحكم",
-      screen: DashboardHome(
-        onCardTap: (selectedIndex) => handleCardTap(selectedIndex),
-      ),
-    ),
-    SidebarItem(
-      icon: LucideIcons.shoppingCart,
-      title: "المبيعات",
-      screen: SalesScreen(repository: _salesRepository),
-    ),
-    SidebarItem(
-      icon: LucideIcons.fileText,
-      title: "الفواتير",
-      screen: BlocProvider<InvoiceCubit>(
-        create: (_) => InvoiceCubit(_salesRepository),
-        child: InvoiceScreen(
-            repository: _salesRepository, currentUser: curUser),
-      ),
-    ),
-
-    SidebarItem(
-      icon: LucideIcons.box,
-      title: "المنتجات",
-      screen: const ProductsScreen(),
-    ),
-    SidebarItem(
-      icon: LucideIcons.alertTriangle,
-      title: "المنتجات الناقصة",
-      screen: const StockScreen(),
-    ),
-    // ARP Screen with BlocProvider
-    SidebarItem(
-      icon: LucideIcons.pieChart,
-      title: "التحليلات والتقارير",
-      screen: BlocProvider(
-        create: (context) => ArpCubit(_arpRepository),
-        child: const ArpScreen(),
-      ),
-    ),
-    SidebarItem(
-      icon: LucideIcons.bell,
-      title: "التنبيهات",
-      screen: const NotificationsScreen(),
-    ),
-    SidebarItem(
-      icon: LucideIcons.settings,
-      title: "الإعدادات",
-      screen: const SettingsScreen(),
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    // Ensuring sidebarItems is initialized. didChangeDependencies called before build.
     final isMobileOrTablet = MediaQuery.of(context).size.width < 1000;
 
     return MultiBlocProvider(
@@ -159,23 +148,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: CustomSidebar(
                       items: sidebarItems,
                       selectedIndex: selectedIndex,
-                      onItemSelected: (index) {
-                        if (curUser.userType == UserType.cashier) {
-                          if (index == 5) {
-                            MotionSnackBarError(context,
-                                "ليس لديك صلاحية الوصول إلى هذه الصفحة.");
-                            return;
-                          } else {
-                            selectedIndex = index;
-                            setState(() {});
-                          }
-                        } else {
-                          selectedIndex = index;
-                          setState(() {});
-                        }
-
-                        Navigator.pop(context);
-                      },
+                      onItemSelected: (index) => _onSidebarSelected(context, index),
                     ),
                   )
                 : null,
@@ -186,21 +159,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     items: sidebarItems,
                     selectedIndex: selectedIndex,
                     isCollapsed: isSidebarCollapsed,
-                    onItemSelected: (index) {
-                      if (curUser.userType == UserType.cashier) {
-                        if (index == 5) {
-                          MotionSnackBarError(context,
-                              "ليس لديك صلاحية الوصول إلى هذه الصفحة.");
-                          return;
-                        } else {
-                          selectedIndex = index;
-                          setState(() {});
-                        }
-                      } else {
-                        selectedIndex = index;
-                        setState(() {});
-                      }
-                    },
+                    onItemSelected: (index) => _onSidebarSelected(context, index),
                   ),
                 Expanded(
                   child: Container(
@@ -215,24 +174,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+  
+  void _onSidebarSelected(BuildContext context, int index) {
+      if (index == 5) { // Report index
+          try {
+              PermissionGuard.checkReportAccess(curUser);
+          } catch (e) {
+              MotionSnackBarError(context, e.toString());
+              return;
+          }
+      }
+      
+      setState(() {
+          selectedIndex = index;
+      });
+      
+      if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+          Navigator.pop(context);
+      }
+  }
 
   /// Handles tap on a card in the dashboard screen.
   void handleCardTap(int targetIndex) {
-    print(targetIndex);
-    if (curUser.userType == UserType.cashier) {
-      if (targetIndex == 5) {
-        MotionSnackBarError(context, "ليس لديك صلاحية الوصول إلى هذه الصفحة.");
-      } else {
-        selectedIndex = targetIndex;
-        setState(() {});
-      }
-    } else {
-      selectedIndex = targetIndex;
-      setState(() {});
-    }
-    final scaffoldState = Scaffold.maybeOf(context);
-    if (scaffoldState != null && scaffoldState.isDrawerOpen) {
-      Navigator.of(context).pop();
-    }
+    _onSidebarSelected(context, targetIndex);
   }
 }

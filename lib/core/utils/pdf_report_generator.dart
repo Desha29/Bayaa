@@ -2,12 +2,11 @@ import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-import '../../features/arp/data/models/dialy_report_model.dart';
-
+import '../../features/arp/data/models/daily_report_model.dart';
 
 class PdfReportGenerator {
   static Future<File> generateDailyReportPDF(
-      DailyReportModel report, String filePath,
+      DailyReport report, String filePath,
       {PdfPageFormat format = PdfPageFormat.a4}) async {
     final pdf = pw.Document();
 
@@ -39,10 +38,9 @@ class PdfReportGenerator {
                   ),
                   child: pw.Column(
                     children: [
-                      _buildSummaryRow('Total Revenue', report.totalRevenue),
-                      _buildSummaryRow('Total Cost', report.totalCost),
-                      _buildSummaryRow('Total Profit', report.totalProfit),
-                      _buildSummaryRow('Profit Margin (%)', report.profitMargin),
+                      _buildSummaryRow('Total Sales', report.totalSales),
+                      _buildSummaryRow('Total Refunds', report.totalRefunds),
+                      _buildSummaryRow('Net Revenue', report.netRevenue),
                     ],
                   ),
                 ),
@@ -53,7 +51,7 @@ class PdfReportGenerator {
                         fontWeight: pw.FontWeight.bold,
                         color: PdfColors.blue900)),
                 pw.SizedBox(height: 10),
-                pw.Table.fromTextArray(
+                pw.TableHelper.fromTextArray(
                   headers: ['Product Name', 'Qty Sold', 'Revenue', 'Profit'],
                   data: report.topProducts
                       .map((p) => [

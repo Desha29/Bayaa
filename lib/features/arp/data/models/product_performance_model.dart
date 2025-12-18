@@ -1,11 +1,22 @@
+import 'package:hive/hive.dart';
 
-class ProductPerformanceModel {
+part 'product_performance_model.g.dart';
+
+@HiveType(typeId: 9)
+class ProductPerformanceModel extends HiveObject {
+  @HiveField(0)
   final String productId;
+  @HiveField(1)
   final String productName;
+  @HiveField(2)
   final int quantitySold;
+  @HiveField(3)
   final double revenue;
+  @HiveField(4)
   final double cost;
+  @HiveField(5)
   final double profit;
+  @HiveField(6)
   final double profitMargin;
 
   ProductPerformanceModel({

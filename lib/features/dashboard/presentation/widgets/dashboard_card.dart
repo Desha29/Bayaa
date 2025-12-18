@@ -147,23 +147,22 @@ class _DashboardCardState extends State<DashboardCard> {
                                 : SizedBox(),
                             (widget.title == 'المنتجات الناقصة')
                                 ? Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: AppColors.errorColor,
                                     ),
                                     child: Text(
-                                      getIt<StockCubit>()
-                                          .lowStockCount
-                                          .toString(),
-                                      style: TextStyle(
+                                      // Show total (ناقص + منتهي) instead of فقط منخفض المخزون
+                                      getIt<StockCubit>().totalCount.toString(),
+                                      style: const TextStyle(
                                         color: AppColors.backgroundColor,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 14,
                                       ),
                                     ),
                                   )
-                                : SizedBox(),
+                                : const SizedBox(),
                           ],
                         ),
                       ),

@@ -7,16 +7,20 @@ import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../data/arp_repository_impl.dart';
-import '../../data/models/dialy_report_model.dart';
+import '../../data/models/daily_report_model.dart';
 import '../../data/models/product_performance_model.dart';
 import '../../domain/daily_report_pdf_service.dart';
 import 'daily_report_preview_screen.dart';
 import '../../../../core/components/message_overlay.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../domain/arp_repository.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 
 class DailyReportScreen extends StatefulWidget {
-  const DailyReportScreen({Key? key}) : super(key: key);
+  final DailyReport? initialReport;
+  
+  const DailyReportScreen({Key? key, this.initialReport}) : super(key: key);
 
   @override
   State<DailyReportScreen> createState() => _DailyReportScreenState();
@@ -25,7 +29,7 @@ class DailyReportScreen extends StatefulWidget {
 class _DailyReportScreenState extends State<DailyReportScreen>
     with SingleTickerProviderStateMixin {
   DateTime selectedDate = DateTime.now();
-  DailyReportModel? report;
+  DailyReport? report;
   bool loading = false;
   late AnimationController _animationController;
 
@@ -36,7 +40,18 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    fetchReport();
+    
+    // Use initialReport if provided (for session closure)
+    if (widget.initialReport != null) {
+      report = widget.initialReport;
+      // Extract date from report if available
+      if (report!.date != null) {
+        selectedDate = report!.date!;
+      }
+    } else {
+      fetchReport();
+    }
+    
     _animationController.forward();
   }
 
@@ -51,13 +66,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       loading = true;
     });
 
-    final repo = ArpRepositoryImpl(
-      salesRepository: SalesRepositoryImpl(
-        productsBox: HiveHelper.productsBox,
-        salesBox: HiveHelper.salesBox,
-      ),
-    );
 
+    final repo = getIt<ArpRepository>();
     final result = await repo.getDailyReport(selectedDate);
 
     result.fold((failure) {
@@ -103,9 +113,6 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Future<void> _handlePreview() async {
-    print('Loaded report: $report');
-    print('Top products: ${report?.topProducts}');
-
     if (report == null) return;
     await Navigator.of(context).push(
       PageRouteBuilder(
@@ -132,9 +139,9 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     if (report == null) return;
     GlobalMessage.showLoading("جاري إعداد التقرير للطباعة...");
     try {
+      final pdfBytes = await DailyReportPdfService.generateDailyReportPDF(report!);
       await Printing.layoutPdf(
-        onLayout: (format) =>
-            DailyReportPdfService.generateDailyReportPDF(report!),
+        onLayout: (format) => pdfBytes,
       );
       GlobalMessage.showSuccess("تم إرسال التقرير للطباعة بنجاح");
     } catch (e) {
@@ -324,33 +331,54 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildReportContent() {
-    return Column(
-      children: [
-        // Summary Cards
-        FadeTransition(
-          opacity: _animationController,
-          child: SlideTransition(
-            position:
-                Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
-                    .animate(CurvedAnimation(
-                        parent: _animationController, curve: Curves.easeOut)),
-            child: _buildSummaryCards(),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 32),
+      child: Column(
+        children: [
+          // Summary Cards
+          FadeTransition(
+            opacity: _animationController,
+            child: SlideTransition(
+              position:
+                  Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
+                      .animate(CurvedAnimation(
+                          parent: _animationController, curve: Curves.easeOut)),
+              child: _buildSummaryCards(),
+            ),
           ),
-        ),
-        const SizedBox(height: 24),
-        FadeTransition(
-          opacity: _animationController,
-          child: SlideTransition(
-            position:
-                Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
-                    .animate(CurvedAnimation(
-                        parent: _animationController, curve: Curves.easeOut)),
-            child: _buildActionButtons(),
+          const SizedBox(height: 24),
+          FadeTransition(
+            opacity: _animationController,
+            child: SlideTransition(
+              position:
+                  Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
+                      .animate(CurvedAnimation(
+                          parent: _animationController, curve: Curves.easeOut)),
+              child: _buildActionButtons(),
+            ),
           ),
-        ),
-        const SizedBox(height: 24),
-        Expanded(
-          child: FadeTransition(
+          const SizedBox(height: 24),
+          if (report?.refundedProducts.isNotEmpty == true) ...[
+            SizedBox(
+              height: 300, 
+              child: FadeTransition(
+                opacity: _animationController,
+                child: _buildRefundedProductsList(),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (report?.transactions.isNotEmpty == true) ...[
+            SizedBox(
+              height: 400,
+              child: FadeTransition(
+                opacity: _animationController,
+                child: _buildTransactionsLog(),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+          FadeTransition(
             opacity: _animationController,
             child: SlideTransition(
               position:
@@ -360,8 +388,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               child: _buildTopProductsList(),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -370,18 +398,18 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       children: [
         Expanded(
           child: _buildSummaryCard(
-              'إجمالي الإيرادات',
-              '${report!.totalRevenue.toStringAsFixed(2)} ج.م',
+              'إجمالي المبيعات',
+              '${report!.totalSales.toStringAsFixed(2)} ج.م',
               Icons.attach_money,
               AppColors.successColor),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: _buildSummaryCard(
-              'إجمالي التكاليف',
-              '${report!.totalCost.toStringAsFixed(2)} ج.م',
-              Icons.money_off,
-              AppColors.errorColor),
+              'صافي الإيراد',
+              '${report!.netRevenue.toStringAsFixed(2)} ج.م',
+              Icons.trending_up,
+              Color(0xFF2E7D32)),
         ),
       ],
     );
@@ -457,7 +485,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                 icon: const Icon(Icons.print, size: 20),
                 label: const Text('طباعة مباشرة'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.successColor,
+                  backgroundColor: Color(0xFF2E7D32),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -515,7 +543,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                     color: AppColors.primaryColor, size: 24),
                 const SizedBox(width: 12),
                 Text(
-                  'جميع المنتجات المباعة (${report!.topProducts.length})',
+                  'أداء المنتجات (${report!.topProducts.length})',
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -524,14 +552,14 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               ],
             ),
           ),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: report!.topProducts.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) =>
-                  _buildProductCard(report!.topProducts[index], index),
-            ),
+          ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: report!.topProducts.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) =>
+                _buildProductCard(report!.topProducts[index], index),
           ),
           const SizedBox(height: 20),
         ],
@@ -633,4 +661,187 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       ),
     );
   }
+
+  Widget _buildRefundedProductsList() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                const Icon(Icons.remove_shopping_cart,
+                    color: AppColors.errorColor, size: 24),
+                const SizedBox(width: 12),
+                Text(
+                  'تفاصيل المرتجعات (${report!.refundedProducts.length})',
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.kDarkChip),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                dividerColor: Colors.grey.withOpacity(0.1),
+              ),
+              child: SingleChildScrollView(
+                child: DataTable(
+                  headingTextStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.mutedColor,
+                  ),
+                  dataTextStyle: const TextStyle(
+                    color: AppColors.kDarkChip,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  columnSpacing: 20,
+                  columns: const [
+                    DataColumn(label: Text('المنتج')),
+                    DataColumn(label: Text('الكمية المرتجعة'), numeric: true),
+                    DataColumn(label: Text('قيمة الاسترجاع'), numeric: true),
+                  ],
+                  rows: report!.refundedProducts.map((product) {
+                    return DataRow(
+                      cells: [
+                        DataCell(
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.errorColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Icon(Icons.inventory_2_outlined,
+                                    size: 16, color: AppColors.errorColor),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(product.productName),
+                            ],
+                          ),
+                        ),
+                        DataCell(Text('${product.quantitySold}')),
+                        DataCell(Text('${product.revenue.toStringAsFixed(2)} ج.م',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.errorColor))),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionsLog() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                const Icon(Icons.receipt_long,
+                    color: AppColors.primaryColor, size: 24),
+                const SizedBox(width: 12),
+                Text(
+                  'سجل العمليات (${report!.transactions.length})',
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.kDarkChip),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                dividerColor: Colors.grey.withOpacity(0.1),
+              ),
+              child: SingleChildScrollView(
+                child: DataTable(
+                  headingTextStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.mutedColor,
+                  ),
+                  dataTextStyle: const TextStyle(
+                    color: AppColors.kDarkChip,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  columnSpacing: 20,
+                  columns: const [
+                    DataColumn(label: Text('رقم الفاتورة')),
+                    DataColumn(label: Text('الوقت')),
+                    DataColumn(label: Text('النوع')),
+                    DataColumn(label: Text('الإجمالي'), numeric: true),
+                  ],
+                  rows: report!.transactions.map((sale) {
+                    final isRefund = sale.isRefund;
+                    return DataRow(
+                      cells: [
+                        DataCell(Text(sale.id.length > 8 ? '#${sale.id.substring(0, 8)}' : '#${sale.id}')),
+                        DataCell(Text(DateFormat('hh:mm a').format(sale.date))),
+                        DataCell(Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: (isRefund ? AppColors.errorColor : AppColors.successColor).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isRefund ? 'مرتجع' : 'بيع',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isRefund ? AppColors.errorColor : AppColors.successColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )),
+                        DataCell(Text('${sale.total.toStringAsFixed(2)} ج.م',
+                            style: const TextStyle(fontWeight: FontWeight.bold))),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
 }
+

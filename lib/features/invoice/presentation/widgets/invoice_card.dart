@@ -11,14 +11,16 @@ class InvoiceCard extends StatelessWidget {
   final Sale sale;
   final VoidCallback onOpen;
   final VoidCallback? onDelete;
-  final VoidCallback onReturn;
+  final VoidCallback? onReturn;
+  final VoidCallback onPrint;
   final bool isManager;
 
   const InvoiceCard({
     Key? key,
     required this.sale,
     required this.onOpen,
-    required this.onReturn,
+    this.onReturn,
+    required this.onPrint,
     this.onDelete,
     required this.isManager,
   }) : super(key: key);
@@ -67,13 +69,36 @@ class InvoiceCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'فاتورة #${sale.id}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.kDarkChip,
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            'فاتورة #${sale.id}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.kDarkChip,
+                            ),
+                          ),
+                          if (sale.isRefund) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.errorColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                'مرتجع',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.errorColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -113,7 +138,7 @@ class InvoiceCard extends StatelessWidget {
                         df.format(sale.date),
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.mutedColor.withOpacity(0.1),
+                          color: AppColors.mutedColor,
                         ),
                       ),
                     ],
@@ -133,19 +158,22 @@ class InvoiceCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
+                        if (onReturn != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.undo,
+                                  color: AppColors.primaryColor, size: 20),
+                              tooltip: 'مرتجع الفاتورة',
+                              onPressed: onReturn,
+                            ),
                           ),
-                          child: IconButton(
-                            icon: const Icon(Icons.undo, color: AppColors.primaryColor, size: 20),
-                            tooltip: 'مرتجع الفاتورة',
-                            onPressed: onReturn,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
+                          const SizedBox(width: 8),
+                        ],
                         if (isManager && onDelete != null)
                           Container(
                             padding: const EdgeInsets.all(8),
@@ -154,7 +182,8 @@ class InvoiceCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: IconButton(
-                              icon: const Icon(Icons.delete, color: AppColors.errorColor, size: 20),
+                              icon: const Icon(Icons.delete,
+                                  color: AppColors.errorColor, size: 20),
                               tooltip: 'حذف الفاتورة',
                               onPressed: onDelete,
                             ),
@@ -166,7 +195,12 @@ class InvoiceCard extends StatelessWidget {
                             color: AppColors.primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.print, color: AppColors.primaryColor, size: 20),
+                          child: IconButton(
+                            icon: const Icon(Icons.print,
+                                color: AppColors.primaryColor, size: 20),
+                            tooltip: 'طباعة الفاتورة',
+                            onPressed: onPrint,
+                          ),
                         ),
                       ],
                     ),

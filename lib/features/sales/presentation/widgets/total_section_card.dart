@@ -31,7 +31,7 @@ class TotalSectionCard extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.kCardBackground,
           borderRadius: BorderRadius.circular(16),
@@ -57,10 +57,10 @@ class TotalSectionCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'الإجمالي النهائي',
+                          'الإجمالي',
                           style: TextStyle(
                             color: AppColors.mutedColor,
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -69,7 +69,7 @@ class TotalSectionCard extends StatelessWidget {
                           '${totalAmount.toStringAsFixed(0)} ج.م',
                           style: TextStyle(
                             color: AppColors.kPrimaryBlue,
-                            fontSize: isWide ? 32 : 28,
+                            fontSize: isWide ? 24 : 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -77,13 +77,13 @@ class TotalSectionCard extends StatelessWidget {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: AppColors.successColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '$itemCount منتجات',
+                        '$itemCount منتج',
                         style: TextStyle(
                           color: AppColors.successColor,
                           fontWeight: FontWeight.bold,
@@ -92,25 +92,25 @@ class TotalSectionCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       flex: isWide ? 2 : 1,
                       child: ElevatedButton.icon(
                         onPressed: onCheckout ?? () {},
-                        icon: const Icon(Icons.shopping_cart, size: 20),
+                        icon: const Icon(Icons.payment, size: 18),
                         label: const Text(
-                          'إنهاء البيع',
+                          'إتمام الشراء',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.kSuccessGreen,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -122,18 +122,18 @@ class TotalSectionCard extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: onClearCart ?? () {},
-                        icon: const Icon(Icons.delete_outline, size: 20),
+                        icon: const Icon(Icons.delete_outline, size: 18),
                         label: const Text(
-                          'حذف الكل',
+                          'مسح السلة',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.kDangerRed,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

@@ -3,6 +3,7 @@
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/core/functions/messege.dart';
+import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 
 import 'package:flutter/material.dart';
 
@@ -15,8 +16,7 @@ import '../../dashboard/presentation/dashboard_screen.dart';
 
 import 'cubit/user_cubit.dart';
 import 'cubit/user_states.dart';
-import 'widgets/custom_button.dart';
-import 'widgets/custom_text_field.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,235 +26,261 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    // Fetch users on init
+    getIt<UserCubit>().getAllUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = 3;
+    double childAspectRatio = 1.1;
+
+    if (screenWidth < 900) {
+      crossAxisCount = 2;
+      childAspectRatio = 1.0;
+    }
+    if (screenWidth < 600) {
+      crossAxisCount = 1;
+      childAspectRatio = 1.1;
+    }
+
     return BlocProvider<UserCubit>.value(
       value: getIt<UserCubit>(),
-      child: LayoutBuilder(
-        builder: (context, c) {
-          final isMobile = c.maxWidth < 520;
-          final pad = isMobile ? 14.0 : 24.0;
-          final cardWidth = isMobile ? c.maxWidth - 28 : 500.0;
-
-          return BlocListener<UserCubit, UserStates>(
-            listener: (context, state) {
-              if (state is UserFailure) {
-                MotionSnackBarError(context, state.error);
-              } else if (state is UserSuccess) {
-                MotionSnackBarSuccess(context, state.message);
-                if (state.message == "تم تسجيل الدخول بنجاح") {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DashboardScreen(),
-                      ));
-                } else {
-                  MotionSnackBarInfo(context, state.message);
-                }
-              }
-            },
-            child: Scaffold(
-              backgroundColor: AppColors.backgroundColor,
-              body: LayoutBuilder(
-                builder: (context, c2) {
-                  final isShort = c2.maxHeight < 680;
-                  final avatarRadius = isMobile
-                      ? (isShort ? 56.0 : 68.0)
-                      : (isShort ? 76.0 : 92.0);
-
-                  return SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: 720,
-                          minHeight: c2.maxHeight - pad * 2,
+      child: BlocListener<UserCubit, UserStates>(
+        listener: (context, state) {
+          if (state is UserFailure) {
+            MotionSnackBarError(context, state.error);
+          } else if (state is UserSuccess) {
+            MotionSnackBarSuccess(context, state.message);
+            if (state.message == "تم تسجيل الدخول بنجاح") {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardScreen(),
+                  ));
+            } else {
+              MotionSnackBarInfo(context, state.message);
+            }
+          }
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.backgroundColor,
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 32),
+                  const Logo(isMobile: false, avatarRadius: 90),
+                  const SizedBox(height: 24),
+                  Text(
+                    'اختر المستخدم لتسجيل الدخول',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryColor,
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.all(pad),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Logo + titles
-                              Logo(
-                                  isMobile: isMobile,
-                                  avatarRadius: avatarRadius),
-                              SizedBox(height: isShort ? 16 : 24),
-
-                              // Form card
-                              Container(
-                                width: cardWidth,
-                                padding: EdgeInsets.all(isMobile ? 20 : 28),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Form(
-                                  key: _formKey,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          'تسجيل الدخول',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20,
-                                              ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          'أدخل بياناتك للوصول إلى النظام',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(
-                                                color: AppColors.mutedColor,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      CustomTextField(
-                                        controller: _usernameController,
-                                        label: 'اسم المستخدم',
-                                        autoFocus: true,
-                                        prefixIcon: LucideIcons.user,
-                                        textDirection: TextDirection.rtl,
-                                        validator: (v) =>
-                                            (v == null || v.trim().isEmpty)
-                                                ? 'يرجى إدخال اسم المستخدم'
-                                                : null,
-                                      ),
-                                      const SizedBox(height: 14),
-                                      BlocBuilder<UserCubit, UserStates>(
-                                        builder: (context, state) {
-                                          final cubit = UserCubit.get(context);
-                                          final isPasswordVisible =
-                                              cubit.isPasswordVisible;
-                                          return CustomTextField(
-                                            controller: _passwordController,
-                                            onEditingComplete: () {
-                                              _handleLogin(context);
-                                            },
-                                            label: 'كلمة المرور',
-                                            prefixIcon: isPasswordVisible
-                                                ? LucideIcons.unlock
-                                                : LucideIcons.lock,
-                                            obscureText: !isPasswordVisible,
-                                            textDirection: TextDirection.rtl,
-                                            suffixIcon: isPasswordVisible
-                                                ? LucideIcons.eye
-                                                : LucideIcons.eyeOff,
-                                            onSuffixTap: () {
-                                              UserCubit.get(context)
-                                                  .togglePasswordVisibility();
-                                            },
-                                            validator: (v) =>
-                                                (v == null || v.isEmpty)
-                                                    ? 'يرجى إدخال كلمة المرور'
-                                                    : null,
-                                          );
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                      BlocBuilder<UserCubit, UserStates>(
-                                        builder: (context, state) =>
-                                            CustomButton(
-                                          text: (state is UserLoading)
-                                              ? 'جاري تسجيل الدخول...'
-                                              : 'تسجيل الدخول',
-                                          onPressed: (state is UserLoading)
-                                              ? null
-                                              : () {
-                                                  _handleLogin(context);
-                                                },
-                                          isLoading: (state is UserLoading),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(height: 16),
-
-                              // Footer
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          '© 2025 Amr Store. جميع الحقوق محفوظة',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.copyWith(
-                                                  color: AppColors.mutedColor),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                  ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: BlocBuilder<UserCubit, UserStates>(
+                      builder: (context, state) {
+                        if (state is UserLoading) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (state is UsersLoaded) {
+                          if (state.users.isEmpty) {
+                            return const Center(child: Text("لا يوجد مستخدمين. يرجى إضافة مستخدم أولاً."));
+                          }
+                          return GridView.builder(
+                            padding: const EdgeInsets.all(20),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: childAspectRatio,
+                            ),
+                            itemCount: state.users.length,
+                            itemBuilder: (context, index) {
+                              final user = state.users[index];
+                              return _buildUserCard(context, user);
+                            },
+                          );
+                        } else if (state is UserFailure) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(state.error, style: const TextStyle(color: Colors.red)),
+                                const SizedBox(height: 10),
+                                ElevatedButton(
+                                  onPressed: () {
+                                     UserCubit.get(context).getAllUsers();
+                                  },
+                                  child: const Text("إعادة المحاولة"),
+                                )
+                              ],
+                            ),
+                          );
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    '© 2025 Amr Store. جميع الحقوق محفوظة.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 10),
+                ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserCard(BuildContext context, User user) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: () => _showPasswordDialog(context, user),
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+              child: Text(
+                user.name.isNotEmpty ? user.name[0].toUpperCase() : "?",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              user.name,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: user.userType == UserType.manager
+                    ? Colors.orange.withOpacity(0.2)
+                    : Colors.blue.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                user.userType == UserType.manager ? "مدير" : "كاشير",
+                style: TextStyle(
+                  color: user.userType == UserType.manager
+                      ? Colors.orange[800]
+                      : Colors.blue[800],
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPasswordDialog(BuildContext context, User user) {
+    final passwordController = TextEditingController();
+    bool isPasswordVisible = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(
+              "أدخل كلمة المرور لـ ${user.name}",
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            content: SizedBox(
+              width: 300,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: passwordController,
+                    obscureText: !isPasswordVisible,
+                    textAlign: TextAlign.center,
+                    decoration: InputDecoration(
+                      hintText: "كلمة المرور",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(isPasswordVisible
+                            ? LucideIcons.eye
+                            : LucideIcons.eyeOff),
+                        onPressed: () {
+                          setState(() {
+                            isPasswordVisible = !isPasswordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                    onSubmitted: (_) {
+                       Navigator.pop(dialogContext);
+                       _attemptLogin(context, user.username, passwordController.text);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text("إلغاء", style: TextStyle(color: Colors.red)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  _attemptLogin(context, user.username, passwordController.text);
+                },
+                child: const Text("دخول"),
+              ),
+            ],
+            actionsAlignment: MainAxisAlignment.center,
           );
         },
       ),
     );
   }
 
-  void _handleLogin(context) {
-    if (_formKey.currentState!.validate()) {
-      UserCubit.get(context).login(
-        _usernameController.text.trim(),
-        _passwordController.text,
-      );
+  void _attemptLogin(BuildContext context, String username, String password) {
+    if (password.isEmpty) {
+      MotionSnackBarError(context, "الرجاء إدخال كلمة المرور");
+      return;
     }
-  }
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+    // Use the UserCubit provided by the parent via getIt/context
+    getIt<UserCubit>().login(username, password);
   }
 }

@@ -26,6 +26,15 @@ class Sale extends HiveObject {
   @HiveField(6)
   final String? cashierUsername; // NEW: Username for reference
 
+  @HiveField(7)
+  final String? sessionId;
+
+  @HiveField(8)
+  final int invoiceTypeIndex; // 0: Sale, 1: Refund
+
+  @HiveField(9)
+  final String? refundOriginalInvoiceId;
+
   Sale({
     required this.id,
     required this.total,
@@ -34,7 +43,13 @@ class Sale extends HiveObject {
     required this.saleItems,
     required this.cashierName,
     this.cashierUsername,
+    this.sessionId,
+    this.invoiceTypeIndex = 0,
+    this.refundOriginalInvoiceId,
   });
+
+  bool get isRefund => invoiceTypeIndex == 1;
+  bool get canBeRefunded => !isRefund;
 }
 
 @HiveType(typeId: 6)

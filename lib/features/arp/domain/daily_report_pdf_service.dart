@@ -3,9 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-import '../data/models/dialy_report_model.dart';
-
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import '../data/models/daily_report_model.dart';
 
 // PDF Color helpers based on AppColors
 class PdfAppColors {
@@ -18,7 +16,7 @@ class PdfAppColors {
 
 class DailyReportPdfService {
   static Future<Uint8List> generateDailyReportPDF(
-    DailyReportModel report, {
+    DailyReport report, {
     bool landscape = false,
   }) async {
     final pdf = pw.Document();
@@ -109,7 +107,7 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- REPORT INFO -------------------------
-  static pw.Widget _buildReportInfo(DailyReportModel report, pw.Font boldFont) {
+  static pw.Widget _buildReportInfo(DailyReport report, pw.Font boldFont) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
@@ -120,9 +118,9 @@ class DailyReportPdfService {
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           _infoItem('تاريخ التقرير:', _formatDate(report.date), boldFont),
-          _infoItem('عدد المنتجات:', '${report.topProducts.length}', boldFont),
-          _infoItem('إجمالي الإيرادات:',
-              '${report.totalRevenue.toStringAsFixed(2)} ج.م', boldFont),
+          _infoItem('عدد الحركات:', '${report.totalTransactions}', boldFont),
+          _infoItem('صافي الإيرادات:',
+              '${report.netRevenue.toStringAsFixed(2)} ج.م', boldFont),
         ],
       ),
     );
@@ -155,24 +153,16 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- SUMMARY SECTION -------------------------
-  static pw.Widget _buildSummarySection(DailyReportModel report, pw.Font boldFont) {
-    final totalSold =
-        report.topProducts.fold<int>(0, (prev, e) => prev + e.quantitySold);
-    final avgValue = report.topProducts.isEmpty
-        ? 0.0
-        : report.totalRevenue / report.topProducts.length;
-
+  static pw.Widget _buildSummarySection(DailyReport report, pw.Font boldFont) {
     final summaries = [
-      _summaryBox('إجمالي الإيرادات',
-          '${report.totalRevenue.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('إجمالي الأرباح',
-          '${report.totalProfit.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('إجمالي التكاليف',
-          '${report.totalCost.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('إجمالي المنتجات المباعة', '$totalSold وحدة', boldFont),
-      _summaryBox('عدد المنتجات المختلفة', '${report.topProducts.length}', boldFont),
-      _summaryBox('متوسط قيمة المنتج',
-          '${avgValue.toStringAsFixed(2)} ج.م', boldFont),
+      _summaryBox('المبيعات الكلية',
+          '${report.totalSales.toStringAsFixed(2)} ج.م', boldFont),
+      _summaryBox('المرتجعات الكلية',
+          '${report.totalRefunds.toStringAsFixed(2)} ج.م', boldFont),
+      _summaryBox('صافي الربح',
+          '${report.netRevenue.toStringAsFixed(2)} ج.م', boldFont),
+      _summaryBox('عدد المعاملات', '${report.totalTransactions}', boldFont),
+      _summaryBox('تم الإغلاق بواسطة', report.closedByUserName, boldFont),
     ];
 
     return pw.Column(
@@ -230,11 +220,10 @@ class DailyReportPdfService {
 
   /// ------------------------- PRODUCT TABLE -------------------------
   static pw.Widget _buildProductTable(
-      DailyReportModel report, pw.Font font, pw.Font boldFont) {
+      DailyReport report, pw.Font font, pw.Font boldFont) {
     final headers = [
       'المنتج',
       'الكمية',
-      'سعر الوحدة',
       'الإيرادات',
       'التكلفة',
       'الأرباح',
@@ -242,20 +231,13 @@ class DailyReportPdfService {
     ];
 
     final data = report.topProducts.map((p) {
-      final qty = p.quantitySold;
-      final revenue = p.revenue;
-      final cost = p.cost;
-      final profit = p.profit;
-      final margin = p.profitMargin;
-      final unitPrice = qty > 0 ? revenue / qty : 0.0;
       return [
         p.productName,
-        qty.toString(),
-        '${unitPrice.toStringAsFixed(2)}',
-        '${revenue.toStringAsFixed(2)}',
-        '${cost.toStringAsFixed(2)}',
-        '${profit.toStringAsFixed(2)}',
-        '${margin.toStringAsFixed(1)}%',
+        p.quantitySold.toString(),
+        '${p.revenue.toStringAsFixed(2)}',
+        '${p.cost.toStringAsFixed(2)}',
+        '${p.profit.toStringAsFixed(2)}',
+        '${p.profitMargin.toStringAsFixed(1)}%',
       ];
     }).toList();
 
@@ -263,7 +245,7 @@ class DailyReportPdfService {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'تفاصيل المنتجات المباعة',
+          'أداء المنتجات الأكثر مبيعاً',
           style: pw.TextStyle(
             font: boldFont,
             fontSize: 17,
@@ -271,7 +253,6 @@ class DailyReportPdfService {
           ),
         ),
         pw.SizedBox(height: 10),
-        // Using TableHelper instead of deprecated Table.fromTextArray
         pw.TableHelper.fromTextArray(
           headers: headers,
           data: data,

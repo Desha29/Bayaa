@@ -14,6 +14,7 @@ class InvoiceListSection extends StatelessWidget {
   final Function(Sale) onOpenInvoice;
   final Function(Sale) onDeleteSale;
   final Function(Sale) onReturnSale;
+  final Function(Sale) onPrintInvoice;
   final bool isManager;
 
   const InvoiceListSection({
@@ -26,6 +27,7 @@ class InvoiceListSection extends StatelessWidget {
     required this.onOpenInvoice,
     required this.onDeleteSale,
     required this.onReturnSale,
+    required this.onPrintInvoice,
     required this.isManager,
   }) : super(key: key);
 
@@ -91,7 +93,9 @@ class InvoiceListSection extends StatelessWidget {
             sale: sales[i],
             onOpen: () => onOpenInvoice(sales[i]),
             onDelete: isManager ? () => onDeleteSale(sales[i]) : null,
-            onReturn: () => onReturnSale(sales[i]),
+            // Refunds are restricted to manager only, and cannot refund a refund
+            onReturn: (isManager && !sales[i].isRefund) ? () => onReturnSale(sales[i]) : null,
+            onPrint: () => onPrintInvoice(sales[i]),
             isManager: isManager,
           ),
         ),

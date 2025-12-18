@@ -5,6 +5,9 @@ import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:crazy_phone_pos/features/sales/data/models/sale_model.dart';
 import 'package:crazy_phone_pos/features/settings/data/models/store_info_model.dart';
+import 'package:crazy_phone_pos/features/arp/data/models/session_model.dart';
+import 'package:crazy_phone_pos/features/arp/data/models/daily_report_model.dart';
+import 'package:crazy_phone_pos/features/arp/data/models/product_performance_model.dart';
 
 class HiveHelper {
   /// Initialize Hive and perform all setup operations
@@ -41,6 +44,9 @@ class HiveHelper {
     Hive.registerAdapter(ProductAdapter());
     Hive.registerAdapter(SaleAdapter());
     Hive.registerAdapter(SaleItemAdapter());
+    Hive.registerAdapter(SessionAdapter());
+    Hive.registerAdapter(DailyReportAdapter());
+    Hive.registerAdapter(ProductPerformanceModelAdapter());
   }
 
   /// Open all required Hive boxes with error handling
@@ -51,7 +57,9 @@ class HiveHelper {
         Hive.openBox<Product>('productsBox'),
         Hive.openBox('categoryBox'),
         Hive.openBox<StoreInfo>('storeBox'),
-        Hive.openBox<Sale>('salesBox'),
+        Hive.openLazyBox<Sale>('salesBox'),
+        Hive.openBox<Session>('sessionBox'),
+        Hive.openBox<DailyReport>('dailyReportBox'),
       ]);
     } catch (e) {
       print('Error opening boxes, attempting to recover: $e');
@@ -63,7 +71,9 @@ class HiveHelper {
         Hive.openBox<Product>('productsBox'),
         Hive.openBox('categoryBox'),
         Hive.openBox<StoreInfo>('storeBox'),
-        Hive.openBox<Sale>('salesBox'),
+        Hive.openLazyBox<Sale>('salesBox'),
+        Hive.openBox<Session>('sessionBox'),
+        Hive.openBox<DailyReport>('dailyReportBox'),
       ]);
     }
   }
@@ -77,6 +87,8 @@ class HiveHelper {
         Hive.deleteBoxFromDisk('categoryBox'),
         Hive.deleteBoxFromDisk('storeBox'),
         Hive.deleteBoxFromDisk('salesBox'),
+        Hive.deleteBoxFromDisk('sessionBox'),
+        Hive.deleteBoxFromDisk('dailyReportBox'),
       ]);
       print('Corrupted boxes deleted successfully');
     } catch (e) {
@@ -106,7 +118,9 @@ class HiveHelper {
   static Box<Product> get productsBox => Hive.box<Product>('productsBox');
   static Box get categoryBox => Hive.box('categoryBox');
   static Box<StoreInfo> get storeBox => Hive.box<StoreInfo>('storeBox');
-  static Box<Sale> get salesBox => Hive.box<Sale>('salesBox');
+  static LazyBox<Sale> get salesBox => Hive.lazyBox<Sale>('salesBox'); // Changed to LazyBox
+  static Box<Session> get sessionBox => Hive.box<Session>('sessionBox');
+  static Box<DailyReport> get dailyReportBox => Hive.box<DailyReport>('dailyReportBox');
 
   static Future<void> closeAllBoxes() async => Hive.close();
 

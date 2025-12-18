@@ -1,50 +1,51 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'arp_summary_model.dart';
+part of 'product_performance_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class ArpSummaryModelAdapter extends TypeAdapter<ArpSummaryModel> {
+class ProductPerformanceModelAdapter
+    extends TypeAdapter<ProductPerformanceModel> {
   @override
-  final int typeId = 4;
+  final int typeId = 9;
 
   @override
-  ArpSummaryModel read(BinaryReader reader) {
+  ProductPerformanceModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return ArpSummaryModel(
-      totalRevenue: fields[0] as double,
-      totalCost: fields[1] as double,
-      totalProfit: fields[2] as double,
-      profitMargin: fields[3] as double,
-      totalSales: fields[4] as int,
-      startDate: fields[5] as DateTime,
-      endDate: fields[6] as DateTime,
+    return ProductPerformanceModel(
+      productId: fields[0] as String,
+      productName: fields[1] as String,
+      quantitySold: fields[2] as int,
+      revenue: fields[3] as double,
+      cost: fields[4] as double,
+      profit: fields[5] as double,
+      profitMargin: fields[6] as double,
     );
   }
 
   @override
-  void write(BinaryWriter writer, ArpSummaryModel obj) {
+  void write(BinaryWriter writer, ProductPerformanceModel obj) {
     writer
       ..writeByte(7)
       ..writeByte(0)
-      ..write(obj.totalRevenue)
+      ..write(obj.productId)
       ..writeByte(1)
-      ..write(obj.totalCost)
+      ..write(obj.productName)
       ..writeByte(2)
-      ..write(obj.totalProfit)
+      ..write(obj.quantitySold)
       ..writeByte(3)
-      ..write(obj.profitMargin)
+      ..write(obj.revenue)
       ..writeByte(4)
-      ..write(obj.totalSales)
+      ..write(obj.cost)
       ..writeByte(5)
-      ..write(obj.startDate)
+      ..write(obj.profit)
       ..writeByte(6)
-      ..write(obj.endDate);
+      ..write(obj.profitMargin);
   }
 
   @override
@@ -53,7 +54,7 @@ class ArpSummaryModelAdapter extends TypeAdapter<ArpSummaryModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ArpSummaryModelAdapter &&
+      other is ProductPerformanceModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:printing/printing.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../auth/data/models/user_model.dart';
@@ -10,13 +11,16 @@ import '../../sales/data/models/sale_model.dart';
 import '../../../core/components/screen_header.dart';
 import '../../sales/domain/sales_repository.dart';
 import '../data/invoice_models.dart';
+import '../domain/invoice_pdf_service.dart';
+import '../domain/refund_calculation_service.dart';
 import 'cubit/invoice_cubit.dart';
 import 'cubit/invoice_state.dart';
 import 'invoice_preview_screen.dart';
 import 'widgets/invoice_filter_section.dart';
 import 'widgets/invoice_list_section.dart';
+import 'widgets/partial_refund_dialog.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 
 class InvoiceScreen extends StatefulWidget {
   final SalesRepository repository;
@@ -97,7 +101,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
   }
 
   void _clearFilters() {
-    context.read<InvoiceCubit>().setDate(null, null);
+    context.read<InvoiceCubit>().resetFilters();
   }
 
   Future<void> _selectDate(bool isStart) async {
@@ -146,23 +150,30 @@ class _InvoiceScreenState extends State<InvoiceScreen>
   }
 
   Future<void> _handleReturnSale(Sale sale) async {
-    final confirmed = await showDialog<bool>(
+    // Show partial refund dialog
+    final refundService = RefundCalculationService(widget.repository);
+    
+    final selectedItems = await showDialog<List<RefundItem>>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('تأكيد المرتجع'),
-        content: Text(
-            'هل أنت متأكد من إرجاع الفاتورة (#${sale.id})؟ سيتم زيادة الكمية مرة أخرى في المخزن'),
-        actions: [
-          TextButton(child: const Text('إلغاء'), onPressed: () => Navigator.of(ctx).pop(false)),
-          ElevatedButton(child: const Text('تأكيد'), onPressed: () => Navigator.of(ctx).pop(true)),
-        ],
+      builder: (ctx) => PartialRefundDialog(
+        originalSale: sale,
+        refundService: refundService,
       ),
     );
-    if (confirmed != true) return;
 
-    await context.read<InvoiceCubit>().returnSale(sale);
-    ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم المرتجع وإزالة الفاتورة')));
+    if (selectedItems == null || selectedItems.isEmpty) return;
+
+    // Create partial refund
+    await context.read<InvoiceCubit>().createPartialRefund(
+      originalSale: sale,
+      itemsToRefund: selectedItems,
+    );
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم المرتجع بنجاح')),
+      );
+    }
   }
 
   Future<void> _deleteInvoices(
@@ -195,9 +206,9 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: 'Amr Store',
-      storeAddress: ' الخانكة امام شارع الحجار   - القليوبية ',
-      storePhone: '01002546124',
+      storeName: '',
+      storeAddress: '',
+      storePhone: '',
       cashierName: cashierName,
       lines: sale.saleItems
           .map((it) => InvoiceLine(
@@ -210,7 +221,6 @@ class _InvoiceScreenState extends State<InvoiceScreen>
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
-      logoAsset: 'assets/images/logo.jpg',
     );
 
     await Navigator.of(context).push(PageRouteBuilder(
@@ -230,6 +240,35 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     ));
   }
 
+  Future<void> _handlePrintInvoice(Sale sale) async {
+    final subtotal = sale.saleItems.fold<double>(0, (s, it) => s + it.total);
+    final cashierName = sale.cashierName ?? 'الكاشير';
+
+    final data = InvoiceData(
+      invoiceId: sale.id,
+      date: sale.date,
+      storeName: '', // Will be replaced by dynamic data in service
+      storeAddress: '', 
+      storePhone: '',
+      cashierName: cashierName,
+      lines: sale.saleItems
+          .map((it) => InvoiceLine(
+                name: it.name,
+                price: it.price,
+                qty: it.quantity,
+              ))
+          .toList(),
+      subtotal: subtotal,
+      discount: 0.0,
+      tax: 0.0,
+      grandTotal: sale.total,
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (format) => InvoicePdfService.buildReceipt80mm(data),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -244,7 +283,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FadeTransition(
+                   FadeTransition(
                     opacity: _animationController,
                     child: SlideTransition(
                       position: Tween<Offset>(
@@ -289,6 +328,9 @@ class _InvoiceScreenState extends State<InvoiceScreen>
                         onClearFilters: _clearFilters,
                         onDeleteInvoices: () =>
                             _deleteInvoices(state.startDate, state.endDate, state.searchQuery),
+                        filterType: state.filterType,
+                        onFilterTypeChanged: (type) =>
+                            context.read<InvoiceCubit>().setFilterType(type),
                       ),
                     ),
                   ),
@@ -303,6 +345,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
                       onOpenInvoice: _openInvoice,
                       onDeleteSale: _handleDeleteSale,
                       onReturnSale: _handleReturnSale,
+                      onPrintInvoice: _handlePrintInvoice,
                       isManager: widget.currentUser.userType == UserType.manager,
                     ),
                   ),

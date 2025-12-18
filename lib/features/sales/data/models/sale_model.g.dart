@@ -24,13 +24,16 @@ class SaleAdapter extends TypeAdapter<Sale> {
       saleItems: (fields[4] as List).cast<SaleItem>(),
       cashierName: fields[5] as String?,
       cashierUsername: fields[6] as String?,
+      sessionId: fields[7] as String?,
+      invoiceTypeIndex: fields[8] as int,
+      refundOriginalInvoiceId: fields[9] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Sale obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +47,13 @@ class SaleAdapter extends TypeAdapter<Sale> {
       ..writeByte(5)
       ..write(obj.cashierName)
       ..writeByte(6)
-      ..write(obj.cashierUsername);
+      ..write(obj.cashierUsername)
+      ..writeByte(7)
+      ..write(obj.sessionId)
+      ..writeByte(8)
+      ..write(obj.invoiceTypeIndex)
+      ..writeByte(9)
+      ..write(obj.refundOriginalInvoiceId);
   }
 
   @override
@@ -74,7 +83,7 @@ class SaleItemAdapter extends TypeAdapter<SaleItem> {
       price: fields[2] as double,
       quantity: fields[3] as int,
       total: fields[4] as double,
-      wholesalePrice: (fields[5] as double?) ?? 0.0,
+      wholesalePrice: fields[5] as double,
     );
   }
 

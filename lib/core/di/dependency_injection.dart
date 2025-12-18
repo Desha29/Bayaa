@@ -5,52 +5,68 @@ import 'package:crazy_phone_pos/features/products/data/data_source/category_data
 import 'package:crazy_phone_pos/features/products/data/data_source/product_data_source.dart';
 import 'package:crazy_phone_pos/features/products/data/repository/product_repository_imp.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
-import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive_flutter/adapters.dart';
-
 
 import '../../features/arp/data/arp_repository_impl.dart';
+import '../../features/arp/domain/arp_repository.dart';
 import '../../features/arp/presentation/cubit/arp_cubit.dart';
 import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
-import '../../features/sales/data/models/sale_model.dart';
 import '../../features/sales/data/repository/sales_repository_impl.dart';
 
 import '../../features/sales/presentation/cubit/sales_cubit.dart';
 import '../../features/settings/data/data_source/store_info_data_source.dart';
 import '../../features/settings/data/repository/settings_repository_imp.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
+import '../../core/utils/hive_helper.dart';
+import '../../features/arp/data/repositories/session_repository_impl.dart';
 
 final getIt = GetIt.instance;
 
 void setup() {
+  // Repositories
+  getIt.registerSingleton<SessionRepositoryImpl>(SessionRepositoryImpl());
+
   getIt.registerSingleton<UserCubit>(UserCubit(
-      userRepository: UserRepositoryImp(userDataSource: UserDataSource())));
+      userRepository: UserRepositoryImp(userDataSource: UserDataSource()),
+      sessionRepository: getIt<SessionRepositoryImpl>()));
+
   getIt.registerSingleton<ProductCubit>(ProductCubit(
       productRepositoryInt: ProductRepositoryImp(
           productDataSource: ProductDataSource(),
           categoryDataSource: CategoryDataSource())));
-  getIt.registerSingleton<SalesCubit>(SalesCubit(
-      repository: SalesRepositoryImpl(
-          productsBox: Hive.box<Product>('productsBox'),
-          salesBox: Hive.box<Sale>('salesBox'))));
+
+  // Sales Repository with LazyBox
+  final salesRepo = SalesRepositoryImpl(
+    productsBox: HiveHelper.productsBox,
+    salesBox: HiveHelper.salesBox,
+  );
+
+  // Expose SalesRepositoryImpl itself for direct injection (e.g., in DashboardScreen)
+  getIt.registerSingleton<SalesRepositoryImpl>(salesRepo);
+
+  getIt.registerSingleton<SalesCubit>(SalesCubit(repository: salesRepo));
+
   getIt.registerSingleton<StockCubit>(StockCubit(
       productRepository: ProductRepositoryImp(
           productDataSource: ProductDataSource(),
           categoryDataSource: CategoryDataSource())));
-  getIt.registerSingleton<NotificationsCubit>(NotificationsCubit());
-  getIt.registerSingleton<ArpCubit>(ArpCubit( ArpRepositoryImpl(
-    salesRepository: SalesRepositoryImpl(
-        productsBox: Hive.box<Product>('productsBox'),
-        salesBox: Hive.box<Sale>('salesBox')),
-  ),
 
-  ));
+  getIt.registerSingleton<NotificationsCubit>(NotificationsCubit());
+
+  final arpRepo = ArpRepositoryImpl();
+  getIt.registerSingleton<ArpRepository>(arpRepo);
+
+  getIt.registerSingleton<ArpCubit>(ArpCubit(arpRepo));
+
+  // Store info repository (used by Settings and Invoice PDF/printing)
+  final storeInfoRepo = StoreInfoRepository(
+    dataSource: StoreInfoDataSource(),
+  );
+  getIt.registerSingleton<StoreInfoRepository>(storeInfoRepo);
 
   getIt.registerSingleton<SettingsCubit>(SettingsCubit(
-      userCubit: getIt<UserCubit>(),
-      storeRepository: StoreInfoRepository(
-        dataSource: StoreInfoDataSource(),
-      )));
+    userCubit: getIt<UserCubit>(),
+    storeRepository: storeInfoRepo,
+  ));
 }

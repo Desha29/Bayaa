@@ -9,7 +9,7 @@ import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 class ActivationScreen extends StatelessWidget {
   const ActivationScreen({super.key});
 
-  // بيانات التواصل (عدّلها برحتك)
+  
   final String phone = "+201025461241";
   final String email = "mstfo23mr5@gmail.com";
   final String whatsapp = "https://wa.me/201025461241";
