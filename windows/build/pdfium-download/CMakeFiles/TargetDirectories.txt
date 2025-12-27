@@ -1,0 +1,3 @@
+D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/pdfium-download.dir
+D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/ALL_BUILD.dir
+D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/ZERO_CHECK.dir

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// HID suppression handled by SalesScreen via focus checks; don't directly
+// remove global listeners from widgets.
 import '../../../../core/constants/app_colors.dart';
 
 class CartItemRow extends StatefulWidget {
@@ -41,7 +43,8 @@ class _CartItemRowState extends State<CartItemRow> {
   @override
   void initState() {
     super.initState();
-    _priceController = TextEditingController(text: widget.price.toStringAsFixed(2));
+    _priceController =
+        TextEditingController(text: widget.price.toStringAsFixed(2));
   }
 
   @override
@@ -50,71 +53,81 @@ class _CartItemRowState extends State<CartItemRow> {
     super.dispose();
   }
 
-  void _showEditPriceDialog() {
+  Future<void> _showEditPriceDialog() async {
     _priceController.text = widget.price.toStringAsFixed(2);
-    showDialog(
+
+    // Rely on focus-based suppression in SalesScreen; do not remove global listeners here.
+
+    await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('تعديل السعر'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'الحد الأدنى للسعر: ${widget.minPrice.toStringAsFixed(2)} ج.م',
-              style: TextStyle(
-                color: AppColors.warningColor,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('تعديل السعر'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'الحد الأدنى للسعر: ${widget.minPrice.toStringAsFixed(2)} ج.م',
+                style: TextStyle(
+                  color: AppColors.warningColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _priceController,
+                autofocus: true,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                // Allow progressive typing: empty, integers, or decimals up to 2 places.
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$')),
+                ],
+                decoration: InputDecoration(
+                  labelText: 'السعر الجديد',
+                  suffixText: 'ج.م',
+                  border: const OutlineInputBorder(),
+                  filled: true,
+                  fillColor: AppColors.surfaceColor,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _priceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-              decoration: InputDecoration(
-                labelText: 'السعر الجديد',
-                suffixText: 'ج.م',
-                border: const OutlineInputBorder(),
-                filled: true,
-                fillColor: AppColors.surfaceColor,
+            ElevatedButton(
+              onPressed: () {
+                final newPrice = double.tryParse(_priceController.text);
+                if (newPrice != null && newPrice >= widget.minPrice) {
+                  widget.onEditPrice?.call(newPrice);
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'السعر يجب أن يكون أكبر من أو يساوي ${widget.minPrice.toStringAsFixed(2)} ج.م',
+                      ),
+                      backgroundColor: AppColors.kDangerRed,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.kPrimaryBlue,
               ),
+              child: const Text('حفظ'),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final newPrice = double.tryParse(_priceController.text);
-              if (newPrice != null && newPrice >= widget.minPrice) {
-                widget.onEditPrice?.call(newPrice);
-                Navigator.pop(context);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'السعر يجب أن يكون أكبر من أو يساوي ${widget.minPrice.toStringAsFixed(2)} ج.م',
-                    ),
-                    backgroundColor: AppColors.kDangerRed,
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.kPrimaryBlue,
-            ),
-            child: const Text('حفظ'),
-          ),
-        ],
-      ),
+        );
+      },
     );
+
+    // No-op: HID listener reattachment handled centrally by SalesScreen focus logic.
   }
 
   // Get color for remaining quantity indicator
@@ -163,12 +176,15 @@ class _CartItemRowState extends State<CartItemRow> {
                         const SizedBox(width: 8),
                         // Remaining quantity indicator
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: _getRemainingQuantityColor().withOpacity(0.1),
+                            color:
+                                _getRemainingQuantityColor().withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
-                              color: _getRemainingQuantityColor().withOpacity(0.3),
+                              color:
+                                  _getRemainingQuantityColor().withOpacity(0.3),
                             ),
                           ),
                           child: Row(
@@ -196,14 +212,14 @@ class _CartItemRowState extends State<CartItemRow> {
                   ],
                 ),
               ),
-              
               if (isWide) const SizedBox(width: 12),
               Expanded(
                 flex: isWide ? 2 : 2,
                 child: GestureDetector(
                   onTap: _showEditPriceDialog,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.surfaceColor,
                       borderRadius: BorderRadius.circular(6),

@@ -70,7 +70,10 @@ class SaleItem {
   final double total;
 
   @HiveField(5)
-  final double wholesalePrice; // Add this field with Hive annotation
+  final double wholesalePrice;
+
+  @HiveField(6)
+  int refundedQuantity = 0; // NEW: Track refunded quantity permanently
 
   SaleItem({
     required this.productId,
@@ -78,6 +81,7 @@ class SaleItem {
     required this.price,
     required this.quantity,
     required this.total,
-    required this.wholesalePrice, // Add this to constructor
+    required this.wholesalePrice,
+    this.refundedQuantity = 0, // Default to 0
   });
 }

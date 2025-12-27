@@ -1,0 +1,8 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeParseArguments.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindPackageMessage.cmake
+D:/Work/crazy_phone_pos/windows/build/pdfium-src/PDFiumConfig.cmake
+D:/Work/crazy_phone_pos/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/CMakeLists.txt
+D:/Work/crazy_phone_pos/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/DownloadProject.CMakeLists.cmake.in
+D:/Work/crazy_phone_pos/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/DownloadProject.cmake

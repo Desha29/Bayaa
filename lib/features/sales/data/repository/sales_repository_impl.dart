@@ -183,29 +183,25 @@ class SalesRepositoryImpl implements SalesRepository {
 @override
 Future<Either<Failure, Unit>> deleteSalesInRange(DateTime start, DateTime end) async {
   try {
-    // This is expensive with LazyBox as we must load everything to check date.
-    // Archive strategy: If keys are timestamps, filter keys directly!
-    // Key format check: "1734537123" (millis).
-    // If keys are millis strings, we can convert filter keys directly without loading value.
-    
     final keys = salesBox.keys.toList();
     for (var key in keys) {
-      if (key is String) { // Assuming string keys from millis
+      if (key is String) { 
            final keyMillis = int.tryParse(key);
            if (keyMillis != null) {
                final date = DateTime.fromMillisecondsSinceEpoch(keyMillis);
                if (!date.isBefore(start) && !date.isAfter(end)) {
-                    await salesBox.delete(key);
+                    // Use deleteSale to ensure stock adjustment
+                    await deleteSale(key);
                }
                continue;
            }
       }
       
-      // Fallback: Load object if key isn't timestamp
       final sale = await salesBox.get(key);
       if (sale != null) {
            if (!sale.date.isBefore(start) && !sale.date.isAfter(end)) {
-               await salesBox.delete(key);
+               // Use deleteSale to ensure stock adjustment
+               await deleteSale(key.toString());
            }
       }
     }
@@ -218,8 +214,6 @@ Future<Either<Failure, Unit>> deleteSalesInRange(DateTime start, DateTime end) a
 @override
 Future<Either<Failure, Unit>> deleteSalesByQuery(String query) async {
   try {
-      // Very expensive. Iterates all. 
-      // Recommend avoiding this on large datasets, or restrict to recent.
     final keys = salesBox.keys.toList();
     for (var key in keys) {
        final sale = await salesBox.get(key);
@@ -227,7 +221,8 @@ Future<Either<Failure, Unit>> deleteSalesByQuery(String query) async {
           if (sale.id.contains(query) || sale.saleItems.any((item) =>
               item.productId.contains(query) || item.name.toLowerCase().contains(query.toLowerCase())
           )) {
-              await salesBox.delete(key);
+              // Use deleteSale to ensure stock is adjusted correctly
+              await deleteSale(key.toString());
           }
        }
     }
@@ -236,26 +231,27 @@ Future<Either<Failure, Unit>> deleteSalesByQuery(String query) async {
     return Left(CacheFailure('فشل في حذف الفواتير المطابقة: ${e.toString()}'));
   }
 }
-@override
-Future<Either<Failure, Unit>> deleteSale(String saleId) async {
-  try {
-    if (!salesBox.containsKey(saleId)) {
-      return Left(CacheFailure('عملية الحذف فشلت: لم يتم العثور على هذا البيع.'));
+
+  @override
+  Future<Either<Failure, Unit>> deleteSale(String saleId) async {
+    try {
+      if (!salesBox.containsKey(saleId)) {
+        return Left(CacheFailure('عملية الحذف فشلت: لم يتم العثور على هذا البيع.'));
+      }
+
+      // User requested NO stock update on delete ("when delete no").
+      // We strictly delete the record here without modifying product quantities.
+
+      await salesBox.delete(saleId);
+      return const Right(unit);
+    } catch (e) {
+      return Left(CacheFailure('فشل في حذف البيع: ${e.toString()}'));
     }
-    await salesBox.delete(saleId);
-    return const Right(unit);
-  } catch (e) {
-    return Left(CacheFailure('فشل في حذف البيع: ${e.toString()}'));
   }
-}
 
  @override
 Future<Either<Failure, List<Sale>>> getAllSales() async {
   try {
-     // Should we pagination here? Interface says getAll.
-     // User requirement: NEVER load all.
-     // We'll return empty or throw, or implement pagination.
-     // For compatibility, let's load LAST 100 max.
      final keys = salesBox.keys.toList(); 
      final recentKeys = keys.reversed.take(100).toList();
      final List<Sale> sales = [];

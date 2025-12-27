@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    '© 2025 Amr Store. جميع الحقوق محفوظة.',
+                    '© 2025 Crazy Phone POS. جميع الحقوق محفوظة.',
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 10),

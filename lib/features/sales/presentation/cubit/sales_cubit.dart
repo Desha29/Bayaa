@@ -19,12 +19,12 @@ class SalesCubit extends Cubit<SalesState> {
   // But strictly constructor injection is better. I will add it to DI later.
   // For now, to minimize diffs and since getIt is used elsewhere, allow lookup or optional Param?
   // Let's rely on DI update.
-  // But wait, the previous code update for DI (Step 173) did NOT inject SessionRepository into SalesCubit yet. 
+  // But wait, the previous code update for DI (Step 173) did NOT inject SessionRepository into SalesCubit yet.
   // I will assume I will update DI in next step.
   // So I add the field here.
-  
+
   // Note: DI update is NEEDED after this file change.
-  
+
   SalesCubit({required this.repository}) : super(SalesInitial());
 
   // HID buffer for keyboard-wedge scanners
@@ -138,6 +138,12 @@ class SalesCubit extends Cubit<SalesState> {
     _emitLoaded();
   }
 
+  // Public API so other features (e.g., Products screen) can add items
+  // directly to the sales cart.
+  void addProduct(Product p) {
+    _addProductToCart(p);
+  }
+
   void increase(int index) {
     if (index < 0 || index >= _cartItems.length) return;
     _cartItems[index] =
@@ -198,21 +204,21 @@ class SalesCubit extends Cubit<SalesState> {
     // This is safer as I don't need to change Constructor if I don't want to break other tests immediately, but constructor injection is best practice.
     // However, since I am rewriting this file, I might as well rely on getIt global or update constructor.
     // Given the constraints and context, using getIt inside method is lower risk for now.
-    
+
     final sessionRepo = getIt<SessionRepositoryImpl>();
     var currentSession = sessionRepo.getCurrentSession();
     Session session;
-    
+
     // Auto-Open Session if not exists (for Admin flow who stays logged in)
     if (currentSession == null || !currentSession.isOpen) {
-       final currentUser = getIt<UserCubit>().currentUser;
-       try {
-         session = await sessionRepo.openSession(currentUser);
-       } catch (e) {
-         emit(SalesError(message: 'فشل فتح جلسة جديدة: $e'));
-         _emitLoaded();
-         return;
-       }
+      final currentUser = getIt<UserCubit>().currentUser;
+      try {
+        session = await sessionRepo.openSession(currentUser);
+      } catch (e) {
+        emit(SalesError(message: 'فشل فتح جلسة جديدة: $e'));
+        _emitLoaded();
+        return;
+      }
     } else {
       session = currentSession;
     }
@@ -234,7 +240,8 @@ class SalesCubit extends Cubit<SalesState> {
       total: _total(),
       items: _cartItems.length,
       cashierName: getIt<UserCubit>().currentUser.name,
-      cashierUsername: getIt<UserCubit>().currentUser.username, // Added username
+      cashierUsername:
+          getIt<UserCubit>().currentUser.username, // Added username
       sessionId: session.id, // Linked Session ID
       date: DateTime.now(),
       saleItems: _cartItems
@@ -261,7 +268,7 @@ class SalesCubit extends Cubit<SalesState> {
         // Session definition says: "List<String> validInvoiceIds".
         // session.invoiceIds.add(sale.id); session.save();
         // I should do this.
-        
+
         // Optimistic update of session
         session.invoiceIds.add(sale.id);
         await session.save(); // Hive save

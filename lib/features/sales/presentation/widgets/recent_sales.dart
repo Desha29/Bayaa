@@ -112,7 +112,12 @@ class RecentSalesSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderColor.withOpacity(0.5)),
+        border: Border.all(
+          color: (sale['isRefund'] == true)
+              ? Colors.red.withOpacity(0.5)
+              : Colors.green.withOpacity(0.5),
+          width: 1.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,11 +137,13 @@ class RecentSalesSection extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppColors.kDarkChip,
+                  color: (sale['isRefund'] == true) ? Colors.red : Colors.green,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  '${sale['items']} منتج',
+                  (sale['isRefund'] == true)
+                      ? 'مرتجع (${sale['items']})'
+                      : '${sale['items']} منتج',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,

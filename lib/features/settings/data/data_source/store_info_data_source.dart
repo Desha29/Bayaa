@@ -39,7 +39,7 @@ class StoreInfoDataSource {
       name: 'Amr Store',
       phone: '01000000000',
       email: 'info@amrstore.com',
-      address: "امام شارع الحجار - الخانكة - القليوبية",
+      address: "العرب-القليوبية",
       vat: '123456789',
       logoPath: '',
     );

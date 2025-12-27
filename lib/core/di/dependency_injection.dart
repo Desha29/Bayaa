@@ -6,6 +6,7 @@ import 'package:crazy_phone_pos/features/products/data/data_source/product_data_
 import 'package:crazy_phone_pos/features/products/data/repository/product_repository_imp.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
+import '../../features/stock_summary/presentation/cubit/stock_summary_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../features/arp/data/arp_repository_impl.dart';
@@ -59,7 +60,11 @@ void setup() {
 
   getIt.registerSingleton<ArpCubit>(ArpCubit(arpRepo));
 
+  getIt.registerFactory<StockSummaryCubit>(
+      () => StockSummaryCubit()); // Changed to Factory
+
   // Store info repository (used by Settings and Invoice PDF/printing)
+
   final storeInfoRepo = StoreInfoRepository(
     dataSource: StoreInfoDataSource(),
   );

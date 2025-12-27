@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing_plugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\print_job.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include\printing\printing_plugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\print_job.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6D692C6E-DF36-3FF7-AC8B-B4427116FAAC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{1AF7249F-D9D0-3EA9-B405-50CAC91084FC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

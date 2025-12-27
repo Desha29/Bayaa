@@ -1,0 +1,354 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Profile|x64">
+      <Configuration>Profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{874C79B6-5E26-3EB1-B024-E27C662F8633}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>crazy_phone_pos</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Work\crazy_phone_pos\windows\build\runner\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">crazy_phone_pos.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">crazy_phone_pos</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">D:\Work\crazy_phone_pos\windows\build\runner\Profile\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">crazy_phone_pos.dir\Profile\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">crazy_phone_pos</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Work\crazy_phone_pos\windows\build\runner\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">crazy_phone_pos.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">crazy_phone_pos</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>"4100"</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_HAS_EXCEPTIONS=0;_DEBUG;FLUTTER_VERSION="1.0.0+1";FLUTTER_VERSION_MAJOR=1;FLUTTER_VERSION_MINOR=0;FLUTTER_VERSION_PATCH=0;FLUTTER_VERSION_BUILD=1;NOMINMAX;UNICODE;_UNICODE;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_HAS_EXCEPTIONS=0;FLUTTER_VERSION=\"1.0.0+1\";FLUTTER_VERSION_MAJOR=1;FLUTTER_VERSION_MINOR=0;FLUTTER_VERSION_PATCH=0;FLUTTER_VERSION_BUILD=1;NOMINMAX;UNICODE;_UNICODE;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\flutter\Debug\flutter_wrapper_app.lib;dwmapi.lib;..\plugins\flutter_libserialport\Debug\flutter_libserialport_plugin.lib;..\plugins\printing\Debug\printing_plugin.lib;..\plugins\screen_retriever_windows\Debug\screen_retriever_windows_plugin.lib;..\plugins\url_launcher_windows\Debug\url_launcher_windows_plugin.lib;..\plugins\window_manager\Debug\window_manager_plugin.lib;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Work/crazy_phone_pos/windows/build/runner/Debug/crazy_phone_pos.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>D:/Work/crazy_phone_pos/windows/build/runner/Debug/crazy_phone_pos.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Manifest>
+      <AdditionalManifestFiles>D:\Work\crazy_phone_pos\windows\runner\runner.exe.manifest;</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DisableSpecificWarnings>"4100"</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;FLUTTER_VERSION="1.0.0+1";FLUTTER_VERSION_MAJOR=1;FLUTTER_VERSION_MINOR=0;FLUTTER_VERSION_PATCH=0;FLUTTER_VERSION_BUILD=1;NOMINMAX;UNICODE;_UNICODE;CMAKE_INTDIR="Profile"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;FLUTTER_VERSION=\"1.0.0+1\";FLUTTER_VERSION_MAJOR=1;FLUTTER_VERSION_MINOR=0;FLUTTER_VERSION_PATCH=0;FLUTTER_VERSION_BUILD=1;NOMINMAX;UNICODE;_UNICODE;CMAKE_INTDIR=\"Profile\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\flutter\Profile\flutter_wrapper_app.lib;dwmapi.lib;..\plugins\flutter_libserialport\Profile\flutter_libserialport_plugin.lib;..\plugins\printing\Profile\printing_plugin.lib;..\plugins\screen_retriever_windows\Profile\screen_retriever_windows_plugin.lib;..\plugins\url_launcher_windows\Profile\url_launcher_windows_plugin.lib;..\plugins\window_manager\Profile\window_manager_plugin.lib;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Work/crazy_phone_pos/windows/build/runner/Profile/crazy_phone_pos.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>D:/Work/crazy_phone_pos/windows/build/runner/Profile/crazy_phone_pos.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Manifest>
+      <AdditionalManifestFiles>D:\Work\crazy_phone_pos\windows\runner\runner.exe.manifest;</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DisableSpecificWarnings>"4100"</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;FLUTTER_VERSION="1.0.0+1";FLUTTER_VERSION_MAJOR=1;FLUTTER_VERSION_MINOR=0;FLUTTER_VERSION_PATCH=0;FLUTTER_VERSION_BUILD=1;NOMINMAX;UNICODE;_UNICODE;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;FLUTTER_VERSION=\"1.0.0+1\";FLUTTER_VERSION_MAJOR=1;FLUTTER_VERSION_MINOR=0;FLUTTER_VERSION_PATCH=0;FLUTTER_VERSION_BUILD=1;NOMINMAX;UNICODE;_UNICODE;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Work\crazy_phone_pos\windows;D:\Work\crazy_phone_pos\windows\flutter\ephemeral;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\cpp_client_wrapper\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\flutter_libserialport\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\screen_retriever_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\url_launcher_windows\windows\include;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\.plugin_symlinks\window_manager\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\flutter\Release\flutter_wrapper_app.lib;dwmapi.lib;..\plugins\flutter_libserialport\Release\flutter_libserialport_plugin.lib;..\plugins\printing\Release\printing_plugin.lib;..\plugins\screen_retriever_windows\Release\screen_retriever_windows_plugin.lib;..\plugins\url_launcher_windows\Release\url_launcher_windows_plugin.lib;..\plugins\window_manager\Release\window_manager_plugin.lib;D:\Work\crazy_phone_pos\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Work/crazy_phone_pos/windows/build/runner/Release/crazy_phone_pos.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>D:/Work/crazy_phone_pos/windows/build/runner/Release/crazy_phone_pos.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Manifest>
+      <AdditionalManifestFiles>D:\Work\crazy_phone_pos\windows\runner\runner.exe.manifest;</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Work\crazy_phone_pos\windows\runner\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Work/crazy_phone_pos/windows/runner/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Work/crazy_phone_pos/windows -BD:/Work/crazy_phone_pos/windows/build --check-stamp-file D:/Work/crazy_phone_pos/windows/build/runner/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Work\crazy_phone_pos\windows\build\runner\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Building Custom Rule D:/Work/crazy_phone_pos/windows/runner/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Work/crazy_phone_pos/windows -BD:/Work/crazy_phone_pos/windows/build --check-stamp-file D:/Work/crazy_phone_pos/windows/build/runner/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">D:\Work\crazy_phone_pos\windows\build\runner\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Work/crazy_phone_pos/windows/runner/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Work/crazy_phone_pos/windows -BD:/Work/crazy_phone_pos/windows/build --check-stamp-file D:/Work/crazy_phone_pos/windows/build/runner/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Work\crazy_phone_pos\windows\build\runner\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="D:\Work\crazy_phone_pos\windows\runner\flutter_window.cpp" />
+    <ClCompile Include="D:\Work\crazy_phone_pos\windows\runner\main.cpp" />
+    <ClCompile Include="D:\Work\crazy_phone_pos\windows\runner\utils.cpp" />
+    <ClCompile Include="D:\Work\crazy_phone_pos\windows\runner\win32_window.cpp" />
+    <ClCompile Include="D:\Work\crazy_phone_pos\windows\flutter\generated_plugin_registrant.cc" />
+    <ResourceCompile Include="D:\Work\crazy_phone_pos\windows\runner\Runner.rc" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="D:\Work\crazy_phone_pos\windows\build\ZERO_CHECK.vcxproj">
+      <Project>{48425FA1-1037-3888-8EC5-DFB9686502AC}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\Work\crazy_phone_pos\windows\build\flutter\flutter_assemble.vcxproj">
+      <Project>{14ED45F4-B41A-3F15-95E4-E51FBB306C75}</Project>
+      <Name>flutter_assemble</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\Work\crazy_phone_pos\windows\build\plugins\flutter_libserialport\flutter_libserialport_plugin.vcxproj">
+      <Project>{56C42459-BA5E-3826-A76E-62C39D9F5405}</Project>
+      <Name>flutter_libserialport_plugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Work\crazy_phone_pos\windows\build\flutter\flutter_wrapper_app.vcxproj">
+      <Project>{C58D4B4C-C544-3D9A-A4A5-EB661E2E7121}</Project>
+      <Name>flutter_wrapper_app</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Work\crazy_phone_pos\windows\build\plugins\printing\printing_plugin.vcxproj">
+      <Project>{A4D4911B-5738-33A1-8523-C1E49D48541D}</Project>
+      <Name>printing_plugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Work\crazy_phone_pos\windows\build\plugins\screen_retriever_windows\screen_retriever_windows_plugin.vcxproj">
+      <Project>{DFB103CD-CB1A-3464-AAAD-2A02457C4714}</Project>
+      <Name>screen_retriever_windows_plugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Work\crazy_phone_pos\windows\build\plugins\url_launcher_windows\url_launcher_windows_plugin.vcxproj">
+      <Project>{F8BD2208-9BF7-37C7-A133-FDAECE07A113}</Project>
+      <Name>url_launcher_windows_plugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Work\crazy_phone_pos\windows\build\plugins\window_manager\window_manager_plugin.vcxproj">
+      <Project>{B7D045F5-C86C-3D3F-9C64-B2B595680C17}</Project>
+      <Name>window_manager_plugin</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -331,6 +331,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
                         filterType: state.filterType,
                         onFilterTypeChanged: (type) =>
                             context.read<InvoiceCubit>().setFilterType(type),
+                        isManager: widget.currentUser.userType == UserType.manager,
                       ),
                     ),
                   ),

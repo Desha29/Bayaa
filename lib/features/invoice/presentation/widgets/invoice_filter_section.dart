@@ -16,6 +16,7 @@ class InvoiceFilterSection extends StatelessWidget {
   final VoidCallback onDeleteInvoices;
   final InvoiceFilterType filterType;
   final Function(InvoiceFilterType) onFilterTypeChanged;
+  final bool isManager;
 
   const InvoiceFilterSection({
     Key? key,
@@ -31,6 +32,7 @@ class InvoiceFilterSection extends StatelessWidget {
     required this.onDeleteInvoices,
     required this.filterType,
     required this.onFilterTypeChanged,
+    required this.isManager,
   }) : super(key: key);
 
   @override
@@ -156,21 +158,23 @@ class InvoiceFilterSection extends StatelessWidget {
                         ),
                       ),
                     ),
+
                     const SizedBox(width: 16),
-                    ElevatedButton.icon(
-                      onPressed: onDeleteInvoices,
-                      icon: const Icon(Icons.clear, size: 20),
-                      label: const Text('مسح الفواتير'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.errorColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    if (isManager)
+                      ElevatedButton.icon(
+                        onPressed: onDeleteInvoices,
+                        icon: const Icon(Icons.clear, size: 20),
+                        label: const Text('مسح الفواتير'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.errorColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ],

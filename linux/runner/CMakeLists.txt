@@ -14,7 +14,7 @@ add_executable(${BINARY_NAME}
 
 # Apply the standard set of build settings. This can be removed for applications
 # that need different build settings.
-apply_standard_settings(${BINARY_NAME})
+
 
 # Add preprocessor definitions for the application ID.
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")

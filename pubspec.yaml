@@ -70,8 +70,8 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/logo.jpg"  # Your logo path
-  adaptive_icon_background: "#000000"  # Black background to match logo
+  image_path: "assets/images/logo.jpg"
+  adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/images/logo.jpg"
   web:
     generate: true

@@ -179,7 +179,18 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     session.invoiceIds.add(refundSale.id);
     await session.save();
 
-    // 6. Restock Items (only refunded items)
+    // 6. Update Original Invoice Permanent Tracking
+    // We update the original sale record to "consume" the items permanently
+    for (var item in itemsToRefund) {
+      final itemToUpdate = originalSale.saleItems.firstWhere(
+        (si) => si.productId == item.productId,
+        orElse: () => throw Exception('Item not found in original sale'),
+      );
+      itemToUpdate.refundedQuantity += item.quantity;
+    }
+    await repository.saveSale(originalSale); // Persist updated original sale
+
+    // 7. Restock Items (only refunded items)
     for (var item in itemsToRefund) {
       final prodResult = await repository.findProductByBarcode(item.productId);
       await prodResult.fold(

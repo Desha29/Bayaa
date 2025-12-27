@@ -72,7 +72,7 @@ class InvoicePdfService {
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
           name: 'كرزي فون',
-          address: 'غزة - شارع الجلاء',
+          address: 'الخانكة',
           phone: '0599000000',
           vat: '', email: '',
         ));
@@ -127,7 +127,7 @@ class InvoicePdfService {
               // Items Table
               pw.TableHelper.fromTextArray(
                 context: null,
-                headers: ['المنتج', 'ق', 'س', 'ج'],
+                headers: ['المنتج', 'ك', 'س', 'ج'],
                 data: data.lines.map((l) => [
                   l.name,
                   l.qty.toString(),

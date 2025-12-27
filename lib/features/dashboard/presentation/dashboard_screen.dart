@@ -29,6 +29,8 @@ import '../../arp/data/arp_repository_impl.dart';
 
 import 'widgets/dashboard_home.dart';
 import 'widgets/side_bar.dart';
+import '../../stock_summary/presentation/pages/stock_summary_screen.dart';
+import '../../stock_summary/presentation/cubit/stock_summary_cubit.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -55,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _arpRepository = ArpRepositoryImpl();
 
     // Build sidebar items once
-    sidebarItems = [
+    final allSidebarItems = [
       SidebarItem(
         icon: LucideIcons.layoutDashboard,
         title: "لوحة التحكم",
@@ -87,6 +89,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: "المنتجات الناقصة",
         screen: const StockScreen(),
       ),
+      // Stock Summary - Only for managers
+      if (curUser.userType != UserType.cashier)
+        SidebarItem(
+          icon: LucideIcons.clipboardList,
+          title: "ملخص المخزون",
+          screen: BlocProvider(
+            create: (_) => getIt<StockSummaryCubit>()..init(),
+            child: const StockSummaryScreen(),
+          ),
+        ),
       SidebarItem(
         icon: LucideIcons.pieChart,
         title: "التحليلات والتقارير",
@@ -106,6 +118,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         screen: const SettingsScreen(),
       ),
     ];
+    
+    sidebarItems = allSidebarItems;
   }
 
   @override

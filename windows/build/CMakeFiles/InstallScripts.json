@@ -1,0 +1,15 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/Work/crazy_phone_pos/windows/build/cmake_install.cmake",
+		"D:/Work/crazy_phone_pos/windows/build/flutter/cmake_install.cmake",
+		"D:/Work/crazy_phone_pos/windows/build/runner/cmake_install.cmake",
+		"D:/Work/crazy_phone_pos/windows/build/plugins/flutter_libserialport/cmake_install.cmake",
+		"D:/Work/crazy_phone_pos/windows/build/plugins/flutter_libserialport/libserialport/cmake_install.cmake",
+		"D:/Work/crazy_phone_pos/windows/build/plugins/printing/cmake_install.cmake",
+		"D:/Work/crazy_phone_pos/windows/build/plugins/screen_retriever_windows/cmake_install.cmake",
+		"D:/Work/crazy_phone_pos/windows/build/plugins/url_launcher_windows/cmake_install.cmake",
+		"D:/Work/crazy_phone_pos/windows/build/plugins/window_manager/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -3,16 +3,17 @@ import '../../../../core/constants/app_colors.dart';
 
 class BarcodeScanCard extends StatelessWidget {
   final TextEditingController? controller;
-  final VoidCallback? onAddPressed;
   final FocusNode? focusNode;
   final Function(String)? onSubmitted;
+
+  final Function(String)? onChanged;
 
   const BarcodeScanCard({
     super.key,
     this.controller,
-    this.onAddPressed,
     this.focusNode,
     this.onSubmitted,
+    this.onChanged,
   });
 
   @override
@@ -64,30 +65,15 @@ class BarcodeScanCard extends StatelessWidget {
                 controller: controller,
                 focusNode: focusNode,
                 autofocus: true,
+                onChanged: onChanged,
                 onSubmitted: onSubmitted,
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
-                  hintText: 'امسح الباركود أو أدخل رقم المنتج...',
+                  hintText: 'امسح الباركود أو ابحث عن منتج...',
                   hintStyle: TextStyle(color: AppColors.mutedColor),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
                 ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            ElevatedButton.icon(
-              onPressed: onAddPressed ?? () {},
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('إضافة منتج'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.kPrimaryBlue,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 0,
               ),
             ),
           ],

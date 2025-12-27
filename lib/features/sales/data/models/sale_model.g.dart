@@ -84,13 +84,14 @@ class SaleItemAdapter extends TypeAdapter<SaleItem> {
       quantity: fields[3] as int,
       total: fields[4] as double,
       wholesalePrice: fields[5] as double,
+      refundedQuantity: fields[6] as int? ?? 0,
     );
   }
 
   @override
   void write(BinaryWriter writer, SaleItem obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.productId)
       ..writeByte(1)
@@ -102,7 +103,9 @@ class SaleItemAdapter extends TypeAdapter<SaleItem> {
       ..writeByte(4)
       ..write(obj.total)
       ..writeByte(5)
-      ..write(obj.wholesalePrice);
+      ..write(obj.wholesalePrice)
+      ..writeByte(6)
+      ..write(obj.refundedQuantity);
   }
 
   @override

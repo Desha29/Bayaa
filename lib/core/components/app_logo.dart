@@ -45,7 +45,7 @@ class AppLogo extends StatelessWidget {
 
   Widget _buildAssetLogo() {
     return Image.asset(
-      'assets/images/logo.jpg',
+      'assets/images/logo1.png',
       width: width,
       height: height,
       fit: fit,

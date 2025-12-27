@@ -1,0 +1,12 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=url
+command=C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;D:/Work/crazy_phone_pos/windows/build/pdfium-download/pdfium-download-prefix/src/pdfium-download-stamp/download-pdfium-download.cmake;COMMAND;C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;D:/Work/crazy_phone_pos/windows/build/pdfium-download/pdfium-download-prefix/src/pdfium-download-stamp/verify-pdfium-download.cmake;COMMAND;C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;D:/Work/crazy_phone_pos/windows/build/pdfium-download/pdfium-download-prefix/src/pdfium-download-stamp/extract-pdfium-download.cmake
+source_dir=D:/Work/crazy_phone_pos/windows/build/pdfium-src
+work_dir=D:/Work/crazy_phone_pos/windows/build
+url(s)=https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/5200/pdfium-win-x64.tgz
+hash=
+      no_extract=
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Profile"/>
+		<BuildType Name="Release"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="28f4528a-681a-3ba5-8f5c-fb25aee54df9" DefaultStartup="true">
+		<BuildDependency Project="../../../ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="serialport.vcxproj"/>
+	</Project>
+	<Project Path="INSTALL.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7fef27e0-eae7-3ba5-9154-d589e70b77ca">
+		<BuildDependency Project="ALL_BUILD.vcxproj"/>
+		<BuildDependency Project="../../../ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Profile|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+	</Project>
+	<Project Path="../../../ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="48425fa1-1037-3888-8ec5-dfb9686502ac"/>
+	<Project Path="serialport.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ffd74576-ad57-3da1-a13d-c91931bb7474">
+		<BuildDependency Project="../../../ZERO_CHECK.vcxproj"/>
+	</Project>
+</Solution>

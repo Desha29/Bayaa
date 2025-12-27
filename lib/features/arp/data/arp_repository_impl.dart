@@ -1,24 +1,14 @@
 import 'package:dartz/dartz.dart';
-
+import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
+import 'package:crazy_phone_pos/core/utils/hive_helper.dart'; 
 import '../../../core/error/failure.dart';
 import '../../sales/domain/sales_repository.dart';
 import '../domain/arp_repository.dart';
 import '../data/models/arp_summary_model.dart';
-
 import 'models/daily_report_model.dart';
 import 'models/product_performance_model.dart';
-
-import 'package:dartz/dartz.dart';
-import 'package:crazy_phone_pos/core/utils/hive_helper.dart'; // Direct access for now
-import '../../../core/error/failure.dart';
-import '../domain/arp_repository.dart';
-import '../data/models/arp_summary_model.dart';
-import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/features/sales/data/models/sale_model.dart';
 import 'package:crazy_phone_pos/features/arp/data/repositories/session_repository_impl.dart';
-
-import 'models/daily_report_model.dart';
-import 'models/product_performance_model.dart';
 
 class ArpRepositoryImpl implements ArpRepository {
   // We access Hive boxes directly via HiveHelper for simplicity and efficiency
@@ -222,7 +212,7 @@ class ArpRepositoryImpl implements ArpRepository {
         if (productStats.containsKey(item.productId)) {
           final existing = productStats[item.productId]!;
           productStats[item.productId] = existing.copyWith(
-            quantitySold: existing.quantitySold + qty,
+            quantitySold: (existing.quantitySold + qty).toInt(),
             revenue: existing.revenue + revenue,
             cost: existing.cost + cost,
           );
@@ -243,7 +233,7 @@ class ArpRepositoryImpl implements ArpRepository {
           if (refundStats.containsKey(item.productId)) {
             final existing = refundStats[item.productId]!;
             refundStats[item.productId] = existing.copyWith(
-              quantitySold: existing.quantitySold + item.quantity,
+              quantitySold: (existing.quantitySold + item.quantity).toInt(),
               revenue: existing.revenue + item.total,
             );
           } else {

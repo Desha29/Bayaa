@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import '../../../core/error/failure.dart';
-import '../../sales/data/models/sale_model.dart';
 import '../../sales/domain/sales_repository.dart';
 
 /// Represents an item that can be refunded with calculated quantities
@@ -35,20 +34,22 @@ class RefundCalculationService {
   /// Get total refunded quantities for each product in an invoice
   Future<Either<Failure, Map<String, int>>> getRefundedQuantities(
       String originalInvoiceId) async {
-    final refundsResult = await repository.getRefundsForInvoice(originalInvoiceId);
-    
+    final refundsResult =
+        await repository.getRefundsForInvoice(originalInvoiceId);
+
     return refundsResult.fold(
       (failure) => Left(failure),
       (refunds) {
         final Map<String, int> refundedQuantities = {};
-        
+
         for (final refund in refunds) {
           for (final item in refund.saleItems) {
-            refundedQuantities[item.productId] = 
-                (refundedQuantities[item.productId] ?? 0) + item.quantity;
+            refundedQuantities[item.productId] =
+                ((refundedQuantities[item.productId] ?? 0) + item.quantity)
+                    .toInt();
           }
         }
-        
+
         return Right(refundedQuantities);
       },
     );
@@ -57,7 +58,7 @@ class RefundCalculationService {
   /// Check if an invoice has been fully refunded
   Future<Either<Failure, bool>> isFullyRefunded(String invoiceId) async {
     final refundableItemsResult = await getRefundableItems(invoiceId);
-    
+
     return refundableItemsResult.fold(
       (failure) => Left(failure),
       (items) => Right(items.every((item) => item.remainingQuantity == 0)),
@@ -69,7 +70,7 @@ class RefundCalculationService {
       String invoiceId) async {
     // Get the original invoice
     final salesResult = await repository.getRecentSales(limit: 10000);
-    
+
     return salesResult.fold(
       (failure) => Left(failure),
       (allSales) async {
@@ -83,26 +84,19 @@ class RefundCalculationService {
         }
 
         // Get refunded quantities
-        final refundedQuantitiesResult = await getRefundedQuantities(invoiceId);
-        
-        return refundedQuantitiesResult.fold(
-          (failure) => Left(failure),
-          (refundedQuantities) {
-            final refundableItems = originalSale.saleItems.map((item) {
-              final refunded = refundedQuantities[item.productId] ?? 0;
-              return RefundableItem(
-                productId: item.productId,
-                productName: item.name,
-                originalQuantity: item.quantity,
-                refundedQuantity: refunded,
-                unitPrice: item.price,
-                wholesalePrice: item.wholesalePrice,
-              );
-            }).toList();
-            
-            return Right(refundableItems);
-          },
-        );
+        // We now prioritize the stored refundedQuantity in SaleItem
+        // to handle cases where refund invoices might be deleted
+
+        return Right(originalSale.saleItems.map((item) {
+          return RefundableItem(
+            productId: item.productId,
+            productName: item.name,
+            originalQuantity: item.quantity,
+            refundedQuantity: item.refundedQuantity,
+            unitPrice: item.price,
+            wholesalePrice: item.wholesalePrice,
+          );
+        }).toList());
       },
     );
   }

@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/pdfium-download"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/58f5684a898db598eba84e2091540fd9/pdfium-download.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/000b54503762b72b480d15efca2f5ed1/pdfium-download-complete.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/e47a7a26f17c2f1d89a9968edc88b886/pdfium-download-build.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/e47a7a26f17c2f1d89a9968edc88b886/pdfium-download-configure.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/e47a7a26f17c2f1d89a9968edc88b886/pdfium-download-download.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/e47a7a26f17c2f1d89a9968edc88b886/pdfium-download-install.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/e47a7a26f17c2f1d89a9968edc88b886/pdfium-download-mkdir.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/e47a7a26f17c2f1d89a9968edc88b886/pdfium-download-patch.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/e47a7a26f17c2f1d89a9968edc88b886/pdfium-download-test.rule"
+		},
+		{
+			"file" : "D:/Work/crazy_phone_pos/windows/build/pdfium-download/CMakeFiles/e47a7a26f17c2f1d89a9968edc88b886/pdfium-download-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"pdfium-download"
+		],
+		"name" : "pdfium-download"
+	}
+}

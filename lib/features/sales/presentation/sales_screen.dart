@@ -21,6 +21,7 @@ import 'widgets/barcode_scan_card.dart';
 import 'widgets/cart_section.dart';
 import 'widgets/total_section_card.dart';
 import 'widgets/recent_sales.dart';
+import 'widgets/product_search_overlay.dart';
 
 class SalesScreen extends StatefulWidget {
   final SalesRepository? repository; // optional, create if not passed
@@ -56,6 +57,7 @@ class _SalesScreenState extends State<SalesScreen>
   // Simple in-memory cart
   final List<Map<String, dynamic>> _cartItems = [];
   List<Map<String, dynamic>> _recentSales = [];
+  List<Product> _filteredProducts = [];
 
   double get _totalAmount => _cartItems.fold<double>(
         0.0,
@@ -93,21 +95,51 @@ class _SalesScreenState extends State<SalesScreen>
     _loadRecentSales();
   }
 
-  void _onSearchTextChanged() {
+  void _onSearchChanged(String text) {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
-      final text = _barcodeController.text.trim();
-      if (text.isEmpty) return;
-
-      final productFound = _productsBox.values.any((p) =>
-          p.barcode == text ||
-          p.name.toLowerCase().contains(text.toLowerCase()));
-
-      if (!productFound) {
-        MotionSnackBarError(context, "المنتج غير موجود: $text");
-        _barcodeController.clear();
-        setState(() {});
+    _searchDebounce = Timer(const Duration(milliseconds: 150), () {
+      final q = text.trim();
+      if (q.isEmpty) {
+        setState(() => _filteredProducts = []);
+        return;
       }
+
+      final query = q.toLowerCase();
+      final parsedNumber = double.tryParse(q.replaceAll(',', '.'));
+
+      // Collect matches and score them for simple ranking
+      final List<Map<String, dynamic>> scored = [];
+      for (final p in _productsBox.values) {
+        var score = 0;
+        final name = p.name.toLowerCase();
+        final barcode = p.barcode.toLowerCase();
+        final category = (p.category ?? '').toLowerCase();
+        final priceStr = p.price.toStringAsFixed(2).toLowerCase();
+
+        if (barcode == query) score += 100;
+        if (barcode.startsWith(query)) score += 40;
+        if (name == query) score += 80;
+        if (name.contains(query)) score += 30;
+        if (category.contains(query)) score += 20;
+        if (priceStr.contains(query)) score += 30;
+        if (parsedNumber != null) {
+          if ((p.price - parsedNumber).abs() < 0.001) score += 60;
+        }
+
+        if (score > 0) scored.add({'product': p, 'score': score});
+      }
+
+      scored.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+
+      setState(() => _filteredProducts = scored.map((s) => s['product'] as Product).toList());
+    });
+  }
+
+  void _addProductFromSearch(Product product) {
+    // Add directly to cart like scanning
+    _commitBarcode(product.barcode);
+    setState(() {
+      _filteredProducts = [];
     });
   }
 
@@ -122,6 +154,7 @@ class _SalesScreenState extends State<SalesScreen>
                     'total': s.total,
                     'items': s.items,
                     'date': s.date,
+                    'isRefund': s.isRefund,
                   })
               .toList();
         });
@@ -145,9 +178,12 @@ class _SalesScreenState extends State<SalesScreen>
   // Capture scanner keystrokes and commit to search
   void _onRawKey(RawKeyEvent event) {
     if (event is! RawKeyDownEvent) return;
-    
     // If the text field has focus, let the system/TextField handle the input.
     if (_barcodeFocusNode.hasFocus) return;
+
+    // If another widget has focus (e.g. dialog TextField), suppress HID handling
+    final primary = FocusManager.instance.primaryFocus;
+    if (primary != null && primary != _barcodeFocusNode) return;
 
     // Commit as soon as scanner sends Enter/NumpadEnter
     if (event.logicalKey == LogicalKeyboardKey.enter ||
@@ -246,11 +282,7 @@ class _SalesScreenState extends State<SalesScreen>
     _barcodeFocusNode.requestFocus();
   }
 
-  // Manual add uses the same path (pressing your existing Add button)
-  void _onAddPressed() {
-    final code = _barcodeController.text.trim();
-    _commitBarcode(code);
-  }
+
 
   /// Checkout with invoice auto-open
   Future<void> _onCheckout() async {
@@ -324,6 +356,7 @@ class _SalesScreenState extends State<SalesScreen>
             'total': _totalAmount,
             'items': _cartItems.length,
             'date': DateTime.now(),
+            'isRefund': false,
           },
           ..._recentSales,
         ];
@@ -434,47 +467,88 @@ class _SalesScreenState extends State<SalesScreen>
                 },
               ),
               const SizedBox(height: 12),
-              BarcodeScanCard(
-                controller: _barcodeController,
-                focusNode: _barcodeFocusNode,
-                onSubmitted: (val) => _commitBarcode(val),
-                onAddPressed: _onAddPressed,
-              ),
-              const SizedBox(height: 16),
-              // Only the cart section scrolls
+              const SizedBox(height: 12),
               Expanded(
-                child: CartSection(
-                  cartItems: _cartItems,
-                  onRemoveItem: (i) {
-                    _cartItems.removeAt(i);
-                    setState(() {});
-                  },
-                  onIncreaseQty: (i) {
-                    final currentQty = _cartItems[i]['qty'] as int;
-                    final stockQuantity = _cartItems[i]['quantity'] as int;
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Layout Column with Phantom Widget to reserve space
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Phantom ScanCard
+                        Visibility(
+                          maintainSize: true,
+                          maintainAnimation: true,
+                          maintainState: true,
+                          visible: false,
+                          child: const BarcodeScanCard(),
+                        ),
+                        const SizedBox(height: 16),
+                        // The CartSection
+                        Expanded(
+                          child: CartSection(
+                            cartItems: _cartItems,
+                            onRemoveItem: (i) {
+                              _cartItems.removeAt(i);
+                              setState(() {});
+                            },
+                            onIncreaseQty: (i) {
+                              final currentQty = _cartItems[i]['qty'] as int;
+                              final stockQuantity =
+                                  _cartItems[i]['quantity'] as int;
 
-                    if (currentQty < stockQuantity) {
-                      _cartItems[i]['qty'] = currentQty + 1;
-                      setState(() {});
-                    } else {
-                      MotionSnackBarWarning(context,
-                          "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
-                    }
-                  },
-                  onDecreaseQty: (i) {
-                    final q = _cartItems[i]['qty'] as int;
-                    if (q > 1) {
-                      _cartItems[i]['qty'] = q - 1;
-                      setState(() {});
-                    } else {
-                      _cartItems.removeAt(i);
-                      setState(() {});
-                    }
-                  },
-                  onEditPrice: (i, newPrice) {
-                    _cartItems[i]['price'] = newPrice;
-                    setState(() {});
-                  },
+                              if (currentQty < stockQuantity) {
+                                _cartItems[i]['qty'] = currentQty + 1;
+                                setState(() {});
+                              } else {
+                                MotionSnackBarWarning(context,
+                                    "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
+                              }
+                            },
+                            onDecreaseQty: (i) {
+                              final q = _cartItems[i]['qty'] as int;
+                              if (q > 1) {
+                                _cartItems[i]['qty'] = q - 1;
+                                setState(() {});
+                              } else {
+                                _cartItems.removeAt(i);
+                                setState(() {});
+                              }
+                            },
+                            onEditPrice: (i, newPrice) {
+                              _cartItems[i]['price'] = newPrice;
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // The Real Interactive Elements (ScanCard + Overlay) on Top
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          BarcodeScanCard(
+                            controller: _barcodeController,
+                            focusNode: _barcodeFocusNode,
+                            onSubmitted: (val) => _commitBarcode(val),
+                            onChanged: _onSearchChanged,
+                          ),
+                          if (_filteredProducts.isNotEmpty)
+                            ProductSearchOverlay(
+                              products: _filteredProducts,
+                              allProducts: _productsBox.values.toList(),
+                              onProductSelected: _addProductFromSearch,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -518,46 +592,84 @@ class _SalesScreenState extends State<SalesScreen>
                 },
               ),
               const SizedBox(height: 12),
-              BarcodeScanCard(
-                controller: _barcodeController,
-                focusNode: _barcodeFocusNode,
-                onSubmitted: (val) => _commitBarcode(val),
-                onAddPressed: _onAddPressed,
-              ),
               const SizedBox(height: 12),
               Expanded(
-                child: CartSection(
-                  cartItems: _cartItems,
-                  onRemoveItem: (i) {
-                    _cartItems.removeAt(i);
-                    setState(() {});
-                  },
-                  onIncreaseQty: (i) {
-                    final currentQty = _cartItems[i]['qty'] as int;
-                    final stockQuantity = _cartItems[i]['quantity'] as int;
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Layout with Phantom
+                    Column(
+                      children: [
+                        Visibility(
+                          maintainSize: true,
+                          maintainAnimation: true,
+                          maintainState: true,
+                          visible: false,
+                          child: const BarcodeScanCard(),
+                        ),
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: CartSection(
+                            cartItems: _cartItems,
+                            onRemoveItem: (i) {
+                              _cartItems.removeAt(i);
+                              setState(() {});
+                            },
+                            onIncreaseQty: (i) {
+                              final currentQty = _cartItems[i]['qty'] as int;
+                              final stockQuantity =
+                                  _cartItems[i]['quantity'] as int;
 
-                    if (currentQty < stockQuantity) {
-                      _cartItems[i]['qty'] = currentQty + 1;
-                      setState(() {});
-                    } else {
-                      MotionSnackBarWarning(context,
-                          "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
-                    }
-                  },
-                  onDecreaseQty: (i) {
-                    final q = _cartItems[i]['qty'] as int;
-                    if (q > 1) {
-                      _cartItems[i]['qty'] = q - 1;
-                      setState(() {});
-                    } else {
-                      _cartItems.removeAt(i);
-                      setState(() {});
-                    }
-                  },
-                  onEditPrice: (i, newPrice) {
-                    _cartItems[i]['price'] = newPrice;
-                    setState(() {});
-                  },
+                              if (currentQty < stockQuantity) {
+                                _cartItems[i]['qty'] = currentQty + 1;
+                                setState(() {});
+                              } else {
+                                MotionSnackBarWarning(context,
+                                    "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
+                              }
+                            },
+                            onDecreaseQty: (i) {
+                              final q = _cartItems[i]['qty'] as int;
+                              if (q > 1) {
+                                _cartItems[i]['qty'] = q - 1;
+                                setState(() {});
+                              } else {
+                                _cartItems.removeAt(i);
+                                setState(() {});
+                              }
+                            },
+                            onEditPrice: (i, newPrice) {
+                              _cartItems[i]['price'] = newPrice;
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Real Interactive Elements on Top
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          BarcodeScanCard(
+                            controller: _barcodeController,
+                            focusNode: _barcodeFocusNode,
+                            onSubmitted: (val) => _commitBarcode(val),
+                            onChanged: _onSearchChanged,
+                          ),
+                          if (_filteredProducts.isNotEmpty)
+                            ProductSearchOverlay(
+                              products: _filteredProducts,
+                              allProducts: _productsBox.values.toList(),
+                              onProductSelected: _addProductFromSearch,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

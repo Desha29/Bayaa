@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Work\crazy_phone_pos\windows\build\CMakeFiles\2e10cdc717292a40e8286d19850fb604\flutter_windows.dll.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Work\crazy_phone_pos\windows\build\CMakeFiles\fc5674a12c002e2feb929b6966213d82\flutter_assemble.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Work\crazy_phone_pos\windows\flutter\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Work\crazy_phone_pos\windows\build\flutter\CMakeFiles\flutter_assemble" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{2A44248C-5101-345D-BDD6-DFB9330E2E25}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

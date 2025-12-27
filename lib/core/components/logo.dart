@@ -118,7 +118,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
 
 // Lightweight shimmer used by Logo; self-contained.
 class Shimmer extends StatefulWidget {
-  const Shimmer({required this.child, this.enabled = true});
+  const Shimmer({super.key, required this.child, this.enabled = true});
   final Widget child;
   final bool enabled;
 
