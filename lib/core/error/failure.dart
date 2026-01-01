@@ -1,4 +1,4 @@
-// lib/core/error/failure.dart
+
 abstract class Failure {
   final String message;
   

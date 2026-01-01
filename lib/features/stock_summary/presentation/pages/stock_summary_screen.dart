@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:crazy_phone_pos/features/stock_summary/data/models/stock_summary_category_model.dart';
 import 'package:crazy_phone_pos/features/stock_summary/presentation/cubit/stock_summary_cubit.dart';
@@ -418,10 +420,10 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                         )),
                         DataCell(Text("${item.productCount}")),
                         DataCell(Text("${item.totalQuantity}")),
-                        DataCell(Text("${item.totalSoldQuantity}")), // NEW: Outputs
-                        DataCell(Text("${item.totalHistoricValue.toStringAsFixed(0)}")),
-                        DataCell(Text("${item.totalCurrentWholesaleValue.toStringAsFixed(0)}")),
-                        DataCell(Text("${item.totalDefaultSellValue.toStringAsFixed(0)}")),
+                        DataCell(Text("${item.totalSoldQuantity}")), 
+                        DataCell(Text(item.totalHistoricValue.toStringAsFixed(0))),
+                        DataCell(Text(item.totalCurrentWholesaleValue.toStringAsFixed(0))),
+                        DataCell(Text(item.totalDefaultSellValue.toStringAsFixed(0))),
                         DataCell(
                           Container(
                             padding:

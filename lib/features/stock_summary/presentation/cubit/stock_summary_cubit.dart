@@ -45,29 +45,12 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
         categoryProducts[product.category]!.add(product);
       }
 
-      // 2. Process Sales for Historic Value
-      // Historic Value = (Current Stock * Wholesale) + (Sold Qty * Sold Wholesale) - (Refunded Qty * Sold Wholesale)
-      // Note: Refunded items return to stock, so they are counted in "Current Stock". 
-      // We only need to account for items that physically left the store (Net Sold).
 
-      // Iterate over all sales (LazyBox: get keys then values)
-      // Optimisation: For huge datasets, this might be slow on main thread. 
-      // Ideally should be in Isolate, but keeping simple per requirements first.
       
       final saleKeys = salesBox.keys;
       for (var key in saleKeys) {
         final Sale? sale = await salesBox.get(key);
         if (sale == null) continue;
-
-        // Skip refunds (Type 1) as they are negative modifiers to sales? 
-        // Or handle them? 
-        // If sale is Refund:
-        // Usually refunds reference a sale. 
-        // Our logic: Historic = Cost of goods entered.
-        // Goods Entered = Goods Currently In Stock + Goods Permanently Sold.
-        // Goods Permanently Sold = Sold - Refunded.
-        
-        // So we just sum up the Net Sold Items.
         
         // If it's a Sale (Index 0)
         if (sale.invoiceTypeIndex == 0) {
@@ -88,7 +71,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
                productName = product.name;
             }
 
-            // Track product-level details
+       
             if (!categoryProductDetails.containsKey(category)) {
               categoryProductDetails[category] = {};
             }
@@ -170,7 +153,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
           totalMinSellValue: currentMinSellValue,
           totalDefaultSellValue: currentDefaultSellValue,
           isDeletedCategory: category == 'المحذوفة',
-          productDetails: productDetailsList, // NEW: Product-level breakdown
+          productDetails: productDetailsList, 
         ));
       }
 

@@ -16,7 +16,7 @@ class AppTheme {
         error: AppColors.errorColor,
         onError: Colors.white,
       ),
-      fontFamily: 'Cairo', // Arabic font
+      fontFamily: 'Cairo', 
       textTheme: const TextTheme(
         displayLarge: TextStyle(
           fontSize: 32,

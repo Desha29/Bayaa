@@ -23,7 +23,7 @@ class _MessageOverlayState extends State<MessageOverlay> {
   }
 }
 
-// Global message helper class
+
 class GlobalMessage {
   static BuildContext? _context;
 

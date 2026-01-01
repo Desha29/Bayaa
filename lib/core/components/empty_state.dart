@@ -4,14 +4,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
-    this.icon, // Custom icon (Material or Lucide via IconData)
+    this.icon, 
     this.title,
     this.message,
     this.variant = EmptyStateVariant.notifications,
-    this.background, // Optional circular bg behind icon
-    this.useCircle = true, // Wrap icon in circle like products example
-    this.gap = 14, // Spacing between lines
-    this.center = true, // Center the whole column
+    this.background,
+    this.useCircle = true, 
+    this.gap = 14,
+    this.center = true, 
   });
 
   final IconData? icon;

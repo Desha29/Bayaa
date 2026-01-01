@@ -4,13 +4,13 @@ class StockSummaryCategoryModel {
   final String categoryName;
   final int productCount;
   final int totalQuantity;
-  final int totalSoldQuantity; // NEW: Total outputs (sold items)
+  final int totalSoldQuantity; 
   final double totalHistoricValue;
   final double totalCurrentWholesaleValue;
   final double totalMinSellValue;
   final double totalDefaultSellValue;
   final bool isDeletedCategory;
-  final List<ProductSalesDetail> productDetails; // NEW: Product-level breakdown
+  final List<ProductSalesDetail> productDetails; 
 
   StockSummaryCategoryModel({
     required this.categoryName,

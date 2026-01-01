@@ -8,7 +8,7 @@ class Logo extends StatefulWidget {
     this.isMobile,
   });
 
-  // Optional: allow caller to hint size or layout; both can be omitted.
+ 
   final double? avatarRadius;
   final bool? isMobile;
 
@@ -43,7 +43,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Derive responsive defaults if not provided.
+  
     final maxW = MediaQuery.of(context).size.width;
     final isMobile = widget.isMobile ?? maxW < 520;
     final avatarRadius = widget.avatarRadius ?? (isMobile ? 72.0 : 100.0);

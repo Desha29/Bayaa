@@ -34,7 +34,7 @@ class ActivationScreen extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
       debugPrint("❌ Launch error: $e");
-      // لو عايز تظهر SnackBar أو Dialog
+      
     }
   }
 
@@ -56,7 +56,7 @@ class ActivationScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo (نفس فكرة صفحة الوجن)
+                
                   CircleAvatar(
                     radius: 60,
                     backgroundColor: AppColors.primaryColor.withOpacity(0.1),
@@ -68,7 +68,7 @@ class ActivationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // الكارد الرئيسي
+                  
                   Container(
                     width: cardWidth,
                     padding: EdgeInsets.all(isMobile ? 20 : 28),

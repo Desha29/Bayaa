@@ -12,7 +12,7 @@ class ResponsiveHelper {
   static bool isDesktop(BuildContext context) =>
       MediaQuery.of(context).size.width >= 1024;
 
-  /// مثال: حجم الخط حسب الجهاز
+  
   static double fontSize(BuildContext context,
       {double mobile = 14, double tablet = 16, double desktop = 18}) {
     if (isDesktop(context)) return desktop;
@@ -20,7 +20,7 @@ class ResponsiveHelper {
     return mobile;
   }
 
-  /// مثال: البادينج حسب الجهاز
+  
   static EdgeInsets padding(BuildContext context,
       {EdgeInsets? mobile, EdgeInsets? tablet, EdgeInsets? desktop}) {
     if (isDesktop(context)) {
@@ -32,7 +32,7 @@ class ResponsiveHelper {
     }
   }
 
-  /// عدد الأعمدة في GridView حسب حجم الشاشة
+
   static int gridCount(BuildContext context,
       {int mobile = 2, int tablet = 3, int desktop = 4}) {
     if (isDesktop(context)) return desktop;

@@ -22,9 +22,7 @@ class PermissionGuard {
   }
 
   static void checkDayClosePermission(User user) {
-    // Both Cashier and Manager can close the day (User override)
-    // So this might just pass, or we enforce logic if requirements change.
-    // For now, based on requirements: "Cashier can close the day".
+
     
     return;
   }

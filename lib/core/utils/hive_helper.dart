@@ -10,11 +10,9 @@ import 'package:crazy_phone_pos/features/arp/data/models/daily_report_model.dart
 import 'package:crazy_phone_pos/features/arp/data/models/product_performance_model.dart';
 
 class HiveHelper {
-  /// Initialize Hive and perform all setup operations
+ 
   static Future<void> initialize() async {
-    // -------------------------------------------------
-    // ✅ Store Hive data in a "data" folder next to exe
-    // -------------------------------------------------
+   // Define custom directory for Hive boxes
     final Directory exeDir = Directory.current;
     final Directory hiveDir = Directory('${exeDir.path}\\data');
 

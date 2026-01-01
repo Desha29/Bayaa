@@ -37,13 +37,13 @@ void setup() {
           productDataSource: ProductDataSource(),
           categoryDataSource: CategoryDataSource())));
 
-  // Sales Repository with LazyBox
+
   final salesRepo = SalesRepositoryImpl(
     productsBox: HiveHelper.productsBox,
     salesBox: HiveHelper.salesBox,
   );
 
-  // Expose SalesRepositoryImpl itself for direct injection (e.g., in DashboardScreen)
+
   getIt.registerSingleton<SalesRepositoryImpl>(salesRepo);
 
   getIt.registerSingleton<SalesCubit>(SalesCubit(repository: salesRepo));
@@ -61,9 +61,9 @@ void setup() {
   getIt.registerSingleton<ArpCubit>(ArpCubit(arpRepo));
 
   getIt.registerFactory<StockSummaryCubit>(
-      () => StockSummaryCubit()); // Changed to Factory
+      () => StockSummaryCubit()); 
 
-  // Store info repository (used by Settings and Invoice PDF/printing)
+ 
 
   final storeInfoRepo = StoreInfoRepository(
     dataSource: StoreInfoDataSource(),
