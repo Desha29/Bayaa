@@ -16,7 +16,7 @@ import '../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../products/presentation/products_screen.dart';
 import '../../sales/data/repository/sales_repository_impl.dart';
-import '../../sales/presentation/cubit/sales_cubit.dart';
+
 import '../../sales/presentation/sales_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
 import '../../stock/presentation/stock_screen.dart';
@@ -52,25 +52,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
 
-    // Resolve repositories once via DI
+   
     _salesRepository = getIt<SalesRepositoryImpl>();
     _arpRepository = ArpRepositoryImpl();
 
-    // Build sidebar items once
+ 
     final allSidebarItems = [
       SidebarItem(
+        id: 'dashboard',
         icon: LucideIcons.layoutDashboard,
         title: "لوحة التحكم",
         screen: DashboardHome(
-          onCardTap: (selectedIndex) => handleCardTap(selectedIndex),
+          onCardTap: (id) => handleCardTap(id),
         ),
       ),
       SidebarItem(
+        id: 'sales',
         icon: LucideIcons.shoppingCart,
         title: "المبيعات",
         screen: SalesScreen(repository: _salesRepository),
       ),
       SidebarItem(
+        id: 'invoices',
         icon: LucideIcons.fileText,
         title: "الفواتير",
         screen: BlocProvider<InvoiceCubit>(
@@ -80,11 +83,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       SidebarItem(
+        id: 'products',
         icon: LucideIcons.box,
         title: "المنتجات",
         screen: const ProductsScreen(),
       ),
       SidebarItem(
+        id: 'stock_alerts',
         icon: LucideIcons.alertTriangle,
         title: "المنتجات الناقصة",
         screen: const StockScreen(),
@@ -92,6 +97,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // Stock Summary - Only for managers
       if (curUser.userType != UserType.cashier)
         SidebarItem(
+          id: 'stock_summary',
           icon: LucideIcons.clipboardList,
           title: "ملخص المخزون",
           screen: BlocProvider(
@@ -100,6 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       SidebarItem(
+        id: 'reports',
         icon: LucideIcons.pieChart,
         title: "التحليلات والتقارير",
         screen: BlocProvider(
@@ -108,11 +115,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       SidebarItem(
+        id: 'notifications',
         icon: LucideIcons.bell,
         title: "التنبيهات",
         screen: const NotificationsScreen(),
       ),
       SidebarItem(
+        id: 'settings',
         icon: LucideIcons.settings,
         title: "الإعدادات",
         screen: const SettingsScreen(),
@@ -124,7 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Ensuring sidebarItems is initialized. didChangeDependencies called before build.
+
     final isMobileOrTablet = MediaQuery.of(context).size.width < 1000;
 
     return MultiBlocProvider(
@@ -148,7 +157,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             appBar: isMobileOrTablet
                 ? AppBar(
                     backgroundColor: AppColors.primaryColor,
-                    title: const Text("Amr Store"),
+                    title: const Text("Bayaa"),
                     leading: Builder(
                       builder: (context) => IconButton(
                         icon: const Icon(LucideIcons.menu),
@@ -209,7 +218,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   /// Handles tap on a card in the dashboard screen.
-  void handleCardTap(int targetIndex) {
-    _onSidebarSelected(context, targetIndex);
+  void handleCardTap(String id) {
+    final index = sidebarItems.indexWhere((item) => item.id == id);
+    if (index != -1) {
+      _onSidebarSelected(context, index);
+    } else {
+      MotionSnackBarWarning(context, "الشاشة غير متاحة");
+    }
   }
 }

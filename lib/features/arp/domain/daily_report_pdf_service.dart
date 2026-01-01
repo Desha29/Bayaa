@@ -31,7 +31,7 @@ class DailyReportPdfService {
     final arabicBoldFont = pw.Font.ttf(arabicBoldFontData);
 
     // تحميل اللوجو
-    final logoData = await rootBundle.load('assets/images/logo.jpg');
+    final logoData = await rootBundle.load('assets/images/logo.png');
     final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
 
     // إعداد الصفحة (A4 عمودي أو أفقي)
@@ -79,12 +79,12 @@ class DailyReportPdfService {
                 font: boldFont,
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 22,
-                color: PdfColors.black,
+                color: PdfColor.fromInt(0xFF1E3A8A), // Bayaa Primary Blue
               ),
             ),
             pw.SizedBox(height: 6),
             pw.Text(
-              'نظام نقاط البيع المتطور - Amr Store',
+              'نظام نقاط البيع المتطور - Bayaa',
               style: pw.TextStyle(
                 font: boldFont,
                 fontSize: 13,
@@ -292,7 +292,7 @@ class DailyReportPdfService {
         ),
         pw.SizedBox(height: 3),
         pw.Text(
-          '© 2025 Amr Store POS - جميع الحقوق محفوظة',
+          '© 2026 Bayaa POS - جميع الحقوق محفوظة',
           style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
       ]),

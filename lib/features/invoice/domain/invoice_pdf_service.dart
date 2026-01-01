@@ -44,9 +44,10 @@ class InvoicePdfService {
       }
     }
     
+ 
     // Fallback
     try {
-      final bytes = await rootBundle.load('assets/images/logo.jpg');
+      final bytes = await rootBundle.load('assets/images/logo.png'); // Updated asset
       _cachedLogo = pw.MemoryImage(bytes.buffer.asUint8List());
       return _cachedLogo;
     } catch (e) {
@@ -67,21 +68,23 @@ class InvoicePdfService {
     final arabicFont = await _loadArabicFont();
     final boldFont = await _loadBoldFont();
 
+    // Brand Colors
+    final brandBlue = PdfColor.fromInt(0xFF1E3A8A);
+    final brandOrange = PdfColor.fromInt(0xFFF97316);
+
     // Get dynamic store info
     final storeRepo = getIt<StoreInfoRepository>();
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
-          name: 'كرزي فون',
-          address: 'الخانكة',
-          phone: '0599000000',
+          name: 'Bayaa', // Updated Default Name
+          address: '',
+          phone: '',
           vat: '', email: '',
         ));
     
     final logoProvider = await _loadLogo(storeInfo.logoPath); 
 
     // Styles...
-    final primaryColor = PdfColors.black;
-    final accentColor = PdfColors.black; // Standard thermal black
     final dividerColor = PdfColors.grey400;
 
     doc.addPage(
@@ -99,21 +102,23 @@ class InvoicePdfService {
                   child: pw.Image(logoProvider),
                 ),
               pw.Text(storeInfo.name, 
-                  style: pw.TextStyle(font: boldFont, fontSize: 16, fontWeight: pw.FontWeight.bold)),
-              pw.Text(storeInfo.address, 
-                  style: pw.TextStyle(font: arabicFont, fontSize: 8), textAlign: pw.TextAlign.center),
-              pw.Text('هاتف: ${storeInfo.phone}', 
-                  style: pw.TextStyle(font: arabicFont, fontSize: 8)),
+                  style: pw.TextStyle(font: boldFont, fontSize: 16, fontWeight: pw.FontWeight.bold, color: brandBlue)),
+              if (storeInfo.address.isNotEmpty)
+                pw.Text(storeInfo.address, 
+                    style: pw.TextStyle(font: arabicFont, fontSize: 8), textAlign: pw.TextAlign.center),
+              if (storeInfo.phone.isNotEmpty)
+                pw.Text('هاتف: ${storeInfo.phone}', 
+                    style: pw.TextStyle(font: arabicFont, fontSize: 8)),
               if (storeInfo.vat.isNotEmpty)
                 pw.Text('الرقم الضريبي: ${storeInfo.vat}', 
                     style: pw.TextStyle(font: arabicFont, fontSize: 7)),
               
               pw.Padding(
                 padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                child: pw.Divider(color: dividerColor, thickness: 0.5),
+                child: pw.Divider(color: brandOrange, thickness: 1), // Orange Divider
               ),
 
-              pw.Text('فاتورة مبيعات', style: pw.TextStyle(font: boldFont, fontSize: 12)),
+              pw.Text('فاتورة مبيعات', style: pw.TextStyle(font: boldFont, fontSize: 12, color: brandBlue)),
               pw.SizedBox(height: 4),
               _row('رقم الفاتورة:', data.invoiceId, arabicFont, boldFont),
               _row('التاريخ:', _fmt(data.date), arabicFont, boldFont),
@@ -134,7 +139,7 @@ class InvoicePdfService {
                   l.price.toStringAsFixed(0),
                   l.total.toStringAsFixed(0),
                 ]).toList(),
-                headerStyle: pw.TextStyle(font: boldFont, fontSize: 9),
+                headerStyle: pw.TextStyle(font: boldFont, fontSize: 9, color: PdfColors.white),
                 cellStyle: pw.TextStyle(font: arabicFont, fontSize: 9),
                 columnWidths: {
                   0: const pw.FlexColumnWidth(3),
@@ -142,7 +147,7 @@ class InvoicePdfService {
                   2: const pw.FlexColumnWidth(1.5),
                   3: const pw.FlexColumnWidth(1.5),
                 },
-                headerDecoration: const pw.BoxDecoration(color: PdfColors.grey100),
+                headerDecoration: pw.BoxDecoration(color: brandBlue), // Blue Header
                 border: null,
                 cellAlignment: pw.Alignment.centerRight,
               ),
@@ -152,20 +157,20 @@ class InvoicePdfService {
                 child: pw.Divider(color: dividerColor, thickness: 0.5),
               ),
 
-              _row('الإجمالي:', '${data.grandTotal.toStringAsFixed(2)} ج.م', arabicFont, boldFont, fontSize: 12),
+              _row('الإجمالي:', '${data.grandTotal.toStringAsFixed(2)}', arabicFont, boldFont, fontSize: 12, color: brandBlue),
               
               pw.SizedBox(height: 10),
               pw.Text('شكراً لزيارتكم!', style: pw.TextStyle(font: arabicFont, fontSize: 10)),
+              pw.Text('Powered by Bayaa', style: pw.TextStyle(font: arabicFont, fontSize: 6, color: PdfColors.grey500)), 
               
-              pw.SizedBox(height: 10),
+              pw.SizedBox(height: 5),
               pw.BarcodeWidget(
                 barcode: Barcode.code128(),
                 data: data.invoiceId,
-                width: 120,
+                width: 100,
                 height: 30,
                 drawText: false,
               ),
-              pw.Text(data.invoiceId, style: pw.TextStyle(font: arabicFont, fontSize: 7)),
             ],
           ),
         ),
@@ -175,12 +180,12 @@ class InvoicePdfService {
     return doc.save();
   }
 
-  static pw.Widget _row(String label, String value, pw.Font font, pw.Font bold, {double fontSize = 9}) {
+  static pw.Widget _row(String label, String value, pw.Font font, pw.Font bold, {double fontSize = 9, PdfColor? color}) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
-        pw.Text(label, style: pw.TextStyle(font: font, fontSize: fontSize)),
-        pw.Text(value, style: pw.TextStyle(font: bold, fontSize: fontSize)),
+        pw.Text(label, style: pw.TextStyle(font: font, fontSize: fontSize, color: color)),
+        pw.Text(value, style: pw.TextStyle(font: bold, fontSize: fontSize, color: color)),
       ],
     );
   }
@@ -191,12 +196,17 @@ class InvoicePdfService {
     
     final arabicFont = await _loadArabicFont();
     final boldFont = await _loadBoldFont();
+    
+    // Brand Colors
+    final brandBlue = PdfColor.fromInt(0xFF1E3A8A);
+    final brandOrange = PdfColor.fromInt(0xFFF97316);
+
     final storeRepo = getIt<StoreInfoRepository>();
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
-          name: 'كرزي فون',
-          address: 'غزة - شارع الجلاء',
-          phone: '0599000000',
+          name: 'Bayaa',
+          address: '',
+          phone: '',
           vat: '', email: '',
         ));
     final logoProvider = await _loadLogo(storeInfo.logoPath);
@@ -208,13 +218,13 @@ class InvoicePdfService {
         textDirection: pw.TextDirection.rtl,
         theme: pw.ThemeData.withFont(base: arabicFont, bold: boldFont),
         build: (context) => [
-          _buildA4Header(storeInfo, logoProvider, boldFont),
-          pw.Divider(),
+          _buildA4Header(storeInfo, logoProvider, boldFont, brandBlue),
+          pw.Divider(color: brandOrange, thickness: 2),
           _buildA4InvoiceInfo(data, boldFont),
           pw.SizedBox(height: 20),
-          _buildA4ItemsTable(data, boldFont, arabicFont),
+          _buildA4ItemsTable(data, boldFont, arabicFont, brandBlue),
           pw.SizedBox(height: 20),
-          _buildA4Summary(data, boldFont),
+          _buildA4Summary(data, boldFont, brandBlue),
           pw.Spacer(),
           _buildA4Footer(arabicFont),
         ],
@@ -224,16 +234,16 @@ class InvoicePdfService {
     return doc.save();
   }
 
-  static pw.Widget _buildA4Header(StoreInfo store, pw.ImageProvider? logo, pw.Font bold) {
+  static pw.Widget _buildA4Header(StoreInfo store, pw.ImageProvider? logo, pw.Font bold, PdfColor brandColor) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text(store.name, style: pw.TextStyle(font: bold, fontSize: 24)),
-            pw.Text(store.address),
-            pw.Text('هاتف: ${store.phone}'),
+            pw.Text(store.name, style: pw.TextStyle(font: bold, fontSize: 24, color: brandColor)),
+            if (store.address.isNotEmpty) pw.Text(store.address),
+            if (store.phone.isNotEmpty) pw.Text('هاتف: ${store.phone}'),
             if (store.vat.isNotEmpty) pw.Text('الرقم الضريبي: ${store.vat}'),
           ],
         ),
@@ -264,7 +274,7 @@ class InvoicePdfService {
     );
   }
 
-  static pw.Widget _buildA4ItemsTable(InvoiceData data, pw.Font bold, pw.Font regular) {
+  static pw.Widget _buildA4ItemsTable(InvoiceData data, pw.Font bold, pw.Font regular, PdfColor brandColor) {
      return pw.TableHelper.fromTextArray(
       headers: ['المنتج', 'الكمية', 'السعر', 'الإجمالي'],
       data: data.lines.map((l) => [
@@ -273,14 +283,14 @@ class InvoicePdfService {
         l.price.toStringAsFixed(2),
         l.total.toStringAsFixed(2),
       ]).toList(),
-      headerStyle: pw.TextStyle(font: bold),
+      headerStyle: pw.TextStyle(font: bold, color: PdfColors.white),
       cellStyle: pw.TextStyle(font: regular),
-      headerDecoration: const pw.BoxDecoration(color: PdfColors.grey200),
+      headerDecoration: pw.BoxDecoration(color: brandColor), // Blue Header
       cellAlignment: pw.Alignment.center,
     );
-  }
+    }
 
-  static pw.Widget _buildA4Summary(InvoiceData data, pw.Font bold) {
+  static pw.Widget _buildA4Summary(InvoiceData data, pw.Font bold, PdfColor brandColor) {
     return pw.Align(
       alignment: pw.Alignment.centerLeft,
       child: pw.Container(
@@ -289,7 +299,7 @@ class InvoicePdfService {
           children: [
             _row('الإجمالي الفرعي:', data.subtotal.toStringAsFixed(2), bold, bold),
             pw.Divider(),
-            _row('الإجمالي الكلي:', '${data.grandTotal.toStringAsFixed(2)} ج.م', bold, bold, fontSize: 14),
+            _row('الإجمالي الكلي:', '${data.grandTotal.toStringAsFixed(2)} ج.م', bold, bold, fontSize: 14, color: brandColor),
           ],
         ),
       ),

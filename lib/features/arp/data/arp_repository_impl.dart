@@ -166,8 +166,7 @@ class ArpRepositoryImpl implements ArpRepository {
       final session = sessionRepo.getCurrentSession();
       if (session == null || !session.isOpen) return null;
 
-      // Fetch Sales (Logic matching UserCubit.closeSession)
-      // We process ALL recent sales and filter in memory for speed & accuracy with orphans
+     
       final salesResult = await salesRepo.getRecentSales(limit: 10000); 
       final allSales = salesResult.getOrElse(() => []);
       

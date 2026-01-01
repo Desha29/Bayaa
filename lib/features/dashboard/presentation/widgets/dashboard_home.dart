@@ -8,7 +8,7 @@ import 'dashboard_card.dart';
 
 class DashboardHome extends StatefulWidget {
   const DashboardHome({super.key, required this.onCardTap});
-  final void Function(int index) onCardTap;
+  final void Function(String id) onCardTap;
 
   @override
   State<DashboardHome> createState() => _DashboardHomeState();
@@ -21,40 +21,46 @@ class _DashboardHomeState extends State<DashboardHome>
 
   final List<Map<String, dynamic>> cards = [
     {
+      "id": "sales",
       "icon": LucideIcons.shoppingCart,
       "title": "المبيعات",
       "subtitle": "إدارة عمليات البيع",
       "color": AppColors.primaryColor,
     },
     {
+      "id": "invoices",
       "icon": LucideIcons.fileText,
       "title": "الفواتير",
       "subtitle": "إدارة الفواتير",
       "color": AppColors.accentGold,
     },
     {
-      "icon": LucideIcons.bell,
-      "title": "التنبيهات",
-      "subtitle": "الإشعارات والتنبيهات",
-      "color": AppColors.darkGold,
-    },
-    {
-      "icon": LucideIcons.alertTriangle,
-      "title": "المنتجات الناقصة",
-      "subtitle": "تنبيهات المخزون",
-      "color": AppColors.warningColor,
-    },
-    {
+      "id": "products",
       "icon": LucideIcons.package,
       "title": "المنتجات",
       "subtitle": "إدارة المخزون",
       "color": AppColors.successColor,
     },
     {
+      "id": "stock_alerts",
+      "icon": LucideIcons.alertTriangle,
+      "title": "المنتجات الناقصة",
+      "subtitle": "تنبيهات المخزون",
+      "color": AppColors.warningColor,
+    },
+    {
+      "id": "reports",
       "icon": LucideIcons.barChart2,
       "title": "التحديلات و التقارير",
       "subtitle": "ادارة تقارير النظام",
       "color": AppColors.primaryColor,
+    },
+    {
+      "id": "notifications",
+      "icon": LucideIcons.bell,
+      "title": "التنبيهات",
+      "subtitle": "الإشعارات والتنبيهات",
+      "color": AppColors.darkGold,
     },
   ];
 
@@ -111,7 +117,7 @@ class _DashboardHomeState extends State<DashboardHome>
             children: [
               ScreenHeader(
                 title: "لوحة التحكم",
-                subtitle: "مرحباً بك في نظام Amr Store لإدارة نقاط البيع",
+                subtitle: "مرحباً بك في نظام Bayaa لإدارة نقاط البيع",
                 icon: LucideIcons.layoutDashboard,
                 titleColor: AppColors.kDarkChip,
                 iconColor: AppColors.primaryColor,
@@ -146,8 +152,7 @@ class _DashboardHomeState extends State<DashboardHome>
                         title: card["title"],
                         subtitle: card["subtitle"],
                         color: card["color"],
-                        onTap: () =>
-                            widget.onCardTap(_getTargetScreenIndex(index)),
+                        onTap: () => widget.onCardTap(card["id"]),
                       ),
                     );
                   }),
@@ -165,32 +170,5 @@ class _DashboardHomeState extends State<DashboardHome>
       scale: _animations[index],
       child: FadeTransition(opacity: _animations[index], child: child),
     );
-  }
-
-  int _getTargetScreenIndex(int cardIndex) {
-    // Fixed mapping based on card order:
-    // 0: المبيعات -> screen 1
-    // 1: الفواتير -> screen 2
-    // 2: التنبيهات -> screen 6
-    // 3: المنتجات الناقصة -> screen 4
-    // 4: المنتجات -> screen 3
-    // 5: التحديلات و التقارير -> screen 5
-
-    switch (cardIndex) {
-      case 0:
-        return 1; // المبيعات
-      case 1:
-        return 2; // الفواتير
-      case 2:
-        return 6; // التنبيهات
-      case 3:
-        return 4; // المنتجات الناقصة
-      case 4:
-        return 3; // المنتجات
-      case 5:
-        return 5; // التحديلات و التقارير
-      default:
-        return 0;
-    }
   }
 }

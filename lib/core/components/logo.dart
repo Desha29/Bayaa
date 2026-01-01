@@ -80,7 +80,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            'Amr Store',
+            'Bayaa',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,

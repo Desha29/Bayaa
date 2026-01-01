@@ -10,10 +10,11 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 
 class SidebarItem {
+  final String id;
   final IconData icon;
   final String title;
   final Widget screen;
-  SidebarItem({required this.icon, required this.title, required this.screen});
+  SidebarItem({required this.id, required this.icon, required this.title, required this.screen});
 }
 
 class CustomSidebar extends StatefulWidget {
@@ -276,7 +277,7 @@ class _SidebarHeader extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    'Amr Store',
+                    'Bayaa',
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.secondaryColor,

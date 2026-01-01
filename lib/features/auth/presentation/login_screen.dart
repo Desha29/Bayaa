@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    '© 2025 Crazy Phone POS. جميع الحقوق محفوظة.',
+                    '© 2026 Bayaa. جميع الحقوق محفوظة.',
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 10),
@@ -181,16 +181,16 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: user.userType == UserType.manager
-                    ? Colors.orange.withOpacity(0.2)
-                    : Colors.blue.withOpacity(0.2),
+                    ? AppColors.accentColor.withOpacity(0.2)
+                    : AppColors.secondaryColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 user.userType == UserType.manager ? "مدير" : "كاشير",
                 style: TextStyle(
                   color: user.userType == UserType.manager
-                      ? Colors.orange[800]
-                      : Colors.blue[800],
+                      ? AppColors.darkGold // Use darker orange for text
+                      : AppColors.primaryColor,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -257,7 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
+                  backgroundColor: AppColors.secondaryColor, // Use Secondary Blue
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),

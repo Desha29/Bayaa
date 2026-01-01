@@ -9,7 +9,7 @@ class AppTheme {
       colorScheme: const ColorScheme.light(
         primary: AppColors.primaryColor,
         onPrimary: AppColors.primaryForeground,
-        secondary: AppColors.accentGold,
+        secondary: AppColors.accentColor, // Orange for Accents/FABs
         onSecondary: Colors.white,
         surface: AppColors.surfaceColor,
         onSurface: AppColors.textPrimary,
@@ -80,23 +80,24 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        elevation: 2,
+        elevation: 1, // Cleaner, flatter look
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         color: AppColors.surfaceColor,
+        surfaceTintColor: Colors.transparent, // Avoid tint on M3
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryColor,
-          foregroundColor: AppColors.primaryForeground,
-          elevation: 2,
+          backgroundColor: AppColors.secondaryColor, // Per user spec: Secondary Blue for Buttons
+          foregroundColor: Colors.white,
+          elevation: 1,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryColor,
-          side: const BorderSide(color: AppColors.primaryColor),
+          foregroundColor: AppColors.secondaryColor,
+          side: const BorderSide(color: AppColors.borderColor),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
@@ -121,7 +122,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
+          borderSide: const BorderSide(color: AppColors.secondaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -133,15 +134,17 @@ class AppTheme {
         ),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.backgroundColor,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: AppColors.primaryColor, // Deep Blue Headers
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
+          color: Colors.white,
+          fontFamily: 'Cairo',
         ),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
     );
   }

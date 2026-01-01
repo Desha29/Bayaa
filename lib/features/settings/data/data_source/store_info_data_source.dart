@@ -36,11 +36,11 @@ class StoreInfoDataSource {
 
   StoreInfo getDefaultStoreInfo() {
     return StoreInfo(
-      name: 'Amr Store',
-      phone: '01000000000',
-      email: 'info@amrstore.com',
-      address: "العرب-القليوبية",
-      vat: '123456789',
+      name: 'Bayaa',
+      phone: '',
+      email: '',
+      address: "",
+      vat: '',
       logoPath: '',
     );
   }
