@@ -1,4 +1,4 @@
-# � Bayaa POS
+# <img src="assets/images/Icon_app.png" width="40" height="40" style="vertical-align:middle"> Bayaa POS
 
 ![Bayaa Logo](assets/images/logo.png)
 
@@ -22,7 +22,7 @@ Tailored for **Mobile Phone Stores** and retail outlets, Bayaa combines a beauti
 
 ## ✨ Key Features
 
-### � Sales & Point of Sale
+### 💰 Sales & Point of Sale
 *   **Fast Checkout:** Streamlined sales process with barcode scanning or manual entry.
 *   **Smart Invoicing:** Generate professional A4 invoices and 80mm thermal receipts.
 *   **Refund Management:** Handle returns and refunds with strict stock validation.
@@ -38,7 +38,7 @@ Tailored for **Mobile Phone Stores** and retail outlets, Bayaa combines a beauti
 *   **Visual Insights:** Interactive charts and graphs for business performance.
 *   **Session History:** Audit logs of previous shifts and transactions.
 
-### �️ System & Security
+### 🛡️ System & Security
 *   **Role-Based Access:** Distinct permissions for Managers and Cashiers.
 *   **Offline-First:** Built on **Hive** for zero-latency local database performance.
 *   **Secure:** Data privacy and local storage focus.
@@ -63,15 +63,28 @@ Bayaa is built using industry-standard **Clean Architecture** principles to ensu
 
 ## 📸 Screenshots
 
-| Dashboard | Sales Screen |
-|-----------|--------------|
-| ![Dashboard](assets/screenshots/dashboard.png) | ![Sales](assets/screenshots/sales.png) |
+### 🖥️ General
+| Login Screen | Sales Interface |
+|--------------|-----------------|
+| ![Login](Screenshots/login.png) | ![Sales](Screenshots/sales.png) |
 
-| Invoices | Reports |
-|----------|---------|
-| ![Invoices](assets/screenshots/invoices.png) | ![Reports](assets/screenshots/reports.png) |
+### 👨‍💼 Manager Interface
+| Manager Dashboard | Products Management |
+|-------------------|-------------------|
+| ![Manager Dashboard](Screenshots/Manger/manger_dashboard.png) | ![Products](Screenshots/Manger/manger_product.png) |
 
-*(Note: Add screenshot files to `assets/screenshots/` to display them here)*
+| Invoices History | Daily Reports |
+|------------------|---------------|
+| ![Invoices](Screenshots/Manger/manger_invoices.png) | ![Daily Reports](Screenshots/Manger/daliy_report1.png) |
+
+| Stock Summary | Refund Management |
+|---------------|-------------------|
+| ![Stock Summary](Screenshots/Manger/summary_stock1.png) | ![Refund](Screenshots/Manger/refund_invoice.png) |
+
+### 👨‍💻 Cashier Interface
+| Cashier Dashboard | Cashier Sales |
+|-------------------|---------------|
+| ![Cashier Dashboard](Screenshots/Cashier/cashier_dashboard.png) | ![Cashier Products](Screenshots/Cashier/cashier_products.png) |
 
 ---
 
