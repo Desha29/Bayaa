@@ -6,6 +6,7 @@
 .DS_Store
 .atom/
 .build/
+
 .buildlog/
 .history
 .svn/
@@ -55,3 +56,78 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Local configuration file
+/local.properties
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+# Keystore files
+*.jks
+*.keystore
+# Google Services (e.g. APIs or Firebase)
+/google-services.json
+/GoogleService-Info.plist
+# Fastlane files
+/fastlane/report.xml
+/fastlane/Preview.html
+/fastlane/screenshots
+/fastlane/test_output
+# Flutter generated files
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/App.framework
+**/ios/Flutter/engine/
+**/ios/Flutter/flutter_export_environment.sh
+**/android/app/src/main/jniLibs/
+**/android/app/src/debug/jniLibs/   
+**/android/app/src/profile/jniLibs/
+**/android/local.properties
+# CocoaPods
+**/ios/Pods/
+**/ios/Podfile.lock
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.podspec
+# Xcode
+**/ios/Runner.xcworkspace/
+**/ios/Runner/xcuserdata/
+**/ios/build/
+**/ios/DerivedData/
+# macOS
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+**/macos/Runner.xcworkspace/
+**/macos/Runner/xcuserdata/
+**/macos/build/
+# Windows
+**/windows/Flutter/ephemeral/
+**/windows/flutter_export_environment.bat
+**/windows/runner/Debug/
+**/windows/runner/Release/
+**/windows/runner/GeneratedPluginRegistrant.cpp
+**/windows/runner/GeneratedPluginRegistrant.h
+**/windows/build/
+# Linux
+**/linux/flutter/ephemeral/
+**/linux/flutter_export_environment.sh
+**/linux/build/
+# Web
+**/web/flutter_service_worker.js
+**/web/flutter_service_worker.js.map
+
+# Firebase Crashlytics
+**/ios/Runner/Crashlytics.framework/
+**/android/app/crashlytics/
+# VS Code
+.vscode/
+# JetBrains
+.idea/
+*.iml
+*.ipr
+*.iws
+#folder database
+data/
+# End of .gitignore
+lib/secrets.dart

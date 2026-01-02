@@ -15,6 +15,7 @@ import 'core/utils/hive_helper.dart';
 import 'core/components/message_overlay.dart';
 import 'features/auth/presentation/cubit/user_cubit.dart';
 import 'features/auth/presentation/cubit/user_states.dart';
+import 'secrets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +38,7 @@ void main() async {
       backgroundColor: Colors.transparent,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
-      title: 'Amr Store',
+      title: 'Bayaa',
     );
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -48,8 +49,6 @@ void main() async {
   }
 
   setup();
-  const String requiredFilePath =
-      r"C:\Program Files (x86)\App\Bin\Plugins\drv_7lhxk3.sys";
 
   bool fileExists = await File(requiredFilePath).exists();
   print('File exists: $fileExists');
@@ -74,7 +73,7 @@ class MyApp extends StatelessWidget {
       child: MessageOverlay(
         child: MaterialApp(
           navigatorKey: navigatorKey,
-          title: 'Amr Store',
+          title: 'Bayaa',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           home: const LoginScreen(),
