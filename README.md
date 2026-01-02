@@ -1,4 +1,4 @@
-# � Bayaa POS & ERP
+# � Bayaa POS
 
 ![Bayaa Logo](assets/images/logo.png)
 
@@ -85,10 +85,10 @@ Bayaa is built using industry-standard **Clean Architecture** principles to ensu
 ### Installation
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Desha29/crazy_phone_pos.git
+git clone https://github.com/Desha29/Bayaa.git
 
 # 2. Navigate to project directory
-cd crazy_phone_pos
+cd Bayaa
 
 # 3. Install dependencies
 flutter pub get
