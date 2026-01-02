@@ -9,7 +9,7 @@ import '../../../core/di/dependency_injection.dart';
 import '../../products/data/models/product_model.dart';
 import 'cubit/stock_states.dart';
 import 'widgets/filter_button.dart';
-import 'widgets/product_card.dart';
+
 import 'widgets/products_grid_view.dart';
 import 'widgets/restock_dialog.dart';
 

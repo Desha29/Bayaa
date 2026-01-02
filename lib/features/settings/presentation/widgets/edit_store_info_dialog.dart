@@ -152,6 +152,12 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                                 Icons.receipt_long,
                               ),
                             ]),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              addressCtrl,
+                              'العنوان',
+                              Icons.location_on,
+                            ),
                           ] else ...[
                             _buildTextField(
                               nameCtrl,

@@ -1,5 +1,3 @@
-// store_info_repository_int.dart
-
 
 import 'package:dartz/dartz.dart';
 

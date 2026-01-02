@@ -1,10 +1,10 @@
-// settings_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
-import 'package:crazy_phone_pos/features/settings/data/data_source/store_info_data_source.dart';
+
 import 'package:crazy_phone_pos/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:crazy_phone_pos/core/functions/messege.dart';
 import '../../../core/di/dependency_injection.dart';
@@ -13,7 +13,7 @@ import '../../arp/data/models/daily_report_model.dart';
 import '../../arp/presentation/screens/dialy_report_screen.dart';
 import '../../auth/data/models/user_model.dart';
 import '../../auth/presentation/cubit/user_states.dart';
-import '../data/repository/settings_repository_imp.dart';
+
 import 'widgets/logout_warning_banner.dart';
 import 'widgets/store_info_card.dart';
 import 'widgets/users_management_card.dart';

@@ -6,7 +6,7 @@ import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 
 class AddEditUserDialog extends StatefulWidget {
   final User? userToEdit;

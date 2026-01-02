@@ -72,22 +72,22 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/Icon_app.png"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/images/logo.png"
+  adaptive_icon_foreground: "assets/images/Icon_app.png"
   web:
     generate: true
-    image_path: "assets/images/logo.png"
+    image_path: "assets/images/Icon_app.png"
   windows:
     generate: true
-    image_path: "assets/images/logo.png"
+    image_path: "assets/images/Icon_app.png"
     icon_size: 256 # High-res windows icon
   macos:
     generate: true
-    image_path: "assets/images/logo.png"
+    image_path: "assets/images/Icon_app.png"
   linux:
     generate: true
-    image_path: "assets/images/logo.png"
+    image_path: "assets/images/Icon_app.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -41,7 +41,7 @@ class StoreInfo {
   }
 }
 
-// Simpler, more reliable TypeAdapter
+
 class StoreInfoAdapter extends TypeAdapter<StoreInfo> {
   @override
   final int typeId = 2;
@@ -54,7 +54,7 @@ class StoreInfoAdapter extends TypeAdapter<StoreInfo> {
       phone: reader.readString(),
       email: reader.readString(),
       vat: reader.readString(),
-      logoPath: reader.readString(),  // Added logoPath read
+      logoPath: reader.readString(), 
     );
   }
 
@@ -65,6 +65,6 @@ class StoreInfoAdapter extends TypeAdapter<StoreInfo> {
     writer.writeString(obj.phone);
     writer.writeString(obj.email);
     writer.writeString(obj.vat);
-    writer.writeString(obj.logoPath ?? ''); // Added logoPath write
+    writer.writeString(obj.logoPath ?? ''); 
   }
 }

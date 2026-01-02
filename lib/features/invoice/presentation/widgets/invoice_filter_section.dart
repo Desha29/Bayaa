@@ -17,6 +17,8 @@ class InvoiceFilterSection extends StatelessWidget {
   final InvoiceFilterType filterType;
   final Function(InvoiceFilterType) onFilterTypeChanged;
   final bool isManager;
+  final FocusNode? focusNode;
+  final Function(String)? onChanged;
 
   const InvoiceFilterSection({
     Key? key,
@@ -33,6 +35,8 @@ class InvoiceFilterSection extends StatelessWidget {
     required this.filterType,
     required this.onFilterTypeChanged,
     required this.isManager,
+    this.focusNode,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -73,17 +77,13 @@ class InvoiceFilterSection extends StatelessWidget {
                   children: [
                     Expanded(
                       child: TextField(
+                        focusNode: focusNode,
                         controller: barcodeSearchController,
                         decoration: InputDecoration(
                           hintText: 'امسح الباركود أو اكتب رقم الفاتورة',
                           prefixIcon:
                               Icon(Icons.search, color: AppColors.primaryColor),
-                          suffixIcon: searchQuery.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear),
-                                  onPressed: onClearSearch,
-                                )
-                              : null,
+                          suffixIcon: null,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
@@ -101,6 +101,7 @@ class InvoiceFilterSection extends StatelessWidget {
                           ),
                         ),
                         onSubmitted: onSearch,
+                        onChanged: onChanged,
                       ),
                     ),
                     const SizedBox(width: 12),

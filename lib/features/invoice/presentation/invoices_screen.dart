@@ -19,6 +19,8 @@ import 'invoice_preview_screen.dart';
 import 'widgets/invoice_filter_section.dart';
 import 'widgets/invoice_list_section.dart';
 import 'widgets/partial_refund_dialog.dart';
+import '../../settings/presentation/cubit/settings_cubit.dart';
+import '../../../core/di/dependency_injection.dart';
 
 
 
@@ -40,8 +42,11 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   final TextEditingController _barcodeSearchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+
   final StringBuffer _hidBuffer = StringBuffer();
   Timer? _hidTimer;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -52,25 +57,44 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     );
     _animationController.forward();
 
-    // Delay cubit access until widget context includes BlocProvider
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<InvoiceCubit>().loadSales();
     });
 
+
+    
+    _searchFocusNode.addListener(_onFocusChange);
     RawKeyboard.instance.addListener(_onRawKey);
+  }
+
+  void _onFocusChange() {
+    if (_searchFocusNode.hasFocus) {
+      RawKeyboard.instance.removeListener(_onRawKey);
+    } else {
+      RawKeyboard.instance.addListener(_onRawKey);
+    }
   }
 
   @override
   void dispose() {
+    _searchFocusNode.removeListener(_onFocusChange);
     RawKeyboard.instance.removeListener(_onRawKey);
     _hidTimer?.cancel();
+    _debounceTimer?.cancel();
     _barcodeSearchController.dispose();
+    _searchFocusNode.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
   void _onRawKey(RawKeyEvent event) {
     if (event is! RawKeyDownEvent) return;
+    
+    if (ModalRoute.of(context)?.isCurrent != true) return;
+  
+    if (_searchFocusNode.hasFocus) return; 
+
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
       _hidTimer?.cancel();
@@ -98,6 +122,17 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
   void _searchByBarcode(String barcode) {
     context.read<InvoiceCubit>().setSearchQuery(barcode);
+  }
+
+  void _onSearchChanged(String query) {
+    _debounceTimer?.cancel();
+    if (query.isEmpty) {
+      _searchByBarcode('');
+      return;
+    }
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      _searchByBarcode(query);
+    });
   }
 
   void _clearFilters() {
@@ -206,9 +241,9 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: '',
-      storeAddress: '',
-      storePhone: '',
+      storeName: getIt<SettingsCubit>().currentStoreInfo?.name ?? '',
+      storeAddress: getIt<SettingsCubit>().currentStoreInfo?.address ?? '',
+      storePhone: getIt<SettingsCubit>().currentStoreInfo?.phone ?? '',
       cashierName: cashierName,
       lines: sale.saleItems
           .map((it) => InvoiceLine(
@@ -247,9 +282,9 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: '', // Will be replaced by dynamic data in service
-      storeAddress: '', 
-      storePhone: '',
+      storeName: getIt<SettingsCubit>().currentStoreInfo?.name ?? '',
+      storeAddress: getIt<SettingsCubit>().currentStoreInfo?.address ?? '',
+      storePhone: getIt<SettingsCubit>().currentStoreInfo?.phone ?? '',
       cashierName: cashierName,
       lines: sale.saleItems
           .map((it) => InvoiceLine(
@@ -316,8 +351,10 @@ class _InvoiceScreenState extends State<InvoiceScreen>
                       child: InvoiceFilterSection(
                         isDesktop: isDesktop,
                         barcodeSearchController: _barcodeSearchController,
+                        focusNode: _searchFocusNode,
                         searchQuery: state.searchQuery,
                         onSearch: _searchByBarcode,
+                        onChanged: _onSearchChanged,
                         onClearSearch: () {
                           _barcodeSearchController.clear();
                           _searchByBarcode('');

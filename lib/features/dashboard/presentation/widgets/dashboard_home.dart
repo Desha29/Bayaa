@@ -7,8 +7,9 @@ import 'package:crazy_phone_pos/core/components/app_logo.dart';
 import 'dashboard_card.dart';
 
 class DashboardHome extends StatefulWidget {
-  const DashboardHome({super.key, required this.onCardTap});
+  const DashboardHome({super.key, required this.onCardTap, required this.isManager});
   final void Function(String id) onCardTap;
+  final bool isManager;
 
   @override
   State<DashboardHome> createState() => _DashboardHomeState();
@@ -19,7 +20,12 @@ class _DashboardHomeState extends State<DashboardHome>
   late List<AnimationController> _controllers;
   late List<Animation<double>> _animations;
 
-  final List<Map<String, dynamic>> cards = [
+  late List<Map<String, dynamic>> cards;
+
+  @override
+  void initState() {
+    super.initState();
+    cards = [
     {
       "id": "sales",
       "icon": LucideIcons.shoppingCart,
@@ -48,12 +54,21 @@ class _DashboardHomeState extends State<DashboardHome>
       "subtitle": "تنبيهات المخزون",
       "color": AppColors.warningColor,
     },
+    if (widget.isManager)
     {
       "id": "reports",
       "icon": LucideIcons.barChart2,
       "title": "التحديلات و التقارير",
       "subtitle": "ادارة تقارير النظام",
       "color": AppColors.primaryColor,
+    }
+    else 
+    {
+      "id": "settings",
+      "icon": LucideIcons.settings,
+      "title": "الإعدادات",
+      "subtitle": "إدارة إعدادات النظام",
+      "color": Colors.blueGrey,
     },
     {
       "id": "notifications",
@@ -63,10 +78,6 @@ class _DashboardHomeState extends State<DashboardHome>
       "color": AppColors.darkGold,
     },
   ];
-
-  @override
-  void initState() {
-    super.initState();
     _controllers = List.generate(
       cards.length,
       (index) => AnimationController(

@@ -64,6 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: "لوحة التحكم",
         screen: DashboardHome(
           onCardTap: (id) => handleCardTap(id),
+          isManager: curUser.userType == UserType.manager,
         ),
       ),
       SidebarItem(
@@ -94,7 +95,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: "المنتجات الناقصة",
         screen: const StockScreen(),
       ),
-      // Stock Summary - Only for managers
+  
       if (curUser.userType != UserType.cashier)
         SidebarItem(
           id: 'stock_summary',
@@ -105,15 +106,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: const StockSummaryScreen(),
           ),
         ),
-      SidebarItem(
-        id: 'reports',
-        icon: LucideIcons.pieChart,
-        title: "التحليلات والتقارير",
-        screen: BlocProvider(
-          create: (context) => ArpCubit(_arpRepository),
-          child: const ArpScreen(),
+      if (curUser.userType == UserType.manager)
+        SidebarItem(
+          id: 'reports',
+          icon: LucideIcons.pieChart,
+          title: "التحليلات والتقارير",
+          screen: BlocProvider(
+            create: (context) => ArpCubit(_arpRepository),
+            child: const ArpScreen(),
+          ),
         ),
-      ),
       SidebarItem(
         id: 'notifications',
         icon: LucideIcons.bell,
@@ -199,7 +201,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   
   void _onSidebarSelected(BuildContext context, int index) {
-      if (index == 5) { // Report index
+    final item = sidebarItems[index];
+    if (item.id == 'reports' || item.id == 'stock_summary') {
           try {
               PermissionGuard.checkReportAccess(curUser);
           } catch (e) {
