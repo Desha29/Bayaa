@@ -1,22 +1,12 @@
-import 'package:hive/hive.dart';
 
-part 'product_performance_model.g.dart';
 
-@HiveType(typeId: 9)
-class ProductPerformanceModel extends HiveObject {
-  @HiveField(0)
+class ProductPerformanceModel {
   final String productId;
-  @HiveField(1)
   final String productName;
-  @HiveField(2)
   final int quantitySold;
-  @HiveField(3)
   final double revenue;
-  @HiveField(4)
   final double cost;
-  @HiveField(5)
   final double profit;
-  @HiveField(6)
   final double profitMargin;
 
   ProductPerformanceModel({
@@ -28,6 +18,18 @@ class ProductPerformanceModel extends HiveObject {
     required this.profit,
     required this.profitMargin,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'productId': productId,
+      'productName': productName,
+      'quantitySold': quantitySold,
+      'revenue': revenue,
+      'cost': cost,
+      'profit': profit,
+      'profitMargin': profitMargin,
+    };
+  }
 
   ProductPerformanceModel copyWith({
     String? productId,
@@ -49,4 +51,3 @@ class ProductPerformanceModel extends HiveObject {
     );
   }
 }
-

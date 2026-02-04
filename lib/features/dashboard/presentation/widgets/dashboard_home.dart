@@ -4,10 +4,14 @@ import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:crazy_phone_pos/core/components/app_logo.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../settings/presentation/cubit/settings_cubit.dart'
+    show SettingsCubit;
 import 'dashboard_card.dart';
 
 class DashboardHome extends StatefulWidget {
-  const DashboardHome({super.key, required this.onCardTap, required this.isManager});
+  const DashboardHome(
+      {super.key, required this.onCardTap, required this.isManager});
   final void Function(String id) onCardTap;
   final bool isManager;
 
@@ -19,65 +23,65 @@ class _DashboardHomeState extends State<DashboardHome>
     with TickerProviderStateMixin {
   late List<AnimationController> _controllers;
   late List<Animation<double>> _animations;
-
+  final store = getIt<SettingsCubit>().currentStoreInfo;
   late List<Map<String, dynamic>> cards;
 
   @override
   void initState() {
     super.initState();
     cards = [
-    {
-      "id": "sales",
-      "icon": LucideIcons.shoppingCart,
-      "title": "المبيعات",
-      "subtitle": "إدارة عمليات البيع",
-      "color": AppColors.primaryColor,
-    },
-    {
-      "id": "invoices",
-      "icon": LucideIcons.fileText,
-      "title": "الفواتير",
-      "subtitle": "إدارة الفواتير",
-      "color": AppColors.accentGold,
-    },
-    {
-      "id": "products",
-      "icon": LucideIcons.package,
-      "title": "المنتجات",
-      "subtitle": "إدارة المخزون",
-      "color": AppColors.successColor,
-    },
-    {
-      "id": "stock_alerts",
-      "icon": LucideIcons.alertTriangle,
-      "title": "المنتجات الناقصة",
-      "subtitle": "تنبيهات المخزون",
-      "color": AppColors.warningColor,
-    },
-    if (widget.isManager)
-    {
-      "id": "reports",
-      "icon": LucideIcons.barChart2,
-      "title": "التحديلات و التقارير",
-      "subtitle": "ادارة تقارير النظام",
-      "color": AppColors.primaryColor,
-    }
-    else 
-    {
-      "id": "settings",
-      "icon": LucideIcons.settings,
-      "title": "الإعدادات",
-      "subtitle": "إدارة إعدادات النظام",
-      "color": Colors.blueGrey,
-    },
-    {
-      "id": "notifications",
-      "icon": LucideIcons.bell,
-      "title": "التنبيهات",
-      "subtitle": "الإشعارات والتنبيهات",
-      "color": AppColors.darkGold,
-    },
-  ];
+      {
+        "id": "sales",
+        "icon": LucideIcons.shoppingCart,
+        "title": "المبيعات",
+        "subtitle": "إدارة عمليات البيع",
+        "color": AppColors.primaryColor,
+      },
+      {
+        "id": "invoices",
+        "icon": LucideIcons.fileText,
+        "title": "الفواتير",
+        "subtitle": "إدارة الفواتير",
+        "color": AppColors.accentGold,
+      },
+      {
+        "id": "products",
+        "icon": LucideIcons.package,
+        "title": "المنتجات",
+        "subtitle": "إدارة المخزون",
+        "color": AppColors.successColor,
+      },
+      {
+        "id": "stock_alerts",
+        "icon": LucideIcons.alertTriangle,
+        "title": "المنتجات الناقصة",
+        "subtitle": "تنبيهات المخزون",
+        "color": AppColors.warningColor,
+      },
+      if (widget.isManager)
+        {
+          "id": "reports",
+          "icon": LucideIcons.barChart2,
+          "title": "التحديلات و التقارير",
+          "subtitle": "ادارة تقارير النظام",
+          "color": AppColors.primaryColor,
+        }
+      else
+        {
+          "id": "settings",
+          "icon": LucideIcons.settings,
+          "title": "الإعدادات",
+          "subtitle": "إدارة إعدادات النظام",
+          "color": Colors.blueGrey,
+        },
+      {
+        "id": "notifications",
+        "icon": LucideIcons.bell,
+        "title": "التنبيهات",
+        "subtitle": "الإشعارات والتنبيهات",
+        "color": AppColors.darkGold,
+      },
+    ];
     _controllers = List.generate(
       cards.length,
       (index) => AnimationController(
@@ -128,7 +132,8 @@ class _DashboardHomeState extends State<DashboardHome>
             children: [
               ScreenHeader(
                 title: "لوحة التحكم",
-                subtitle: "مرحباً بك في نظام Bayaa لإدارة نقاط البيع",
+                subtitle:
+                    "مرحباً بك في نظام ${store?.name ?? "Bayaa"} لإدارة نقاط البيع",
                 icon: LucideIcons.layoutDashboard,
                 titleColor: AppColors.kDarkChip,
                 iconColor: AppColors.primaryColor,
@@ -142,7 +147,8 @@ class _DashboardHomeState extends State<DashboardHome>
                     backgroundColor: AppColors.surfaceColor,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(80),
-                      child: const AppLogo(width: 160, height: 160, fit: BoxFit.cover),
+                      child: const AppLogo(
+                          width: 160, height: 160, fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -151,8 +157,8 @@ class _DashboardHomeState extends State<DashboardHome>
               Expanded(
                 child: GridView.count(
                   crossAxisCount: crossAxisCount,
-                  mainAxisSpacing: 4, 
-                  crossAxisSpacing: 8, 
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 8,
                   childAspectRatio: aspectRatio,
                   children: List.generate(cards.length, (index) {
                     final card = cards[index];

@@ -5,7 +5,7 @@ import 'package:crazy_phone_pos/core/functions/messege.dart';
 import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart'; // Explicit absolute import
 
 import '../../../core/components/screen_header.dart';
 import '../../../core/constants/app_colors.dart';
@@ -48,10 +48,9 @@ class _SalesScreenState extends State<SalesScreen>
   final StringBuffer _hidBuffer = StringBuffer();
   Timer? _hidTimer;
 
-  // Local products box (already opened in main)
-  late final Box<Product> _productsBox;
-
-  // Repository for saving sales
+  // No local products box
+  
+  // Repository for scanning/lookup
   late final SalesRepository _repository;
 
   // Simple in-memory cart
@@ -64,16 +63,12 @@ class _SalesScreenState extends State<SalesScreen>
         (sum, e) => sum + (e['price'] as double) * (e['qty'] as int),
       );
   Timer? _searchDebounce;
+  
   @override
   void initState() {
     super.initState();
 
-    _productsBox = Hive.box<Product>('productsBox');
-    _repository = widget.repository ??
-        SalesRepositoryImpl(
-          productsBox: _productsBox,
-          salesBox: Hive.lazyBox<Sale>('salesBox'),
-        );
+    _repository = widget.repository ?? getIt<SalesRepositoryImpl>();
 
     _fadeController = AnimationController(
         duration: const Duration(milliseconds: 800), vsync: this);
@@ -90,26 +85,33 @@ class _SalesScreenState extends State<SalesScreen>
 
     // Global HID listener: commits on Enter or brief idle after burst
     RawKeyboard.instance.addListener(_onRawKey);
-    // _barcodeController.addListener(_onSearchTextChanged); // Removed debounce
     // Load recent sales
     _loadRecentSales();
   }
 
   void _onSearchChanged(String text) {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 150), () {
+    _searchDebounce = Timer(const Duration(milliseconds: 150), () async {
       final q = text.trim();
       if (q.isEmpty) {
         setState(() => _filteredProducts = []);
         return;
       }
-
+      
+      // Use ProductCubit or Repository to search (for now using ProductCubit's cached list if available or repository search)
+      // Since we want to search broadly, let's use the loaded products in ProductCubit if available
+      final productCubit = getIt<ProductCubit>();
+      
+      // If products are loaded in memory, filter them. Else we might need a search API.
+      // Assuming small catalogue for now as per previous logic.
+      final allProducts = productCubit.allProducts; 
+      
       final query = q.toLowerCase();
       final parsedNumber = double.tryParse(q.replaceAll(',', '.'));
 
-      // Collect matches and score them for simple ranking
+      // Collect matches and score them
       final List<Map<String, dynamic>> scored = [];
-      for (final p in _productsBox.values) {
+      for (final p in allProducts) {
         var score = 0;
         final name = p.name.toLowerCase();
         final barcode = p.barcode.toLowerCase();
@@ -135,151 +137,62 @@ class _SalesScreenState extends State<SalesScreen>
     });
   }
 
-  void _addProductFromSearch(Product product) {
-    // Add directly to cart like scanning
-    _commitBarcode(product.barcode);
-    setState(() {
-      _filteredProducts = [];
-    });
-  }
-
-  Future<void> _loadRecentSales() async {
-    final result = await _repository.getRecentSales(limit: 10);
-    result.fold(
-      (_) {},
-      (sales) {
-        setState(() {
-          _recentSales = sales
-              .map((s) => {
-                    'total': s.total,
-                    'items': s.items,
-                    'date': s.date,
-                    'isRefund': s.isRefund,
-                  })
-              .toList();
-        });
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    RawKeyboard.instance.removeListener(_onRawKey);
-    _hidTimer?.cancel();
-    _searchDebounce?.cancel();
-    // _barcodeController.removeListener(_onSearchTextChanged);
-    _barcodeController.dispose();
-    _barcodeFocusNode.dispose();
-    _fadeController.dispose();
-    _slideController.dispose();
-    super.dispose();
-  }
-
-  // Capture scanner keystrokes and commit to search
-  void _onRawKey(RawKeyEvent event) {
-    if (event is! RawKeyDownEvent) return;
-    // If the text field has focus, let the system/TextField handle the input.
-    if (_barcodeFocusNode.hasFocus) return;
-
-    // If another widget has focus (e.g. dialog TextField), suppress HID handling
-    final primary = FocusManager.instance.primaryFocus;
-    if (primary != null && primary != _barcodeFocusNode) return;
-
-    // Commit as soon as scanner sends Enter/NumpadEnter
-    if (event.logicalKey == LogicalKeyboardKey.enter ||
-        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
-      _hidTimer?.cancel();
-      final code = _hidBuffer.toString().trim();
-      _hidBuffer.clear();
-      _commitBarcode(code);
-      return;
-    }
-
-    // Prefer character; fallback to keyLabel for digits/letters on Windows
-    String? ch = event.character;
-    if ((ch == null || ch.isEmpty) && event.logicalKey.keyLabel.length == 1) {
-      ch = event.logicalKey.keyLabel;
-    }
-
-    // Accept visible characters only
-    if (ch != null && ch.isNotEmpty && ch.codeUnitAt(0) >= 32) {
-      _hidBuffer.write(ch);
-      _barcodeController.text = _hidBuffer.toString(); // mirror to TextField
-    }
-
-    // If no Enter suffix, commit shortly after the burst ends
-    _hidTimer?.cancel();
-    _hidTimer = Timer(const Duration(milliseconds: 120), () {
-      final code = _hidBuffer.toString().trim();
-      _hidBuffer.clear();
-      _commitBarcode(code);
-    });
-  }
-
-  // Central path: find product by barcode and add to cart
-  void _commitBarcode(String code) {
+  Future<void> _commitBarcode(String code) async {
     if (code.isEmpty) return;
 
-    // Look up product by barcode in local Hive
-    final product = _productsBox.values.firstWhere(
-      (p) => p.barcode == code,
-      orElse: () => Product(
-        minQuantity: 0,
-        wholesalePrice: 0,
-        barcode: '',
-        name: '',
-        price: 0,
-        quantity: 0,
-        minPrice: 0,
-        category: '',
-      ),
-    );
+    // Look up product by barcode via Repository (SQLite)
+    final result = await _repository.findProductByBarcode(code);
+    
+    result.fold(
+      (failure) {
+         MotionSnackBarError(context, "خطأ في البحث: ${failure.message}");
+      },
+      (product) {
+        if (product == null) {
+          MotionSnackBarError(context, "المنتج غير موجود: $code");
+          _barcodeController.clear();
+          setState(() {});
+          _barcodeFocusNode.requestFocus();
+          return;
+        }
 
-    if (product.barcode.isEmpty) {
-      // Notify when not found
-      MotionSnackBarError(context, "المنتج غير موجود: $code");
+        // Check strict availability
+        if (product.quantity <= 0) {
+          MotionSnackBarError(context, "الكمية نفذت من المخزن لهذا المنتج");
+          _barcodeController.clear();
+          setState(() {});
+          _barcodeFocusNode.requestFocus();
+          return;
+        }
 
-      _barcodeController.clear();
-      setState(() {});
-      _barcodeFocusNode.requestFocus();
-      return;
-    }
+        // Already in cart? increase qty
+        final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
+        if (idx != -1) {
+          final currentQty = _cartItems[idx]['qty'] as int;
+          if (currentQty >= product.quantity) {
+             MotionSnackBarWarning(
+                 context, "لقد وصلت إلى الحد الأقصى للكمية المتاحة (${product.quantity})");
+          } else {
+             _cartItems[idx]['qty'] = currentQty + 1;
+          }
+        } else {
+          _cartItems.add({
+            'id': product.barcode,
+            'name': product.name,
+            'price': product.price,
+            'qty': 1,
+            'quantity': product.quantity,
+            'wholesalePrice': product.wholesalePrice,
+            'date': DateTime.now(),
+            'minPrice': product.minPrice,
+          });
+        }
 
-    // Check strict availability
-    if (product.quantity <= 0) {
-      MotionSnackBarError(context, "الكمية نفذت من المخزن لهذا المنتج");
-      _barcodeController.clear();
-      setState(() {});
-      _barcodeFocusNode.requestFocus();
-      return;
-    }
-
-    // Already in cart? increase qty; else add line
-    final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
-    if (idx != -1) {
-      final currentQty = _cartItems[idx]['qty'] as int;
-      if (currentQty >= product.quantity) {
-        MotionSnackBarWarning(
-            context, "لقد وصلت إلى الحد الأقصى للكمية المتاحة (${product.quantity})");
-      } else {
-        _cartItems[idx]['qty'] = currentQty + 1;
+        _barcodeController.clear();
+        setState(() {});
+        _barcodeFocusNode.requestFocus();
       }
-    } else {
-      _cartItems.add({
-        'id': product.barcode,
-        'name': product.name,
-        'price': product.price,
-        'qty': 1,
-        'quantity': product.quantity,
-        'wholesalePrice': product.wholesalePrice,
-        'date': DateTime.now(),
-        'minPrice': product.minPrice,
-      });
-    }
-
-    _barcodeController.clear();
-    setState(() {});
-    _barcodeFocusNode.requestFocus();
+    );
   }
 
 
@@ -291,32 +204,20 @@ class _SalesScreenState extends State<SalesScreen>
       return;
     }
 
+    // Update stock via Repository
     for (final item in _cartItems) {
       final productBarcode = item['id'] as String;
       final qtySold = item['qty'] as int;
-
-      final product = _productsBox.get(
-        productBarcode,
-      );
-
-      if (product!.barcode.isNotEmpty) {
-        final newQuantity = product.quantity - qtySold;
-
-        final updatedProduct = Product(
-          barcode: product.barcode,
-          name: product.name,
-          price: product.price,
-          quantity: newQuantity < 0 ? 0 : newQuantity,
-          minPrice: product.minPrice,
-          category: product.category,
-          minQuantity: product.minQuantity,
-          wholesalePrice: product.wholesalePrice,
-        );
-
-        await _productsBox.put(product.barcode, updatedProduct);
-        await getIt<NotificationsCubit>().addItem(updatedProduct);
-      }
+      final stockQuantity = item['quantity'] as int;
+      
+      final newQuant = stockQuantity - qtySold;
+      
+      // Update DB
+      await _repository.updateProductQuantity(productBarcode, newQuant < 0 ? 0 : newQuant);
     }
+    
+    // Refresh Product Cubit to reflect stock changes across app
+    getIt<ProductCubit>().getAllProducts();
 
     final sale = Sale(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -542,7 +443,7 @@ class _SalesScreenState extends State<SalesScreen>
                           if (_filteredProducts.isNotEmpty)
                             ProductSearchOverlay(
                               products: _filteredProducts,
-                              allProducts: _productsBox.values.toList(),
+                              allProducts: getIt<ProductCubit>().allProducts,
                               onProductSelected: _addProductFromSearch,
                             ),
                         ],
@@ -663,7 +564,7 @@ class _SalesScreenState extends State<SalesScreen>
                           if (_filteredProducts.isNotEmpty)
                             ProductSearchOverlay(
                               products: _filteredProducts,
-                              allProducts: _productsBox.values.toList(),
+                              allProducts: getIt<ProductCubit>().allProducts,
                               onProductSelected: _addProductFromSearch,
                             ),
                         ],
@@ -686,4 +587,85 @@ class _SalesScreenState extends State<SalesScreen>
       ],
     );
   }
-}
+  // Capture scanner keystrokes and commit to search
+  void _onRawKey(RawKeyEvent event) {
+    if (event is! RawKeyDownEvent) return;
+    // If the text field has focus, let the system/TextField handle the input.
+    if (_barcodeFocusNode.hasFocus) return;
+
+    // If another widget has focus (e.g. dialog TextField), suppress HID handling
+    final primary = FocusManager.instance.primaryFocus;
+    if (primary != null && primary != _barcodeFocusNode) return;
+
+    // Commit as soon as scanner sends Enter/NumpadEnter
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      _hidTimer?.cancel();
+      final code = _hidBuffer.toString().trim();
+      _hidBuffer.clear();
+      _commitBarcode(code);
+      return;
+    }
+
+    // Prefer character; fallback to keyLabel for digits/letters on Windows
+    String? ch = event.character;
+    if ((ch == null || ch.isEmpty) && event.logicalKey.keyLabel.length == 1) {
+      ch = event.logicalKey.keyLabel;
+    }
+
+    // Accept visible characters only
+    if (ch != null && ch.isNotEmpty && ch.codeUnitAt(0) >= 32) {
+      _hidBuffer.write(ch);
+      _barcodeController.text = _hidBuffer.toString(); // mirror to TextField
+    }
+
+    // If no Enter suffix, commit shortly after the burst ends
+    _hidTimer?.cancel();
+    _hidTimer = Timer(const Duration(milliseconds: 120), () {
+      final code = _hidBuffer.toString().trim();
+      _hidBuffer.clear();
+      _commitBarcode(code);
+    });
+  }
+
+  void _addProductFromSearch(Product product) {
+    // Add directly to cart like scanning
+    _commitBarcode(product.barcode);
+    setState(() {
+      _filteredProducts = [];
+    });
+  }
+
+  Future<void> _loadRecentSales() async {
+    final result = await _repository.getRecentSales(limit: 10);
+    result.fold(
+      (_) {},
+      (sales) {
+        if (mounted) {
+           setState(() {
+          _recentSales = sales
+              .map((s) => {
+                    'total': s.total,
+                    'items': s.items,
+                    'date': s.date,
+                    'isRefund': s.isRefund,
+                  })
+              .toList();
+        });
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    RawKeyboard.instance.removeListener(_onRawKey);
+    _hidTimer?.cancel();
+    _searchDebounce?.cancel();
+    _barcodeController.dispose();
+    _barcodeFocusNode.dispose();
+    _fadeController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
+} // End of class

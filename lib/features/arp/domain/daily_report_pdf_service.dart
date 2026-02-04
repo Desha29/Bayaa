@@ -5,7 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../data/models/daily_report_model.dart';
 
-// PDF Color helpers based on AppColors
+
 class PdfAppColors {
   static const mutedColor = PdfColors.grey600;
   static const mutedColor200 = PdfColor.fromInt(0xFFE5E7EB);

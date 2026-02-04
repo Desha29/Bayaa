@@ -16,16 +16,15 @@ import 'widgets/restock_dialog.dart';
 class StockScreen extends StatelessWidget {
   const StockScreen({super.key});
 
-  void _openRestockDialog(Product product,context) async {
+  void _openRestockDialog(Product product, context) async {
     final result = await showDialog<int>(
       context: context,
       builder: (context) => RestockDialog(product: product),
     );
 
     if (result != null) {
-      product.quantity += result;
-      getIt<ProductCubit>().saveProduct(product);
-      getIt<StockCubit>().loadData();
+      // Use the Cubit to handle update + immediate UI refresh
+      getIt<StockCubit>().restockProduct(product, result);
     }
   }
 

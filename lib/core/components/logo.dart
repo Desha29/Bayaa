@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:crazy_phone_pos/core/components/app_logo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/settings/presentation/cubit/settings_cubit.dart';
+import '../../features/settings/presentation/cubit/settings_states.dart';
+import '../di/dependency_injection.dart';
 
 class Logo extends StatefulWidget {
   const Logo({
@@ -77,39 +81,52 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
           },
         ),
         const SizedBox(height: 16),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'Bayaa',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                  letterSpacing: 1,
-                  fontSize: isMobile ? 18 : 24,
-                ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: FittedBox(
+        BlocBuilder<SettingsCubit, SettingsStates>( // Listen to settings changes
+          bloc: getIt<SettingsCubit>(),
+          builder: (context, state) {
+             final store = getIt<SettingsCubit>().currentStoreInfo;
+             final name = store?.name.isNotEmpty == true ? store!.name : 'Bayaa';
+             final slogan  = 'نظام نقاط البيع الاحترافي';
+             
+             return Column(
+               children: [
+                 FittedBox(
                   fit: BoxFit.scaleDown,
-                  alignment: Alignment.center,
                   child: Text(
-                    'نظام نقاط البيع الاحترافي',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[700],
+                    name,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          letterSpacing: 1,
+                          fontSize: isMobile ? 18 : 24,
                         ),
                   ),
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.center,
+                          child: Text(
+                            slogan,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+               ],
+             );
+          },
         ),
       ],
     );

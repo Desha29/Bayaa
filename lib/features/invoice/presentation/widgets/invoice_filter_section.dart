@@ -162,17 +162,26 @@ class InvoiceFilterSection extends StatelessWidget {
 
                     const SizedBox(width: 16),
                     if (isManager)
-                      ElevatedButton.icon(
-                        onPressed: onDeleteInvoices,
-                        icon: const Icon(Icons.clear, size: 20),
-                        label: const Text('مسح الفواتير'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.errorColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      Tooltip(
+                        message: startDate == null || endDate == null
+                            ? 'يجب تحديد نطاق التاريخ أولاً'
+                            : 'حذف الفواتير',
+                        child: ElevatedButton.icon(
+                          onPressed: (startDate != null && endDate != null)
+                              ? onDeleteInvoices
+                              : null,
+                          icon: const Icon(Icons.delete_sweep, size: 20),
+                          label: const Text('مسح الفواتير'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.errorColor,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: AppColors.mutedColor.withOpacity(0.3),
+                            disabledForegroundColor: AppColors.mutedColor,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
                       ),

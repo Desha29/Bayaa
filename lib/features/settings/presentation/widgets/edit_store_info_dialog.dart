@@ -1,5 +1,8 @@
 // edit_store_info_dialog.dart
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import '../../../../core/components/app_logo.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
 
@@ -23,6 +26,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
   late final TextEditingController emailCtrl;
   late final TextEditingController vatCtrl;
   late final TextEditingController addressCtrl;
+  String? logoPath;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -35,6 +39,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
     vatCtrl = TextEditingController(text: widget.storeInfo['vat'] ?? '');
     addressCtrl =
         TextEditingController(text: widget.storeInfo['address'] ?? '');
+    logoPath = widget.storeInfo['logoPath'];
   }
 
   @override
@@ -59,6 +64,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
       'email': emailCtrl.text.trim(),
       'vat': vatCtrl.text.trim(),
       'address': addressCtrl.text.trim(),
+      'logoPath': logoPath ?? '',
     };
 
     MotionSnackBarSuccess(context, 'تم حفظ المعلومات بنجاح');
@@ -124,6 +130,40 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                       final isWide = constraints.maxWidth > 500;
                       return Column(
                         children: [
+                          Center(
+                            child: Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.borderColor),
+                                  ),
+                                  child: ClipOval(
+                                    child: logoPath != null && logoPath!.isNotEmpty
+                                        ? Image.file(File(logoPath!), fit: BoxFit.cover)
+                                        : const AppLogo(width: 100, height: 100, fit: BoxFit.cover),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: _pickImage,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: const Icon(Icons.camera_alt,
+                                        size: 16, color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
                           if (isWide) ...[
                             _buildTwoColumnRow([
                               _buildTextField(
@@ -280,5 +320,22 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
         ),
       ),
     );
+  }
+  Future<void> _pickImage() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+      );
+
+      if (result != null && result.files.single.path != null) {
+        setState(() {
+          logoPath = result.files.single.path!;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        MotionSnackBarError(context, "حدث خطأ أثناء اختيار الصورة");
+      }
+    }
   }
 }

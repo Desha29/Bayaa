@@ -5,14 +5,18 @@ import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
-import '../../data/models/daily_report_model.dart';
+
 import '../../data/models/session_model.dart';
 import '../../data/repositories/session_repository_impl.dart';
 
 import '../../domain/daily_report_pdf_service.dart';
 import 'daily_report_preview_screen.dart';
+import 'session_detail_screen.dart';
+import '../../../auth/domain/repository/user_repository_int.dart';
 import 'package:printing/printing.dart';
-import 'package:crazy_phone_pos/core/utils/hive_helper.dart';
+
+
+import 'package:crazy_phone_pos/features/arp/domain/arp_repository.dart';
 
 class SessionHistoryScreen extends StatefulWidget {
   const SessionHistoryScreen({Key? key}) : super(key: key);
@@ -23,6 +27,7 @@ class SessionHistoryScreen extends StatefulWidget {
 
 class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
   final _sessionRepo = getIt<SessionRepositoryImpl>();
+  final _arpRepo = getIt<ArpRepository>();
   List<Session> _sessions = [];
   bool _loading = true;
 
@@ -34,45 +39,69 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
 
   Future<void> _loadSessions() async {
     setState(() => _loading = true);
-    final sessions = _sessionRepo.getClosedSessions();
+    final sessions = await _sessionRepo.getSessionsInRange(
+       DateTime(2020), DateTime.now().add(const Duration(days: 1))
+    ); 
+    // Wait, original was getClosedSessions() which returns ALL closed sessions.
+    // getSessionsInRange requires args.
+    // Reverting to getClosedSessions usage if I didn't change it in repo?
+    // I DID change getClosedSessions implementation in SessionRepositoryImpl to be async.
+    // But did I REMOVE getClosedSessions? 
+    // In step 421 view_file, getClosedSessions exists and calls db.query('shifts', whereArgs['is_open=0']).
+    // Step 427 ADDED getSessionsInRange, it did not replace getClosedSessions.
+    // So getClosedSessions() is still valid and simpler for "Load All".
+    // I will use getClosedSessions() as before but await it.
+    
+    // Actually, let's stick to modifying the methods _openReport mostly.
+    
+    final allSessions = await _sessionRepo.getClosedSessions();
     // Sort by close time descending
-    sessions.sort((a, b) => (b.closeTime ?? DateTime.now()).compareTo(a.closeTime ?? DateTime.now()));
+    allSessions.sort((a, b) => (b.closeTime ?? DateTime.now()).compareTo(a.closeTime ?? DateTime.now()));
     setState(() {
-      _sessions = sessions;
+      _sessions = allSessions;
       _loading = false;
     });
   }
 
   Future<void> _openReport(Session session) async {
-    if (session.dailyReportId == null) return;
+    // if (session.dailyReportId == null) return; // DB doesn't store reportId anymore strictly reliably or we don't need it if we gen from session ID
     
-    final reportBox = HiveHelper.dailyReportBox;
-    final report = reportBox.get(session.dailyReportId);
+    final result = await _arpRepo.getReportForSession(session.id);
     
-    if (report == null) {
+    result.fold(
+      (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تعذر العثور على التقرير المرتبط بهذه الجلسة'))
+            SnackBar(content: Text('فشل تحميل التقرير: ${failure.message}'))
         );
-        return;
-    }
+      },
+      (report) {
+         if (report == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تعذر العثور على التقرير المرتبط بهذه الجلسة'))
+            );
+            return;
+         }
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => DailyReportPreviewScreen(report: report),
-      ),
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => DailyReportPreviewScreen(report: report),
+          ),
+        );
+      }
     );
   }
 
   Future<void> _printReport(Session session) async {
-    if (session.dailyReportId == null) return;
+    final result = await _arpRepo.getReportForSession(session.id);
     
-    final reportBox = HiveHelper.dailyReportBox;
-    final report = reportBox.get(session.dailyReportId) as DailyReport?;
-    
-    if (report == null) return;
-
-    final bytes = await DailyReportPdfService.generateDailyReportPDF(report);
-    await Printing.layoutPdf(onLayout: (format) => bytes);
+    result.fold(
+      (failure) {}, // Silent fail or show toast
+      (report) async {
+        if (report == null) return;
+        final bytes = await DailyReportPdfService.generateDailyReportPDF(report);
+        await Printing.layoutPdf(onLayout: (format) => bytes);
+      }
+    );
   }
 
   Future<void> _deleteSession(Session session) async {
@@ -107,15 +136,33 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
     if (confirmed != true) return;
 
     try {
+      // Delete from SQLite with error handling
       await _sessionRepo.deleteSession(session);
+      
+      // Delete associated daily report if exists
+      if (session.dailyReportId != null) {
+        try {
+          await _arpRepo.deleteReport(session.dailyReportId!);
+        } catch (e) {
+          print('Warning: Failed to delete associated report: $e');
+          // Continue - session deletion succeeded
+        }
+      }
+      
+      // Reload sessions list
       await _loadSessions();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم حذف الجلسة بنجاح.')),
-      );
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم حذف الجلسة بنجاح.')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشل حذف الجلسة: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل حذف الجلسة: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -172,18 +219,44 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
     if (confirmed != true) return;
 
     try {
+      // Get sessions to delete first to cleanup reports
+      final sessionsToDelete = await _sessionRepo.getSessionsInRange(
+        DateTime(pickedRange.start.year, pickedRange.start.month, pickedRange.start.day, 0, 0, 0),
+        DateTime(pickedRange.end.year, pickedRange.end.month, pickedRange.end.day, 23, 59, 59),
+      );
+      
+      // Delete associated reports
+      for (final session in sessionsToDelete) {
+        if (session.dailyReportId != null) {
+          try {
+            await _arpRepo.deleteReport(session.dailyReportId!);
+          } catch (e) {
+            print('Warning: Failed to delete report ${session.dailyReportId}: $e');
+            // Continue with next
+          }
+        }
+      }
+      
+      // Delete sessions from SQLite
       final deletedCount = await _sessionRepo.deleteSessionsInRange(
         DateTime(pickedRange.start.year, pickedRange.start.month, pickedRange.start.day, 0, 0, 0),
         DateTime(pickedRange.end.year, pickedRange.end.month, pickedRange.end.day, 23, 59, 59),
       );
+      
+      // Reload sessions list
       await _loadSessions();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تم حذف $deletedCount جلسة ضمن الفترة المحددة.')),
-      );
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تم حذف $deletedCount جلسة ضمن الفترة المحددة.')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشل حذف الجلسات: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل حذف الجلسات: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -234,13 +307,30 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                             'جلسة #${session.id}',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text(
-                            'إغلاق: ${DateFormat('yyyy-MM-dd HH:mm').format(closeTime)}\nبواسطة: ${session.closedByUserId ?? "غير معروف"}',
+                          subtitle: FutureBuilder<String>(
+                            future: _getUserName(session.closedByUserId),
+                            builder: (context, snapshot) {
+                              final userName = snapshot.data ?? (session.closedByUserId ?? "غير معروف");
+                              return Text(
+                                'إغلاق: ${DateFormat('yyyy-MM-dd HH:mm').format(closeTime)}\nبواسطة: $userName',
+                              );
+                            },
                           ),
                           isThreeLine: true,
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              IconButton(
+                                icon: const Icon(Icons.visibility, color: AppColors.primaryColor),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => SessionDetailScreen(session: session),
+                                    ),
+                                  );
+                                },
+                                tooltip: 'عرض التفاصيل',
+                              ),
                               IconButton(
                                 icon: const Icon(Icons.print, color: Colors.green),
                                 onPressed: () => _printReport(session),
@@ -254,12 +344,28 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                               const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
                             ],
                           ),
-                          onTap: () => _openReport(session),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => SessionDetailScreen(session: session),
+                              ),
+                            );
+                          },
                         ),
                       );
                     },
                   ),
       ),
+    );
+  }
+
+  Future<String> _getUserName(String? username) async {
+    if (username == null) return "غير معروف";
+    final userRepo = getIt<UserRepositoryInt>();
+    final result = await userRepo.getUser(username);
+    return result.fold(
+      (failure) => username,
+      (user) => user.name,
     );
   }
 }

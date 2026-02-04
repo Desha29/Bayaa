@@ -74,14 +74,36 @@ class ArpChartSection extends StatelessWidget {
                       )
                     : LineChart(
                         LineChartData(
+                          lineTouchData: LineTouchData(
+                            handleBuiltInTouches: true,
+                            touchTooltipData: LineTouchTooltipData(
+                              getTooltipColor: (touchedSpot) => AppColors.primaryColor.withOpacity(0.9),
+                              tooltipBorderRadius: BorderRadius.circular(8),
+                              tooltipPadding: const EdgeInsets.all(8),
+                              tooltipMargin: 8,
+                              getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                                return touchedBarSpots.map((barSpot) {
+                                  return LineTooltipItem(
+                                    '${barSpot.y.toInt()} ج.م',
+                                    const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                            ),
+                          ),
                           gridData: FlGridData(
                             show: true,
                             drawVerticalLine: false,
                             horizontalInterval: 1,
                             getDrawingHorizontalLine: (value) {
                               return FlLine(
-                                color: AppColors.mutedColor.withOpacity(0.3),
+                                color: AppColors.mutedColor.withOpacity(0.1),
                                 strokeWidth: 1,
+                                dashArray: [5, 5], // Dashed line
                               );
                             },
                           ),
@@ -95,19 +117,20 @@ class ArpChartSection extends StatelessWidget {
                             bottomTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
-                                reservedSize: 30,
+                                reservedSize: 32,
                                 interval: 1,
                                 getTitlesWidget: (value, meta) {
                                   final index = value.toInt();
                                   if (index >= 0 && index < dailySales.length) {
                                     final date = dailySales.keys.elementAt(index);
                                     return Padding(
-                                      padding: const EdgeInsets.only(top: 8),
+                                      padding: const EdgeInsets.only(top: 10),
                                       child: Text(
                                         date.split('-').last,
-                                        style: const TextStyle(
-                                          color: AppColors.mutedColor,
-                                          fontSize: 12,
+                                        style: TextStyle(
+                                          color: AppColors.mutedColor.withOpacity(0.8),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     );
@@ -119,13 +142,15 @@ class ArpChartSection extends StatelessWidget {
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
-                                reservedSize: 50,
+                                reservedSize: 45,
                                 getTitlesWidget: (value, meta) {
+                                  if (value == meta.min || value == meta.max) return const SizedBox();
                                   return Text(
                                     '${value.toInt()}',
-                                    style: const TextStyle(
-                                      color: AppColors.mutedColor,
-                                      fontSize: 12,
+                                    style: TextStyle(
+                                      color: AppColors.mutedColor.withOpacity(0.8),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   );
                                 },
@@ -137,23 +162,39 @@ class ArpChartSection extends StatelessWidget {
                             LineChartBarData(
                               spots: _generateSpots(),
                               isCurved: true,
-                              color: AppColors.primaryColor,
-                              barWidth: 3,
+                              curveSmoothness: 0.35,
+                              // Use Gradient for the line
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.secondaryColor,
+                                  AppColors.primaryColor,
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              barWidth: 4,
                               isStrokeCapRound: true,
                               dotData: FlDotData(
                                 show: true,
                                 getDotPainter: (spot, percent, barData, index) {
                                   return FlDotCirclePainter(
-                                    radius: 4,
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                    strokeColor: AppColors.primaryColor,
+                                    radius: 5,
+                                    color: AppColors.accentColor, // Orange accent
+                                    strokeWidth: 3,
+                                    strokeColor: Colors.white,
                                   );
                                 },
                               ),
                               belowBarData: BarAreaData(
                                 show: true,
-                                color: AppColors.primaryColor.withOpacity(0.1),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.secondaryColor.withOpacity(0.25),
+                                    AppColors.primaryColor.withOpacity(0.0),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
                               ),
                             ),
                           ],

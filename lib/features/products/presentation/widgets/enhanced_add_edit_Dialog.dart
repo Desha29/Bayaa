@@ -48,8 +48,16 @@ class _EnhancedAddEditProductDialogState
     minPriceCtrl = TextEditingController(text: p?.minPrice.toString() ?? '');
     wholesalePriceCtrl =
         TextEditingController(text: p?.wholesalePrice.toString() ?? '');
-    selectedCategory = p?.category ??
-        (widget.categories.isNotEmpty ? widget.categories.first : '');
+    
+    // Filter out "الكل" from valid categories
+    final validCategories = widget.categories.where((c) => c != 'الكل').toList();
+    
+    // Set initial category, ensuring it's not "الكل"
+    if (p?.category != null && p!.category != 'الكل' && validCategories.contains(p.category)) {
+      selectedCategory = p.category;
+    } else {
+      selectedCategory = validCategories.isNotEmpty ? validCategories.first : '';
+    }
   }
 
   @override
@@ -64,20 +72,54 @@ class _EnhancedAddEditProductDialogState
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     // ✅ تحقق من جميع الحقول قبل الحفظ
     if (!_formKey.currentState!.validate()) return;
+
+    final barcode = barcodeCtrl.text.trim();
+    
+    // Check for duplicates if adding new product
+    if (widget.productToEdit == null) {
+      if (!mounted) return;
+      final exists = await getIt<ProductCubit>().checkProductExists(barcode);
+      if (!mounted) return;
+      
+      if (exists) {
+         // Show simple dialog or snackbar. Since it's a dialog, a snackbar might be behind it or on top?
+         // Dialog is safe.
+         showDialog(
+           context: context,
+           builder: (ctx) => AlertDialog(
+             title: const Row(children: [
+               Icon(Icons.error_outline, color: AppColors.errorColor),
+               SizedBox(width: 8),
+               Text('خطأ في الباركود'),
+             ]),
+             content: Text('المنتج ذو الباركود "$barcode" موجود بالفعل.\nالرجاء استخدام باركود مختلف أو تعديل المنتج الموجود.'),
+             actions: [
+               TextButton(
+                 onPressed: () => Navigator.pop(ctx), 
+                 child: const Text('حسناً')
+               )
+             ],
+           )
+         );
+         return;
+      }
+    }
 
     final productSave = Product(
       wholesalePrice: double.tryParse(wholesalePriceCtrl.text.trim()) ?? 0.0,
       minPrice: double.tryParse(minPriceCtrl.text.trim()) ?? 0.0,
       name: nameCtrl.text.trim(),
-      barcode: barcodeCtrl.text.trim(),
+      barcode: barcode,
       price: double.tryParse(priceCtrl.text.trim()) ?? 0.0,
       quantity: int.tryParse(qtyCtrl.text.trim()) ?? 0,
       minQuantity: int.tryParse(minQtyCtrl.text.trim()) ?? 0,
       category: selectedCategory,
     );
+    
+    if (!mounted) return;
     getIt<ProductCubit>().saveProduct(productSave);
     getIt<NotificationsCubit>().addItem(productSave);
 
@@ -264,6 +306,14 @@ class _EnhancedAddEditProductDialogState
   }
 
   Widget _buildCategoryDropdown() {
+    // Filter out "الكل" (All) - it's only a UI filter, not a real category
+    final validCategories = widget.categories.where((c) => c != 'الكل').toList();
+    
+    // Ensure selected category is valid
+    if (selectedCategory == 'الكل' && validCategories.isNotEmpty) {
+      selectedCategory = validCategories.first;
+    }
+    
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -278,8 +328,8 @@ class _EnhancedAddEditProductDialogState
         ],
       ),
       child: DropdownButtonFormField<String>(
-        value: selectedCategory,
-        items: widget.categories
+        value: validCategories.contains(selectedCategory) ? selectedCategory : (validCategories.isNotEmpty ? validCategories.first : null),
+        items: validCategories
             .map((c) => DropdownMenuItem(
                   value: c,
                   child: Text(c),
@@ -297,8 +347,8 @@ class _EnhancedAddEditProductDialogState
           ),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'يجب اختيار فئة';
+          if (value == null || value.isEmpty || value == 'الكل') {
+            return 'يجب اختيار فئة صالحة';
           }
           return null;
         },

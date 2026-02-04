@@ -1,38 +1,17 @@
 // sale_model.dart
-import 'package:hive_flutter/hive_flutter.dart';
 
-part 'sale_model.g.dart';
+// Removed Hive dependencies
 
-@HiveType(typeId: 5)
-class Sale extends HiveObject {
-  @HiveField(0)
+class Sale {
   final String id;
-
-  @HiveField(1)
   final double total;
-
-  @HiveField(2)
   final int items;
-
-  @HiveField(3)
   final DateTime date;
-
-  @HiveField(4)
   final List<SaleItem> saleItems;
-
-  @HiveField(5)
   final String? cashierName; // NEW: Who made the sale
-
-  @HiveField(6)
   final String? cashierUsername; // NEW: Username for reference
-
-  @HiveField(7)
   final String? sessionId;
-
-  @HiveField(8)
   final int invoiceTypeIndex; // 0: Sale, 1: Refund
-
-  @HiveField(9)
   final String? refundOriginalInvoiceId;
 
   Sale({
@@ -50,29 +29,30 @@ class Sale extends HiveObject {
 
   bool get isRefund => invoiceTypeIndex == 1;
   bool get canBeRefunded => !isRefund;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'total': total,
+      'items': items,
+      'date': date.toIso8601String(),
+      'cashierName': cashierName,
+      'cashierUsername': cashierUsername,
+      'sessionId': sessionId,
+      'invoiceTypeIndex': invoiceTypeIndex,
+      'refundOriginalInvoiceId': refundOriginalInvoiceId,
+      'saleItems': saleItems.map((x) => x.toMap()).toList(),
+    };
+  }
 }
 
-@HiveType(typeId: 6)
 class SaleItem {
-  @HiveField(0)
   final String productId;
-
-  @HiveField(1)
   final String name;
-
-  @HiveField(2)
   final double price;
-
-  @HiveField(3)
   final int quantity;
-
-  @HiveField(4)
   final double total;
-
-  @HiveField(5)
   final double wholesalePrice;
-
-  @HiveField(6)
   int refundedQuantity = 0; // NEW: Track refunded quantity permanently
 
   SaleItem({
@@ -84,4 +64,16 @@ class SaleItem {
     required this.wholesalePrice,
     this.refundedQuantity = 0, // Default to 0
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'productId': productId,
+      'name': name,
+      'price': price,
+      'quantity': quantity,
+      'total': total,
+      'wholesalePrice': wholesalePrice,
+      'refundedQuantity': refundedQuantity,
+    };
+  }
 }

@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
-import 'package:crazy_phone_pos/core/utils/hive_helper.dart';
-import 'package:crazy_phone_pos/features/sales/data/repository/sales_repository_impl.dart';
+
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../data/arp_repository_impl.dart';
+
 import '../../data/models/daily_report_model.dart';
 import '../../data/models/product_performance_model.dart';
 import '../../domain/daily_report_pdf_service.dart';
 import 'daily_report_preview_screen.dart';
+import 'daily_report_datasheet_screen.dart';
 import '../../../../core/components/message_overlay.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../domain/arp_repository.dart';
@@ -237,7 +238,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.analytics_outlined,
-                                      size: 80, color: AppColors.mutedColor.withOpacity(0.4)),
+                                      size: 80, color: AppColors.mutedColor.withValues(alpha: 0.4)),
                                   const SizedBox(height: 16),
                                   Text(
                                     'لا توجد بيانات متاحة لهذا التاريخ',
@@ -266,7 +267,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 2)),
         ],
@@ -296,7 +297,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.mutedColor.withOpacity(0.4)),
+                border: Border.all(color: AppColors.mutedColor.withValues(alpha: 0.4)),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -423,7 +424,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 2)),
         ],
@@ -437,7 +438,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8)),
                 child: Icon(icon, color: color, size: 20),
               ),
@@ -481,6 +482,26 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton.icon(
+                onPressed: () {
+                   if (report == null) return;
+                   Navigator.of(context).push(MaterialPageRoute(
+                     builder: (context) => DailyReportDatasheetScreen(report: report!),
+                   ));
+                },
+                icon: const Icon(Icons.table_chart, size: 20),
+                label: const Text('عرض كجدول'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.secondaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton.icon(
                 onPressed: _handlePrint,
                 icon: const Icon(Icons.print, size: 20),
                 label: const Text('طباعة مباشرة'),
@@ -503,7 +524,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             icon: const Icon(Icons.share, size: 20),
             label: const Text('مشاركة PDF'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.mutedColor.withOpacity(0.15),
+              backgroundColor: AppColors.mutedColor.withValues(alpha: 0.15),
               foregroundColor: AppColors.mutedColor,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -519,7 +540,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     if (report?.topProducts.isEmpty ?? true) {
       return Center(
           child: Text('لا توجد منتجات مباعة لهذا التاريخ',
-              style: TextStyle(color: AppColors.mutedColor.withOpacity(0.1), fontSize: 16)));
+              style: TextStyle(color: AppColors.mutedColor.withValues(alpha: 0.1), fontSize: 16)));
     }
     return Container(
       decoration: BoxDecoration(
@@ -527,7 +548,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 2)),
         ],
@@ -595,9 +616,9 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.mutedColor.withOpacity(0.1),
+            color: AppColors.mutedColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.mutedColor.withOpacity(0.3)),
+            border: Border.all(color: AppColors.mutedColor.withValues(alpha: 0.3)),
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -606,7 +627,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
+                  color: AppColors.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.inventory_2,
@@ -669,7 +690,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 2)),
         ],
@@ -697,7 +718,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
           Expanded(
             child: Theme(
               data: Theme.of(context).copyWith(
-                dividerColor: Colors.grey.withOpacity(0.1),
+                dividerColor: Colors.grey.withValues(alpha: 0.1),
               ),
               child: SingleChildScrollView(
                 child: DataTable(
@@ -725,7 +746,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: AppColors.errorColor.withOpacity(0.1),
+                                  color: AppColors.errorColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: const Icon(Icons.inventory_2_outlined,
@@ -761,7 +782,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 2)),
         ],
@@ -789,7 +810,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
           Expanded(
             child: Theme(
               data: Theme.of(context).copyWith(
-                dividerColor: Colors.grey.withOpacity(0.1),
+                dividerColor: Colors.grey.withValues(alpha: 0.1),
               ),
               child: SingleChildScrollView(
                 child: DataTable(
@@ -817,7 +838,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                         DataCell(Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: (isRefund ? AppColors.errorColor : AppColors.successColor).withOpacity(0.1),
+                            color: (isRefund ? AppColors.errorColor : AppColors.successColor).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(

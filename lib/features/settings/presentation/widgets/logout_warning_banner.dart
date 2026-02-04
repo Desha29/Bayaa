@@ -1,8 +1,7 @@
 import 'package:crazy_phone_pos/core/functions/messege.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
-import 'package:crazy_phone_pos/core/utils/hive_helper.dart';
+
 
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 

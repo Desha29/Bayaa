@@ -11,11 +11,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/components/logo.dart';
+import '../../../core/data/services/persistence_initializer.dart';
 
 import '../../dashboard/presentation/dashboard_screen.dart';
 
 import 'cubit/user_cubit.dart';
 import 'cubit/user_states.dart';
+
 
 
 class LoginScreen extends StatefulWidget {
@@ -31,7 +33,22 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     // Fetch users on init
     getIt<UserCubit>().getAllUsers();
+    
+    // Check if persistence needs setup (after build)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      
+      // Check if persistence is already enabled
+      if (!PersistenceInitializer.isEnabled) {
+        // First launch - mandatory setup
+        await PersistenceInitializer.promptForDataPath(
+          context,
+          allowCancel: false,
+        );
+      }
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {

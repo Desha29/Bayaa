@@ -1,36 +1,77 @@
-import 'package:hive/hive.dart';
+import 'package:crazy_phone_pos/core/data/services/persistence_initializer.dart';
 import '../models/store_info_model.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class StoreInfoDataSource {
-  final Box<StoreInfo> _storeBox = Hive.box('storeBox');
-  static const String _storeKey = 'store_info';
+  static const String _table = 'store_settings';
+  static const String _id = 'store_settings_singleton';
 
-  void saveStoreInfo(StoreInfo storeInfo) {
+  Future<void> saveStoreInfo(StoreInfo storeInfo) async {
     try {
-      _storeBox.put(_storeKey, storeInfo);
-    } on Exception {
-      rethrow;
+      final db = PersistenceInitializer.persistenceManager!.sqliteManager;
+      
+      final count = await db.update(_table, {
+        'store_name': storeInfo.name,
+        'store_address': storeInfo.address,
+        'store_phone': storeInfo.phone,
+        'store_email': storeInfo.email,
+        'tax_number': storeInfo.vat,
+        'logo_path': storeInfo.logoPath ?? '',
+        'updated_at': DateTime.now().toIso8601String(),
+      }, where: 'id = ?', whereArgs: [_id]);
+
+      if (count == 0) {
+        // Fallback insert if not exists (should be rare)
+        await db.insert(_table, {
+          'id': _id,
+          'store_name': storeInfo.name,
+          'store_address': storeInfo.address,
+          'store_phone': storeInfo.phone,
+          'store_email': storeInfo.email,
+          'tax_number': storeInfo.vat,
+          'logo_path': storeInfo.logoPath ?? '',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+          // Defaults for others will be used
+        });
+      }
+
+    } catch (e) {
+      throw Exception('Failed to save store info: $e');
     }
   }
 
-  StoreInfo? getStoreInfo() {
+  Future<StoreInfo?> getStoreInfo() async {
     try {
-      return _storeBox.get(_storeKey);
-    } on Exception {
-      rethrow;
+      final db = PersistenceInitializer.persistenceManager!.sqliteManager;
+      final results = await db.query(_table, where: 'id = ?', whereArgs: [_id]);
+      
+      if (results.isNotEmpty) {
+        final row = results.first;
+        return StoreInfo(
+          name: row['store_name'] as String ,
+          address: (row['store_address'] as String?) ?? 'Alkhanka',
+          phone: (row['store_phone'] as String?) ?? '01000000000',
+          email: (row['store_email'] as String?) ?? 'bayaa@bayaa',
+         
+          vat: (row['tax_number'] as String?) ?? '0000000000000',
+          logoPath: row['logo_path'] as String?,
+        );
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to get store info: $e');
     }
   }
 
-  void deleteStoreInfo() {
-    try {
-      _storeBox.delete(_storeKey);
-    } on Exception {
-      rethrow;
-    }
+  Future<void> deleteStoreInfo() async {
+    // We typically don't delete the singleton settings, just reset or ignore.
+    // implementation kept for interface compatibility
   }
 
-  bool hasStoreInfo() {
-    return _storeBox.containsKey(_storeKey);
+  Future<bool> hasStoreInfo() async {
+    final info = await getStoreInfo();
+    return info != null;
   }
 
   StoreInfo getDefaultStoreInfo() {

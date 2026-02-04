@@ -8,6 +8,8 @@ import '../../../../core/components/app_logo.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
+import '../../../settings/presentation/cubit/settings_cubit.dart';
+import '../../../settings/presentation/cubit/settings_states.dart';
 
 class SidebarItem {
   final String id;
@@ -276,14 +278,20 @@ class _SidebarHeader extends StatelessWidget {
               Flexible(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(
-                    'Bayaa',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.secondaryColor,
-                          fontSize: 13,
-                          height: 1.2,
-                        ),
+                  child: BlocBuilder<SettingsCubit, SettingsStates>(
+                    bloc: getIt<SettingsCubit>(),
+                    builder: (context, state) {
+                       final name = getIt<SettingsCubit>().currentStoreInfo?.name ?? 'Bayaa';
+                       return Text(
+                        name.isNotEmpty ? name : 'Bayaa',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.secondaryColor,
+                              fontSize: 13,
+                              height: 1.2,
+                            ),
+                      );
+                    }
                   ),
                 ),
               ),

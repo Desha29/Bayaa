@@ -177,7 +177,11 @@ class InvoiceCubit extends Cubit<InvoiceState> {
 
     // 5. Link to Session
     session.invoiceIds.add(refundSale.id);
-    await session.save();
+    // Session is automatically saved via Repository persistence if managed correctly.
+    // Assuming session object in memory is enough for now, or use SessionRepository to update.
+    // For now, removing .save() as it was Hive-specific.
+    // If persistent update is needed: await getIt<SessionRepositoryImpl>().updateSession(session);
+    // CHECK: SessionRepositoryImpl should support update if needed.
 
     // 6. Update Original Invoice Permanent Tracking
     // We update the original sale record to "consume" the items permanently

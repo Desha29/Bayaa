@@ -15,23 +15,39 @@ class StockCubit extends Cubit<StockStates> {
   int outOfStockCount = 0;
   int totalCount = 0;
   List<Product> sendData() {
-    loadData();
     return products.where((p) => p.quantity <= p.minQuantity).toList();
   }
 
-  void loadData() {
-    productRepository
-        .getAllProduct()
-        .fold((error) => emit(StockErrorState(error.message)), (data) {
-      products = data;
+  void loadData() async {
+    final result = await productRepository.getAllProduct();
+    result.fold(
+      (error) => emit(StockErrorState(error.message)), 
+      (data) {
+        products = data;
+        _calculateCounts();
+        filterProducts();
+      }
+    );
+  }
 
-      outOfStockCount = products.where((p) => p.quantity == 0).length;
-      lowStockCount = products
-          .where((p) => p.quantity > 0 && p.quantity < p.minQuantity)
-          .length;
-      totalCount = lowStockCount + outOfStockCount;
-      filterProducts();
-    });
+  void _calculateCounts() {
+    outOfStockCount = products.where((p) => p.quantity == 0).length;
+    lowStockCount = products
+        .where((p) => p.quantity > 0 && p.quantity < p.minQuantity)
+        .length;
+    totalCount = lowStockCount + outOfStockCount;
+  }
+
+  Future<void> restockProduct(Product product, int quantity) async {
+    // Optimistic update
+    product.quantity += quantity;
+    
+    // Recalculate and update UI immediately
+    _calculateCounts();
+    filterProducts(); // This will remove it from the list if it no longer matches 'out' or 'low'
+    
+    // Persist to DB
+    await productRepository.saveProduct(product);
   }
 
   void filterProducts() {

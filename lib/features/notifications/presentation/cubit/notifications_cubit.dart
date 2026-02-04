@@ -1,13 +1,20 @@
 import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:async';
 
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../core/state/state_synchronizer.dart';
+import '../../../../core/logging/file_logger.dart';
 import '../../../dashboard/data/models/notify_model.dart';
 import '../../../stock/presentation/cubit/stock_cubit.dart';
 
 class NotificationsCubit extends Cubit<NotificationsStates> {
-  NotificationsCubit() : super(NotificationsLoading());
+  NotificationsCubit() : super(NotificationsLoading()) {
+    _setupStateSync();
+  }
+  
+  StreamSubscription? _subscription;
   List<NotifyItem> _notifications = [];
   Set<String> selected = {};
   NotifyFilter filter = NotifyFilter.all;
@@ -15,6 +22,23 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
   int unread = 0;
   int urgent = 0;
   int opened = 0;
+  
+  @override
+  Future<void> close() async {
+    await _subscription?.cancel();
+    return super.close();
+  }
+  
+  /// Set up state synchronization to auto-refresh when products change
+  void _setupStateSync() {
+    _subscription = StateSynchronizer.events.listen((event) {
+      if (event.entityType == 'product' || event.entityType == 'product_stock') {
+        FileLogger.debug('NotificationsCubit auto-refreshing due to ${event.entityType} ${event.operation}', source: 'NotificationsCubit');
+        // Auto-refresh notifications when products or stock changes
+        loadData();
+      }
+    });
+  }
   loadData() {
     var products = getIt<StockCubit>().sendData();
     _notifications = products
@@ -52,7 +76,7 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
         total = _notifications.length;
         unread = _notifications.where((e) => !e.read).length;
         opened = total - unread;
-        await Future.delayed(const Duration(seconds: 1));
+    // await Future.delayed(const Duration(seconds: 1));
         emit(NotificationsLoaded(_notifications));
         return;
       } else {
@@ -68,7 +92,7 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
     total = _notifications.length;
     unread = _notifications.where((e) => !e.read).length;
     opened = total - unread;
-    await Future.delayed(const Duration(seconds: 1));
+    // await Future.delayed(const Duration(seconds: 1));
     emit(NotificationsError(
       product.quantity == 0
           ? 'المنتج نفد من المخزون'

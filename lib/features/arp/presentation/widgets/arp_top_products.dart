@@ -80,16 +80,20 @@ class ArpTopProducts extends StatelessWidget {
                   ),
                 )
               else
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: products.length,
-                  separatorBuilder: (context, index) =>
-                      const Divider(height: 24),
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return _buildProductItem(product, index + 1);
-                  },
+                Builder(
+                  builder: (context) {
+                    final maxRev = products.isNotEmpty ? products.first.revenue : 0.0;
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: products.length,
+                      separatorBuilder: (context, index) => const Divider(height: 24),
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return _buildProductItem(product, index + 1, maxRev); 
+                      },
+                    );
+                  }
                 ),
             ],
           ),
@@ -98,105 +102,98 @@ class ArpTopProducts extends StatelessWidget {
     );
   }
 
-  Widget _buildProductItem(ProductPerformanceModel product, int rank) {
-    final isProfit = product.profit >= 0;
-
-    return Row(
+  Widget _buildProductItem(ProductPerformanceModel product, int rank, double maxRevenue) {
+    // Avoid division by zero
+    final ratio = maxRevenue > 0 ? (product.revenue / maxRevenue) : 0.0;
+    
+    return Column(
       children: [
-        // Rank badge
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: rank <= 3
-                ? AppColors.primaryColor.withOpacity(0.1)
-                : AppColors.mutedColor.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: Text(
-              '$rank',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: rank <= 3 ? AppColors.primaryColor : AppColors.mutedColor,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-
-        // Product info
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product.productName,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.kDarkChip,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'الكمية: ${product.quantitySold} • التكلفة: ${product.cost.toStringAsFixed(2)} ج.م',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.mutedColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Profit/Loss
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        Row(
           children: [
-            Text(
-              '${product.revenue.toStringAsFixed(2)} ج.م',
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: AppColors.kDarkChip,
+            // Rank
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: rank <= 3 ? AppColors.primaryColor : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text(
+                  '$rank',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: rank <= 3 ? Colors.white : AppColors.textSecondary,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: isProfit
-                    ? const Color(0xFF10B981).withOpacity(0.1)
-                    : const Color(0xFFEF4444).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(6),
-              ),
+            const SizedBox(width: 12),
+            // Info Row
+            Expanded(
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    isProfit ? Icons.arrow_upward : Icons.arrow_downward,
-                    size: 12,
-                    color: isProfit
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFFEF4444),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${product.profitMargin.toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isProfit
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFFEF4444),
+                  Expanded(
+                    child: Text(
+                      product.productName,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textPrimary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${product.revenue.toStringAsFixed(0)} ج.م',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.primaryColor),
                   ),
                 ],
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 8),
+        // Bar
+        Row(
+          children: [
+             const SizedBox(width: 40), // Offset for rank
+             Expanded(
+               child: Stack(
+                 children: [
+                   Container(
+                     height: 8,
+                     decoration: BoxDecoration(
+                       color: Colors.grey.shade100,
+                       borderRadius: BorderRadius.circular(4),
+                     ),
+                   ),
+                   FractionallySizedBox(
+                     widthFactor: ratio,
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+                         gradient: LinearGradient(
+                           colors: [
+                             rank <= 3 ? AppColors.secondaryColor : Colors.grey.shade400,
+                             rank <= 3 ? AppColors.primaryColor : Colors.grey.shade500,
+                           ],
+                         ),
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+                   ),
+                 ],
+               ),
+             ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        // Detail (Quantity)
+        Padding(
+          padding: const EdgeInsets.only(right: 40),
+          child: Text(
+            'بيع: ${product.quantitySold} قطعة',
+            style: const TextStyle(fontSize: 12, color: AppColors.mutedColor),
+          ),
         ),
       ],
     );

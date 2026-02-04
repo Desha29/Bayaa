@@ -100,7 +100,8 @@ class StoreInfoCard extends StatelessWidget {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(50),
-                                child: const AppLogo(width: 100, height: 100, fit: BoxFit.cover),
+                                child: const AppLogo(
+                                    width: 120, height: 120, fit: BoxFit.cover),
                               ),
                               if (cubit.isAdmin())
                                 GestureDetector(
@@ -110,36 +111,86 @@ class StoreInfoCard extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: AppColors.primaryColor,
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 2),
+                                      border: Border.all(
+                                          color: Colors.white, width: 2),
                                     ),
-                                    child: const Icon(LucideIcons.camera, size: 16, color: Colors.white),
+                                    child: const Icon(LucideIcons.camera,
+                                        size: 16, color: Colors.white),
                                   ),
                                 ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 12),
                         if (isWide)
                           Wrap(
                             spacing: 16,
                             runSpacing: 12,
                             children: [
-                              _StoreInfoRow(icon: LucideIcons.store, label: 'اسم المتجر', value: store!.name, theme: theme),
-                              _StoreInfoRow(icon: LucideIcons.mapPin, label: 'العنوان', value: store.address, theme: theme),
-                              _StoreInfoRow(icon: LucideIcons.phone, label: 'رقم الهاتف', value: store.phone, theme: theme),
-                              _StoreInfoRow(icon: LucideIcons.mail, label: 'البريد الإلكتروني', value: store.email, theme: theme),
-                              _StoreInfoRow(icon: LucideIcons.fileText, label: 'الرقم الضريبي', value: store.vat, theme: theme),
-                            ].map((row) => SizedBox(width: (constraints.maxWidth - 16) / 2, child: row)).toList(),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.store,
+                                  label: 'اسم المتجر',
+                                  value: store!.name,
+                                  theme: theme),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.mapPin,
+                                  label: 'العنوان',
+                                  value: store.address,
+                                  theme: theme),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.phone,
+                                  label: 'رقم الهاتف',
+                                  value: store.phone,
+                                  theme: theme),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.mail,
+                                  label: 'البريد الإلكتروني',
+                                  value: store.email,
+                                  theme: theme),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.fileText,
+                                  label: 'الرقم الضريبي',
+                                  value: store.vat,
+                                  theme: theme),
+                            ]
+                                .map((row) => SizedBox(
+                                    width: (constraints.maxWidth - 16) / 2,
+                                    child: row))
+                                .toList(),
                           )
                         else
                           Column(
                             children: [
-                              _StoreInfoRow(icon: LucideIcons.store, label: 'اسم المتجر', value: store!.name, theme: theme),
-                              _StoreInfoRow(icon: LucideIcons.mapPin, label: 'العنوان', value: store.address, theme: theme),
-                              _StoreInfoRow(icon: LucideIcons.phone, label: 'رقم الهاتف', value: store.phone, theme: theme),
-                              _StoreInfoRow(icon: LucideIcons.mail, label: 'البريد الإلكتروني', value: store.email, theme: theme),
-                              _StoreInfoRow(icon: LucideIcons.fileText, label: 'الرقم الضريبي', value: store.vat, theme: theme),
-                            ].map((row) => Padding(padding: const EdgeInsets.only(bottom: 12), child: row)).toList(),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.store,
+                                  label: 'اسم المتجر',
+                                  value: store!.name,
+                                  theme: theme),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.mapPin,
+                                  label: 'العنوان',
+                                  value: store.address,
+                                  theme: theme),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.phone,
+                                  label: 'رقم الهاتف',
+                                  value: store.phone,
+                                  theme: theme),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.mail,
+                                  label: 'البريد الإلكتروني',
+                                  value: store.email,
+                                  theme: theme),
+                              _StoreInfoRow(
+                                  icon: LucideIcons.fileText,
+                                  label: 'الرقم الضريبي',
+                                  value: store.vat,
+                                  theme: theme),
+                            ]
+                                .map((row) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: row))
+                                .toList(),
                           ),
                       ],
                     );
@@ -178,10 +229,10 @@ class StoreInfoCard extends StatelessWidget {
 
       if (result != null && result.files.single.path != null) {
         final newPath = result.files.single.path!;
-        
+
         final updatedMap = currentInfo.toMap();
         updatedMap['logoPath'] = newPath;
-        
+
         if (context.mounted) {
           SettingsCubit.get(context).updateStoreInfo(updatedMap);
         }

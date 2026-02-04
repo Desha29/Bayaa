@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
@@ -18,6 +17,7 @@ import 'widgets/logout_warning_banner.dart';
 import 'widgets/store_info_card.dart';
 import 'widgets/users_management_card.dart';
 import 'widgets/close_day_card.dart';
+import 'widgets/data_protection_card.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -34,8 +34,6 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-
-
 class _SettingsScreenContent extends StatelessWidget {
   const _SettingsScreenContent();
 
@@ -48,20 +46,34 @@ class _SettingsScreenContent extends StatelessWidget {
         body: BlocListener<UserCubit, UserStates>(
           listener: (context, state) {
             if (state is CloseSessionLoading) {
-               showDialog(
+              showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (c) => const Center(child: CircularProgressIndicator()),
+                builder: (c) =>
+                    const Center(child: CircularProgressIndicator()),
               );
             } else if (state is UserFailure) {
               if (state.error.contains("إغلاق")) {
-                Navigator.of(context, rootNavigator: true).pop(); // Close loading only for session closure
+                Navigator.of(context, rootNavigator: true)
+                    .pop(); // Close loading only for session closure
               }
               // Replace SnackBar with MotionToast
               MotionSnackBarError(context, state.error);
             } else if (state is UserSuccessWithReport) {
               Navigator.of(context, rootNavigator: true).pop(); // Close loading
-              _showReportDialog(context, state.report);
+
+              final userCubit = getIt<UserCubit>();
+              if (userCubit.currentUser.userType == UserType.manager) {
+                _showReportDialog(context, state.report);
+              } else {
+                // For Cashier: Immediate Logout, No Report Dialog
+                MotionSnackBarSuccess(
+                    context, "تم إغلاق الجلسة بنجاح. جاري تسجيل الخروج...");
+                // Short delay to let the toast show
+                Future.delayed(const Duration(milliseconds: 1500), () {
+                  userCubit.logout();
+                });
+              }
             } else if (state is UserSuccess) {
               // Replace SnackBar with MotionToast
               MotionSnackBarSuccess(context, state.message);
@@ -91,11 +103,14 @@ class _SettingsScreenContent extends StatelessWidget {
                       Expanded(
                         child: ListView(
                           children: [
+                            // DataProtectionCard(isMobile: isMobile),
+                            // SizedBox(height: isMobile ? 12 : 16),
                             StoreInfoCard(isMobile: isMobile),
                             SizedBox(height: isMobile ? 12 : 16),
                             CloseDayCard(isMobile: isMobile),
                             SizedBox(height: isMobile ? 12 : 16),
-                            if (getIt<UserCubit>().currentUser.userType != UserType.cashier)
+                            if (getIt<UserCubit>().currentUser.userType !=
+                                UserType.cashier)
                               UsersManagementCard(isMobile: isMobile),
                           ],
                         ),
@@ -125,9 +140,10 @@ class _SettingsScreenContent extends StatelessWidget {
           children: [
             const Text('تم حفظ تقرير الجلسة بنجاح.'),
             const SizedBox(height: 16),
-            Text(isManager 
-              ? 'يمكنك الآن عرض التقرير التفصيلي للجلسة.' 
-              : 'سيتم تسجيل الخروج الآن.', 
+            Text(
+              isManager
+                  ? 'يمكنك الآن عرض التقرير التفصيلي للجلسة.'
+                  : 'سيتم تسجيل الخروج الآن.',
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],
@@ -139,9 +155,9 @@ class _SettingsScreenContent extends StatelessWidget {
               if (isManager) {
                 // Navigate to Daily Report Screen with the session-specific report
                 Navigator.of(context).push(
-                   MaterialPageRoute(
-                     builder: (_) => DailyReportScreen(initialReport: report),
-                   ),
+                  MaterialPageRoute(
+                    builder: (_) => DailyReportScreen(initialReport: report),
+                  ),
                 );
               } else {
                 userCubit.logout();

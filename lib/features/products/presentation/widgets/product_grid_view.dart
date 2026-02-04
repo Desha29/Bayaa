@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/components/empty_state.dart';
 import '../../../../core/utils/responsive_helper.dart';
 import 'enhanced_product_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/product_cubit.dart';
 
 class ProductsGridView extends StatelessWidget {
   final List<Product> products;
@@ -11,6 +13,11 @@ class ProductsGridView extends StatelessWidget {
   final Color Function(int, int) statusColorFn;
   final String Function(int, int) statusTextFn;
 
+  final ScrollController? scrollController;
+  final bool isLoadingMore;
+  final String? emptyTitle;
+  final String? emptyMessage;
+
   const ProductsGridView({
     super.key,
     required this.products,
@@ -18,17 +25,34 @@ class ProductsGridView extends StatelessWidget {
     required this.onEdit,
     required this.statusColorFn,
     required this.statusTextFn,
+    this.scrollController,
+    this.isLoadingMore = false,
+    this.emptyTitle,
+    this.emptyMessage,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (products.isEmpty)
-      return const EmptyState(variant: EmptyStateVariant.products);
+    if (products.isEmpty) {
+      return EmptyState(
+        variant: EmptyStateVariant.products,
+        title: emptyTitle ?? 'ابدأ البحث',
+        message: emptyMessage ?? 'قم بالبحث عن منتج أو اختر فئة لعرض المنتجات',
+        icon: Icons.search,
+      );
+    }
 
     return ListView.builder(
+      controller: scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      itemCount: products.length,
+      itemCount: products.length + (isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index == products.length) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
         final product = products[index];
         final qty = product.quantity;
         final min = product.minQuantity;

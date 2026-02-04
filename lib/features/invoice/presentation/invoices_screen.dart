@@ -169,19 +169,41 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تأكيد الحذف'),
-        content: Text('هل أنت متأكد من حذف الفاتورة (#${sale.id}) نهائياً؟'),
+        title: const Text('تأكيد حذف الفاتورة'),
+        content: Text('هل أنت متأكد من حذف الفاتورة (#${sale.id}) نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه.'),
         actions: [
-          TextButton(child: const Text('إلغاء'), onPressed: () => Navigator.of(ctx).pop(false)),
-          ElevatedButton(child: const Text('تأكيد'), onPressed: () => Navigator.of(ctx).pop(true)),
+          TextButton(
+            child: const Text('إلغاء'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.errorColor,
+            ),
+            child: const Text('تأكيد الحذف'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
         ],
       ),
     );
+    
     if (confirmed != true) return;
 
-    await context.read<InvoiceCubit>().deleteSale(sale.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم الحذف بنجاح')));
+    try {
+      await context.read<InvoiceCubit>().deleteSale(sale.id);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم حذف الفاتورة بنجاح')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل حذف الفاتورة: ${e.toString()}')),
+        );
+      }
+    }
   }
 
   Future<void> _handleReturnSale(Sale sale) async {
@@ -213,25 +235,58 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
   Future<void> _deleteInvoices(
       DateTime? startDate, DateTime? endDate, String searchQuery) async {
+    // Require date range for bulk deletion
+    if (startDate == null || endDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('يجب تحديد نطاق التاريخ لحذف الفواتير'),
+          backgroundColor: AppColors.errorColor,
+        ),
+      );
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تأكيد الحذف'),
+        title: const Text('تأكيد حذف الفواتير'),
         content: Text(
-            'هل أنت متأكد من حذف الفواتير من ${startDate ?? 'البداية'} إلى ${endDate ?? 'النهاية'}؟'),
+            'هل أنت متأكد من حذف جميع الفواتير من ${startDate.year}-${startDate.month}-${startDate.day} إلى ${endDate.year}-${endDate.month}-${endDate.day}؟\n\nهذا الإجراء لا يمكن التراجع عنه.'),
         actions: [
-          TextButton(child: const Text('إلغاء'), onPressed: () => Navigator.of(ctx).pop(false)),
-          ElevatedButton(child: const Text('تأكيد'), onPressed: () => Navigator.of(ctx).pop(true)),
+          TextButton(
+            child: const Text('إلغاء'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.errorColor,
+            ),
+            child: const Text('تأكيد الحذف'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
         ],
       ),
     );
+    
     if (confirmed != true) return;
 
-    await context
-        .read<InvoiceCubit>()
-        .deleteInvoices(startDate, endDate, searchQuery);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('تم الحذف بنجاح')));
+    try {
+      await context
+          .read<InvoiceCubit>()
+          .deleteInvoices(startDate, endDate, searchQuery);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم حذف الفواتير بنجاح')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل حذف الفواتير: ${e.toString()}')),
+        );
+      }
+    }
   }
 
   Future<void> _openInvoice(Sale sale) async {

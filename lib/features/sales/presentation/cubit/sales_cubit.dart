@@ -5,6 +5,7 @@ import 'package:crazy_phone_pos/features/arp/data/repositories/session_repositor
 import 'package:crazy_phone_pos/features/arp/data/models/session_model.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
 
 import '../../../products/data/models/product_model.dart';
 import '../../data/models/cart_item_model.dart';
@@ -228,8 +229,12 @@ class SalesCubit extends Cubit<SalesState> {
       final prod = await repository.findProductByBarcode(it.id);
       await prod.fold((_) async {}, (p) async {
         if (p != null) {
-          await repository.updateProductQuantity(
-              p.barcode, p.quantity - it.qty);
+          final newQty = p.quantity - it.qty;
+          await repository.updateProductQuantity(p.barcode, newQty);
+          
+          // Notify immediate stock alert
+          // Construct updated product to check low stock logic in NotificationsCubit
+          getIt<NotificationsCubit>().addItem(p.copyWith(quantity: newQty));
         }
       });
     }
@@ -264,15 +269,9 @@ class SalesCubit extends Cubit<SalesState> {
       },
       (_) async {
         _lastCompletedSale = sale; // cache for invoice
-        // Also add invoice ID to session?
-        // Session definition says: "List<String> validInvoiceIds".
-        // session.invoiceIds.add(sale.id); session.save();
-        // I should do this.
-
-        // Optimistic update of session
-        session.invoiceIds.add(sale.id);
-        await session.save(); // Hive save
-
+        // Using SQLite, linking is by session_id in sales table, so explicit linking in session list is NOT needed.
+        // We just need to ensure the sale record has sessionId (which it does).
+        
         final total = _total();
         _cartItems.clear();
 

@@ -14,13 +14,18 @@ import '../../../core/security/permission_guard.dart';
 import '../../auth/presentation/cubit/user_cubit.dart';
 import '../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../notifications/presentation/notifications_screen.dart';
+import '../../products/presentation/cubit/product_cubit.dart';
 import '../../products/presentation/products_screen.dart';
 import '../../sales/data/repository/sales_repository_impl.dart';
 
 import '../../sales/presentation/sales_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
+import '../../stock/presentation/cubit/stock_states.dart';
 import '../../stock/presentation/stock_screen.dart';
 import '../../invoice/presentation/invoices_screen.dart';
+
+import '../../settings/presentation/cubit/settings_cubit.dart';
+import '../../settings/presentation/cubit/settings_states.dart';
 
 // ARP imports
 import '../../arp/presentation/screens/arp_screen.dart';
@@ -143,23 +148,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
         BlocProvider<StockCubit>.value(
           value: getIt<StockCubit>()..loadData(),
         ),
+        BlocProvider<ProductCubit>.value(
+          value: getIt<ProductCubit>()..getAllProducts(),
+        ),
         BlocProvider<NotificationsCubit>.value(
           value: getIt<NotificationsCubit>()..loadData(),
         ),
       ],
-      child: BlocListener<NotificationsCubit, NotificationsStates>(
-        listener: (context, state) {
-          if (state is NotificationsError) {
-            MotionSnackBarWarning(context, state.message);
-          }
-        },
+        child: MultiBlocListener(
+        listeners: [
+          BlocListener<NotificationsCubit, NotificationsStates>(
+            listener: (context, state) {
+              if (state is NotificationsError) {
+                MotionSnackBarWarning(context, state.message);
+              }
+            },
+          ),
+          BlocListener<StockCubit, StockStates>(
+            listener: (context, state) {
+              if (state is StockSucssesState) {
+                // Sync notifications when stock updates
+                getIt<NotificationsCubit>().loadData();
+              }
+            },
+          ),
+        ],
         child: Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
             appBar: isMobileOrTablet
                 ? AppBar(
                     backgroundColor: AppColors.primaryColor,
-                    title: const Text("Bayaa"),
+                    title: BlocBuilder<SettingsCubit, SettingsStates>(
+                      bloc: getIt<SettingsCubit>(),
+                      builder: (context, state) {
+                         final name = getIt<SettingsCubit>().currentStoreInfo?.name ?? 'Bayaa';
+                         return Text(name.isNotEmpty ? name : 'Bayaa');
+                      }
+                    ),
                     leading: Builder(
                       builder: (context) => IconButton(
                         icon: const Icon(LucideIcons.menu),

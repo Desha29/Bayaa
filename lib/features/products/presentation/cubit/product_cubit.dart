@@ -13,35 +13,102 @@ class ProductCubit extends Cubit<ProductStates> {
   static ProductCubit get(context) => BlocProvider.of(context);
   ProductRepositoryInt productRepositoryInt;
   List<Product> products = [];
+  List<Product> get allProducts => products;
   List<String> categories = [];
   String selectedCategory = 'الكل';
-  void getAllProducts() {
+  String selectedAvailability = 'الكل';
+  
+  String currentSearchQuery = '';
+
+  // Pagination state
+  int currentPage = 0;
+  bool hasMoreProducts = true;
+  bool isLoadingMore = false;
+  static const int pageSize = 50;
+
+  void clearProducts() {
+    products = [];
+    currentPage = 0;
+    hasMoreProducts = true;
+    currentSearchQuery = '';
+    selectedCategory = 'الكل';
+    selectedAvailability = 'الكل';
+    emit(ProductLoadedState([]));
+  }
+
+  void getAllProducts() async {
     emit(ProductLoadingState());
-    final result = productRepositoryInt.getAllProduct();
+    
+    // Reset pagination
+    currentPage = 0;
+    hasMoreProducts = true;
+    products = [];
+    
+    // Load first page
+    final result = await productRepositoryInt.getProductsPaginated(
+      page: currentPage,
+      pageSize: pageSize,
+      category: selectedCategory,
+      availability: selectedAvailability,
+      searchQuery: currentSearchQuery,
+    );
+    
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (productsList) {
         products = productsList;
+        hasMoreProducts = productsList.length >= pageSize;
         emit(ProductLoadedState(productsList));
       },
     );
   }
+  
+  void loadMoreProducts() async {
+    if (isLoadingMore || !hasMoreProducts) return;
+    
+    isLoadingMore = true;
+    emit(ProductLoadedState(products)); // Emit to show execution loading indicator
+    currentPage++;
+    
+    final result = await productRepositoryInt.getProductsPaginated(
+      page: currentPage,
+      pageSize: pageSize,
+      category: selectedCategory,
+      availability: selectedAvailability,
+      searchQuery: currentSearchQuery,
+    );
+    
+    result.fold(
+      (failure) {
+        isLoadingMore = false;
+        currentPage--; // Revert page increment on error
+      },
+      (productsList) {
+        products.addAll(productsList);
+        hasMoreProducts = productsList.length >= pageSize;
+        isLoadingMore = false;
+        emit(ProductLoadedState(products));
+      },
+    );
+  }
 
-  void saveProduct(Product product) {
+  void saveProduct(Product product) async {
     emit(ProductLoadingState());
-    final result = productRepositoryInt.saveProduct(product);
+    final result = await productRepositoryInt.saveProduct(product);
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) {
         emit(ProductSuccessState("تم العملية بنجاح"));
+        // Trigger immediate notification check for this product
+        getIt<NotificationsCubit>().addItem(product);
         getAllProducts();
       },
     );
   }
 
-  void deleteProduct(String barcode) {
+  void deleteProduct(String barcode) async {
     emit(ProductLoadingState());
-    final result = productRepositoryInt.deleteProduct(barcode);
+    final result = await productRepositoryInt.deleteProduct(barcode);
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) {
@@ -52,33 +119,23 @@ class ProductCubit extends Cubit<ProductStates> {
   }
 
   void filterByCategory(String category) {
-    if (category == 'الكل') {
-      getAllProducts();
-      return;
-    }
     selectedCategory = category;
-    final filteredProducts =
-        products.where((product) => product.category == category).toList();
-    emit(ProductLoadedState(filteredProducts));
+    getAllProducts();
+  }
+  
+  void filterByAvailability(String availability) {
+    selectedAvailability = availability;
+    getAllProducts();
   }
 
   void searchProducts(String query) {
-    if (query.isEmpty) {
-      getAllProducts();
-      return;
-    }
-    final filteredProducts = products
-        .where((product) =>
-            product.name.toLowerCase().contains(query.toLowerCase()) ||
-            product.barcode.toLowerCase().contains(query.toLowerCase()) ||
-            product.category.toLowerCase().contains(query.toLowerCase()))
-        .toList();
-    emit(ProductLoadedState(filteredProducts));
+    currentSearchQuery = query;
+    getAllProducts();
   }
 
   void getAllCategories() async {
     await Future.delayed(const Duration(milliseconds: 200));
-    final result = productRepositoryInt.getAllCategory();
+    final result = await productRepositoryInt.getAllCategory();
     result.fold(
       (failure) => emit(CategoryErrorState(failure.message)),
       (categoriesList) {
@@ -88,9 +145,9 @@ class ProductCubit extends Cubit<ProductStates> {
     );
   }
 
-  void saveCategory(String category) {
+  void saveCategory(String category) async {
     emit(ProductLoadingState());
-    final result = productRepositoryInt.saveCategory(category);
+    final result = await productRepositoryInt.saveCategory(category);
     result.fold(
       (failure) => emit(CategoryErrorState(failure.message)),
       (_) {
@@ -103,9 +160,9 @@ class ProductCubit extends Cubit<ProductStates> {
   void deleteCategory(
       {required String category,
       bool forceDelete = false,
-      String? newCategory}) {
+      String? newCategory}) async {
     emit(ProductLoadingState());
-    final result = productRepositoryInt.deleteCategory(
+    final result = await productRepositoryInt.deleteCategory(
         category: category, forceDelete: forceDelete, newCategory: newCategory);
     result.fold(
       (failure) {
@@ -121,5 +178,10 @@ class ProductCubit extends Cubit<ProductStates> {
         getAllProducts();
       },
     );
+  }
+
+  Future<bool> checkProductExists(String barcode) async {
+    final result = await productRepositoryInt.productExists(barcode);
+    return result.fold((l) => false, (exists) => exists);
   }
 }

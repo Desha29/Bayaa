@@ -10,14 +10,14 @@ class StoreInfoRepository implements StoreInfoRepositoryInt {
   StoreInfoRepository({required this.dataSource});
 
   @override
-  Either<Failure, StoreInfo> getStoreInfo() {
+  Future<Either<Failure, StoreInfo>> getStoreInfo() async {
     try {
-      final storeInfo = dataSource.getStoreInfo();
+      final storeInfo = await dataSource.getStoreInfo();
       if (storeInfo != null) {
         return Right(storeInfo);
       } else {
         final defaultStore = dataSource.getDefaultStoreInfo();
-        dataSource.saveStoreInfo(defaultStore);
+        await dataSource.saveStoreInfo(defaultStore);
         return Right(defaultStore);
       }
     } catch (e) {
@@ -26,9 +26,9 @@ class StoreInfoRepository implements StoreInfoRepositoryInt {
   }
 
   @override
-  Either<Failure, Unit> saveStoreInfo(StoreInfo storeInfo) {
+  Future<Either<Failure, Unit>> saveStoreInfo(StoreInfo storeInfo) async {
     try {
-      dataSource.saveStoreInfo(storeInfo);
+      await dataSource.saveStoreInfo(storeInfo);
       return const Right(unit);
     } catch (e) {
       return Left(CacheFailure('فشل في حفظ معلومات المتجر: ${e.toString()}'));
@@ -36,9 +36,9 @@ class StoreInfoRepository implements StoreInfoRepositoryInt {
   }
 
   @override
-  Either<Failure, Unit> deleteStoreInfo() {
+  Future<Either<Failure, Unit>> deleteStoreInfo() async {
     try {
-      dataSource.deleteStoreInfo();
+      await dataSource.deleteStoreInfo();
       return const Right(unit);
     } catch (e) {
       return Left(CacheFailure('فشل في حذف معلومات المتجر: ${e.toString()}'));

@@ -16,21 +16,23 @@ class DropDownFilter extends StatefulWidget {
     required this.onChanged,
     required this.icon,
     this.iconRemove,
+    this.hint,
   });
 
   final String label;
-  final String value;
+  final String? value;
   final List<String> items;
   final ValueChanged<String> onChanged;
   final IconData icon;
   final IconData? iconRemove;
+  final String? hint;
 
   @override
   State<DropDownFilter> createState() => _DropDownFilterState();
 }
 
 class _DropDownFilterState extends State<DropDownFilter> {
-  late String selectedValue;
+  String? selectedValue;
 
   @override
   void initState() {
@@ -59,6 +61,7 @@ class _DropDownFilterState extends State<DropDownFilter> {
         isExpanded: true,
         icon:
             const Icon(LucideIcons.chevronDown, color: AppColors.primaryColor),
+        hint: widget.hint != null ? Text(widget.hint!) : null,
         decoration: InputDecoration(
           labelText: widget.label,
           prefixIcon: Icon(widget.icon, color: AppColors.primaryColor),

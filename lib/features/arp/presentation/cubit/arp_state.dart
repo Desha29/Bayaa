@@ -16,16 +16,29 @@ class ArpLoading extends ArpState {}
 class ArpLoaded extends ArpState {
   final ArpSummaryModel summary;
   final List<ProductPerformanceModel> topProducts;
-  final Map<String, double> dailySales;
+  final Map<String, double> dailySales; // Legacy summary (Revenue/Cost/Profit)
+  final Map<int, double> hourlySales;
+  final Map<String, double> categorySales;
+  final Map<String, double> dailyTimeSeries;
 
   ArpLoaded({
     required this.summary,
     required this.topProducts,
     required this.dailySales,
+    this.hourlySales = const {},
+    this.categorySales = const {},
+    this.dailyTimeSeries = const {},
   });
 
   @override
-  List<Object?> get props => [summary, topProducts, dailySales];
+  List<Object?> get props => [
+        summary,
+        topProducts,
+        dailySales,
+        hourlySales,
+        categorySales,
+        dailyTimeSeries
+      ];
 }
 
 class ArpError extends ArpState {

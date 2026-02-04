@@ -30,10 +30,24 @@ class UserCubit extends Cubit<UserStates> {
 
   void getAllUsers() async {
     emit(UserLoading());
-    final result = userRepository.getAllUsers();
+    final result = await userRepository.getAllUsers();
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
-      (usersList) {
+      (usersList) async {
+        if (usersList.isEmpty) {
+          print('ℹ️ No users found. Seeding default admin...');
+          final defaultAdmin = User(
+            username: 'admin',
+            password: 'admin',
+            name: 'مدير النظام',
+            userType: UserType.manager,
+            phone: '000',
+          );
+          await userRepository.saveUser(defaultAdmin);
+          getAllUsers(); // Retry loading
+          return;
+        }
+
         // Sort: Managers first
         usersList.sort((a, b) {
            if (a.userType == UserType.manager && b.userType != UserType.manager) return -1;
@@ -48,7 +62,7 @@ class UserCubit extends Cubit<UserStates> {
 
  void deleteUser(String username) async {
   emit(UserLoading());
-  final result = userRepository.deleteUser(username);
+  final result = await userRepository.deleteUser(username);
   result.fold(
     (failure) => emit(UserFailure(failure.message)),
     (_) {
@@ -60,7 +74,7 @@ class UserCubit extends Cubit<UserStates> {
 
 void saveUser(User user) async {
   emit(UserLoading());
-  final result = userRepository.saveUser(user);
+  final result = await userRepository.saveUser(user);
   result.fold(
     (failure) => emit(UserFailure(failure.message)),
     (_) {
@@ -71,7 +85,7 @@ void saveUser(User user) async {
 }
 void updateUser(User user) async {
   emit(UserLoading());
-  final result = userRepository.updateUser(user);
+  final result = await userRepository.updateUser(user);
   result.fold(
     (failure) => emit(UserFailure(failure.message)),
     (_) {
@@ -85,7 +99,7 @@ void updateUser(User user) async {
 }
   void getUser(String username) async {
     emit(UserLoading());
-    final result = userRepository.getUser(username);
+    final result = await userRepository.getUser(username);
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
       (user) =>
@@ -95,11 +109,18 @@ void updateUser(User user) async {
 
   void login(String username, String password) async {
     emit(UserLoading());
-    final result = userRepository.getUser(username);
+    final trimmedUsername = username.trim();
+    final trimmedPassword = password.trim();
+    
+    final result = await userRepository.getUser(trimmedUsername);
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
       (user) async {
-        if (user.password == password) {
+        print("🔐 Login Attempt: '${trimmedUsername}'");
+        print("   Input Password: '${trimmedPassword}'");
+        print("   Stored Password: '${user.password}'");
+        
+        if (user.password == trimmedPassword) {
           currentUser = user;
           try {
              // Open Session on Login
@@ -109,6 +130,7 @@ void updateUser(User user) async {
              emit(UserFailure("فشل فتح الجلسة: $e"));
           }
         } else {
+          print("   ❌ Password Mismatch!");
           emit(UserFailure("كلمة المرور غير صحيحة"));
         }
       },

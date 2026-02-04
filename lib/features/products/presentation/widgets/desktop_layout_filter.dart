@@ -27,10 +27,10 @@ class DesktopLayout extends StatelessWidget {
 
   final TextEditingController searchController;
   final VoidCallback onSearchChanged;
-  final String categoryFilter;
+  final String? categoryFilter;
   final List<String> categories;
   final ValueChanged<String> onCategoryChanged;
-  final String availabilityFilter;
+  final String? availabilityFilter;
   final List<String> availabilities;
   final ValueChanged<String> onAvailabilityChanged;
   final VoidCallback onAddPressed;
@@ -88,6 +88,7 @@ class DesktopLayout extends StatelessWidget {
                 onChanged: onCategoryChanged,
                 icon: Icons.category_outlined,
                 iconRemove: Icons.cancel,
+                hint: 'اختر الفئة',
               ),
             ),
             const SizedBox(width: 16),
@@ -99,6 +100,7 @@ class DesktopLayout extends StatelessWidget {
                 items: availabilities,
                 onChanged: onAvailabilityChanged,
                 icon: Icons.inventory_outlined,
+                hint: 'اختر التوفر',
               ),
             ),
             const SizedBox(width: 16),

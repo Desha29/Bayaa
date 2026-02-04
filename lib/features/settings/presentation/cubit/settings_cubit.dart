@@ -21,9 +21,9 @@ class SettingsCubit extends Cubit<SettingsStates> {
   StoreInfo? _currentStoreInfo;
   StoreInfo? get currentStoreInfo => _currentStoreInfo;
 
-  void loadStoreInfo() {
+  Future<void> loadStoreInfo() async {
     emit(SettingsLoading());
-    final result = storeRepository.getStoreInfo();
+    final result = await storeRepository.getStoreInfo();
     
     result.fold(
       (failure) => emit(StoreInfoUpdateFailure(failure.message)),
@@ -34,10 +34,10 @@ class SettingsCubit extends Cubit<SettingsStates> {
     );
   }
 
-  void updateStoreInfo(Map<String, String> newStoreInfoMap) {
+  Future<void> updateStoreInfo(Map<String, String> newStoreInfoMap) async {
     emit(SettingsLoading());
     final newStoreInfo = StoreInfo.fromMap(newStoreInfoMap);
-    final result = storeRepository.saveStoreInfo(newStoreInfo);
+    final result = await storeRepository.saveStoreInfo(newStoreInfo);
     
     result.fold(
       (failure) {

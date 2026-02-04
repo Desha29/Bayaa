@@ -1,32 +1,14 @@
-import 'package:hive/hive.dart';
 
-part 'session_model.g.dart';
 
-@HiveType(typeId: 7)
-class Session extends HiveObject {
-  @HiveField(0)
+class Session {
   final String id;
-
-  @HiveField(1)
   final DateTime openTime;
-
-  @HiveField(2)
   DateTime? closeTime;
-
-  @HiveField(3)
   bool isOpen;
-
-  @HiveField(4)
   final String openedByUserId;
-
-  @HiveField(5)
   String? closedByUserId;
-
-  @HiveField(6)
-  final List<String> invoiceIds; // Optimization: Link invoices to session
-
-  @HiveField(7)
-  String? dailyReportId; // Link to the snapshot report
+  final List<String> invoiceIds; 
+  String? dailyReportId; 
 
   Session({
     required this.id,
@@ -38,4 +20,17 @@ class Session extends HiveObject {
     List<String>? invoiceIds,
     this.dailyReportId,
   }) : invoiceIds = invoiceIds ?? [];
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'openTime': openTime.toIso8601String(),
+      'closeTime': closeTime?.toIso8601String(),
+      'isOpen': isOpen,
+      'openedByUserId': openedByUserId,
+      'closedByUserId': closedByUserId,
+      'invoiceIds': invoiceIds,
+      'dailyReportId': dailyReportId,
+    };
+  }
 }

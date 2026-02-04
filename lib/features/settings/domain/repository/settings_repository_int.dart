@@ -6,7 +6,7 @@ import '../../../../core/error/failure.dart';
 import '../../data/models/store_info_model.dart';
 
 abstract class StoreInfoRepositoryInt {
-  Either<Failure, StoreInfo> getStoreInfo();
-  Either<Failure, Unit> saveStoreInfo(StoreInfo storeInfo);
-  Either<Failure, Unit> deleteStoreInfo();
+  Future<Either<Failure, StoreInfo>> getStoreInfo();
+  Future<Either<Failure, Unit>> saveStoreInfo(StoreInfo storeInfo);
+  Future<Either<Failure, Unit>> deleteStoreInfo();
 }

@@ -6,8 +6,8 @@ import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class ProductsFilterSection extends StatelessWidget {
   final TextEditingController searchController;
-  final String categoryFilter;
-  final String availabilityFilter;
+  final String? categoryFilter;
+  final String? availabilityFilter;
   final List<String> categories;
   final List<String> availabilities;
   final ValueChanged<String> onCategoryChanged;

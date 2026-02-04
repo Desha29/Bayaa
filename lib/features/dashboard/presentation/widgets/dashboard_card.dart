@@ -3,6 +3,11 @@
 
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
+import 'package:crazy_phone_pos/features/products/presentation/cubit/product_states.dart';
+import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_states.dart';
+import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -106,61 +111,69 @@ class _DashboardCardState extends State<DashboardCard> {
                               ),
                             ),
                             (widget.title == 'التنبيهات')
-                                ? Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.errorColor,
-                                    ),
-                                    child: Text(
-                                      getIt<NotificationsCubit>()
-                                          .total
-                                          .toString(),
-                                      style: TextStyle(
-                                        color: AppColors.backgroundColor,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                      ),
-                                    ),
+                                ? BlocBuilder<NotificationsCubit, NotificationsStates>(
+                                    builder: (context, state) {
+                                      final count = getIt<NotificationsCubit>().total;
+                                      return Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColors.errorColor,
+                                        ),
+                                        child: Text(
+                                          count.toString(),
+                                          style: const TextStyle(
+                                            color: AppColors.backgroundColor,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   )
-                                : SizedBox(),
+                                : const SizedBox(),
                             (widget.title == 'المنتجات')
-                                ? Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.errorColor,
-                                    ),
-                                    child: Text(
-                                      getIt<ProductCubit>()
-                                          .productRepositoryInt
-                                          .getAllProduct()
-                                          .fold((l) => 0, (r) => r.length)
-                                          .toString(),
-                                      style: TextStyle(
-                                        color: AppColors.backgroundColor,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                      ),
-                                    ),
+                                ? BlocBuilder<ProductCubit, ProductStates>(
+                                    builder: (context, state) {
+                                      final count = getIt<ProductCubit>().products.length;
+                                      return Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColors.errorColor,
+                                        ),
+                                        child: Text(
+                                          count.toString(),
+                                          style: const TextStyle(
+                                            color: AppColors.backgroundColor,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   )
-                                : SizedBox(),
+                                : const SizedBox(),
                             (widget.title == 'المنتجات الناقصة')
-                                ? Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.errorColor,
-                                    ),
-                                    child: Text(
-                                      // Show total (ناقص + منتهي) instead of فقط منخفض المخزون
-                                      getIt<StockCubit>().totalCount.toString(),
-                                      style: const TextStyle(
-                                        color: AppColors.backgroundColor,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                      ),
-                                    ),
+                                ? BlocBuilder<StockCubit, StockStates>(
+                                    builder: (context, state) {
+                                      final count = getIt<StockCubit>().totalCount;
+                                      return Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColors.errorColor,
+                                        ),
+                                        child: Text(
+                                          count.toString(),
+                                          style: const TextStyle(
+                                            color: AppColors.backgroundColor,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   )
                                 : const SizedBox(),
                           ],

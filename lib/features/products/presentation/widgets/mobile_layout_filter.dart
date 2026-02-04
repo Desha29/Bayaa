@@ -21,10 +21,10 @@ class MobileLayout extends StatelessWidget {
 
   final TextEditingController searchController;
   final VoidCallback onSearchChanged;
-  final String categoryFilter;
+  final String? categoryFilter;
   final List<String> categories;
   final ValueChanged<String> onCategoryChanged;
-  final String availabilityFilter;
+  final String? availabilityFilter;
   final List<String> availabilities;
   final ValueChanged<String> onAvailabilityChanged;
   final VoidCallback onAddPressed;
@@ -76,7 +76,9 @@ class MobileLayout extends StatelessWidget {
                   value: categoryFilter,
                   items: categories,
                   onChanged: onCategoryChanged,
-                  icon: Icons.category_outlined),
+                  icon: Icons.category_outlined,
+                  hint: 'اختر الفئة',
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -85,7 +87,9 @@ class MobileLayout extends StatelessWidget {
                   value: availabilityFilter,
                   items: availabilities,
                   onChanged: onAvailabilityChanged,
-                  icon: Icons.inventory_outlined),
+                  icon: Icons.inventory_outlined,
+                  hint: 'اختر التوفر',
+              ),
             ),
           ],
         ),

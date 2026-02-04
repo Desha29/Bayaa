@@ -12,6 +12,8 @@ class EmptyState extends StatelessWidget {
     this.useCircle = true, 
     this.gap = 14,
     this.center = true, 
+    this.actionText,
+    this.onAction,
   });
 
   final IconData? icon;
@@ -22,6 +24,8 @@ class EmptyState extends StatelessWidget {
   final bool useCircle;
   final double gap;
   final bool center;
+  final String? actionText;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +75,19 @@ class EmptyState extends StatelessWidget {
           textAlign: TextAlign.center,
           style: mStyle,
         ),
+        if (onAction != null && actionText != null) ...[
+          SizedBox(height: gap * 1.5),
+          ElevatedButton(
+            onPressed: onAction,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(actionText!),
+          ),
+        ],
       ],
     );
 
