@@ -211,6 +211,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     selectedIndex: selectedIndex,
                     isCollapsed: isSidebarCollapsed,
                     onItemSelected: (index) => _onSidebarSelected(context, index),
+                    onToggleCollapse: () {
+                      setState(() {
+                        isSidebarCollapsed = !isSidebarCollapsed;
+                      });
+                    },
                   ),
                 Expanded(
                   child: Container(

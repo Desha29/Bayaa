@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/core/functions/messege.dart';
+import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_states.dart';
@@ -336,6 +338,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                                               statusTextFn: statusText,
                                               scrollController: _scrollController,
                                               isLoadingMore: ProductCubit.get(context).isLoadingMore,
+                                              isManager: getIt<UserCubit>().currentUser.userType == UserType.manager,
                                             )
                                           : ProductsGridView(
                                               products: currentFilteredProducts,

@@ -1,10 +1,7 @@
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/components/empty_state.dart';
-import '../../../../core/utils/responsive_helper.dart';
 import 'enhanced_product_card.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../cubit/product_cubit.dart';
 
 class ProductsGridView extends StatelessWidget {
   final List<Product> products;

@@ -7,7 +7,10 @@ import 'package:crazy_phone_pos/core/components/app_logo.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart'
     show SettingsCubit;
+import '../../../invoice/presentation/cubit/invoice_cubit.dart';
+import '../../../products/presentation/cubit/product_cubit.dart';
 import 'dashboard_card.dart';
+import 'recent_operations.dart';
 
 class DashboardHome extends StatefulWidget {
   const DashboardHome(
@@ -29,6 +32,10 @@ class _DashboardHomeState extends State<DashboardHome>
   @override
   void initState() {
     super.initState();
+    // Load data for dashboard stats
+    getIt<InvoiceCubit>().loadSales();
+    getIt<ProductCubit>().getAllCategories();
+    
     cards = [
       {
         "id": "sales",
@@ -58,12 +65,19 @@ class _DashboardHomeState extends State<DashboardHome>
         "subtitle": "تنبيهات المخزون",
         "color": AppColors.warningColor,
       },
+      {
+        "id": "stock_summary",
+        "icon": LucideIcons.layers,
+        "title": "ملخص المخزون",
+        "subtitle": "تصنيفات المخزون",
+        "color": Colors.teal,
+      },
       if (widget.isManager)
         {
           "id": "reports",
           "icon": LucideIcons.barChart2,
-          "title": "التحديلات و التقارير",
-          "subtitle": "ادارة تقارير النظام",
+          "title": "التحليلات والتقارير",
+          "subtitle": "إدارة تقارير النظام",
           "color": AppColors.primaryColor,
         }
       else
@@ -74,13 +88,14 @@ class _DashboardHomeState extends State<DashboardHome>
           "subtitle": "إدارة إعدادات النظام",
           "color": Colors.blueGrey,
         },
-      {
-        "id": "notifications",
-        "icon": LucideIcons.bell,
-        "title": "التنبيهات",
-        "subtitle": "الإشعارات والتنبيهات",
-        "color": AppColors.darkGold,
-      },
+      if (!widget.isManager) // Remove Notifications for Manager (Admin)
+        {
+          "id": "notifications",
+          "icon": LucideIcons.bell,
+          "title": "التنبيهات",
+          "subtitle": "الإشعارات والتنبيهات",
+          "color": AppColors.darkGold,
+        },
     ];
     _controllers = List.generate(
       cards.length,
@@ -114,19 +129,22 @@ class _DashboardHomeState extends State<DashboardHome>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount = 3;
-        double aspectRatio = 1.8;
+        int crossAxisCount = 2;
+        double aspectRatio = 1.4;
 
-        if (constraints.maxWidth < 600) {
+        if (constraints.maxWidth < 800) {
           crossAxisCount = 1;
-          aspectRatio = 1.6;
-        } else if (constraints.maxWidth < 1000) {
+          aspectRatio = 1.8;
+        } else if (constraints.maxWidth < 1200) {
           crossAxisCount = 2;
-          aspectRatio = 1.1;
+          aspectRatio = 1.3;
+        } else {
+          crossAxisCount = 3;
+          aspectRatio = 1.4;
         }
 
         return Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -135,44 +153,44 @@ class _DashboardHomeState extends State<DashboardHome>
                 subtitle:
                     "مرحباً بك في نظام ${store?.name ?? "Bayaa"} لإدارة نقاط البيع",
                 icon: LucideIcons.layoutDashboard,
-                titleColor: AppColors.kDarkChip,
+                titleColor: AppColors.textPrimary,
                 iconColor: AppColors.primaryColor,
               ),
-              Align(
-                alignment: Alignment.center,
-                child: Shimmer(
-                  enabled: true,
-                  child: CircleAvatar(
-                    radius: 80,
-                    backgroundColor: AppColors.surfaceColor,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(80),
-                      child: const AppLogo(
-                          width: 160, height: 160, fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 20),
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: crossAxisCount,
-                  mainAxisSpacing: 4,
-                  crossAxisSpacing: 8,
-                  childAspectRatio: aspectRatio,
-                  children: List.generate(cards.length, (index) {
-                    final card = cards[index];
-                    return _buildAnimatedCard(
-                      index: index,
-                      child: DashboardCard(
-                        icon: card["icon"],
-                        title: card["title"],
-                        subtitle: card["subtitle"],
-                        color: card["color"],
-                        onTap: () => widget.onCardTap(card["id"]),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Stats Grid - Takes 60% width
+                    Expanded(
+                      flex: 6,
+                      child: GridView.count(
+                        crossAxisCount: crossAxisCount,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: aspectRatio,
+                        children: List.generate(cards.length, (index) {
+                          final card = cards[index];
+                          return _buildAnimatedCard(
+                            index: index,
+                            child: DashboardCard(
+                              icon: card["icon"],
+                              title: card["title"],
+                              subtitle: card["subtitle"],
+                              color: card["color"],
+                              onTap: () => widget.onCardTap(card["id"]),
+                            ),
+                          );
+                        }),
                       ),
-                    );
-                  }),
+                    ),
+                    const SizedBox(width: 16),
+                    // Recent Operations - Takes 30% width  
+                    const Expanded(
+                      flex: 3,
+                      child: RecentOperations(),
+                    ),
+                  ],
                 ),
               ),
             ],

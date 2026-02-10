@@ -181,10 +181,15 @@ class SessionRepositoryImpl with RepositoryPersistenceMixin {
   Future<List<Session>> getClosedSessions() async {
     try {
       final db = PersistenceInitializer.persistenceManager!.sqliteManager;
+      print('DEBUG: Querying shifts table for closed sessions...');
+      
       final results = await db.query('shifts', 
-        where: 'is_open = 0',
+        where: 'is_open = ?',  // Use proper parameter binding
+        whereArgs: [0],         // Pass as argument
         orderBy: 'open_time DESC', // Newest first
       );
+      
+      print('DEBUG: Found ${results.length} closed sessions');
       
       return results.map((row) => Session(
         id: row['id'] as String,
@@ -195,7 +200,7 @@ class SessionRepositoryImpl with RepositoryPersistenceMixin {
         closedByUserId: row['closed_by'] as String?,
       )).toList();
     } catch(e) {
-      print('Failed to get closed sessions: $e');
+      print('ERROR getting closed sessions: $e');
       return [];
     }
   }

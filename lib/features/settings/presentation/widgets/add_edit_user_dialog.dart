@@ -48,34 +48,40 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
     super.dispose();
   }
 
+  bool _isSubmitting = false;
+
   void _submit() {
-  if (nameCtrl.text.trim().isEmpty ||
-      usernameCtrl.text.trim().isEmpty ||
-      passwordCtrl.text.trim().isEmpty) {
-    MotionSnackBarError(context, 'يرجى ملء الحقول المطلوبة');
-    return;
+    if (_isSubmitting) return;
+
+    if (nameCtrl.text.trim().isEmpty ||
+        usernameCtrl.text.trim().isEmpty ||
+        passwordCtrl.text.trim().isEmpty) {
+      MotionSnackBarError(context, 'يرجى ملء الحقول المطلوبة');
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    final User user = User(
+      name: nameCtrl.text.trim(),
+      phone: phoneCtrl.text.trim(),
+      username: usernameCtrl.text.trim(),
+      password: passwordCtrl.text.trim(),
+      userType: selectedUserType,
+    );
+
+    if (widget.userToEdit == null) {
+      getIt<UserCubit>().saveUser(user);
+      MotionSnackBarSuccess(context, 'تم إضافة المستخدم بنجاح');
+      getIt<UserCubit>().getAllUsers();
+    } else {
+      getIt<UserCubit>().updateUser(user);
+      MotionSnackBarSuccess(context, 'تم تعديل المستخدم بنجاح');
+      getIt<UserCubit>().getAllUsers(); 
+    }
+
+    Navigator.of(context).pop(user);
   }
-
-  final User user = User(
-    name: nameCtrl.text.trim(),
-    phone: phoneCtrl.text.trim(),
-    username: usernameCtrl.text.trim(),
-    password: passwordCtrl.text.trim(),
-    userType: selectedUserType,
-  );
-
-  if (widget.userToEdit == null) {
-    getIt<UserCubit>().saveUser(user);
-    MotionSnackBarSuccess(context, 'تم إضافة المستخدم بنجاح');
-    getIt<UserCubit>().getAllUsers();
-  } else {
-    getIt<UserCubit>().updateUser(user);
-    MotionSnackBarSuccess(context, 'تم تعديل المستخدم بنجاح');
-    getIt<UserCubit>().getAllUsers(); 
-  }
-
-  Navigator.of(context).pop(user);
-}
 
 
   @override
@@ -176,22 +182,28 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                        foregroundColor: AppColors.primaryForeground,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      child: ElevatedButton(
+                        onPressed: _isSubmitting ? null : _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                          foregroundColor: AppColors.primaryForeground,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
+                        child: _isSubmitting 
+                          ? const SizedBox(
+                              height: 20, 
+                              width: 20, 
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                            )
+                          : Text(
+                              widget.userToEdit == null
+                                  ? 'إضافة المستخدم'
+                                  : 'حفظ التعديلات',
+                            ),
                       ),
-                      child: Text(
-                        widget.userToEdit == null
-                            ? 'إضافة المستخدم'
-                            : 'حفظ التعديلات',
-                      ),
-                    ),
                   ),
                 ],
               ),

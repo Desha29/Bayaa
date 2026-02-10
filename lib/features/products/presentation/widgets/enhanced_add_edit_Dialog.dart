@@ -5,7 +5,6 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../cubit/product_cubit.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class EnhancedAddEditProductDialog extends StatefulWidget {
   final List<String> categories;
@@ -34,7 +33,7 @@ class _EnhancedAddEditProductDialogState
   late final TextEditingController wholesalePriceCtrl;
 
   late String selectedCategory;
-  final _formKey = GlobalKey<FormState>(); // ✅ مفتاح النموذج للتحقق
+  final _formKey = GlobalKey<FormState>(); 
 
   @override
   void initState() {
@@ -85,8 +84,7 @@ class _EnhancedAddEditProductDialogState
       if (!mounted) return;
       
       if (exists) {
-         // Show simple dialog or snackbar. Since it's a dialog, a snackbar might be behind it or on top?
-         // Dialog is safe.
+         
          showDialog(
            context: context,
            builder: (ctx) => AlertDialog(
@@ -208,24 +206,24 @@ class _EnhancedAddEditProductDialogState
                                 )
                               ]),
                               const SizedBox(height: 16),
-                              _buildTextField(wholesalePriceCtrl, 'سعر الجملة',
+                              _buildTextField(wholesalePriceCtrl, 'سعرالجملة',
                                   Icons.price_change,
                                   keyboardType: TextInputType.number),
                               const SizedBox(height: 16),
                               _buildTwoColumnRow([
-                                _buildTextField(minPriceCtrl, 'الحد الأدنى للسعر',
+                                _buildTextField(minPriceCtrl, 'الحدالأدنى للسعر',
                                     Icons.price_change,
                                     keyboardType: TextInputType.number),
-                                _buildTextField(priceCtrl, 'السعر بالجنيه المصري',
+                                _buildTextField(priceCtrl, 'سعر البيع',
                                     Icons.attach_money,
                                     keyboardType: TextInputType.number),
                               ]),
                               const SizedBox(height: 16),
                               _buildTwoColumnRow([
-                                _buildTextField(qtyCtrl, 'الكمية المتوفرة',
+                                _buildTextField(qtyCtrl, 'الكميةالمتوفرة',
                                     Icons.inventory,
                                     keyboardType: TextInputType.number),
-                                _buildTextField(minQtyCtrl, 'الحد الأدنى للمخزون',
+                                _buildTextField(minQtyCtrl, 'الحدالأدنى للمخزون',
                                     Icons.trending_down,
                                     keyboardType: TextInputType.number),
                               ]),
@@ -237,15 +235,15 @@ class _EnhancedAddEditProductDialogState
                               _buildTextField(barcodeCtrl, 'رقم الباركود',
                                   Icons.qr_code_scanner),
                               const SizedBox(height: 16),
-                              _buildTextField(priceCtrl, 'السعر بالجنيه المصري',
+                              _buildTextField(priceCtrl, 'سعر البيع',
                                   Icons.attach_money,
                                   keyboardType: TextInputType.number),
                               const SizedBox(height: 16),
-                              _buildTextField(qtyCtrl, 'الكمية المتوفرة',
+                              _buildTextField(qtyCtrl, 'الكميةالمتوفرة',
                                   Icons.inventory,
                                   keyboardType: TextInputType.number),
                               const SizedBox(height: 16),
-                              _buildTextField(minQtyCtrl, 'الحد الأدنى للمخزون',
+                              _buildTextField(minQtyCtrl, 'الحدالأدنى للمخزون',
                                   Icons.trending_down,
                                   keyboardType: TextInputType.number),
                             ],

@@ -6,17 +6,19 @@ import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 
+import '../../data/models/daily_report_model.dart';
 import '../../data/models/session_model.dart';
 import '../../data/repositories/session_repository_impl.dart';
 
 import '../../domain/daily_report_pdf_service.dart';
 import 'daily_report_preview_screen.dart';
-import 'session_detail_screen.dart';
 import '../../../auth/domain/repository/user_repository_int.dart';
 import 'package:printing/printing.dart';
 
 
 import 'package:crazy_phone_pos/features/arp/domain/arp_repository.dart';
+import 'package:crazy_phone_pos/features/arp/presentation/screens/dialy_report_screen.dart';
+import '../../../../core/functions/messege.dart';
 
 class SessionHistoryScreen extends StatefulWidget {
   const SessionHistoryScreen({Key? key}) : super(key: key);
@@ -39,28 +41,33 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
 
   Future<void> _loadSessions() async {
     setState(() => _loading = true);
-    final sessions = await _sessionRepo.getSessionsInRange(
-       DateTime(2020), DateTime.now().add(const Duration(days: 1))
-    ); 
-    // Wait, original was getClosedSessions() which returns ALL closed sessions.
-    // getSessionsInRange requires args.
-    // Reverting to getClosedSessions usage if I didn't change it in repo?
-    // I DID change getClosedSessions implementation in SessionRepositoryImpl to be async.
-    // But did I REMOVE getClosedSessions? 
-    // In step 421 view_file, getClosedSessions exists and calls db.query('shifts', whereArgs['is_open=0']).
-    // Step 427 ADDED getSessionsInRange, it did not replace getClosedSessions.
-    // So getClosedSessions() is still valid and simpler for "Load All".
-    // I will use getClosedSessions() as before but await it.
     
-    // Actually, let's stick to modifying the methods _openReport mostly.
-    
-    final allSessions = await _sessionRepo.getClosedSessions();
-    // Sort by close time descending
-    allSessions.sort((a, b) => (b.closeTime ?? DateTime.now()).compareTo(a.closeTime ?? DateTime.now()));
-    setState(() {
-      _sessions = allSessions;
-      _loading = false;
-    });
+    try {
+      print('DEBUG: Loading closed sessions...');
+      final allSessions = await _sessionRepo.getClosedSessions();
+      print('DEBUG: Loaded ${allSessions.length} sessions');
+      
+      // Debug: print first session if any
+      if (allSessions.isNotEmpty) {
+        print('DEBUG: First session: ${allSessions.first.id}, isOpen: ${allSessions.first.isOpen}');
+      }
+      
+      // Sort by close time descending
+      allSessions.sort((a, b) => (b.closeTime ?? DateTime.now()).compareTo(a.closeTime ?? DateTime.now()));
+      
+      setState(() {
+        _sessions = allSessions;
+        _loading = false;
+      });
+      
+      print('DEBUG: Session history updated with ${_sessions.length} sessions');
+    } catch (e) {
+      print('DEBUG ERROR: Failed to load sessions: $e');
+      setState(() {
+        _sessions = [];
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _openReport(Session session) async {
@@ -70,23 +77,28 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
     
     result.fold(
       (failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('فشل تحميل التقرير: ${failure.message}'))
-        );
+        MotionSnackBarError(context, 'فشل تحميل التقرير: ${failure.message}');
       },
       (report) {
-         if (report == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تعذر العثور على التقرير المرتبط بهذه الجلسة'))
-            );
-            return;
-         }
+         final dailyReport = report ?? DailyReport(
+            id: 'EMPTY_${session.id}',
+            sessionId: session.id,
+            date: session.closeTime ?? DateTime.now(),
+            totalSales: 0,
+            totalRefunds: 0,
+            netRevenue: 0,
+            totalTransactions: 0,
+            closedByUserName: session.closedByUserId ?? 'Unknown',
+            topProducts: [],
+          );
 
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => DailyReportPreviewScreen(report: report),
-          ),
-        );
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DailyReportScreen(
+                initialReport: dailyReport,
+              ),
+            ),
+          );
       }
     );
   }
@@ -322,14 +334,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.visibility, color: AppColors.primaryColor),
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => SessionDetailScreen(session: session),
-                                    ),
-                                  );
-                                },
-                                tooltip: 'عرض التفاصيل',
+                                onPressed: () => _openReport(session),
+                                tooltip: 'عرض التقرير',
                               ),
                               IconButton(
                                 icon: const Icon(Icons.print, color: Colors.green),
@@ -344,13 +350,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                               const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
                             ],
                           ),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => SessionDetailScreen(session: session),
-                              ),
-                            );
-                          },
+                          onTap: () => _openReport(session),
                         ),
                       );
                     },

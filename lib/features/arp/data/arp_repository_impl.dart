@@ -357,7 +357,22 @@ class ArpRepositoryImpl with RepositoryPersistenceMixin implements ArpRepository
           whereArgs: [sessionId],
         );
         
-        if (salesIds.isEmpty) return Right(null);
+        if (salesIds.isEmpty) {
+          // Return empty report for session instead of null
+          return Right(DailyReport(
+            id: 'EMPTY_$sessionId',
+            sessionId: sessionId,
+            date: DateTime.now(),
+            totalSales: 0,
+            totalRefunds: 0,
+            netRevenue: 0,
+            totalTransactions: 0,
+            closedByUserName: 'System', // Will be updated if session info available
+            topProducts: [],
+            transactions: [],
+            refundedProducts: [],
+          ));
+        }
         
         final ids = salesIds.map((r) => r['id'] as String).toList();
         final salesResult = await salesRepo.getSalesByIds(ids);

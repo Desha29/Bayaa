@@ -9,7 +9,7 @@ import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../../auth/presentation/cubit/user_states.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../data/models/user_row.dart';
-import 'mobile_user_list.dart';
+
 import 'desktop_user_table.dart';
 import 'add_edit_user_dialog.dart';
 
@@ -146,7 +146,8 @@ class UsersManagementCard extends StatelessWidget {
     );
 
     if (result != null && context.mounted) {
-      context.read<UserCubit>().saveUser(result);
+       // Dialog handles checking context and saving internally.
+       // Do not call saveUser here to avoid duplicates.
     }
   }
 }

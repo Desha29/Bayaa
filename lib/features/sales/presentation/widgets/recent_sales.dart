@@ -1,12 +1,15 @@
+
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class RecentSalesSection extends StatelessWidget {
   final List<Map<String, dynamic>> recentSales;
+  final VoidCallback? onToggleCollapse;
 
   const RecentSalesSection({
     super.key,
     required this.recentSales,
+    this.onToggleCollapse,
   });
 
   @override
@@ -52,6 +55,16 @@ class RecentSalesSection extends StatelessWidget {
                       color: AppColors.secondaryColor,
                     ),
               ),
+              const Spacer(),
+              if (onToggleCollapse != null)
+                IconButton(
+                  icon: const Icon(
+                    Icons.chevron_right,
+                    color: AppColors.primaryColor,
+                  ),
+                  tooltip: 'إخفاء المبيعات الأخيرة',
+                  onPressed: onToggleCollapse,
+                ),
             ],
           ),
           const SizedBox(height: 20),

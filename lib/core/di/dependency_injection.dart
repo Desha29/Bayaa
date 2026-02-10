@@ -4,6 +4,7 @@ import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart
 import 'package:crazy_phone_pos/features/products/data/repository/product_repository_imp.dart';
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
+import '../../features/invoice/presentation/cubit/invoice_cubit.dart'; // Added Import
 import '../../features/sales/domain/sales_repository.dart';
 import '../../features/stock_summary/presentation/cubit/stock_summary_cubit.dart';
 import 'package:get_it/get_it.dart';
@@ -19,10 +20,14 @@ import '../../features/settings/data/data_source/store_info_data_source.dart';
 import '../../features/settings/data/repository/settings_repository_imp.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../../features/arp/data/repositories/session_repository_impl.dart';
+import '../../core/services/activity_logger.dart';
 
 final getIt = GetIt.instance;
 
 void setup() {
+  // Core Services
+  getIt.registerSingleton<ActivityLogger>(ActivityLogger());
+  
   // Repositories
   getIt.registerSingleton<SessionRepositoryImpl>(SessionRepositoryImpl());
 
@@ -47,6 +52,8 @@ void setup() {
 
   getIt.registerSingleton<StockCubit>(StockCubit(
       productRepository: ProductRepositoryImp()));
+
+  getIt.registerSingleton<InvoiceCubit>(InvoiceCubit(salesRepo)); // Added InvoiceCubit
 
   getIt.registerSingleton<NotificationsCubit>(NotificationsCubit());
 

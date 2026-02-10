@@ -4,6 +4,9 @@ import '../../../auth/data/models/user_model.dart';
 import '../../data/models/store_info_model.dart';
 import '../../domain/repository/settings_repository_int.dart';
 import 'settings_states.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../../core/services/activity_logger.dart';
+import '../../../../core/data/models/activity_log.dart';
 
 class SettingsCubit extends Cubit<SettingsStates> {
   SettingsCubit({
@@ -48,6 +51,14 @@ class SettingsCubit extends Cubit<SettingsStates> {
       },
       (_) {
         _currentStoreInfo = newStoreInfo;
+        
+        // Log activity
+        getIt<ActivityLogger>().logActivity(
+          type: ActivityType.userUpdate, // Reusing userUpdate or create storeUpdate type? userUpdate is close enough for settings
+          description: 'تحديث معلومات المتجر',
+          userName: userCubit.currentUser.name,
+        );
+        
         emit(StoreInfoUpdateSuccess("تم حفظ معلومات المتجر بنجاح"));
         emit(StoreInfoLoaded(newStoreInfo));
       },

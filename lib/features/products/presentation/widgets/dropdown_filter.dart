@@ -2,10 +2,8 @@ import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/functions/messege.dart';
 import '../cubit/product_cubit.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class DropDownFilter extends StatefulWidget {
   const DropDownFilter({

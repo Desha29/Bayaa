@@ -18,6 +18,7 @@ abstract class SalesRepository {
     int limit = 10,
     DateTime? startDate,
     DateTime? endDate,
+    String? sessionId,
   });
   Future<Either<Failure, Unit>> updateProductQuantity(
       String barcode, int newQuantity);
@@ -33,4 +34,6 @@ abstract class SalesRepository {
     required String cashierName,
     required String cashierUsername,
   });
+
+  Future<Either<Failure, Unit>> linkSalesToSession(List<String> saleIds, String sessionId);
 }

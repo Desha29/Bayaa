@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
-import 'package:crazy_phone_pos/core/utils/responsive_helper.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../auth/data/models/user_model.dart';

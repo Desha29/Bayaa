@@ -98,6 +98,8 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
           ? 'المنتج نفد من المخزون'
           : 'كمية المنتج في المخزون منخفضة (${product.quantity})',
     ));
+    // Restore loaded state immediately so list view continues to work
+    emit(NotificationsLoaded(_notifications));
   }
 
   markAllAsRead() {

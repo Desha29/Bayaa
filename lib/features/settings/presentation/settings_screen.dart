@@ -9,7 +9,7 @@ import 'package:crazy_phone_pos/core/functions/messege.dart';
 import '../../../core/di/dependency_injection.dart';
 
 import '../../arp/data/models/daily_report_model.dart';
-import '../../arp/presentation/screens/dialy_report_screen.dart';
+import '../../arp/presentation/screens/daily_report_preview_screen.dart'; // Corrected import
 import '../../auth/data/models/user_model.dart';
 import '../../auth/presentation/cubit/user_states.dart';
 
@@ -17,7 +17,7 @@ import 'widgets/logout_warning_banner.dart';
 import 'widgets/store_info_card.dart';
 import 'widgets/users_management_card.dart';
 import 'widgets/close_day_card.dart';
-import 'widgets/data_protection_card.dart';
+// import 'widgets/data_protection_card.dart'; // Commented out as in user code
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -72,6 +72,7 @@ class _SettingsScreenContent extends StatelessWidget {
                 // Short delay to let the toast show
                 Future.delayed(const Duration(milliseconds: 1500), () {
                   userCubit.logout();
+                   Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
                 });
               }
             } else if (state is UserSuccess) {
@@ -153,14 +154,15 @@ class _SettingsScreenContent extends StatelessWidget {
             onPressed: () {
               Navigator.pop(ctx);
               if (isManager) {
-                // Navigate to Daily Report Screen with the session-specific report
-                Navigator.of(context).push(
+                // Navigate to Daily Report Preview Screen
+                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => DailyReportScreen(initialReport: report),
+                    builder: (_) => DailyReportPreviewScreen(report: report), // Use Preview Screen
                   ),
                 );
               } else {
                 userCubit.logout();
+                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
               }
             },
             child: Text(isManager ? 'عرض تقرير الجلسة' : 'حسناً'),

@@ -6,6 +6,10 @@ import 'package:crazy_phone_pos/features/arp/data/models/session_model.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
+import '../../../invoice/presentation/cubit/invoice_cubit.dart';
+import '../../../../core/services/activity_logger.dart';
+import '../../../../core/data/models/activity_log.dart';
+import '../../../auth/presentation/cubit/user_cubit.dart';
 
 import '../../../products/data/models/product_model.dart';
 import '../../data/models/cart_item_model.dart';
@@ -215,6 +219,13 @@ class SalesCubit extends Cubit<SalesState> {
       final currentUser = getIt<UserCubit>().currentUser;
       try {
         session = await sessionRepo.openSession(currentUser);
+        
+        // Log session open
+        getIt<ActivityLogger>().logActivity(
+          type: ActivityType.sessionOpen,
+          description: 'فتح جلسة جديدة تلقائي',
+          userName: currentUser.name,
+        );
       } catch (e) {
         emit(SalesError(message: 'فشل فتح جلسة جديدة: $e'));
         _emitLoaded();
@@ -283,6 +294,19 @@ class SalesCubit extends Cubit<SalesState> {
         ));
 
         await load(); // reload recent sales
+        
+        // Refresh InvoiceCubit to update Dashboard stats immediately
+        getIt<InvoiceCubit>().loadSales();
+        
+        // Log activity
+        getIt<ActivityLogger>().logActivity(
+          type: sale.isRefund ? ActivityType.refund : ActivityType.sale,
+          description: sale.isRefund 
+              ? 'استرجاع: ${total.toStringAsFixed(2)} ج.م'
+              : 'عملية بيع: ${total.toStringAsFixed(2)} ج.م',
+          userName: getIt<UserCubit>().currentUser.name,
+          details: {'total': total, 'itemCount': _cartItems.length},
+        );
       },
     );
   }

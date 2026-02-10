@@ -8,6 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../sales/data/repository/sales_repository_impl.dart';
 import '../../../arp/data/models/product_performance_model.dart';
+import '../../../../core/services/activity_logger.dart';
+import '../../../../core/data/models/activity_log.dart';
+import '../../../arp/data/models/session_model.dart';
 
 
 class UserCubit extends Cubit<UserStates> {
@@ -67,6 +70,14 @@ class UserCubit extends Cubit<UserStates> {
     (failure) => emit(UserFailure(failure.message)),
     (_) {
       emit(UserSuccess("تم حذف المستخدم بنجاح"));
+      
+      // Log activity
+      getIt<ActivityLogger>().logActivity(
+        type: ActivityType.userDelete,
+        description: 'حذف مستخدم: $username',
+        userName: currentUser.name,
+      );
+      
       getAllUsers(); 
     },
   );
@@ -79,6 +90,19 @@ void saveUser(User user) async {
     (failure) => emit(UserFailure(failure.message)),
     (_) {
       emit(UserSuccess("تم إضافة المستخدم بنجاح"));
+      
+      // Check if update (simple check if username exists in list, though list might be empty if not loaded)
+      // Since we just saved successfully, we can't check _users easily if username is same vs new?
+      // Actually saveUser is usually Upsert.
+      final isUpdate = _users.any((u) => u.username == user.username);
+
+      // Log activity
+      getIt<ActivityLogger>().logActivity(
+        type: isUpdate ? ActivityType.userUpdate : ActivityType.userAdd, // Assuming userUpdate exists in enum, if not use generic
+        description: isUpdate ? 'تحديث مستخدم: ${user.name}' : 'إضافة مستخدم: ${user.name}',
+        userName: currentUser.name,
+      );
+      
       getAllUsers(); 
     },
   );
@@ -93,6 +117,14 @@ void updateUser(User user) async {
         currentUser = user;
       }
       emit(UserSuccess("تم تحديث المستخدم بنجاح"));
+      
+      // Log activity
+      getIt<ActivityLogger>().logActivity(
+        type: ActivityType.userUpdate,
+        description: 'تحديث مستخدم: ${user.name}',
+        userName: currentUser.name,
+      );
+      
       getAllUsers(); 
     },
   );
@@ -125,6 +157,14 @@ void updateUser(User user) async {
           try {
              // Open Session on Login
              await sessionRepository.openSession(user);
+             
+             // Log activity
+             getIt<ActivityLogger>().logActivity(
+               type: ActivityType.sessionOpen,
+               description: 'فتح جلسة جديدة',
+               userName: user.name,
+             );
+             
              emit(UserSuccess("تم تسجيل الدخول بنجاح"));
           } catch (e) {
              emit(UserFailure("فشل فتح الجلسة: $e"));
@@ -164,6 +204,12 @@ void updateUser(User user) async {
            }
            return false;
       }).toList();
+
+      // Ensure all found sales are linked to this session in DB
+      // This fixes "No Data" bug for orphans found by time-window
+      if (sales.isNotEmpty) {
+        await salesRepo.linkSalesToSession(sales.map((e) => e.id).toList(), session.id);
+      }
 
       double totalSales = 0.0;
       double totalRefunds = 0.0;
@@ -253,7 +299,27 @@ void updateUser(User user) async {
         refundedProducts: refundedProducts,
         transactions: sales,
       );
-      emit(UserSuccessWithReport("تم إغلاق اليومية بنجاح.", report));
+      
+      // Log activity
+      getIt<ActivityLogger>().logActivity(
+        type: ActivityType.sessionClose,
+        description: 'إغلاق جلسة: ${totalSales.toStringAsFixed(2)} ج.م',
+        userName: currentUser.name,
+      );
+      
+      // Create closed session for navigation
+      final closedSession = Session(
+        id: session.id,
+        openTime: session.openTime,
+        closeTime: report.date,
+        isOpen: false,
+        openedByUserId: session.openedByUserId,
+        closedByUserId: currentUser.username, // User model uses username as ID
+        invoiceIds: session.invoiceIds,
+        dailyReportId: report.id,
+      );
+
+      emit(UserSuccessWithReport("تم إغلاق اليومية بنجاح.", report, closedSession));
     } catch (e) {
       emit(UserFailure("فشل إغلاق اليومية: $e"));
     }

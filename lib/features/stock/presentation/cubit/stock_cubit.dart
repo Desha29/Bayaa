@@ -4,6 +4,10 @@ import 'package:crazy_phone_pos/features/products/domain/product_repository_int.
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_states.dart'
     show StockErrorState, StockLoadingState, StockStates, StockSucssesState;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../../core/services/activity_logger.dart';
+import '../../../../core/data/models/activity_log.dart';
+import '../../../auth/presentation/cubit/user_cubit.dart';
 
 class StockCubit extends Cubit<StockStates> {
   StockCubit({required this.productRepository}) : super(StockLoadingState());
@@ -48,6 +52,14 @@ class StockCubit extends Cubit<StockStates> {
     
     // Persist to DB
     await productRepository.saveProduct(product);
+    
+    // Log activity
+    getIt<ActivityLogger>().logActivity(
+      type: ActivityType.productQuantityUpdate,
+      description: 'تحديث مخزون: ${product.name} (+$quantity)',
+      userName: getIt<UserCubit>().currentUser.name,
+      details: {'barcode': product.barcode, 'quantityAdded': quantity, 'newTotal': product.quantity},
+    );
   }
 
   void filterProducts() {

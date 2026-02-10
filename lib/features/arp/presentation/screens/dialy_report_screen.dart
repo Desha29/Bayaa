@@ -205,57 +205,69 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(isDesktop ? 32 : 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
-              FadeTransition(
-                opacity: _animationController,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, -0.1),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: _animationController,
-                    curve: Curves.easeOut,
-                  )),
-                  child: _buildDateSelectionSection(),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: Padding(
+                padding: EdgeInsets.all(isDesktop ? 32 : 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 24),
+                    if (widget.initialReport == null)
+                      FadeTransition(
+                        opacity: _animationController,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, -0.1),
+                            end: Offset.zero,
+                          ).animate(CurvedAnimation(
+                            parent: _animationController,
+                            curve: Curves.easeOut,
+                          )),
+                          child: _buildDateSelectionSection(),
+                        ),
+                      )
+                    else 
+                      FadeTransition(
+                        opacity: _animationController,
+                         child: _buildReadOnlyDateSection(),
+                      ),
+                    
+                    const SizedBox(height: 24),
+                    Expanded(
+                      child: loading
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                  color: AppColors.primaryColor))
+                          : report == null
+                              ? FadeTransition(
+                                  opacity: _animationController,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.analytics_outlined,
+                                            size: 80, color: AppColors.mutedColor.withValues(alpha: 0.4)),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          'لا توجد بيانات متاحة لهذا التاريخ',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: AppColors.mutedColor,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : _buildReportContent(),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: loading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.primaryColor))
-                    : report == null
-                        ? FadeTransition(
-                            opacity: _animationController,
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.analytics_outlined,
-                                      size: 80, color: AppColors.mutedColor.withValues(alpha: 0.4)),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'لا توجد بيانات متاحة لهذا التاريخ',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        color: AppColors.mutedColor,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : _buildReportContent(),
-              ),
-            ],
+            ),
           ),
-        ),
       ),
     );
   }
@@ -331,6 +343,80 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     );
   }
 
+  Widget _buildReadOnlyDateSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2)),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.date_range,
+                color: AppColors.primaryColor, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'تاريخ الجلسة',
+                style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.mutedColor,
+                    fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                DateFormat('yyyy-MM-dd   hh:mm a', 'en').format(report?.date ?? DateTime.now()),
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.kDarkChip),
+              ),
+            ],
+          ),
+          if (report?.closedByUserName != null) ...[
+            const Spacer(),
+             Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.secondaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.person,
+                      size: 16, color: AppColors.secondaryColor),
+                  const SizedBox(width: 8),
+                  Text(
+                    'بواسطة: ${report!.closedByUserName}',
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.secondaryColor),
+                  ),
+                ],
+              ),
+            ),
+          ]
+        ],
+      ),
+    );
+  }
+
   Widget _buildReportContent() {
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 32),
@@ -395,24 +481,46 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildSummaryCards() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildSummaryCard(
-              'إجمالي المبيعات',
-              '${report!.totalSales.toStringAsFixed(2)} ج.م',
-              Icons.attach_money,
-              AppColors.successColor),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildSummaryCard(
-              'صافي الإيراد',
-              '${report!.netRevenue.toStringAsFixed(2)} ج.م',
-              Icons.trending_up,
-              Color(0xFF2E7D32)),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        if (isMobile) {
+          return Column(
+            children: [
+              _buildSummaryCard(
+                  'إجمالي المبيعات',
+                  '${report!.totalSales.toStringAsFixed(2)} ج.م',
+                  Icons.attach_money,
+                  AppColors.successColor),
+              const SizedBox(height: 12),
+              _buildSummaryCard(
+                  'صافي الإيراد',
+                  '${report!.netRevenue.toStringAsFixed(2)} ج.م',
+                  Icons.trending_up,
+                  Color(0xFF2E7D32)),
+            ],
+          );
+        }
+        return Row(
+          children: [
+            Expanded(
+              child: _buildSummaryCard(
+                  'إجمالي المبيعات',
+                  '${report!.totalSales.toStringAsFixed(2)} ج.م',
+                  Icons.attach_money,
+                  AppColors.successColor),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildSummaryCard(
+                  'صافي الإيراد',
+                  '${report!.netRevenue.toStringAsFixed(2)} ج.م',
+                  Icons.trending_up,
+                  Color(0xFF2E7D32)),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -461,78 +569,123 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildActionButtons() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        
+        if (isMobile) {
+          return Column(
+            children: [
+              _buildActionButton(
                 onPressed: _handlePreview,
-                icon: const Icon(Icons.visibility, size: 20),
-                label: const Text('معاينة التقرير'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
+                icon: Icons.visibility,
+                label: 'معاينة التقرير',
+                color: AppColors.primaryColor,
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton.icon(
+              const SizedBox(height: 12),
+              _buildActionButton(
                 onPressed: () {
                    if (report == null) return;
                    Navigator.of(context).push(MaterialPageRoute(
                      builder: (context) => DailyReportDatasheetScreen(report: report!),
                    ));
                 },
-                icon: const Icon(Icons.table_chart, size: 20),
-                label: const Text('عرض كجدول'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
+                icon: Icons.table_chart,
+                label: 'عرض كجدول',
+                color: AppColors.secondaryColor,
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton.icon(
+              const SizedBox(height: 12),
+              _buildActionButton(
                 onPressed: _handlePrint,
-                icon: const Icon(Icons.print, size: 20),
-                label: const Text('طباعة مباشرة'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF2E7D32),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                icon: Icons.print,
+                label: 'طباعة مباشرة',
+                color: Color(0xFF2E7D32),
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                onPressed: _handleShare,
+                icon: Icons.share,
+                label: 'مشاركة PDF',
+                 color: AppColors.mutedColor,
+                isOutlined: true,
+              ),
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _buildActionButton(
+                    onPressed: _handlePreview,
+                    icon: Icons.visibility,
+                    label: 'معاينة التقرير',
+                    color: AppColors.primaryColor,
+                  ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildActionButton(
+                    onPressed: () {
+                       if (report == null) return;
+                       Navigator.of(context).push(MaterialPageRoute(
+                         builder: (context) => DailyReportDatasheetScreen(report: report!),
+                       ));
+                    },
+                    icon: Icons.table_chart,
+                    label: 'عرض كجدول',
+                    color: AppColors.secondaryColor,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildActionButton(
+                    onPressed: _handlePrint,
+                    icon: Icons.print,
+                    label: 'طباعة مباشرة',
+                    color: Color(0xFF2E7D32),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: _buildActionButton(
+                onPressed: _handleShare,
+                icon: Icons.share,
+                label: 'مشاركة PDF',
+                color: AppColors.mutedColor,
+                isOutlined: true,
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: _handleShare,
-            icon: const Icon(Icons.share, size: 20),
-            label: const Text('مشاركة PDF'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.mutedColor.withValues(alpha: 0.15),
-              foregroundColor: AppColors.mutedColor,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-        ),
-      ],
+        );
+      }
+    );
+  }
+
+  Widget _buildActionButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required String label,
+    required Color color,
+    bool isOutlined = false,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 20),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isOutlined ? color.withValues(alpha: 0.15) : color,
+        foregroundColor: isOutlined ? color : Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12)),
+        minimumSize: const Size(double.infinity, 50), // Ensure consistent height
+      ),
     );
   }
 
@@ -825,6 +978,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                   columnSpacing: 20,
                   columns: const [
                     DataColumn(label: Text('رقم الفاتورة')),
+                    DataColumn(label: Text('مجري العملية')), // User Column
                     DataColumn(label: Text('الوقت')),
                     DataColumn(label: Text('النوع')),
                     DataColumn(label: Text('الإجمالي'), numeric: true),
@@ -834,6 +988,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                     return DataRow(
                       cells: [
                         DataCell(Text(sale.id.length > 8 ? '#${sale.id.substring(0, 8)}' : '#${sale.id}')),
+                        DataCell(Text(sale.cashierName ?? 'Admin')), // Display User Name
                         DataCell(Text(DateFormat('hh:mm a').format(sale.date))),
                         DataCell(Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

@@ -1,14 +1,22 @@
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:printing/printing.dart';
 
+
 import '../../data/models/daily_report_model.dart';
+import '../../data/models/session_model.dart';
 import '../../domain/daily_report_pdf_service.dart';
 
 class DailyReportPreviewScreen extends StatelessWidget {
   final DailyReport report;
+  final Session? session; // Added session for details
 
-  const DailyReportPreviewScreen({super.key, required this.report});
+  const DailyReportPreviewScreen({
+    super.key, 
+    required this.report,
+    this.session, 
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,40 +79,97 @@ class DailyReportPreviewScreen extends StatelessWidget {
                           ? 16
                           : 24,
                 ),
-                child: Card(
-                  elevation: isDesktop ? 8 : 4,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(isDesktop ? 16 : 12)),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
-                    child: PdfPreview(
-                      build: (format) =>
-                          DailyReportPdfService.generateDailyReportPDF(report),
-                      allowPrinting: true,
-                      allowSharing: true,
-                      canChangeOrientation: false,
-                      canChangePageFormat: false,
-                      canDebug: false,
-                      pdfFileName:
-                          'daily_report_${_formatDate(report.date)}.pdf',
-                      maxPageWidth: maxPageWidth,
-                      dpi: isDesktop ? 200 : 150,
-                      useActions: false,
-                      scrollViewDecoration: BoxDecoration(
-                          color: AppColors.mutedColor.withOpacity(0.1)),
-                      previewPageMargin: EdgeInsets.all(isMobile
-                          ? 4
-                          : isTablet
-                              ? 8
-                              : 12),
+                child: Column(
+                  children: [
+                    // Added Session Details Header
+                    if (session != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildDetailItem(
+                                  Icons.login, 
+                                  'وقت الفتح', 
+                                  DateFormat('hh:mm a').format(session!.openTime)
+                                ),
+                                _buildDetailItem(
+                                  Icons.logout, 
+                                  'وقت الإغلاق', 
+                                  session!.closeTime != null 
+                                    ? DateFormat('hh:mm a').format(session!.closeTime!)
+                                    : 'مفتوح'
+                                ),
+                                _buildDetailItem(
+                                  Icons.person, 
+                                  'بواسطة', 
+                                  report.closedByUserName
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                    Expanded(
+                      child: Card(
+                        elevation: isDesktop ? 8 : 4,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(isDesktop ? 16 : 12)),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
+                          child: PdfPreview(
+                            build: (format) =>
+                                DailyReportPdfService.generateDailyReportPDF(report),
+                            allowPrinting: true,
+                            allowSharing: true,
+                            canChangeOrientation: false,
+                            canChangePageFormat: false,
+                            canDebug: false,
+                            pdfFileName:
+                                'daily_report_${_formatDate(report.date)}.pdf',
+                            maxPageWidth: maxPageWidth,
+                            dpi: isDesktop ? 200 : 150,
+                            useActions: false,
+                            scrollViewDecoration: BoxDecoration(
+                                color: AppColors.mutedColor.withOpacity(0.1)),
+                            previewPageMargin: EdgeInsets.all(isMobile
+                                ? 4
+                                : isTablet
+                                    ? 8
+                                    : 12),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             );
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildDetailItem(IconData icon, String label, String value) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 16, color: AppColors.mutedColor),
+            const SizedBox(width: 4),
+            Text(label, style: TextStyle(color: AppColors.mutedColor, fontSize: 12)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+      ],
     );
   }
 

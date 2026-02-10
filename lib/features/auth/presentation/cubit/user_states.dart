@@ -1,3 +1,5 @@
+import '../../../arp/data/models/session_model.dart';
+
 abstract class UserStates {}
 
 class UserInitial extends UserStates {}
@@ -14,8 +16,9 @@ class UserSuccess extends UserStates {
 
 class UserSuccessWithReport extends UserStates {
   final String message;
-  final dynamic report; // Use dynamic to avoid import cycle if needed, or import DailyReport
-  UserSuccessWithReport(this.message, this.report);
+  final dynamic report;
+  final Session session;
+  UserSuccessWithReport(this.message, this.report, this.session);
 }
 
 class UserFailure extends UserStates {

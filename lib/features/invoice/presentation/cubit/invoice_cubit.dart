@@ -9,6 +9,9 @@ import 'package:crazy_phone_pos/features/arp/data/models/session_model.dart';
 import '../../../sales/data/models/sale_model.dart';
 import '../../../sales/domain/sales_repository.dart';
 import '../widgets/partial_refund_dialog.dart';
+import '../../../../core/services/activity_logger.dart';
+import '../../../../core/data/models/activity_log.dart';
+import 'package:collection/collection.dart'; // for firstWhereOrNull
 
 import 'invoice_state.dart';
 
@@ -113,7 +116,21 @@ class InvoiceCubit extends Cubit<InvoiceState> {
 
   // Delete a single sale
   Future<void> deleteSale(String saleId) async {
+    // Find the sale before deleting for logging
+    final sale = state.sales.firstWhereOrNull((s) => s.id == saleId);
+    
     await repository.deleteSale(saleId);
+    
+    // Log activity if sale was found
+    if (sale != null) {
+      getIt<ActivityLogger>().logActivity(
+        type: ActivityType.refund,
+        description: 'حذف فاتورة: ${sale.total.toStringAsFixed(2)} ج.م',
+        userName: getIt<UserCubit>().currentUser.name,
+        details: {'saleId': saleId, 'items': sale.items},
+      );
+    }
+    
     loadSales();
   }
 

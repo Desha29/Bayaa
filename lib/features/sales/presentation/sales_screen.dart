@@ -57,6 +57,7 @@ class _SalesScreenState extends State<SalesScreen>
   final List<Map<String, dynamic>> _cartItems = [];
   List<Map<String, dynamic>> _recentSales = [];
   List<Product> _filteredProducts = [];
+  bool _isRecentSalesCollapsed = false;
 
   double get _totalAmount => _cartItems.fold<double>(
         0.0,
@@ -456,13 +457,48 @@ class _SalesScreenState extends State<SalesScreen>
           ),
         ),
         SizedBox(width: isDesktop ? 32 : 24),
-        Expanded(
-          flex: isDesktop ? 3 : 4,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: RecentSalesSection(recentSales: _recentSales),
+        if (!_isRecentSalesCollapsed)
+          Expanded(
+            flex: isDesktop ? 3 : 4,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: RecentSalesSection(
+                recentSales: _recentSales,
+                onToggleCollapse: () {
+                  setState(() {
+                    _isRecentSalesCollapsed = !_isRecentSalesCollapsed;
+                  });
+                },
+              ),
+            ),
           ),
-        ),
+        // Toggle button when collapsed
+        if (_isRecentSalesCollapsed)
+          Container(
+            width: 40,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderColor),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                IconButton(
+                  icon: const Icon(
+                    Icons.chevron_left,
+                    color: AppColors.primaryColor,
+                  ),
+                  tooltip: 'عرض المبيعات الأخيرة',
+                  onPressed: () {
+                    setState(() {
+                      _isRecentSalesCollapsed = false;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

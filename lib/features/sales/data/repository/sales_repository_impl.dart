@@ -178,6 +178,7 @@ class SalesRepositoryImpl with RepositoryPersistenceMixin implements SalesReposi
     int limit = 10,
     DateTime? startDate,
     DateTime? endDate,
+    String? sessionId,
   }) async {
     try {
       final db = PersistenceInitializer.persistenceManager!.sqliteManager;
@@ -197,7 +198,14 @@ class SalesRepositoryImpl with RepositoryPersistenceMixin implements SalesReposi
           conditions.add('created_at <= ?');
           whereArgs.add(endDate.toIso8601String());
         }
+        if (sessionId != null) {
+          conditions.add('shift_id = ?');
+          whereArgs.add(sessionId);
+        }
         where = conditions.join(' AND ');
+      } else if (sessionId != null) {
+        where = 'shift_id = ?';
+        whereArgs = [sessionId];
       }
 
       final saleRows = await db.query(
@@ -383,9 +391,14 @@ class SalesRepositoryImpl with RepositoryPersistenceMixin implements SalesReposi
              // First select IDs to delete for logging/security if needed.
              // Then delete.
              
+             // Ensure we cover the full range of the given end date
+             // e.g. if start=today, end=today, we want start 00:00:00 to end 23:59:59
+             final adjustedStart = DateTime(start.year, start.month, start.day, 0, 0, 0);
+             final adjustedEnd = DateTime(end.year, end.month, end.day, 23, 59, 59, 999);
+             
              await db.delete('sales', 
                 where: 'created_at >= ? AND created_at <= ?',
-                whereArgs: [start.toIso8601String(), end.toIso8601String()]
+                whereArgs: [adjustedStart.toIso8601String(), adjustedEnd.toIso8601String()]
              );
              // SQLite with PRAGMA foreign_keys = ON should trigger cascade delete on sale_items
              // If not, we should manually delete items where sale_id undefined.
@@ -497,6 +510,31 @@ class SalesRepositoryImpl with RepositoryPersistenceMixin implements SalesReposi
       return Right(sales);
     } catch (e) {
       return Left(CacheFailure('فشل في جلب المرتجعات: ${e.toString()}'));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, Unit>> linkSalesToSession(List<String> saleIds, String sessionId) async {
+    try {
+      if (saleIds.isEmpty) return const Right(unit);
+
+      await updateCritical(
+        entity: 'session_sales_link',
+        id: sessionId,
+        data: {'sale_ids': saleIds},
+        sqliteWrite: () async {
+          final db = PersistenceInitializer.persistenceManager!.sqliteManager;
+          final placeholders = List.filled(saleIds.length, '?').join(',');
+          
+          await db.database.rawUpdate(
+            'UPDATE sales SET shift_id = ? WHERE id IN ($placeholders)',
+            [sessionId, ...saleIds],
+          );
+        },
+      );
+      return const Right(unit);
+    } catch (e) {
+      return Left(CacheFailure('فشل في ربط الفواتير بالجلسة: ${e.toString()}'));
     }
   }
 }

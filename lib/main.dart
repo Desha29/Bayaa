@@ -19,6 +19,8 @@ import 'features/auth/presentation/cubit/user_cubit.dart';
 import 'features/auth/presentation/cubit/user_states.dart';
 import 'secrets.dart';
 import 'core/data/services/persistence_initializer.dart';
+import 'features/arp/data/repositories/session_repository_impl.dart';
+import 'core/services/activity_logger.dart';
 
 Future<void> _initializePersistenceSystem() async {
   print('\n========================================');
@@ -58,6 +60,21 @@ Future<void> _initializePersistenceSystem() async {
       print('  - Configuration: Loaded');
       print('  - File Logging: Active');
       print('  - Crash Logger: Active');
+      
+      // Load recoverables
+      print('\n🔄 Recovering session state...');
+      await getIt<SessionRepositoryImpl>().loadCurrentSession();
+      final session = getIt<SessionRepositoryImpl>().getCurrentSession();
+      if (session != null) {
+         print('  ✅ Resumed open session: ${session.id} (User: ${session.openedByUserId})');
+         FileLogger.info('Resumed open session: ${session.id}', source: 'Init');
+      } else {
+         print('  ℹ️ No active session found.');
+      }
+
+      print('🔄 Loading activity history...');
+      await getIt<ActivityLogger>().loadRecentActivities();
+      print('  ✅ Activity history loaded.');
       
     } else {
       print('ℹ️ INFO: First launch detected - configuring data storage...');

@@ -16,7 +16,11 @@ class SidebarItem {
   final IconData icon;
   final String title;
   final Widget screen;
-  SidebarItem({required this.id, required this.icon, required this.title, required this.screen});
+  SidebarItem(
+      {required this.id,
+      required this.icon,
+      required this.title,
+      required this.screen});
 }
 
 class CustomSidebar extends StatefulWidget {
@@ -24,6 +28,7 @@ class CustomSidebar extends StatefulWidget {
   final int selectedIndex;
   final Function(int) onItemSelected;
   final bool isCollapsed;
+  final VoidCallback? onToggleCollapse;
 
   const CustomSidebar({
     super.key,
@@ -31,6 +36,7 @@ class CustomSidebar extends StatefulWidget {
     required this.selectedIndex,
     required this.onItemSelected,
     this.isCollapsed = false,
+    this.onToggleCollapse,
   });
 
   @override
@@ -91,7 +97,7 @@ class _CustomSidebarState extends State<CustomSidebar>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-        
+
               SizedBox(
                 height: 96,
                 child: Center(
@@ -99,6 +105,22 @@ class _CustomSidebarState extends State<CustomSidebar>
                 ),
               ),
               const SizedBox(height: 12),
+
+              // Toggle button
+              if (widget.onToggleCollapse != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: IconButton(
+                    icon: Icon(
+                      widget.isCollapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft,
+                      color: AppColors.primaryColor,
+                      size: 20,
+                    ),
+                    tooltip: widget.isCollapsed ? 'توسيع القائمة' : 'تصغير القائمة',
+                    onPressed: widget.onToggleCollapse,
+                  ),
+                ),
+              const SizedBox(height: 8),
 
               // Items
               Expanded(
@@ -254,11 +276,11 @@ class _SidebarHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = compact ? 20.0 : 30.0; 
+    final radius = compact ? 20.0 : 30.0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min, 
+      mainAxisSize: MainAxisSize.min,
       children: [
         Flexible(
           child: FittedBox(
@@ -279,20 +301,22 @@ class _SidebarHeader extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: BlocBuilder<SettingsCubit, SettingsStates>(
-                    bloc: getIt<SettingsCubit>(),
-                    builder: (context, state) {
-                       final name = getIt<SettingsCubit>().currentStoreInfo?.name ?? 'Bayaa';
-                       return Text(
-                        name.isNotEmpty ? name : 'Bayaa',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.secondaryColor,
-                              fontSize: 13,
-                              height: 1.2,
-                            ),
-                      );
-                    }
-                  ),
+                      bloc: getIt<SettingsCubit>(),
+                      builder: (context, state) {
+                        final name =
+                            getIt<SettingsCubit>().currentStoreInfo?.name ??
+                                'Bayaa';
+                        return Text(
+                          name.isNotEmpty ? name : 'Bayaa',
+                          style:
+                              Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primaryColor,
+                                    fontSize: 16,
+                                    height: 1.2,
+                                  ),
+                        );
+                      }),
                 ),
               ),
             ],

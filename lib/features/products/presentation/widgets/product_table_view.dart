@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/components/empty_state.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../cubit/product_cubit.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductsTableView extends StatelessWidget {
   final List<Product> products;
@@ -16,6 +14,7 @@ class ProductsTableView extends StatelessWidget {
   final bool isLoadingMore;
   final String? emptyTitle;
   final String? emptyMessage;
+  final bool isManager;
 
   const ProductsTableView({
     super.key,
@@ -28,6 +27,7 @@ class ProductsTableView extends StatelessWidget {
     this.isLoadingMore = false,
     this.emptyTitle,
     this.emptyMessage,
+    this.isManager = false,
   });
 
   @override
@@ -35,8 +35,8 @@ class ProductsTableView extends StatelessWidget {
     if (products.isEmpty) {
       return EmptyState(
         variant: EmptyStateVariant.products,
-        title: emptyTitle ?? 'ابدأ البحث',
-        message: emptyMessage ?? 'قم بالبحث عن منتج أو اختر فئة لعرض المنتجات',
+        title: emptyTitle ?? 'لا توجد منتجات',
+        message: emptyMessage ?? 'قم بإضافة منتجات جديدة لعرضها هنا',
         icon: Icons.search,
       );
     }
@@ -72,27 +72,53 @@ class ProductsTableView extends StatelessWidget {
                       width: 1,
                     ),
                   ),
-                  columns: const [
-                    DataColumn(label: Text('اسم المنتج', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('الباركود', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('الفئة', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('السعر', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('الكمية', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('الحالة', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('إجراءات', style: TextStyle(fontWeight: FontWeight.bold))),
+                  columns: [
+                    const DataColumn(
+                        label: Text('اسم المنتج',
+                            style: TextStyle(fontWeight: FontWeight.bold))),
+                    const DataColumn(
+                        label: Text('الباركود',
+                            style: TextStyle(fontWeight: FontWeight.bold))),
+                    const DataColumn(
+                        label: Text('الفئة',
+                            style: TextStyle(fontWeight: FontWeight.bold))),
+                    const DataColumn(
+                        label: Text('السعر',
+                            style: TextStyle(fontWeight: FontWeight.bold))),
+                    if (isManager) ...[
+                      const DataColumn(
+                          label: Text('سعر الجملة',
+                              style: TextStyle(fontWeight: FontWeight.bold))),
+                      const DataColumn(
+                          label: Text('أدنى سعر',
+                              style: TextStyle(fontWeight: FontWeight.bold))),
+                    ],
+                    const DataColumn(
+                        label: Text('الكمية',
+                            style: TextStyle(fontWeight: FontWeight.bold))),
+                    const DataColumn(
+                        label: Text('الحالة',
+                            style: TextStyle(fontWeight: FontWeight.bold))),
+                    if (isManager)
+                      const DataColumn(
+                          label: Text('إجراءات',
+                              style: TextStyle(fontWeight: FontWeight.bold))),
                   ],
                   rows: [
                     ...products.map((product) {
-                      final statusColor = statusColorFn(product.quantity, product.minQuantity);
-                      final statusText = statusTextFn(product.quantity, product.minQuantity);
-                      
+                      final statusColor =
+                          statusColorFn(product.quantity, product.minQuantity);
+                      final statusText =
+                          statusTextFn(product.quantity, product.minQuantity);
+
                       return DataRow(cells: [
                         DataCell(
                           Container(
                             constraints: const BoxConstraints(maxWidth: 200),
                             child: Text(
                               product.name,
-                              style: const TextStyle(fontWeight: FontWeight.w600),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w600),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -100,7 +126,8 @@ class ProductsTableView extends StatelessWidget {
                         DataCell(Text(product.barcode)),
                         DataCell(
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.grey.shade100,
                               borderRadius: BorderRadius.circular(6),
@@ -108,15 +135,24 @@ class ProductsTableView extends StatelessWidget {
                             child: Text(product.category),
                           ),
                         ),
-                        DataCell(Text('${product.price.toStringAsFixed(2)} ج.م')),
+                        DataCell(
+                            Text('${product.price.toStringAsFixed(2)} ج.م')),
+                        if (isManager) ...[
+                          DataCell(Text(
+                              '${product.wholesalePrice.toStringAsFixed(2)} ج.م')),
+                          DataCell(Text(
+                              '${product.minPrice.toStringAsFixed(2)} ج.م')),
+                        ],
                         DataCell(Text('${product.quantity}')),
                         DataCell(
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: statusColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: statusColor.withOpacity(0.3)),
+                              border: Border.all(
+                                  color: statusColor.withOpacity(0.3)),
                             ),
                             child: Text(
                               statusText,
@@ -128,25 +164,27 @@ class ProductsTableView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        DataCell(
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(LucideIcons.edit3, size: 18),
-                                color: AppColors.primaryColor,
-                                onPressed: () => onEdit(product),
-                                tooltip: 'تعديل',
-                              ),
-                              IconButton(
-                                icon: const Icon(LucideIcons.trash2, size: 18),
-                                color: AppColors.errorColor,
-                                onPressed: () => onDelete(product),
-                                tooltip: 'حذف',
-                              ),
-                            ],
+                        if (isManager)
+                          DataCell(
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(LucideIcons.edit3, size: 18),
+                                  color: AppColors.primaryColor,
+                                  onPressed: () => onEdit(product),
+                                  tooltip: 'تعديل',
+                                ),
+                                IconButton(
+                                  icon: const Icon(LucideIcons.trash2,
+                                      size: 18),
+                                  color: AppColors.errorColor,
+                                  onPressed: () => onDelete(product),
+                                  tooltip: 'حذف',
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                       ]);
                     }),
                     if (isLoadingMore)

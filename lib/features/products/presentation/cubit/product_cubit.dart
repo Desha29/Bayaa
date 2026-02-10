@@ -4,6 +4,9 @@ import 'package:crazy_phone_pos/features/products/domain/product_repository_int.
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../core/services/activity_logger.dart';
+import '../../../../core/data/models/activity_log.dart';
+import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import 'product_states.dart';
 
@@ -98,9 +101,19 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) {
-        emit(ProductSuccessState("تم العملية بنجاح"));
-        // Trigger immediate notification check for this product
-        getIt<NotificationsCubit>().addItem(product);
+        emit(ProductSuccessState("تم حفظ المنتج بنجاح"));
+        
+        // Determine activity type
+        final isUpdate = products.any((p) => p.barcode == product.barcode);
+        
+        // Log activity
+        getIt<ActivityLogger>().logActivity(
+          type: isUpdate ? ActivityType.productUpdate : ActivityType.productAdd,
+          description: isUpdate ? 'تحديث منتج: ${product.name}' : 'إضافة منتج: ${product.name}',
+          userName: getIt<UserCubit>().currentUser.name,
+          details: {'barcode': product.barcode, 'price': product.price},
+        );
+        
         getAllProducts();
       },
     );
@@ -112,7 +125,18 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) {
-        emit(ProductSuccessState("تم الحذف  بنجاح"));
+        final deletedProduct = products.firstWhere((p) => p.barcode == barcode);
+        
+        emit(ProductSuccessState("تم حذف المنتج بنجاح"));
+        
+        // Log activity
+        getIt<ActivityLogger>().logActivity(
+          type: ActivityType.productDelete,
+          description: 'حذف منتج: ${deletedProduct.name}',
+          userName: getIt<UserCubit>().currentUser.name,
+          details: {'barcode': barcode},
+        );
+        
         getAllProducts();
       },
     );

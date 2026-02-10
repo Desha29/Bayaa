@@ -1,7 +1,12 @@
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+
+import '../../../arp/presentation/screens/daily_report_preview_screen.dart';
+import '../../../auth/presentation/cubit/user_states.dart';
+import '../../../auth/data/models/user_model.dart';
 
 class CloseDayCard extends StatelessWidget {
   final bool isMobile;
@@ -14,7 +19,7 @@ class CloseDayCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        onTap: () => _showConfirmationDialog(context),
+        onTap: () => UserCubit.get(context).closeSession(),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -47,9 +52,9 @@ class CloseDayCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'إنهاء الوردية الحالية وإصدار تقرير الإغلاق',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.mutedColor,
-                          ),
+                      style:Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.mutedColor,
+                            ),
                     ),
                   ],
                 ),
@@ -62,25 +67,39 @@ class CloseDayCard extends StatelessWidget {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context) {
+  void _showReportDialog(BuildContext context, dynamic report) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('تأكيد إغلاق اليومية'),
+        title: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.green, size: 28),
+            const SizedBox(width: 12),
+            const Text('تم إغلاق اليومية بنجاح'),
+          ],
+        ),
         content: const Text(
-            'هل أنت متأكد من رغبتك في إغلاق اليومية؟ سيتم إنشاء تقرير الإغلاق ولا يمكن التراجع عن هذا الإجراء.'),
+          'تم إنشاء تقرير الإغلاق. هل ترغب في عرض التقرير الآن؟',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء'),
+            child: const Text('إغلاق'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+            ),
             onPressed: () {
               Navigator.pop(ctx);
-              UserCubit.get(context).closeSession();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => DailyReportPreviewScreen(report: report),
+                ),
+              );
             },
-            child: const Text('إغلاق اليومية'),
+            child: const Text('عرض التقرير'),
           ),
         ],
       ),

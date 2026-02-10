@@ -16,9 +16,8 @@ class PermissionGuard {
   }
 
   static void checkReportAccess(User user) {
-    if (user.userType == UserType.cashier) {
-      throw PermissionDeniedException("لا يمكن للكاشير عرض التقارير والإحصائيات.");
-    }
+    // Cashiers are allowed to check reports and session details per user request
+    return;
   }
 
   static void checkDayClosePermission(User user) {
