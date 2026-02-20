@@ -39,4 +39,7 @@ abstract class ArpRepository {
   Future<Either<Failure, Map<int, double>>> getHourlySalesForSession(String sessionId);
   Future<Either<Failure, Map<String, double>>> getCategorySalesForSession(String sessionId);
   Future<Either<Failure, List<ProductPerformanceModel>>> getTopProductsForSession(String sessionId, int limit);
+  Future<Either<Failure, Map<String, double>>> getMonthlySales(DateTime start, DateTime end);
+  Future<Either<Failure, Map<String, double>>> getYearlySales(DateTime start, DateTime end);
+  Future<Either<Failure, List<ProductPerformanceModel>>> getTopProductsForMonth(String yearMonth, int limit);
 }

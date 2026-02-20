@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class RecentSalesSection extends StatelessWidget {
@@ -36,30 +37,36 @@ class RecentSalesSection extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.warningColor.withOpacity(0.1),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryColor.withOpacity(0.1),
+                      AppColors.primaryColor.withOpacity(0.05),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  Icons.history,
-                  color: AppColors.warningColor,
-                  size: 22,
+                  LucideIcons.history,
+                  color: AppColors.primaryColor,
+                  size: 20,
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
+              const Text(
                 'المبيعات الأخيرة',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondaryColor,
-                    ),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
               const Spacer(),
               if (onToggleCollapse != null)
                 IconButton(
                   icon: const Icon(
-                    Icons.chevron_right,
+                    LucideIcons.chevronRight,
                     color: AppColors.primaryColor,
                   ),
                   tooltip: 'إخفاء المبيعات الأخيرة',
@@ -120,69 +127,64 @@ class RecentSalesSection extends StatelessWidget {
   }
 
   Widget _buildRecentSaleItem(Map<String, dynamic> sale, DateTime date) {
+    final isRefund = sale['isRefund'] == true;
+    final color = isRefund ? AppColors.warningColor : AppColors.successColor;
+    final icon = isRefund ? LucideIcons.cornerUpLeft : LucideIcons.shoppingCart;
+    final timeFormat = DateFormat('hh:mm a');
+
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: (sale['isRefund'] == true)
-              ? Colors.red.withOpacity(0.5)
-              : Colors.green.withOpacity(0.5),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${sale['total'].toStringAsFixed(0)} ج.م',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: AppColors.secondaryColor,
-                ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  color.withOpacity(0.15),
+                  color.withOpacity(0.08),
+                ],
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: (sale['isRefund'] == true) ? Colors.red : Colors.green,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  (sale['isRefund'] == true)
-                      ? 'مرتجع (${sale['items']})'
-                      : '${sale['items']} منتج',
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isRefund ? 'عملية استرجاع' : 'عملية بيع',
                   style: const TextStyle(
-                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                   '${sale['items']} عنصر • ${sale['total'].toStringAsFixed(0)} ج.م',
+                  style: TextStyle(
                     fontSize: 12,
+                    color: color,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(
-                Icons.access_time,
-                size: 14,
-                color: AppColors.mutedColor,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '${date.year}/${date.month}/${date.day} - ${date.hour}:${date.minute.toString().padLeft(2, '0')}',
-                style: TextStyle(
-                  color: AppColors.mutedColor,
-                  fontSize: 12,
-                ),
-              ),
-            ],
+          Text(
+            timeFormat.format(date),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),

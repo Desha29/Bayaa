@@ -1,4 +1,4 @@
-// lib/features/arp/presentation/widgets/arp_chart_section.dart
+// lib/features/sessions/presentation/widgets/arp_chart_section.dart
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/constants/app_colors.dart';

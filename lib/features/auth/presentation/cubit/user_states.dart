@@ -1,4 +1,6 @@
-import '../../../arp/data/models/session_model.dart';
+
+
+import '../../../sessions/data/models/session_model.dart';
 
 abstract class UserStates {}
 

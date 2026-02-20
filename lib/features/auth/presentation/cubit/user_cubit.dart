@@ -2,15 +2,19 @@
 import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import 'package:crazy_phone_pos/features/auth/domain/repository/user_repository_int.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_states.dart';
-import 'package:crazy_phone_pos/features/arp/data/repositories/session_repository_impl.dart';
+import 'package:crazy_phone_pos/features/sessions/data/repositories/session_repository_impl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../sales/data/repository/sales_repository_impl.dart';
-import '../../../arp/data/models/product_performance_model.dart';
+
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
-import '../../../arp/data/models/session_model.dart';
+
+import '../../../../core/session/session_manager.dart';
+import '../../../../core/data/services/checkpoint_service.dart';
+import '../../../sessions/data/models/product_performance_model.dart';
+import '../../../sessions/data/models/session_model.dart';
 
 
 class UserCubit extends Cubit<UserStates> {
@@ -68,14 +72,18 @@ class UserCubit extends Cubit<UserStates> {
   final result = await userRepository.deleteUser(username);
   result.fold(
     (failure) => emit(UserFailure(failure.message)),
-    (_) {
+    (_) async {
       emit(UserSuccess("تم حذف المستخدم بنجاح"));
       
-      // Log activity
-      getIt<ActivityLogger>().logActivity(
+      // Log activity with session (auto-creates session if closed)
+      final sid = await getIt<SessionManager>().ensureSessionId(
+        userName: currentUser.name,
+      );
+      await getIt<ActivityLogger>().logActivity(
         type: ActivityType.userDelete,
         description: 'حذف مستخدم: $username',
         userName: currentUser.name,
+        sessionId: sid,
       );
       
       getAllUsers(); 
@@ -88,7 +96,7 @@ void saveUser(User user) async {
   final result = await userRepository.saveUser(user);
   result.fold(
     (failure) => emit(UserFailure(failure.message)),
-    (_) {
+    (_) async {
       emit(UserSuccess("تم إضافة المستخدم بنجاح"));
       
       // Check if update (simple check if username exists in list, though list might be empty if not loaded)
@@ -96,11 +104,15 @@ void saveUser(User user) async {
       // Actually saveUser is usually Upsert.
       final isUpdate = _users.any((u) => u.username == user.username);
 
-      // Log activity
-      getIt<ActivityLogger>().logActivity(
-        type: isUpdate ? ActivityType.userUpdate : ActivityType.userAdd, // Assuming userUpdate exists in enum, if not use generic
+      // Log activity with session (auto-creates session if closed)
+      final sid = await getIt<SessionManager>().ensureSessionId(
+        userName: currentUser.name,
+      );
+      await getIt<ActivityLogger>().logActivity(
+        type: isUpdate ? ActivityType.userUpdate : ActivityType.userAdd,
         description: isUpdate ? 'تحديث مستخدم: ${user.name}' : 'إضافة مستخدم: ${user.name}',
         userName: currentUser.name,
+        sessionId: sid,
       );
       
       getAllUsers(); 
@@ -112,17 +124,21 @@ void updateUser(User user) async {
   final result = await userRepository.updateUser(user);
   result.fold(
     (failure) => emit(UserFailure(failure.message)),
-    (_) {
+    (_) async {
       if (currentUser.username == user.username) {
         currentUser = user;
       }
       emit(UserSuccess("تم تحديث المستخدم بنجاح"));
       
-      // Log activity
-      getIt<ActivityLogger>().logActivity(
+      // Log activity with session (auto-creates session if closed)
+      final sid = await getIt<SessionManager>().ensureSessionId(
+        userName: currentUser.name,
+      );
+      await getIt<ActivityLogger>().logActivity(
         type: ActivityType.userUpdate,
         description: 'تحديث مستخدم: ${user.name}',
         userName: currentUser.name,
+        sessionId: sid,
       );
       
       getAllUsers(); 
@@ -155,19 +171,27 @@ void updateUser(User user) async {
         if (user.password == trimmedPassword) {
           currentUser = user;
           try {
-             // Open Session on Login
-             await sessionRepository.openSession(user);
+             // Open Session on Login via SessionManager
+             final sessionManager = getIt<SessionManager>();
+             final session = await sessionManager.getOrCreateSession(userName: user.name);
              
              // Log activity
-             getIt<ActivityLogger>().logActivity(
-               type: ActivityType.sessionOpen,
-               description: 'فتح جلسة جديدة',
+             await getIt<ActivityLogger>().logActivity(
+               type: ActivityType.login,
+               description: 'تسجيل دخول',
                userName: user.name,
+               sessionId: session.id,
+             );
+
+             // Create checkpoint on login
+             await CheckpointService().createCheckpoint(
+               reason: 'login_${user.username}', 
+               userName: user.name
              );
              
              emit(UserSuccess("تم تسجيل الدخول بنجاح"));
           } catch (e) {
-             emit(UserFailure("فشل فتح الجلسة: $e"));
+             emit(UserFailure("فشل فتح اليوم: $e"));
           }
         } else {
           print("   ❌ Password Mismatch!");
@@ -180,10 +204,29 @@ void updateUser(User user) async {
   Future<void> closeSession() async {
     emit(CloseSessionLoading());
     try {
-      final session = sessionRepository.getCurrentSession();
-      if (session == null) {
-        emit(UserFailure("لا توجد جلسة مفتوحة لإغلاقها."));
-        return;
+      final sessionManager = getIt<SessionManager>();
+      print('DEBUG_SESSION: UserCubit.closeSession called');
+      print('DEBUG_SESSION: Manager.currentSession: ${sessionManager.currentSession?.id}');
+      print('DEBUG_SESSION: Repo.getCurrentSession: ${sessionRepository.getCurrentSession()?.id}');
+
+      final session = sessionManager.currentSession; // Get pure object from manager/repo
+      
+      if (session == null || !session.isOpen) {
+        print('DEBUG_SESSION: No open session found in manager. Attempting loadSession...');
+         // Try forcing a load just in case (e.g. if started sealed)
+         await sessionManager.loadSession();
+         if (sessionManager.currentSession == null) {
+            print('DEBUG_SESSION: Still no session after load. Emitting failure.');
+            emit(UserFailure("لا يوجد يوم مفتوح لإغلاقه."));
+            return;
+         }
+      }
+      
+      final currentSessionToClose = sessionManager.currentSession!;
+
+      if (currentSessionToClose.id == null) {
+          emit(UserFailure("خطأ في معرف اليوم"));
+          return;
       }
 
       // Robust Session Capture: Time-Based + ID-Based
@@ -194,11 +237,11 @@ void updateUser(User user) async {
       
       final sales = allRecent.where((s) {
            // 1. Explicit Session Match
-           if (s.sessionId == session.id) return true;
+           if (s.sessionId == currentSessionToClose.id) return true;
            
            // 2. Time Window Match (Fallback for orphans or missing IDs)
            // "From Start to End" as requested by user
-           if (s.date.isAfter(session.openTime) && s.date.isBefore(DateTime.now())) {
+           if (s.date.isAfter(currentSessionToClose.openTime) && s.date.isBefore(DateTime.now())) {
              // If manual linking failed, time is the source of truth
              return true; 
            }
@@ -208,7 +251,7 @@ void updateUser(User user) async {
       // Ensure all found sales are linked to this session in DB
       // This fixes "No Data" bug for orphans found by time-window
       if (sales.isNotEmpty) {
-        await salesRepo.linkSalesToSession(sales.map((e) => e.id).toList(), session.id);
+        await salesRepo.linkSalesToSession(sales.map((e) => e.id).toList(), currentSessionToClose.id);
       }
 
       double totalSales = 0.0;
@@ -288,8 +331,8 @@ void updateUser(User user) async {
       
       final netRevenue = totalSales - totalRefunds;
 
-      // Close session with session-based snapshot data (including refunds)
-      final report = await sessionRepository.closeSession(
+      // Close session via SessionManager
+      final report = await sessionManager.closeCurrentSession(
         currentUser,
         totalSales: totalSales,
         totalRefunds: totalRefunds,
@@ -300,22 +343,29 @@ void updateUser(User user) async {
         transactions: sales,
       );
       
-      // Log activity
-      getIt<ActivityLogger>().logActivity(
+      // Log activity with session
+      await getIt<ActivityLogger>().logActivity(
         type: ActivityType.sessionClose,
-        description: 'إغلاق جلسة: ${totalSales.toStringAsFixed(2)} ج.م',
+        description: 'إغلاق يوم: ${totalSales.toStringAsFixed(2)} ج.م',
         userName: currentUser.name,
+        sessionId: currentSessionToClose.id,
+      );
+
+      // Create checkpoint on session close
+      await CheckpointService().createCheckpoint(
+        reason: 'session_close_${currentUser.username}', 
+        userName: currentUser.name
       );
       
       // Create closed session for navigation
       final closedSession = Session(
-        id: session.id,
-        openTime: session.openTime,
+        id: currentSessionToClose.id,
+        openTime: currentSessionToClose.openTime,
         closeTime: report.date,
         isOpen: false,
-        openedByUserId: session.openedByUserId,
+        openedByUserId: currentSessionToClose.openedByUserId,
         closedByUserId: currentUser.username, // User model uses username as ID
-        invoiceIds: session.invoiceIds,
+        invoiceIds: currentSessionToClose.invoiceIds,
         dailyReportId: report.id,
       );
 

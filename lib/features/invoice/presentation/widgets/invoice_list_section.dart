@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../sales/data/models/sale_model.dart';
 import 'invoice_card.dart';
 
-
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class InvoiceListSection extends StatelessWidget {
@@ -34,57 +33,88 @@ class InvoiceListSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (sales.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.receipt_long_outlined,
-              size: 80,
-              color: AppColors.mutedColor.withOpacity(0.4),
-            ),
+            const CircularProgressIndicator(color: AppColors.primaryColor),
             const SizedBox(height: 16),
             Text(
-              startDate != null || endDate != null
-                  ? 'لا توجد فواتير في الفترة المحددة'
-                  : 'لا توجد فواتير حديثة',
-              style: TextStyle(
-                fontSize: 18,
-                color: AppColors.mutedColor,
-                fontWeight: FontWeight.w600,
-              ),
+              'جاري تحميل الفواتير...',
+              style: TextStyle(color: AppColors.mutedColor, fontSize: 13),
             ),
           ],
         ),
       );
     }
+    if (sales.isEmpty) {
+      return Center(
+        child: FadeTransition(
+          opacity: animationController,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withOpacity(0.04),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.receipt_long_outlined,
+                  size: 56,
+                  color: AppColors.mutedColor.withOpacity(0.35),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                startDate != null || endDate != null
+                    ? 'لا توجد فواتير في الفترة المحددة'
+                    : 'لا توجد فواتير حديثة',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: AppColors.mutedColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'جرب تغيير معايير البحث أو الفلتر',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.mutedColor.withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return ListView.separated(
       itemCount: sales.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      padding: const EdgeInsets.only(bottom: 24),
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (context, i) => FadeTransition(
         opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
           CurvedAnimation(
             parent: animationController,
             curve: Interval(
-              (i * 0.1).clamp(0.0, 1.0),
-              ((i * 0.1) + 0.3).clamp(0.0, 1.0),
+              (i * 0.06).clamp(0.0, 0.8),
+              ((i * 0.06) + 0.2).clamp(0.0, 1.0),
               curve: Curves.easeOut,
             ),
           ),
         ),
         child: SlideTransition(
           position: Tween<Offset>(
-            begin: const Offset(0, 0.2),
+            begin: const Offset(0, 0.1),
             end: Offset.zero,
           ).animate(
             CurvedAnimation(
               parent: animationController,
               curve: Interval(
-                (i * 0.1).clamp(0.0, 1.0),
-                ((i * 0.1) + 0.3).clamp(0.0, 1.0),
+                (i * 0.06).clamp(0.0, 0.8),
+                ((i * 0.06) + 0.2).clamp(0.0, 1.0),
                 curve: Curves.easeOut,
               ),
             ),
@@ -93,7 +123,6 @@ class InvoiceListSection extends StatelessWidget {
             sale: sales[i],
             onOpen: () => onOpenInvoice(sales[i]),
             onDelete: isManager ? () => onDeleteSale(sales[i]) : null,
-
             onReturn: (isManager && !sales[i].isRefund) ? () => onReturnSale(sales[i]) : null,
             onPrint: () => onPrintInvoice(sales[i]),
             isManager: isManager,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/message.dart';
+import '../functions/messege.dart';
 
 class MessageOverlay extends StatefulWidget {
   final Widget child;
@@ -33,50 +33,31 @@ class GlobalMessage {
 
   static void showSuccess(String message) {
     if (_context != null) {
-      Message.showSuccess(_context!, message);
+      MotionSnackBarSuccess(_context!, message);
     }
   }
 
   static void showError(String message) {
     if (_context != null) {
-      Message.showError(_context!, message);
+      MotionSnackBarError(_context!, message);
     }
   }
 
   static void showWarning(String message) {
     if (_context != null) {
-      Message.showWarning(_context!, message);
+      MotionSnackBarWarning(_context!, message);
     }
   }
 
   static void showInfo(String message) {
     if (_context != null) {
-      Message.showInfo(_context!, message);
+      MotionSnackBarInfo(_context!, message);
     }
   }
 
   static void showLoading(String message) {
     if (_context != null) {
-      Message.showLoading(_context!, message);
-    }
-  }
-
-  static void showCustom({
-    required String title,
-    required String message,
-    required IconData icon,
-    required Color color,
-    Duration duration = const Duration(seconds: 3),
-  }) {
-    if (_context != null) {
-      Message.showCustom(
-        _context!,
-        title: title,
-        message: message,
-        icon: icon,
-        color: color,
-        duration: duration,
-      );
+      MotionSnackBarInfo(_context!, message);
     }
   }
 
@@ -112,20 +93,20 @@ class GlobalMessage {
   static void lowStock() => showWarning('الكمية قليلة - يرجى إعادة التموين');
   static void unsavedChanges() => showWarning('يوجد تغييرات غير محفوظة');
   static void confirmDelete() => showWarning('هل أنت متأكد من الحذف؟');
-  static void sessionExpired() => showWarning('انتهت جلسة العمل');
+  static void sessionExpired() => showWarning('انتهى يوم العمل');
   static void dataLoss() => showWarning('قد تفقد البيانات غير المحفوظة');
   static void backupRequired() => showWarning('يُفضل عمل نسخة احتياطية');
   static void systemMaintenance() => showWarning('سيتم إغلاق النظام للصيانة');
 
-  static void loadingData() => showLoading('جاري تحميل البيانات...');
-  static void processingRequest() => showLoading('جاري معالجة الطلب...');
-  static void generatingReport() => showLoading('جاري إنشاء التقرير...');
-  static void savingData() => showLoading('جاري حفظ البيانات...');
-  static void updatingData() => showLoading('جاري تحديث البيانات...');
-  static void deletingData() => showLoading('جاري حذف البيانات...');
-  static void exportingData() => showLoading('جاري تصدير البيانات...');
-  static void importingData() => showLoading('جاري استيراد البيانات...');
-  static void synchronizingData() => showLoading('جاري مزامنة البيانات...');
+  static void loadingData() => showInfo('جاري تحميل البيانات...');
+  static void processingRequest() => showInfo('جاري معالجة الطلب...');
+  static void generatingReport() => showInfo('جاري إنشاء التقرير...');
+  static void savingData() => showInfo('جاري حفظ البيانات...');
+  static void updatingData() => showInfo('جاري تحديث البيانات...');
+  static void deletingData() => showInfo('جاري حذف البيانات...');
+  static void exportingData() => showInfo('جاري تصدير البيانات...');
+  static void importingData() => showInfo('جاري استيراد البيانات...');
+  static void synchronizingData() => showInfo('جاري مزامنة البيانات...');
   static void systemReady() => showInfo('النظام جاهز للاستخدام');
   static void newUpdateAvailable() => showInfo('يوجد تحديث جديد متاح');
   static void maintenanceScheduled() => showInfo('مجدولة صيانة النظام');

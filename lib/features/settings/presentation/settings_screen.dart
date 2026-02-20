@@ -8,15 +8,17 @@ import 'package:crazy_phone_pos/features/settings/presentation/cubit/settings_cu
 import 'package:crazy_phone_pos/core/functions/messege.dart';
 import '../../../core/di/dependency_injection.dart';
 
-import '../../arp/data/models/daily_report_model.dart';
-import '../../arp/presentation/screens/daily_report_preview_screen.dart'; // Corrected import
+
 import '../../auth/data/models/user_model.dart';
 import '../../auth/presentation/cubit/user_states.dart';
 
+import '../../sessions/data/models/daily_report_model.dart';
+import '../../sessions/presentation/screens/daily_report_preview_screen.dart';
 import 'widgets/logout_warning_banner.dart';
 import 'widgets/store_info_card.dart';
 import 'widgets/users_management_card.dart';
 import 'widgets/close_day_card.dart';
+import 'widgets/data_management_card.dart'; // New Import
 // import 'widgets/data_protection_card.dart'; // Commented out as in user code
 
 class SettingsScreen extends StatelessWidget {
@@ -68,7 +70,7 @@ class _SettingsScreenContent extends StatelessWidget {
               } else {
                 // For Cashier: Immediate Logout, No Report Dialog
                 MotionSnackBarSuccess(
-                    context, "تم إغلاق الجلسة بنجاح. جاري تسجيل الخروج...");
+                    context, "تم إغلاق اليوم بنجاح. جاري تسجيل الخروج...");
                 // Short delay to let the toast show
                 Future.delayed(const Duration(milliseconds: 1500), () {
                   userCubit.logout();
@@ -106,6 +108,10 @@ class _SettingsScreenContent extends StatelessWidget {
                           children: [
                             // DataProtectionCard(isMobile: isMobile),
                             // SizedBox(height: isMobile ? 12 : 16),
+                            if (getIt<UserCubit>().currentUser.userType == UserType.manager) ...[
+                               DataManagementCard(isMobile: isMobile),
+                               SizedBox(height: isMobile ? 12 : 16),
+                            ],
                             StoreInfoCard(isMobile: isMobile),
                             SizedBox(height: isMobile ? 12 : 16),
                             CloseDayCard(isMobile: isMobile),
@@ -135,15 +141,15 @@ class _SettingsScreenContent extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('تم إغلاق الجلسة بنجاح'),
+        title: const Text('تم إغلاق اليوم بنجاح'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('تم حفظ تقرير الجلسة بنجاح.'),
+            const Text('تم حفظ تقرير اليوم بنجاح.'),
             const SizedBox(height: 16),
             Text(
               isManager
-                  ? 'يمكنك الآن عرض التقرير التفصيلي للجلسة.'
+                  ? 'يمكنك الآن عرض التقرير التفصيلي لليوم.'
                   : 'سيتم تسجيل الخروج الآن.',
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
@@ -165,7 +171,7 @@ class _SettingsScreenContent extends StatelessWidget {
                 Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
               }
             },
-            child: Text(isManager ? 'عرض تقرير الجلسة' : 'حسناً'),
+            child: Text(isManager ? 'عرض تقرير اليوم' : 'حسناً'),
           ),
         ],
       ),

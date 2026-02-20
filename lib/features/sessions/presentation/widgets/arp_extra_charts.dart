@@ -83,8 +83,11 @@ class ArpHourlyChart extends StatelessWidget {
                       tooltipPadding: const EdgeInsets.all(8),
                       tooltipMargin: 8,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final hour = group.x;
+                        final period = hour < 12 ? 'ص' : 'م';
+                        final h12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
                         return BarTooltipItem(
-                          '${group.x}:00\n${rod.toY.toInt()} ج.م',
+                          '$h12:00 $period\n${rod.toY.toInt()} ج.م',
                           const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -102,14 +105,17 @@ class ArpHourlyChart extends StatelessWidget {
                         reservedSize: 30,
                         interval: 4, 
                         getTitlesWidget: (value, meta) {
+                          final hour = value.toInt();
+                          final period = hour < 12 ? 'ص' : 'م';
+                          final h12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              '${value.toInt()}:00',
+                              '$h12 $period',
                               style: const TextStyle(
                                 color: AppColors.mutedColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                                fontSize: 11,
                               ),
                             ),
                           );

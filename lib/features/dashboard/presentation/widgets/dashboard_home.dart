@@ -9,8 +9,10 @@ import '../../../settings/presentation/cubit/settings_cubit.dart'
     show SettingsCubit;
 import '../../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../../products/presentation/cubit/product_cubit.dart';
+import '../../../sessions/data/repositories/session_repository_impl.dart';
 import 'dashboard_card.dart';
 import 'recent_operations.dart';
+import '../../../../core/session/session_manager.dart';
 
 class DashboardHome extends StatefulWidget {
   const DashboardHome(
@@ -35,7 +37,36 @@ class _DashboardHomeState extends State<DashboardHome>
     // Load data for dashboard stats
     getIt<InvoiceCubit>().loadSales();
     getIt<ProductCubit>().getAllCategories();
-    
+
+    // Initialize cards with placeholders, then update with data
+    _initCards();
+
+    // Fetch session count and update
+    if (widget.isManager) {
+      _loadSessionCount();
+    }
+
+    _controllers = List.generate(
+      cards.length,
+      (index) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 600),
+      ),
+    );
+
+    _animations = _controllers
+        .map((c) => CurvedAnimation(parent: c, curve: Curves.easeOutBack))
+        .toList();
+
+    Future.forEach(List.generate(cards.length, (i) => i), (i) async {
+      await Future.delayed(Duration(milliseconds: i * 150));
+      if (mounted && i < _controllers.length) {
+        _controllers[i].forward();
+      }
+    });
+  }
+
+  void _initCards() {
     cards = [
       {
         "id": "sales",
@@ -72,15 +103,22 @@ class _DashboardHomeState extends State<DashboardHome>
         "subtitle": "تصنيفات المخزون",
         "color": Colors.teal,
       },
-      if (widget.isManager)
+      if (widget.isManager) ...[
         {
           "id": "reports",
-          "icon": LucideIcons.barChart2,
-          "title": "التحليلات والتقارير",
-          "subtitle": "إدارة تقارير النظام",
+          "icon": LucideIcons.pieChart,
+          "title": "الإحصائيات",
+          "subtitle": "تحليلات النظام",
           "color": AppColors.primaryColor,
-        }
-      else
+        },
+        {
+          "id": "sessions",
+          "icon": LucideIcons.history,
+          "title": "الايام",
+          "subtitle": "سجل الأيام المغلقة",
+          "color": Colors.orange,
+        },
+      ] else ...[
         {
           "id": "settings",
           "icon": LucideIcons.settings,
@@ -88,7 +126,8 @@ class _DashboardHomeState extends State<DashboardHome>
           "subtitle": "إدارة إعدادات النظام",
           "color": Colors.blueGrey,
         },
-      if (!widget.isManager) // Remove Notifications for Manager (Admin)
+      ],
+      if (!widget.isManager)
         {
           "id": "notifications",
           "icon": LucideIcons.bell,
@@ -97,24 +136,24 @@ class _DashboardHomeState extends State<DashboardHome>
           "color": AppColors.darkGold,
         },
     ];
-    _controllers = List.generate(
-      cards.length,
-      (index) => AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 600),
-      ),
-    );
+  }
 
-    _animations = _controllers
-        .map((c) => CurvedAnimation(parent: c, curve: Curves.easeOutBack))
-        .toList();
+  Future<void> _loadSessionCount() async {
+    try {
+      final repo = getIt<SessionRepositoryImpl>();
+      final count = await repo.getSessionsCount();
 
-    Future.forEach(List.generate(cards.length, (i) => i), (i) async {
-      await Future.delayed(Duration(milliseconds: i * 150));
-      if (mounted && i < _controllers.length) {
-        _controllers[i].forward();
+      if (mounted) {
+        setState(() {
+          final index = cards.indexWhere((c) => c['id'] == 'sessions');
+          if (index != -1) {
+            cards[index]['subtitle'] = '$count يوم مغلق';
+          }
+        });
       }
-    });
+    } catch (e) {
+      print('Failed to load session count: $e');
+    }
   }
 
   @override
@@ -157,6 +196,48 @@ class _DashboardHomeState extends State<DashboardHome>
                 iconColor: AppColors.primaryColor,
               ),
               const SizedBox(height: 20),
+              // Stale session warning banner
+              Builder(
+                builder: (context) {
+                  final manager = getIt<SessionManager>();
+                  if (!manager.isSessionStale) return const SizedBox.shrink();
+                  final age = manager.sessionAge!;
+                  final hours = age.inHours;
+                  final days = hours ~/ 24;
+                  final remainingHours = hours % 24;
+                  final ageText = days > 0
+                      ? '$days يوم و $remainingHours ساعة'
+                      : '$hours ساعة';
+                  return Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(LucideIcons.alertTriangle,
+                            color: Colors.orange.shade700, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'اليوم الحالي مفتوح منذ $ageText — يُنصح بإغلاقه وفتح يوم جديد',
+                            style: TextStyle(
+                              color: Colors.orange.shade900,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
               Expanded(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,7 +266,7 @@ class _DashboardHomeState extends State<DashboardHome>
                       ),
                     ),
                     const SizedBox(width: 16),
-                    // Recent Operations - Takes 30% width  
+                    // Recent Operations - Takes 30% width
                     const Expanded(
                       flex: 3,
                       child: RecentOperations(),

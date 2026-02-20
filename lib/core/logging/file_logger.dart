@@ -148,7 +148,7 @@ class FileLogger {
       return;
     }
 
-    final timestamp = DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(DateTime.now());
+    final timestamp = DateFormat('yyyy-MM-dd hh:mm:ss.SSS a').format(DateTime.now());
     final levelStr = level.name.toUpperCase().padRight(8);
     final sourceStr = source != null ? '[$source] ' : '';
     

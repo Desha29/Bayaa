@@ -17,7 +17,9 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../../invoice/presentation/cubit/invoice_state.dart';
-import '../../../arp/data/repositories/session_repository_impl.dart';
+import '../../../sessions/data/repositories/session_repository_impl.dart';
+import '../../../../core/services/activity_logger.dart';
+
 
 class DashboardCard extends StatefulWidget {
   const DashboardCard({
@@ -137,21 +139,23 @@ class _DashboardCardState extends State<DashboardCard> {
                           ? BlocBuilder<NotificationsCubit, NotificationsStates>(
                               builder: (context, state) {
                                 final count = getIt<NotificationsCubit>().total;
-                                return _buildBadge(count);
+                                return _buildBadge(count.toString());
                               },
                             )
                           : (widget.title == 'المنتجات')
                               ? BlocBuilder<ProductCubit, ProductStates>(
                                   builder: (context, state) {
-                                    final count = getIt<ProductCubit>().products.length;
-                                    return _buildBadge(count);
+                                    final count =
+                                        getIt<ProductCubit>().products.length;
+                                    return _buildBadge(count.toString());
                                   },
                                 )
                               : (widget.title == 'المنتجات الناقصة')
                                   ? BlocBuilder<StockCubit, StockStates>(
                                       builder: (context, state) {
-                                        final count = getIt<StockCubit>().totalCount;
-                                        return _buildBadge(count);
+                                        final count =
+                                            getIt<StockCubit>().totalCount;
+                                        return _buildBadge(count.toString());
                                       },
                                     )
                                   : (widget.title == 'المبيعات')
@@ -159,33 +163,67 @@ class _DashboardCardState extends State<DashboardCard> {
                                           bloc: getIt<InvoiceCubit>(),
                                           builder: (context, state) {
                                             final count = state.sales.where((s) => !s.isRefund).length;
-                                            return _buildBadge(count);
+                                            return _buildBadge(count.toString());
                                           },
                                         )
                                       : (widget.title == 'الفواتير')
-                                          ? BlocBuilder<InvoiceCubit, InvoiceState>(
+                                          ? BlocBuilder<InvoiceCubit,
+                                              InvoiceState>(
                                               bloc: getIt<InvoiceCubit>(),
                                               builder: (context, state) {
-                                                final count = state.sales.length;
-                                                return _buildBadge(count);
+                                                final count =
+                                                    state.sales.length;
+                                                return _buildBadge(count.toString());
                                               },
                                             )
                                           : (widget.title == 'ملخص المخزون')
-                                              ? BlocBuilder<ProductCubit, ProductStates>(
+                                              ? BlocBuilder<ProductCubit,
+                                                  ProductStates>(
                                                   bloc: getIt<ProductCubit>(),
                                                   builder: (context, state) {
-                                                    final count = getIt<ProductCubit>().categories.length;
-                                                    return _buildBadge(count);
+                                                    final count = getIt<ProductCubit>()
+                                                        .categories
+                                                        .length;
+                                                    return _buildBadge(count.toString());
                                                   },
                                                 )
-                                              : (widget.title == 'التحليلات والتقارير')
-                                                  ? FutureBuilder<int>(
-                                                      future: getIt<SessionRepositoryImpl>().getClosedSessions().then((s) => s.length),
+                                              : (widget.title == 'الجلسات')
+                                                  ? StreamBuilder(
+                                                      stream: getIt<ActivityLogger>().activitiesStream,
                                                       builder: (context, snapshot) {
-                                                        return _buildBadge(snapshot.data ?? 0);
+                                                        // Always re-fetch count when stream emits, or initially
+                                                        return FutureBuilder<int>(
+                                                          future: getIt<SessionRepositoryImpl>()
+                                                              .getSessionsCount(),
+                                                          builder:
+                                                              (context, snapshot) {
+                                                            return _buildBadge(
+                                                                (snapshot.data ?? 0)
+                                                                    .toString());
+                                                          },
+                                                        );
                                                       },
                                                     )
-                                                  : const SizedBox(),
+                                                  : (widget.title == 'الإحصائيات')
+                                                      ? BlocBuilder<InvoiceCubit,
+                                                          InvoiceState>(
+                                                          bloc: getIt<InvoiceCubit>(),
+                                                          builder: (context, state) {
+                                                            // Calculate Net Sales: Sales - Refunds
+                                                            final salesTotal = state.sales
+                                                                .where((s) => !s.isRefund)
+                                                                .fold(0.0, (sum, s) => sum + s.total);
+                                                            final refundsTotal = state.sales
+                                                                .where((s) => s.isRefund)
+                                                                .fold(0.0, (sum, s) => sum + s.total);
+                                                            
+                                                            final netTotal = salesTotal - refundsTotal;
+                                                            
+                                                            final val = netTotal.toStringAsFixed(0); 
+                                                            return _buildBadge(val);
+                                                          },
+                                                        )
+                                                      : const SizedBox(),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -221,7 +259,7 @@ class _DashboardCardState extends State<DashboardCard> {
     );
   }
 
-  Widget _buildBadge(int count) {
+  Widget _buildBadge(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -241,7 +279,7 @@ class _DashboardCardState extends State<DashboardCard> {
         ],
       ),
       child: Text(
-        count.toString(),
+        text,
         style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w700,

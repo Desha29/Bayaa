@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:crazy_phone_pos/features/activation/activation_screen.dart'
     show ActivationScreen;
 import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
@@ -19,8 +21,11 @@ import 'features/auth/presentation/cubit/user_cubit.dart';
 import 'features/auth/presentation/cubit/user_states.dart';
 import 'secrets.dart';
 import 'core/data/services/persistence_initializer.dart';
-import 'features/arp/data/repositories/session_repository_impl.dart';
+import 'features/sessions/data/repositories/session_repository_impl.dart';
 import 'core/services/activity_logger.dart';
+import 'core/data/services/recovery_service.dart';
+import 'core/data/services/checkpoint_service.dart';
+import 'core/data/services/backup_manager.dart';
 
 Future<void> _initializePersistenceSystem() async {
   print('\n========================================');
@@ -72,9 +77,26 @@ Future<void> _initializePersistenceSystem() async {
          print('  ℹ️ No active session found.');
       }
 
+      // Run recovery checks
+      print('🔍 Running recovery checks...');
+      await RecoveryService().check();
+
       print('🔄 Loading activity history...');
       await getIt<ActivityLogger>().loadRecentActivities();
       print('  ✅ Activity history loaded.');
+
+      // Create startup checkpoint
+      await CheckpointService().createCheckpoint(reason: 'startup', userName: 'system');
+
+      // Register BackupManager in GetIt for data_management_screen access
+      if (!getIt.isRegistered<BackupManager>()) {
+        getIt.registerSingleton<BackupManager>(
+          PersistenceInitializer.persistenceManager!.backupManager,
+        );
+      }
+
+      // Start periodic auto-backup every 30 minutes
+      PersistenceInitializer.persistenceManager!.backupManager.startPeriodicBackup();
       
     } else {
       print('ℹ️ INFO: First launch detected - configuring data storage...');

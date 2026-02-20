@@ -144,7 +144,7 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
           ),
           SizedBox(height: 8),
           Text(
-            'سيتم إنهاء جلسة العمل الحالية والعودة إلى شاشة تسجيل الدخول.',
+            'سيتم إنهاء يوم العمل الحالي والعودة إلى شاشة تسجيل الدخول.',
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
         ],

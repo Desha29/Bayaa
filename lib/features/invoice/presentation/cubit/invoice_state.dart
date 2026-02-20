@@ -32,9 +32,9 @@ class InvoiceState {
       );
 
   static InvoiceState loadingState(String query, DateTime? start,
-          DateTime? end, InvoiceFilterType filterType) =>
+          DateTime? end, InvoiceFilterType filterType, {List<Sale>? currentSales}) =>
       InvoiceState(
-        sales: [],
+        sales: currentSales ?? [],
         loading: true,
         searchQuery: query,
         startDate: start,

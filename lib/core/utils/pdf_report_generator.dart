@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-import '../../features/arp/data/models/daily_report_model.dart';
+import '../../features/sessions/data/models/daily_report_model.dart';
 
 class PdfReportGenerator {
   static Future<File> generateDailyReportPDF(

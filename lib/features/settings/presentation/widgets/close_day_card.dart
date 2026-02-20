@@ -1,12 +1,10 @@
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../../arp/presentation/screens/daily_report_preview_screen.dart';
-import '../../../auth/presentation/cubit/user_states.dart';
-import '../../../auth/data/models/user_model.dart';
+import '../../../sessions/presentation/screens/daily_report_preview_screen.dart';
 
 class CloseDayCard extends StatelessWidget {
   final bool isMobile;

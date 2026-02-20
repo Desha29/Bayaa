@@ -28,6 +28,7 @@ class EnhancedProductCard extends StatelessWidget {
     final isLowStock = qty > 0 && qty <= min;
     final isOutOfStock = qty == 0;
     final userType = getIt<UserCubit>().currentUser.userType;
+    final isManager = userType == UserType.manager;
 
     // Fixed font sizes for consistent layout
     const double titleSize = 16;
@@ -35,7 +36,7 @@ class EnhancedProductCard extends StatelessWidget {
     const double value = 14;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.surfaceColor,
@@ -59,18 +60,19 @@ class EnhancedProductCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 🔹 Product Name & Category section
+          // 🔹 Product Name, Category & Barcode
           Expanded(
             flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   product.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w800,
                     fontSize: titleSize,
                     color: AppColors.textPrimary,
                   ),
@@ -80,32 +82,42 @@ class EnhancedProductCard extends StatelessWidget {
                     product.category,
                     style: TextStyle(
                       fontSize: small,
-                      color: AppColors.mutedColor,
+                      color: AppColors.primaryColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                const SizedBox(height: 2),
+                Text(
+                  product.barcode,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.mutedColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ],
             ),
           ),
           
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
 
           // 🔹 Price & Status
           Expanded(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
-                   children: [
-                     Icon(Icons.monetization_on_outlined, size: 14, color: AppColors.mutedColor),
-                     const SizedBox(width: 4),
-                     Text("سعر البيع", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
-                   ],
-                 ),
-                 const SizedBox(height: 2),
+                  children: [
+                    Icon(Icons.monetization_on_outlined, size: 14, color: AppColors.mutedColor),
+                    const SizedBox(width: 4),
+                    Text("سعر البيع", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
+                  ],
+                ),
+                const SizedBox(height: 2),
                 Text(
-                  "${product.price.toStringAsFixed(2)}",
+                  "${product.price.toStringAsFixed(2)} ج.م",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: value,
@@ -122,17 +134,18 @@ class EnhancedProductCard extends StatelessWidget {
             ),
           ),
 
-           const SizedBox(width: 16),
+          const SizedBox(width: 12),
 
-          // 🔹 Quantity info
+          // 🔹 Quantity & Stock info
           Expanded(
-            flex: 3,
+            flex: 2,
             child: Row(
               children: [
-                 Column(
-                   crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                     Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
                       children: [
                         Icon(Icons.inventory_2_outlined, size: 14, color: AppColors.mutedColor),
                         const SizedBox(width: 4),
@@ -140,47 +153,69 @@ class EnhancedProductCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 2),
-                     Text("${qty}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                   ],
-                 ),
-                 const SizedBox(width: 12),
-                 if(userType == UserType.manager)
-                  Column(
-                   crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                      Row(
-                      children: [
-                        Icon(Icons.local_offer_outlined, size: 14, color: AppColors.mutedColor),
-                         const SizedBox(width: 4),
-                        Text("جملة", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                     Text("${product.wholesalePrice}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.accentGold)),
-                   ],
-                 ),
+                    Text("$qty", style: TextStyle(fontWeight: FontWeight.bold, fontSize: value)),
+                  ],
+                ),
               ],
             ),
           ),
+
+          // 🔹 Manager-only: Wholesale & Min Price
+          if (isManager) ...[
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("جملة", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
+                      const SizedBox(height: 2),
+                      Text(
+                        "${product.wholesalePrice.toStringAsFixed(2)}",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: value, color: AppColors.accentGold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("أدنى سعر", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
+                      const SizedBox(height: 2),
+                      Text(
+                        "${product.minPrice.toStringAsFixed(2)}",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: value, color: Colors.deepOrange),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
           
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
 
           // 🔹 Actions
           if (userType != UserType.cashier)
-             Row(
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  onPressed: onEdit, 
+                  onPressed: onEdit,
                   icon: const Icon(Icons.edit_rounded, color: AppColors.primaryColor),
                   tooltip: 'تعديل',
                 ),
                 IconButton(
-                  onPressed: onDelete, 
+                  onPressed: onDelete,
                   icon: const Icon(Icons.delete_rounded, color: AppColors.errorColor),
                   tooltip: 'حذف',
                 ),
               ],
-             ),
+            ),
         ],
       ),
     );

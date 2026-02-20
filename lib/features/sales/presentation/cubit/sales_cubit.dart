@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
-import 'package:crazy_phone_pos/features/arp/data/repositories/session_repository_impl.dart';
-import 'package:crazy_phone_pos/features/arp/data/models/session_model.dart';
+import 'package:crazy_phone_pos/features/sessions/data/repositories/session_repository_impl.dart';
+import 'package:crazy_phone_pos/features/sessions/data/models/session_model.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
@@ -10,6 +10,7 @@ import '../../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
+import '../../../../core/session/session_manager.dart';
 
 import '../../../products/data/models/product_model.dart';
 import '../../data/models/cart_item_model.dart';
@@ -203,48 +204,35 @@ class SalesCubit extends Cubit<SalesState> {
     }
     emit(SalesLoading());
 
-    // Get Session ID using DI since we didn't inject repository yet in Setup for this specific cubit (to be safe)
-    // Or better, update DI for SalesCubit.
-    // I will use getIt to access SessionRepositoryImpl.
-    // This is safer as I don't need to change Constructor if I don't want to break other tests immediately, but constructor injection is best practice.
-    // However, since I am rewriting this file, I might as well rely on getIt global or update constructor.
-    // Given the constraints and context, using getIt inside method is lower risk for now.
+    // Capture total NOW before any async operations
+    final total = _total();
+    final itemNames = _cartItems.map((e) => e.name).toList();
+    final itemCount = _cartItems.length;
+    final userName = getIt<UserCubit>().currentUser.name;
+    
+    print('DEBUG_CHECKOUT: Starting checkout total=$total items=$itemCount user=$userName');
 
-    final sessionRepo = getIt<SessionRepositoryImpl>();
-    var currentSession = sessionRepo.getCurrentSession();
-    Session session;
-
-    // Auto-Open Session if not exists (for Admin flow who stays logged in)
-    if (currentSession == null || !currentSession.isOpen) {
-      final currentUser = getIt<UserCubit>().currentUser;
-      try {
-        session = await sessionRepo.openSession(currentUser);
-        
-        // Log session open
-        getIt<ActivityLogger>().logActivity(
-          type: ActivityType.sessionOpen,
-          description: 'فتح جلسة جديدة تلقائي',
-          userName: currentUser.name,
-        );
-      } catch (e) {
-        emit(SalesError(message: 'فشل فتح جلسة جديدة: $e'));
-        _emitLoaded();
-        return;
-      }
-    } else {
-      session = currentSession;
+    // Get or auto-create session via SessionManager
+    String sessionId;
+    try {
+      sessionId = await getIt<SessionManager>().ensureSessionId(
+        userName: userName,
+      );
+    } catch (e) {
+      print('DEBUG_CHECKOUT: Failed to get session: $e');
+      emit(SalesError(message: 'فشل فتح يوم جديد: $e'));
+      _emitLoaded();
+      return;
     }
+    print('DEBUG_CHECKOUT: Using session $sessionId');
 
-    // Update stock
+    // Update stock — fixed: no unawaited fold
     for (final it in _cartItems) {
       final prod = await repository.findProductByBarcode(it.id);
-      await prod.fold((_) async {}, (p) async {
+      prod.fold((_) {}, (p) async {
         if (p != null) {
           final newQty = p.quantity - it.qty;
           await repository.updateProductQuantity(p.barcode, newQty);
-          
-          // Notify immediate stock alert
-          // Construct updated product to check low stock logic in NotificationsCubit
           getIt<NotificationsCubit>().addItem(p.copyWith(quantity: newQty));
         }
       });
@@ -253,12 +241,11 @@ class SalesCubit extends Cubit<SalesState> {
     // Create sale record
     final sale = Sale(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      total: _total(),
-      items: _cartItems.length,
-      cashierName: getIt<UserCubit>().currentUser.name,
-      cashierUsername:
-          getIt<UserCubit>().currentUser.username, // Added username
-      sessionId: session.id, // Linked Session ID
+      total: total,
+      items: itemCount,
+      cashierName: userName,
+      cashierUsername: getIt<UserCubit>().currentUser.username,
+      sessionId: sessionId,
       date: DateTime.now(),
       saleItems: _cartItems
           .map((x) => SaleItem(
@@ -267,48 +254,60 @@ class SalesCubit extends Cubit<SalesState> {
                 price: x.salePrice,
                 quantity: x.qty,
                 total: x.total,
-                wholesalePrice: x.wholesalePrice, // add wholesalePrice here
+                wholesalePrice: x.wholesalePrice,
               ))
           .toList(),
     );
 
+    print('DEBUG_CHECKOUT: Saving sale id=${sale.id} isRefund=${sale.isRefund}');
     final saved = await repository.saveSale(sale);
-    saved.fold(
-      (f) {
-        emit(SalesError(message: f.message));
-        _emitLoaded();
-      },
-      (_) async {
-        _lastCompletedSale = sale; // cache for invoice
-        // Using SQLite, linking is by session_id in sales table, so explicit linking in session list is NOT needed.
-        // We just need to ensure the sale record has sessionId (which it does).
-        
-        final total = _total();
-        _cartItems.clear();
+    if (saved.isLeft()) {
+      saved.fold(
+        (f) {
+          print('DEBUG_CHECKOUT: Save FAILED: ${f.message}');
+          emit(SalesError(message: f.message));
+          _emitLoaded();
+        },
+        (_) {},
+      );
+      return;
+    }
+    print('DEBUG_CHECKOUT: Sale saved successfully');
 
-        // Emit with sale data to open invoice immediately
-        emit(CheckoutSuccessWithSale(
-          message: 'تمت عملية البيع بنجاح',
-          total: total,
-          sale: sale,
-        ));
+    // Sale saved — log activity immediately
+    _lastCompletedSale = sale;
+    
+    try {
+      print('DEBUG_CHECKOUT: Logging activity type=sale total=$total');
+      await getIt<ActivityLogger>().logActivity(
+        type: ActivityType.sale,
+        description: 'عملية بيع: ${total.toStringAsFixed(2)} ج.م',
+        userName: userName,
+        sessionId: sessionId,
+        details: {
+          'total': total,
+          'itemCount': itemCount,
+          'items': itemNames,
+        },
+      );
+      print('DEBUG_CHECKOUT: Activity logged successfully ✓');
+    } catch (e) {
+      print('DEBUG_CHECKOUT: FAILED to log activity: $e');
+    }
 
-        await load(); // reload recent sales
-        
-        // Refresh InvoiceCubit to update Dashboard stats immediately
-        getIt<InvoiceCubit>().loadSales();
-        
-        // Log activity
-        getIt<ActivityLogger>().logActivity(
-          type: sale.isRefund ? ActivityType.refund : ActivityType.sale,
-          description: sale.isRefund 
-              ? 'استرجاع: ${total.toStringAsFixed(2)} ج.م'
-              : 'عملية بيع: ${total.toStringAsFixed(2)} ج.م',
-          userName: getIt<UserCubit>().currentUser.name,
-          details: {'total': total, 'itemCount': _cartItems.length},
-        );
-      },
-    );
+    _cartItems.clear();
+
+    // Emit with sale data to open invoice immediately
+    emit(CheckoutSuccessWithSale(
+      message: 'تمت عملية البيع بنجاح',
+      total: total,
+      sale: sale,
+    ));
+
+    await load(); // reload recent sales
+    
+    // Refresh InvoiceCubit to update Dashboard stats immediately
+    getIt<InvoiceCubit>().loadSales();
   }
 
   double _total() => _cartItems.fold(0.0, (s, x) => s + x.total);

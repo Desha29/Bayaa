@@ -43,161 +43,223 @@ class ProductsTableView extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return SingleChildScrollView(
-          controller: scrollController,
-          scrollDirection: Axis.vertical,
+        return Align(
+          alignment: AlignmentDirectional.topStart,
           child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minWidth: constraints.maxWidth),
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  dividerColor: Colors.grey.withOpacity(0.2),
-                ),
-                child: DataTable(
-                  horizontalMargin: 20,
-                  columnSpacing: 20,
-                  headingRowColor: MaterialStateProperty.all(
-                    AppColors.primaryColor.withOpacity(0.05),
+            controller: scrollController,
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    dividerColor: Colors.grey.withOpacity(0.2),
                   ),
-                  dataRowColor: MaterialStateProperty.resolveWith((states) {
-                    if (states.contains(MaterialState.hovered)) {
-                      return AppColors.primaryColor.withOpacity(0.02);
-                    }
-                    return Colors.white;
-                  }),
-                  border: TableBorder(
-                    horizontalInside: BorderSide(
-                      color: Colors.grey.withOpacity(0.2),
-                      width: 1,
+                  child: DataTable(
+                    horizontalMargin: 20,
+                    columnSpacing: 20,
+                    headingRowHeight: 52,
+                    headingRowColor: MaterialStateProperty.all(
+                      AppColors.primaryColor.withOpacity(0.08),
                     ),
-                  ),
-                  columns: [
-                    const DataColumn(
-                        label: Text('اسم المنتج',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    const DataColumn(
-                        label: Text('الباركود',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    const DataColumn(
-                        label: Text('الفئة',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    const DataColumn(
-                        label: Text('السعر',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    if (isManager) ...[
+                    dataRowHeight: 60,
+                    dataRowColor: MaterialStateProperty.resolveWith((states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return AppColors.primaryColor.withOpacity(0.02);
+                      }
+                      return Colors.white;
+                    }),
+                    border: TableBorder(
+                      horizontalInside: BorderSide(
+                        color: Colors.grey.withOpacity(0.15),
+                        width: 1,
+                      ),
+                      bottom: BorderSide(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    columns: [
                       const DataColumn(
-                          label: Text('سعر الجملة',
-                              style: TextStyle(fontWeight: FontWeight.bold))),
-                      const DataColumn(
-                          label: Text('أدنى سعر',
-                              style: TextStyle(fontWeight: FontWeight.bold))),
-                    ],
-                    const DataColumn(
-                        label: Text('الكمية',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    const DataColumn(
-                        label: Text('الحالة',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    if (isManager)
-                      const DataColumn(
-                          label: Text('إجراءات',
-                              style: TextStyle(fontWeight: FontWeight.bold))),
-                  ],
-                  rows: [
-                    ...products.map((product) {
-                      final statusColor =
-                          statusColorFn(product.quantity, product.minQuantity);
-                      final statusText =
-                          statusTextFn(product.quantity, product.minQuantity);
-
-                      return DataRow(cells: [
-                        DataCell(
-                          Container(
-                            constraints: const BoxConstraints(maxWidth: 200),
-                            child: Text(
-                              product.name,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w600),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                        DataCell(Text(product.barcode)),
-                        DataCell(
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(product.category),
-                          ),
-                        ),
-                        DataCell(
-                            Text('${product.price.toStringAsFixed(2)} ج.م')),
-                        if (isManager) ...[
-                          DataCell(Text(
-                              '${product.wholesalePrice.toStringAsFixed(2)} ج.م')),
-                          DataCell(Text(
-                              '${product.minPrice.toStringAsFixed(2)} ج.م')),
-                        ],
-                        DataCell(Text('${product.quantity}')),
-                        DataCell(
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                  color: statusColor.withOpacity(0.3)),
-                            ),
-                            child: Text(
-                              statusText,
+                          label: Text('اسم المنتج',
                               style: TextStyle(
-                                color: statusColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: AppColors.primaryColor))),
+                      const DataColumn(
+                          label: Text('الباركود',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: AppColors.primaryColor))),
+                      const DataColumn(
+                          label: Text('الفئة',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: AppColors.primaryColor))),
+                      const DataColumn(
+                          label: Text('السعر',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: AppColors.primaryColor))),
+                      if (isManager) ...[
+                        const DataColumn(
+                            label: Text('جملة',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: AppColors.primaryColor))),
+                        const DataColumn(
+                            label: Text('أدنى سعر', // corrected name
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: AppColors.primaryColor))),
+                      ],
+                      const DataColumn(
+                          label: Text('الكمية',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: AppColors.primaryColor))),
+                      const DataColumn(
+                          label: Text('الحالة',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: AppColors.primaryColor))),
+                      if (isManager)
+                        const DataColumn(
+                            label: Text('إجراءات',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: AppColors.primaryColor))),
+                    ],
+                    rows: [
+                      ...products.map((product) {
+                        final statusColor = statusColorFn(
+                            product.quantity, product.minQuantity);
+                        final statusText = statusTextFn(
+                            product.quantity, product.minQuantity);
+
+                        return DataRow(cells: [
+                          DataCell(
+                            Container(
+                              constraints:
+                                  const BoxConstraints(maxWidth: 200),
+                              child: Text(
+                                product.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ),
-                        ),
-                        if (isManager)
+                          DataCell(Text(product.barcode,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13))),
                           DataCell(
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(LucideIcons.edit3, size: 18),
-                                  color: AppColors.primaryColor,
-                                  onPressed: () => onEdit(product),
-                                  tooltip: 'تعديل',
-                                ),
-                                IconButton(
-                                  icon: const Icon(LucideIcons.trash2,
-                                      size: 18),
-                                  color: AppColors.errorColor,
-                                  onPressed: () => onDelete(product),
-                                  tooltip: 'حذف',
-                                ),
-                              ],
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.primaryColor.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(product.category,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                      color: AppColors.primaryColor)),
                             ),
                           ),
-                      ]);
-                    }),
-                    if (isLoadingMore)
-                      const DataRow(cells: [
-                        DataCell(Center(child: CircularProgressIndicator())),
-                        DataCell(SizedBox()),
-                        DataCell(SizedBox()),
-                        DataCell(SizedBox()),
-                        DataCell(SizedBox()),
-                        DataCell(SizedBox()),
-                        DataCell(SizedBox()),
-                      ]),
-                  ],
+                          DataCell(Text(
+                              '${product.price.toStringAsFixed(2)} ج.م',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13))),
+                          if (isManager) ...[
+                            DataCell(Text(
+                                '${product.wholesalePrice.toStringAsFixed(2)} ج.م',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: Colors.blueGrey))),
+                            DataCell(Text(
+                                '${product.minPrice.toStringAsFixed(2)} ج.م',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: Colors.deepOrange))),
+                          ],
+                          DataCell(Text('${product.quantity}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14))),
+                          DataCell(
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: statusColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                    color: statusColor.withOpacity(0.3)),
+                              ),
+                              child: Text(
+                                statusText,
+                                style: TextStyle(
+                                  color: statusColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (isManager)
+                            DataCell(
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(LucideIcons.edit3,
+                                        size: 18),
+                                    color: AppColors.primaryColor,
+                                    onPressed: () => onEdit(product),
+                                    tooltip: 'تعديل',
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(LucideIcons.trash2,
+                                        size: 18),
+                                    color: AppColors.errorColor,
+                                    onPressed: () => onDelete(product),
+                                    tooltip: 'حذف',
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ]);
+                      }),
+                      if (isLoadingMore)
+                        const DataRow(cells: [
+                          DataCell(
+                              Center(child: CircularProgressIndicator())),
+                          DataCell(SizedBox()),
+                          DataCell(SizedBox()),
+                          DataCell(SizedBox()),
+                          DataCell(SizedBox()),
+                          DataCell(SizedBox()),
+                          DataCell(SizedBox()),
+                        ]),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -41,10 +41,10 @@ class ArpCubit extends Cubit<ArpState> {
     final categoryResult = await repository.getCategorySalesForSession(sessionId);
 
     reportResult.fold(
-      (_) => emit(ArpError('فشل تحميل بيانات الجلسة')),
+      (_) => emit(ArpError('فشل تحميل بيانات اليوم')),
       (report) {
         if (report == null) {
-          emit(ArpError('لم يتم العثور على بيانات لهذه الجلسة'));
+          emit(ArpError('لم يتم العثور على بيانات لهذا اليوم'));
           return;
         }
 
@@ -67,7 +67,7 @@ class ArpCubit extends Cubit<ArpState> {
             emit(ArpLoaded(
               summary: summary,
               topProducts: topProducts,
-              dailySales: {'الجلسة': report.netRevenue},
+              dailySales: {'اليوم': report.netRevenue},
               hourlySales: hourlyResult.getOrElse(() => {}),
               categorySales: categoryResult.getOrElse(() => {}),
               dailyTimeSeries: {},
@@ -93,6 +93,8 @@ class ArpCubit extends Cubit<ArpState> {
             final hourlyResult = await repository.getHourlySales(startDate, endDate);
             final categoryResult = await repository.getSalesByCategory(startDate, endDate);
             final timeSeriesResult = await repository.getDailyTimeSeries(startDate, endDate);
+            final monthlyResult = await repository.getMonthlySales(startDate, endDate);
+            final yearlyResult = await repository.getYearlySales(startDate, endDate);
             
             dailySalesResult.fold(
               (_) => emit(ArpError('فشل تحميل المبيعات اليومية')),
@@ -103,6 +105,8 @@ class ArpCubit extends Cubit<ArpState> {
                 hourlySales: hourlyResult.getOrElse(() => {}),
                 categorySales: categoryResult.getOrElse(() => {}),
                 dailyTimeSeries: timeSeriesResult.getOrElse(() => {}),
+                monthlySales: monthlyResult.getOrElse(() => {}),
+                yearlySales: yearlyResult.getOrElse(() => {}),
               )),
             );
           },

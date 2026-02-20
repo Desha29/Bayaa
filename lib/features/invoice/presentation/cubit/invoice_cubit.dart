@@ -1,16 +1,17 @@
 
 
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
-import 'package:crazy_phone_pos/features/arp/data/repositories/session_repository_impl.dart';
-import 'package:crazy_phone_pos/features/arp/data/models/session_model.dart';
+import 'package:crazy_phone_pos/features/sessions/data/models/session_model.dart';
 
 import '../../../sales/data/models/sale_model.dart';
 import '../../../sales/domain/sales_repository.dart';
 import '../widgets/partial_refund_dialog.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
+import '../../../../core/session/session_manager.dart';
 import 'package:collection/collection.dart'; // for firstWhereOrNull
 
 import 'invoice_state.dart';
@@ -19,13 +20,35 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   final SalesRepository repository;
 
 
+  StreamSubscription? _activitySubscription;
+
   InvoiceCubit(this.repository)
-      : super(InvoiceState.initial());
+      : super(InvoiceState.initial()) {
+     _activitySubscription = getIt<ActivityLogger>().activitiesStream.listen((activities) {
+      if (activities.isNotEmpty) {
+        final type = activities.first.type;
+        if (type == ActivityType.sale ||
+            type == ActivityType.refund ||
+            type == ActivityType.invoiceDelete) {
+            // Reload sales if we are not already loading?
+            // loadSales emits loading state which might flicker UI. 
+            // Ideally we'd do a silent refresh, but for now standard load is fine for "Real Time" request.
+            loadSales();
+        }
+      }
+    });     
+  }
+
+  @override
+  Future<void> close() {
+    _activitySubscription?.cancel();
+    return super.close();
+  }
 
   // Load initial and filtered sales
   Future<void> loadSales() async {
     emit(InvoiceState.loadingState(
-        state.searchQuery, state.startDate, state.endDate, state.filterType));
+        state.searchQuery, state.startDate, state.endDate, state.filterType, currentSales: state.sales));
     final result = await repository.getRecentSales(limit: 10000);
     final sales = result.getOrElse(() => []);
     emit(InvoiceState.loaded(
@@ -40,7 +63,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   // Set search query and reload
   void setSearchQuery(String query) async {
     emit(InvoiceState.loadingState(
-        query, state.startDate, state.endDate, state.filterType));
+        query, state.startDate, state.endDate, state.filterType, currentSales: state.sales));
     final result = await repository.getRecentSales(limit: 10000);
     final sales = result.getOrElse(() => []);
     emit(InvoiceState.loaded(
@@ -55,7 +78,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   // Set date range and reload
   void setDate(DateTime? start, DateTime? end) async {
     emit(InvoiceState.loadingState(
-        state.searchQuery, start, end, state.filterType));
+        state.searchQuery, start, end, state.filterType, currentSales: state.sales));
     final result = await repository.getRecentSales(limit: 10000);
     final sales = result.getOrElse(() => []);
     emit(InvoiceState.loaded(
@@ -69,7 +92,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   // Set filter type and reload
   void setFilterType(InvoiceFilterType type) async {
     emit(InvoiceState.loadingState(
-        state.searchQuery, state.startDate, state.endDate, type));
+        state.searchQuery, state.startDate, state.endDate, type, currentSales: state.sales));
     final result = await repository.getRecentSales(limit: 10000);
     final sales = result.getOrElse(() => []);
     emit(InvoiceState.loaded(
@@ -123,10 +146,14 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     
     // Log activity if sale was found
     if (sale != null) {
-      getIt<ActivityLogger>().logActivity(
-        type: ActivityType.refund,
+      final sid = await getIt<SessionManager>().ensureSessionId(
+        userName: getIt<UserCubit>().currentUser.name,
+      );
+      await getIt<ActivityLogger>().logActivity(
+        type: ActivityType.invoiceDelete,
         description: 'حذف فاتورة: ${sale.total.toStringAsFixed(2)} ج.م',
         userName: getIt<UserCubit>().currentUser.name,
+        sessionId: sid,
         details: {'saleId': saleId, 'items': sale.items},
       );
     }
@@ -141,20 +168,14 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   }) async {
     if (itemsToRefund.isEmpty) return;
 
-    // 1. Session Management (Auto-Open if needed)
-    final sessionRepo = getIt<SessionRepositoryImpl>();
-    var currentSession = sessionRepo.getCurrentSession();
+    // 1. Session Management (Auto-Open if needed via SessionManager)
     Session session;
-
-    if (currentSession == null || !currentSession.isOpen) {
-      final currentUser = getIt<UserCubit>().currentUser;
-      try {
-        session = await sessionRepo.openSession(currentUser);
-      } catch (e) {
-        return; // Fail silently or add error handling if UI supports it
-      }
-    } else {
-      session = currentSession;
+    try {
+      session = await getIt<SessionManager>().getOrCreateSession(
+        userName: getIt<UserCubit>().currentUser.name,
+      );
+    } catch (e) {
+      return; // Fail silently or add error handling if UI supports it
     }
 
     // 2. Calculate total and create refund sale items
@@ -225,6 +246,20 @@ class InvoiceCubit extends Cubit<InvoiceState> {
       );
     }
 
+    // 8. Log refund activity
+    await getIt<ActivityLogger>().logActivity(
+      type: ActivityType.refund,
+      description: 'استرجاع: ${refundTotal.toStringAsFixed(2)} ج.م',
+      userName: getIt<UserCubit>().currentUser.name,
+      sessionId: session.id,
+      details: {
+        'total': refundTotal,
+        'itemCount': totalItems,
+        'originalInvoiceId': originalSale.id,
+        'refundedItems': itemsToRefund.map((i) => i.productName).toList(),
+      },
+    );
+
     loadSales();
   }
 
@@ -235,6 +270,25 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     } else {
       await repository.deleteSalesByQuery(searchQuery);
     }
+
+    // Log bulk delete activity
+    try {
+      final sid = await getIt<SessionManager>().ensureSessionId(
+        userName: getIt<UserCubit>().currentUser.name,
+      );
+      await getIt<ActivityLogger>().logActivity(
+        type: ActivityType.invoiceDelete,
+        description: 'حذف فواتير جماعي',
+        userName: getIt<UserCubit>().currentUser.name,
+        sessionId: sid,
+        details: {
+          'startDate': start?.toIso8601String(),
+          'endDate': end?.toIso8601String(),
+          'searchQuery': searchQuery,
+        },
+      );
+    } catch (_) {}
+
     loadSales();
   }
 
@@ -245,7 +299,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     DateTime? start;
     DateTime? end;
 
-    emit(InvoiceState.loadingState(query, start, end, type));
+    emit(InvoiceState.loadingState(query, start, end, type, currentSales: state.sales));
     final result = await repository.getRecentSales(limit: 10000);
     final sales = result.getOrElse(() => []);
     emit(InvoiceState.loaded(

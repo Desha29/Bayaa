@@ -129,7 +129,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                         iconColor: AppColors.primaryColor,
                         titleColor: AppColors.kDarkChip,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       Expanded(
                         child: BlocConsumer<ProductCubit, ProductStates>(
                         listener: (context, state) {
@@ -202,7 +202,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                                 beginOffset: const Offset(0.06, 0),
                                 child: ProductsFilterSection(
                                   searchController: searchController,
-                                  categoryFilter: categoryFilter, // Pass directly (nullable)
+                                  categoryFilter: categoryFilter,
                                   availabilityFilter: availabilityFilter,
                                   categories: categories,
                                   availabilities: availabilities,
@@ -219,101 +219,13 @@ class ProductsScreenState extends State<ProductsScreen> {
                                   onAddPressed: () {
                                     showAddEditDialog();
                                   },
-                                  onSearchChanged: () {}, // Handled by controller listener
+                                  onSearchChanged: () {},
+                                  productCount: currentFilteredProducts.length,
+                                  isTableView: isTableView,
+                                  onViewToggle: (v) => setState(() => isTableView = v),
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              FadeScale(
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    side: const BorderSide(
-                                        color: AppColors.borderColor),
-                                  ),
-                                  color: Colors.white,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: isMobile ? 12 : 20,
-                                      vertical: 14,
-                                    ),
-                                    child: Row(
-                                        children: [
-                                        // View Toggle Buttons
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade100,
-                                            borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: AppColors.borderColor),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                icon: const Icon(Icons.grid_view),
-                                                color: !isTableView ? AppColors.primaryColor : Colors.grey,
-                                                onPressed: () => setState(() => isTableView = false),
-                                                tooltip: 'عرض الشبكة',
-                                              ),
-                                              Container(width: 1, height: 24, color: Colors.grey.shade300),
-                                              IconButton(
-                                                icon: const Icon(Icons.table_chart_outlined),
-                                                color: isTableView ? AppColors.primaryColor : Colors.grey,
-                                                onPressed: () => setState(() => isTableView = true),
-                                                tooltip: 'عرض الجدول',
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Icon(
-                                          Icons.inventory_outlined,
-                                          color: AppColors.primaryColor,
-                                          size: 20,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          alignment: Alignment.centerRight,
-                                          child: Text(
-                                            'عدد المنتجات',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: isMobile ? 16 : 18,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primaryColor
-                                                .withOpacity(
-                                              0.1,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: Text(
-                                              '${currentFilteredProducts.length}',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                                color: AppColors.primaryColor,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 8),
                               Expanded(
                                 child: SubtleSwitcher(
                                   child: KeyedSubtree(

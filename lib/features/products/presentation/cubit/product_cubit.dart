@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:crazy_phone_pos/core/error/failure.dart';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
 import 'package:crazy_phone_pos/features/products/domain/product_repository_int.dart';
@@ -7,12 +8,38 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
+import '../../../../core/session/session_manager.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import 'product_states.dart';
 
 class ProductCubit extends Cubit<ProductStates> {
+  StreamSubscription? _activitySubscription;
+
   ProductCubit({required this.productRepositoryInt})
-      : super(ProductInitialState());
+      : super(ProductInitialState()) {
+    _activitySubscription = getIt<ActivityLogger>().activitiesStream.listen((activities) {
+      if (activities.isNotEmpty) {
+        final type = activities.first.type;
+        // Refresh product list (quantities) on sales/refunds/restocking
+        if (type == ActivityType.sale ||
+            type == ActivityType.refund ||
+            type == ActivityType.restock ||
+            type == ActivityType.productQuantityUpdate) {
+            
+             // Only reload if we have products loaded, to avoid unnecessary calls?
+             // Actually, usually we want to keep UI in sync.
+             getAllProducts();
+        }
+      }
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _activitySubscription?.cancel();
+    return super.close();
+  }
+      
   static ProductCubit get(context) => BlocProvider.of(context);
   ProductRepositoryInt productRepositoryInt;
   List<Product> products = [];
@@ -100,17 +127,21 @@ class ProductCubit extends Cubit<ProductStates> {
     final result = await productRepositoryInt.saveProduct(product);
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
-      (_) {
+      (_) async {
         emit(ProductSuccessState("تم حفظ المنتج بنجاح"));
         
         // Determine activity type
         final isUpdate = products.any((p) => p.barcode == product.barcode);
         
-        // Log activity
-        getIt<ActivityLogger>().logActivity(
+        // Log activity with session (auto-creates session if closed)
+        final sid = await getIt<SessionManager>().ensureSessionId(
+          userName: getIt<UserCubit>().currentUser.name,
+        );
+        await getIt<ActivityLogger>().logActivity(
           type: isUpdate ? ActivityType.productUpdate : ActivityType.productAdd,
           description: isUpdate ? 'تحديث منتج: ${product.name}' : 'إضافة منتج: ${product.name}',
           userName: getIt<UserCubit>().currentUser.name,
+          sessionId: sid,
           details: {'barcode': product.barcode, 'price': product.price},
         );
         
@@ -124,16 +155,20 @@ class ProductCubit extends Cubit<ProductStates> {
     final result = await productRepositoryInt.deleteProduct(barcode);
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
-      (_) {
+      (_) async {
         final deletedProduct = products.firstWhere((p) => p.barcode == barcode);
         
         emit(ProductSuccessState("تم حذف المنتج بنجاح"));
         
-        // Log activity
-        getIt<ActivityLogger>().logActivity(
+        // Log activity with session (auto-creates session if closed)
+        final sid = await getIt<SessionManager>().ensureSessionId(
+          userName: getIt<UserCubit>().currentUser.name,
+        );
+        await getIt<ActivityLogger>().logActivity(
           type: ActivityType.productDelete,
           description: 'حذف منتج: ${deletedProduct.name}',
           userName: getIt<UserCubit>().currentUser.name,
+          sessionId: sid,
           details: {'barcode': barcode},
         );
         

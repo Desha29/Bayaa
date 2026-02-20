@@ -27,10 +27,10 @@ import '../../invoice/presentation/invoices_screen.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../../settings/presentation/cubit/settings_states.dart';
 
-// ARP imports
+import '../../sessions/presentation/screens/sessions_dashboard_screen.dart';
 import '../../arp/presentation/screens/arp_screen.dart';
-import '../../arp/presentation/cubit/arp_cubit.dart';
-import '../../arp/data/arp_repository_impl.dart';
+import '../../sessions/presentation/cubit/arp_cubit.dart';
+import '../../sessions/data/arp_repository_impl.dart';
 
 import 'widgets/dashboard_home.dart';
 import 'widgets/side_bar.dart';
@@ -57,11 +57,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
 
-   
     _salesRepository = getIt<SalesRepositoryImpl>();
     _arpRepository = ArpRepositoryImpl();
 
- 
     final allSidebarItems = [
       SidebarItem(
         id: 'dashboard',
@@ -100,7 +98,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: "المنتجات الناقصة",
         screen: const StockScreen(),
       ),
-  
       if (curUser.userType != UserType.cashier)
         SidebarItem(
           id: 'stock_summary',
@@ -115,10 +112,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         SidebarItem(
           id: 'reports',
           icon: LucideIcons.pieChart,
-          title: "التحليلات والتقارير",
+          title: "الإحصائيات",
           screen: BlocProvider(
             create: (context) => ArpCubit(_arpRepository),
             child: const ArpScreen(),
+          ),
+        ),
+      if (curUser.userType == UserType.manager)
+        SidebarItem(
+          id: 'sessions',
+          icon: LucideIcons.history,
+          title: "الايام",
+          screen: BlocProvider(
+            create: (context) => ArpCubit(_arpRepository),
+            child: const SessionsDashboardScreen(),
           ),
         ),
       SidebarItem(
@@ -134,13 +141,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         screen: const SettingsScreen(),
       ),
     ];
-    
+
     sidebarItems = allSidebarItems;
   }
 
   @override
   Widget build(BuildContext context) {
-
     final isMobileOrTablet = MediaQuery.of(context).size.width < 1000;
 
     return MultiBlocProvider(
@@ -155,7 +161,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           value: getIt<NotificationsCubit>()..loadData(),
         ),
       ],
-        child: MultiBlocListener(
+      child: MultiBlocListener(
         listeners: [
           BlocListener<NotificationsCubit, NotificationsStates>(
             listener: (context, state) {
@@ -180,12 +186,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? AppBar(
                     backgroundColor: AppColors.primaryColor,
                     title: BlocBuilder<SettingsCubit, SettingsStates>(
-                      bloc: getIt<SettingsCubit>(),
-                      builder: (context, state) {
-                         final name = getIt<SettingsCubit>().currentStoreInfo?.name ?? 'Bayaa';
-                         return Text(name.isNotEmpty ? name : 'Bayaa');
-                      }
-                    ),
+                        bloc: getIt<SettingsCubit>(),
+                        builder: (context, state) {
+                          final name =
+                              getIt<SettingsCubit>().currentStoreInfo?.name ??
+                                  'Bayaa';
+                          return Text(name.isNotEmpty ? name : 'Bayaa');
+                        }),
                     leading: Builder(
                       builder: (context) => IconButton(
                         icon: const Icon(LucideIcons.menu),
@@ -199,7 +206,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: CustomSidebar(
                       items: sidebarItems,
                       selectedIndex: selectedIndex,
-                      onItemSelected: (index) => _onSidebarSelected(context, index),
+                      onItemSelected: (index) =>
+                          _onSidebarSelected(context, index),
                     ),
                   )
                 : null,
@@ -210,7 +218,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     items: sidebarItems,
                     selectedIndex: selectedIndex,
                     isCollapsed: isSidebarCollapsed,
-                    onItemSelected: (index) => _onSidebarSelected(context, index),
+                    onItemSelected: (index) =>
+                        _onSidebarSelected(context, index),
                     onToggleCollapse: () {
                       setState(() {
                         isSidebarCollapsed = !isSidebarCollapsed;
@@ -230,25 +239,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
-  
+
   void _onSidebarSelected(BuildContext context, int index) {
     final item = sidebarItems[index];
     if (item.id == 'reports' || item.id == 'stock_summary') {
-          try {
-              PermissionGuard.checkReportAccess(curUser);
-          } catch (e) {
-              MotionSnackBarError(context, e.toString());
-              return;
-          }
+      try {
+        PermissionGuard.checkReportAccess(curUser);
+      } catch (e) {
+        MotionSnackBarError(context, e.toString());
+        return;
       }
-      
-      setState(() {
-          selectedIndex = index;
-      });
-      
-      if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
-          Navigator.pop(context);
-      }
+    }
+
+    setState(() {
+      selectedIndex = index;
+    });
+
+    if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+      Navigator.pop(context);
+    }
   }
 
   /// Handles tap on a card in the dashboard screen.

@@ -20,6 +20,8 @@ class ArpLoaded extends ArpState {
   final Map<int, double> hourlySales;
   final Map<String, double> categorySales;
   final Map<String, double> dailyTimeSeries;
+  final Map<String, double> monthlySales;
+  final Map<String, double> yearlySales;
 
   ArpLoaded({
     required this.summary,
@@ -28,6 +30,8 @@ class ArpLoaded extends ArpState {
     this.hourlySales = const {},
     this.categorySales = const {},
     this.dailyTimeSeries = const {},
+    this.monthlySales = const {},
+    this.yearlySales = const {},
   });
 
   @override
@@ -37,7 +41,9 @@ class ArpLoaded extends ArpState {
         dailySales,
         hourlySales,
         categorySales,
-        dailyTimeSeries
+        dailyTimeSeries,
+        monthlySales,
+        yearlySales,
       ];
 }
 

@@ -40,7 +40,7 @@ class LogoutWarningBanner extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'سيتم إنهاء جلسة العمل الحالية والعودة إلى شاشة تسجيل الدخول',
+                    'سيتم إنهاء يوم العمل الحالي والعودة إلى شاشة تسجيل الدخول',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.errorColor,
                       fontSize: isMobile ? 13 : null,

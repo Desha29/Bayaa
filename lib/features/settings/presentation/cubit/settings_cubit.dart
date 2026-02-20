@@ -7,6 +7,7 @@ import 'settings_states.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
+import '../../../../core/session/session_manager.dart';
 
 class SettingsCubit extends Cubit<SettingsStates> {
   SettingsCubit({
@@ -49,14 +50,18 @@ class SettingsCubit extends Cubit<SettingsStates> {
           emit(StoreInfoLoaded(_currentStoreInfo!));
         }
       },
-      (_) {
+      (_) async {
         _currentStoreInfo = newStoreInfo;
         
-        // Log activity
-        getIt<ActivityLogger>().logActivity(
-          type: ActivityType.userUpdate, // Reusing userUpdate or create storeUpdate type? userUpdate is close enough for settings
+        // Log activity with session (auto-creates session if closed)
+        final sid = await getIt<SessionManager>().ensureSessionId(
+          userName: userCubit.currentUser.name,
+        );
+        await getIt<ActivityLogger>().logActivity(
+          type: ActivityType.userUpdate,
           description: 'تحديث معلومات المتجر',
           userName: userCubit.currentUser.name,
+          sessionId: sid,
         );
         
         emit(StoreInfoUpdateSuccess("تم حفظ معلومات المتجر بنجاح"));

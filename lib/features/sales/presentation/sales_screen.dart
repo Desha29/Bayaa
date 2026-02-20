@@ -22,6 +22,10 @@ import 'widgets/cart_section.dart';
 import 'widgets/total_section_card.dart';
 import 'widgets/recent_sales.dart';
 import 'widgets/product_search_overlay.dart';
+import '../../../../core/services/activity_logger.dart';
+import '../../../../core/data/models/activity_log.dart';
+import '../../../../core/session/session_manager.dart';
+import 'package:crazy_phone_pos/features/invoice/presentation/cubit/invoice_cubit.dart';
 
 class SalesScreen extends StatefulWidget {
   final SalesRepository? repository; // optional, create if not passed
@@ -205,6 +209,12 @@ class _SalesScreenState extends State<SalesScreen>
       return;
     }
 
+    // Capture values before async operations
+    final total = _totalAmount;
+    final itemCount = _cartItems.length;
+    final itemNames = _cartItems.map((e) => e['name'] as String).toList();
+    final userName = getIt<UserCubit>().currentUser.name;
+
     // Update stock via Repository
     for (final item in _cartItems) {
       final productBarcode = item['id'] as String;
@@ -220,12 +230,23 @@ class _SalesScreenState extends State<SalesScreen>
     // Refresh Product Cubit to reflect stock changes across app
     getIt<ProductCubit>().getAllProducts();
 
+    // Get or create session for activity logging
+    String? sessionId;
+    try {
+      sessionId = await getIt<SessionManager>().ensureSessionId(
+        userName: userName,
+      );
+    } catch (e) {
+      print('DEBUG_CHECKOUT: Failed to get session: $e');
+    }
+
     final sale = Sale(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      cashierName: getIt<UserCubit>().currentUser.name,
-      total: _totalAmount,
-      items: _cartItems.length,
+      cashierName: userName,
+      total: total,
+      items: itemCount,
       date: DateTime.now(),
+      sessionId: sessionId,
       saleItems: _cartItems
           .map((item) => SaleItem(
                 productId: item['id'] as String,
@@ -246,17 +267,37 @@ class _SalesScreenState extends State<SalesScreen>
         MotionSnackBarError(context, "فشل حفظ البيع: ${failure.message}");
         setState(() {});
       },
-      (_) {
+      (_) async {
         MotionSnackBarSuccess(
           context,
-          'تمت عملية البيع - الإجمالي: ${_totalAmount.toStringAsFixed(2)} ج.م',
+          'تمت عملية البيع - الإجمالي: ${total.toStringAsFixed(2)} ج.م',
         );
+
+        // ✅ Log sale activity
+        if (sessionId != null) {
+          try {
+            await getIt<ActivityLogger>().logActivity(
+              type: ActivityType.sale,
+              description: 'عملية بيع: ${total.toStringAsFixed(2)} ج.م',
+              userName: userName,
+              sessionId: sessionId,
+              details: {
+                'total': total,
+                'itemCount': itemCount,
+                'items': itemNames,
+              },
+            );
+            print('DEBUG_CHECKOUT: Sale activity logged ✓');
+          } catch (e) {
+            print('DEBUG_CHECKOUT: Failed to log activity: $e');
+          }
+        }
 
         // Update recent sales
         _recentSales = [
           {
-            'total': _totalAmount,
-            'items': _cartItems.length,
+            'total': total,
+            'items': itemCount,
             'date': DateTime.now(),
             'isRefund': false,
           },
@@ -266,6 +307,9 @@ class _SalesScreenState extends State<SalesScreen>
         // Clear cart
         _cartItems.clear();
         setState(() {});
+
+        // Refresh InvoiceCubit for dashboard stats
+        getIt<InvoiceCubit>().loadSales();
 
         // Auto-open invoice
         _openInvoice(sale);
