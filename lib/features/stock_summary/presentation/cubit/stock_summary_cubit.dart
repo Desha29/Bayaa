@@ -12,10 +12,6 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
     loadData();
   }
 
-  @override
-  Future<void> close() {
-    return super.close();
-  }
 
   Future<void> loadData() async {
     if (isClosed) return;
@@ -85,9 +81,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
       // Process Sales Data
       for (var row in salesResults) {
         var categoryId = row['category_id'] as String?;
-        if (categoryId == null) {
-          categoryId = 'المحذوفة';
-        }
+        categoryId ??= 'المحذوفة';
         
         if (!categoryMap.containsKey(categoryId)) {
            // Category exists in sales but not in current active products (maybe deleted category or no active products)
@@ -105,32 +99,10 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
            );
         }
 
-        final model = categoryMap[categoryId]!;
-        final soldQty = (row['sold_qty'] as num).toInt();
-        final refundedQty = (row['refunded_qty'] as num).toInt();
-        final netSoldQty = soldQty - refundedQty;
-        final wholesaleCost = row['total_wholesale_cost'] as double? ?? 0.0;
-
-        // Update Model Totals
-        // Note: totalHistoricValue = Current Stock Value + Net Sold Value
-        // We will sum Current Stock Value at the end. Here we add Net Sold Value.
+        (row['sold_qty'] as num).toInt();
+        (row['refunded_qty'] as num).toInt();
         
-        // Wait, totalHistoricValue logic in original code:
-        // totalHistoricValue = historicFromStock (current stock * wholesale) + historicFromSold (sold * wholesale)
-        
-        // Update product details
-        final detail = ProductSalesDetail(
-          productName: row['product_name'] as String,
-          barcode: row['product_barcode'] as String? ?? row['product_id'] as String,
-          soldQuantity: soldQty,
-          refundedQuantity: refundedQty,
-        );
-        
-        // We need to replace the model with updated values since it's immutable-ish or just update props?
-        // StockSummaryCategoryModel fields are final. We need to reconstruct or make them mutable?
-        // They are final. So we need to accumulate data in a temp structure or copyWith.
-        // Let's assume we can't easily change the model structure.
-        // Better strategy: Accumulate in Maps first, then build models.
+   
       }
       
       // RESTART STRATEGY: Accumulate in Maps
@@ -140,7 +112,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
       
       for (var row in salesResults) {
         var categoryId = row['category_id'] as String?;
-        if (categoryId == null) categoryId = 'المحذوفة';
+        categoryId ??= 'المحذوفة';
         
         final soldQty = (row['sold_qty'] as num).toInt();
         final refundedQty = (row['refunded_qty'] as num).toInt();
@@ -166,8 +138,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
       // Union of all categories
       final allCats = {...categoryMap.keys, ...catDetails.keys}; // categoryMap keys from Stock query
       
-      // Stock Query Map (from Step 1) -> we need to access row data.
-      // Let's re-map stockResults to a Map for easier access
+  
       final stockDataMap = {
         for (var r in stockResults) 
           (r['category_id'] as String? ?? 'عام') : r

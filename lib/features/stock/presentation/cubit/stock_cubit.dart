@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
-import 'package:crazy_phone_pos/features/products/data/repository/product_repository_imp.dart';
 import 'package:crazy_phone_pos/features/products/domain/product_repository_int.dart';
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_states.dart'
     show StockErrorState, StockLoadingState, StockStates, StockSucssesState;
@@ -94,10 +93,12 @@ class StockCubit extends Cubit<StockStates> {
 
   void filterProducts() {
     final List<Product> filtered = products.where((p) {
-      if (filter == 'all' && totalCount > 0)
+      if (filter == 'all' && totalCount > 0) {
         return (p.quantity < p.minQuantity);
-      if (filter == 'low' && lowStockCount > 0)
+      }
+      if (filter == 'low' && lowStockCount > 0) {
         return (p.quantity > 0 && p.quantity < p.minQuantity);
+      }
       if (filter == 'out' && outOfStockCount > 0) return p.quantity == 0;
       return false;
     }).toList();

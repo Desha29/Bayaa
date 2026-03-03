@@ -157,19 +157,14 @@ class ProductsScreenState extends State<ProductsScreen> {
                           if (state is ProductLoadedState) {
                             products = state.products;
                             
-                            // Sync local filter state with cubit if different
-                            // This ensures if "Load All" is clicked in empty state, filter updates to "All"
+                    
                             final cubit = context.read<ProductCubit>();
                             if (categoryFilter != cubit.selectedCategory) {
-                                // Only update if we are not in the initial "null" state OR if the update is from an explicit action
-                                // Actually, if cubit has 'الكل' and we have null, and products ARE loaded, we should show 'الكل'.
-                                // If products are empty, we might keep null? 
-                                // But ProductLoadedState usually means we have products or explicitly loaded empty list.
-                                // If products.isNotEmpty, definitely sync.
+                          
                                 if (products.isNotEmpty || cubit.selectedCategory != 'الكل') {
                                    categoryFilter = cubit.selectedCategory;
                                 } else if (cubit.selectedCategory == 'الكل' && products.isEmpty) {
-                                  // Special case: clearProducts sets 'الكل' but list is empty.
+                                  
                                   categoryFilter = null;
                                 }
                             }

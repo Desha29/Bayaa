@@ -1,9 +1,8 @@
-import 'package:crazy_phone_pos/core/components/logo.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:crazy_phone_pos/core/components/app_logo.dart';
+
 import '../../../../core/di/dependency_injection.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart'
     show SettingsCubit;
@@ -195,47 +194,96 @@ class _DashboardHomeState extends State<DashboardHome>
                 titleColor: AppColors.textPrimary,
                 iconColor: AppColors.primaryColor,
               ),
-              const SizedBox(height: 20),
+
               // Stale session warning banner
               Builder(
                 builder: (context) {
                   final manager = getIt<SessionManager>();
-                  if (!manager.isSessionStale) return const SizedBox.shrink();
-                  final age = manager.sessionAge!;
-                  final hours = age.inHours;
-                  final days = hours ~/ 24;
-                  final remainingHours = hours % 24;
-                  final ageText = days > 0
-                      ? '$days يوم و $remainingHours ساعة'
-                      : '$hours ساعة';
-                  return Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.orange.shade300),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(LucideIcons.alertTriangle,
-                            color: Colors.orange.shade700, size: 20),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'اليوم الحالي مفتوح منذ $ageText — يُنصح بإغلاقه وفتح يوم جديد',
-                            style: TextStyle(
-                              color: Colors.orange.shade900,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
+                  final sessionAge = manager.sessionAge;
+                  
+                  if (sessionAge == null) return const SizedBox.shrink();
+                  
+                  if (manager.isSessionStale) {
+                    final hours = sessionAge.inHours;
+                    final days = hours ~/ 24;
+                    final remainingHours = hours % 24;
+                    final ageText = days > 0
+                        ? '$days يوم و $remainingHours ساعة'
+                        : '$hours ساعة';
+                        
+                    return Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.orange.shade300),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(LucideIcons.alertTriangle,
+                              color: Colors.orange.shade700, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'اليوم الحالي مفتوح منذ $ageText — يُنصح بإغلاقه وفتح يوم جديد',
+                              style: TextStyle(
+                                color: Colors.orange.shade900,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
+                        ],
+                      ),
+                    );
+                  } 
+                  // Info banner for existing previously opened session (e.g. login to a session opened > 15 mins ago)
+                  else if (sessionAge.inMinutes > 5) {
+                    final hours = sessionAge.inHours;
+                    final minutes = sessionAge.inMinutes % 60;
+                    
+                    String ageText = '';
+                    if (hours > 0) {
+                      ageText += '$hours ساعة ';
+                    }
+                    if (minutes > 0 || hours == 0) {
+                      ageText += '$minutes دقيقة';
+                    }
+                    
+                    return Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.blue.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(LucideIcons.info,
+                              color: Colors.blue.shade700, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'أنت الآن تعمل على يومية مفتوحة مسبقاً منذ $ageText',
+                              style: TextStyle(
+                                color: Colors.blue.shade900,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  return const SizedBox.shrink();
                 },
               ),
               Expanded(

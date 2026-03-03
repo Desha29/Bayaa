@@ -34,7 +34,7 @@ import '../../sessions/data/arp_repository_impl.dart';
 
 import 'widgets/dashboard_home.dart';
 import 'widgets/side_bar.dart';
-import '../../stock_summary/presentation/pages/stock_summary_screen.dart';
+import '../../stock_summary/presentation/screens/stock_summary_screen.dart';
 import '../../stock_summary/presentation/cubit/stock_summary_cubit.dart';
 
 class DashboardScreen extends StatefulWidget {

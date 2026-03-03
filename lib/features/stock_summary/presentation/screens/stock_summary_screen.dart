@@ -122,7 +122,6 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 900;
-        final isTablet = constraints.maxWidth > 600 && constraints.maxWidth <= 900;
         
         if (isDesktop) {
           // Desktop: 3 cards in a row

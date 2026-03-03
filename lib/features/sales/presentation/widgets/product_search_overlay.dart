@@ -49,7 +49,7 @@ class ProductSearchOverlay extends StatelessWidget {
                 : product.name.toLowerCase();
             for (final other in allProducts!) {
               if (other.barcode == product.barcode) continue;
-              if ((other.category ?? '').isNotEmpty &&
+              if ((other.category).isNotEmpty &&
                   other.category == product.category) {
                 similar.add(other);
                 continue;
@@ -86,7 +86,7 @@ class ProductSearchOverlay extends StatelessWidget {
                   ),
                 ),
                 subtitle: Text(
-                  '${product.barcode} | ${product.category ?? "بدون تصنيف"}',
+                  '${product.barcode} | ${product.category}',
                   style: TextStyle(color: AppColors.mutedColor, fontSize: 12),
                 ),
                 trailing: Column(
@@ -104,7 +104,7 @@ class ProductSearchOverlay extends StatelessWidget {
                     Text(
                       'المخزون: ${product.quantity}',
                       style: TextStyle(
-                        color: product.quantity <= (product.minQuantity ?? 0)
+                        color: product.quantity <= (product.minQuantity)
                             ? Colors.red
                             : Colors.green,
                         fontSize: 11,

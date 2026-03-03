@@ -33,8 +33,8 @@ class ProductsGridView extends StatelessWidget {
     if (products.isEmpty) {
       return EmptyState(
         variant: EmptyStateVariant.products,
-        title: emptyTitle ?? 'ابدأ البحث',
-        message: emptyMessage ?? 'قم بالبحث عن منتج أو اختر فئة لعرض المنتجات',
+        title: emptyTitle ?? 'لا توجد منتجات',
+         message: emptyMessage ?? 'قم بإضافة منتجات جديدة لعرضها هنا',
         icon: Icons.search,
       );
     }

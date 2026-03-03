@@ -335,8 +335,6 @@ class _ArpMonthlySalesChartState extends State<ArpMonthlySalesChart> {
                             );
                           }),
                         ),
-                        swapAnimationDuration: const Duration(milliseconds: 300),
-                        swapAnimationCurve: Curves.easeOutCubic,
                       ),
               ),
             ],

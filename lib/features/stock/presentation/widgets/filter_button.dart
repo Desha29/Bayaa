@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/components/hover_wrapper.dart';
 import '../../../../core/constants/app_colors.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class FilterButtonsWidget extends StatelessWidget {
   final String filter;

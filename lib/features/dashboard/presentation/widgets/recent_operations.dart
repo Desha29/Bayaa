@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -268,7 +270,8 @@ class _RecentOperationsState extends State<RecentOperations> {
                   (a.type == ActivityType.sale ||
                       a.type == ActivityType.refund ||
                       a.type == ActivityType.sessionOpen ||
-                      a.type == ActivityType.sessionClose))
+                      a.type == ActivityType.sessionClose ||
+                      a.type == ActivityType.login))
               .toList();
         }
 
@@ -278,8 +281,7 @@ class _RecentOperationsState extends State<RecentOperations> {
         final operationalActivities = activities
             .where((a) =>
                 a.type != ActivityType.sessionOpen &&
-                a.type != ActivityType.sessionClose &&
-                a.type != ActivityType.login)
+                a.type != ActivityType.sessionClose)
             .toList();
 
         // Count logins for summary
@@ -311,7 +313,7 @@ class _RecentOperationsState extends State<RecentOperations> {
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.mutedColor,
-                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),

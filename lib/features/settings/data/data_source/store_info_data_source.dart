@@ -1,6 +1,5 @@
 import 'package:crazy_phone_pos/core/data/services/persistence_initializer.dart';
 import '../models/store_info_model.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class StoreInfoDataSource {
   static const String _table = 'store_settings';

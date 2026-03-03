@@ -1,8 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../products/data/models/product_model.dart';
-import 'product_card.dart';
+
 
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 

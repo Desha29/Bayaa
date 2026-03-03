@@ -5,7 +5,7 @@ import '../../../../core/constants/app_colors.dart';
 
 import '../../data/models/product_performance_model.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 
 class ArpTopProducts extends StatelessWidget {
   final List<ProductPerformanceModel> products;

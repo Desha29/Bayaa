@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:crazy_phone_pos/features/activation/activation_screen.dart'
     show ActivationScreen;
 import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
@@ -28,65 +26,42 @@ import 'core/data/services/checkpoint_service.dart';
 import 'core/data/services/backup_manager.dart';
 
 Future<void> _initializePersistenceSystem() async {
-  print('\n========================================');
-  print('🚀 INITIALIZING CRASH-SAFE PERSISTENCE SYSTEM');
-  print('========================================');
-  
   try {
-    print('📦 Step 1: Starting persistence manager...');
     final initialized = await PersistenceInitializer.initialize();
-    
+
     if (initialized) {
-      print('✅ SUCCESS: Persistence system enabled!');
-      print('📁 Data root: ${PersistenceInitializer.persistenceManager!.pathResolver.dataRootPath}');
-      
-      FileLogger.info('Persistence system initialized successfully', source: 'Init');
-      
-      // Test store settings
-      print('\n📋 Testing store settings...');
+      print(
+          '📁 Data root: ${PersistenceInitializer.persistenceManager!.pathResolver.dataRootPath}');
+
+      FileLogger.info('Persistence system initialized successfully',
+          source: 'Init');
+
       try {
-        final settings = await PersistenceInitializer.settingsRepository!.getStoreSettings();
-        print('✅ Store Name: ${settings.storeName}');
-        print('✅ Store Address: ${settings.storeAddress ?? "Not set"}');
-        print('✅ Store Phone: ${settings.storePhone ?? "Not set"}');
-        print('✅ Invoice Prefix: ${settings.invoicePrefix}');
-        print('✅ Last Invoice Number: ${settings.lastInvoiceNumber}');
-        
-        FileLogger.info('Store settings loaded: ${settings.storeName}', source: 'Init');
+        final settings =
+            await PersistenceInitializer.settingsRepository!.getStoreSettings();
+
+        FileLogger.info('Store settings loaded: ${settings.storeName}',
+            source: 'Init');
       } catch (e) {
-        print('⚠️ Store settings error: $e');
         FileLogger.warning('Store settings error', error: e, source: 'Init');
       }
-      
-      print('\n🔒 System Status:');
-      print('  - Ledger: Active');
-      print('  - SQLite (WAL): Active');
-      print('  - Background Queue: Active');
-      print('  - Configuration: Loaded');
-      print('  - File Logging: Active');
-      print('  - Crash Logger: Active');
-      
-      // Load recoverables
-      print('\n🔄 Recovering session state...');
+
+      // Load current session
       await getIt<SessionRepositoryImpl>().loadCurrentSession();
       final session = getIt<SessionRepositoryImpl>().getCurrentSession();
       if (session != null) {
-         print('  ✅ Resumed open session: ${session.id} (User: ${session.openedByUserId})');
-         FileLogger.info('Resumed open session: ${session.id}', source: 'Init');
+        FileLogger.info('Resumed open session: ${session.id}', source: 'Init');
       } else {
-         print('  ℹ️ No active session found.');
+        FileLogger.info('No open session to resume', source: 'Init');
       }
 
-      // Run recovery checks
-      print('🔍 Running recovery checks...');
       await RecoveryService().check();
 
-      print('🔄 Loading activity history...');
       await getIt<ActivityLogger>().loadRecentActivities();
-      print('  ✅ Activity history loaded.');
 
       // Create startup checkpoint
-      await CheckpointService().createCheckpoint(reason: 'startup', userName: 'system');
+      await CheckpointService()
+          .createCheckpoint(reason: 'startup', userName: 'system');
 
       // Register BackupManager in GetIt for data_management_screen access
       if (!getIt.isRegistered<BackupManager>()) {
@@ -96,29 +71,21 @@ Future<void> _initializePersistenceSystem() async {
       }
 
       // Start periodic auto-backup every 30 minutes
-      PersistenceInitializer.persistenceManager!.backupManager.startPeriodicBackup();
-      
+      PersistenceInitializer.persistenceManager!.backupManager
+          .startPeriodicBackup();
     } else {
-      print('ℹ️ INFO: First launch detected - configuring data storage...');
-      print('💡 Prompting user to select data storage location...');
-      FileLogger.info('First launch detected, awaiting data path configuration', source: 'Init');
+      FileLogger.info('First launch detected, awaiting data path configuration',
+          source: 'Init');
     }
-    
   } catch (e, stackTrace) {
-    print('\n❌ ERROR: Persistence system initialization failed!');
-    print('Error: $e');
-    print('Stack trace: $stackTrace');
-    print('\n⚠️ CRITICAL: Persistence initialization failed. App may not function correctly.');
-    
-    FileLogger.critical('Persistence system initialization failed', 
-      error: e, stackTrace: stackTrace, source: 'Init');
-    CrashLogger.logException(e, stackTrace: stackTrace, 
-      context: 'Persistence initialization', isFatal: false);
+    FileLogger.critical('Persistence system initialization failed',
+        error: e, stackTrace: stackTrace, source: 'Init');
+    CrashLogger.logException(e,
+        stackTrace: stackTrace,
+        context: 'Persistence initialization',
+        isFatal: false);
   }
-  
-  print('========================================\n');
 }
-
 
 void main() async {
   // Wrap entire app in error zone to catch all async errors
@@ -126,7 +93,7 @@ void main() async {
     () async {
       try {
         WidgetsFlutterBinding.ensureInitialized();
-        
+
         // 1. Initialize Window Manager for Desktop
         if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
           await windowManager.ensureInitialized();
@@ -143,13 +110,13 @@ void main() async {
           await _initializePersistenceSystem().timeout(
             const Duration(seconds: 5),
             onTimeout: () {
-              print('⚠️ Persistence initialization timed out');
-              FileLogger.warning('Persistence initialization timed out', source: 'Main');
+              FileLogger.warning('Persistence initialization timed out',
+                  source: 'Main');
             },
           );
         } catch (e, stack) {
-          print('❌ Persistence initialization error: $e');
-          FileLogger.error('Persistence initialization error', error: e, stackTrace: stack, source: 'Main');
+          FileLogger.error('Persistence initialization error',
+              error: e, stackTrace: stack, source: 'Main');
         }
 
         // 4. Check activation and Run App
@@ -162,11 +129,11 @@ void main() async {
           runApp(const ActivationScreen());
         }
       } catch (e, stack) {
-        print('💥 CRITICAL STARTUP ERROR: $e');
-        print(stack);
-        FileLogger.critical('Critical startup error', error: e, stackTrace: stack, source: 'Main');
-        CrashLogger.logException(e, stackTrace: stack, context: 'App startup', isFatal: true);
-        
+        FileLogger.critical('Critical startup error',
+            error: e, stackTrace: stack, source: 'Main');
+        CrashLogger.logException(e,
+            stackTrace: stack, context: 'App startup', isFatal: true);
+
         runApp(MaterialApp(
           home: Scaffold(
             body: Center(
@@ -178,10 +145,11 @@ void main() async {
     },
     (error, stack) {
       // Catch all unhandled async errors
-      print('💥 UNHANDLED ASYNC ERROR: $error');
-      print(stack);
-      FileLogger.critical('Unhandled async error', error: error, stackTrace: stack, source: 'ErrorZone');
-      CrashLogger.logException(error, stackTrace: stack, context: 'Unhandled async error', isFatal: true);
+
+      FileLogger.critical('Unhandled async error',
+          error: error, stackTrace: stack, source: 'ErrorZone');
+      CrashLogger.logException(error,
+          stackTrace: stack, context: 'Unhandled async error', isFatal: true);
     },
   );
 }
@@ -207,8 +175,6 @@ Future<void> _setupWindow() async {
     await windowManager.maximize();
   });
 }
-
-
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -237,7 +203,7 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           builder: (context, child) {
-             // Initialize global message context
+            // Initialize global message context
             GlobalMessage.initialize(context);
 
             return BlocListener<UserCubit, UserStates>(

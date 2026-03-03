@@ -173,6 +173,9 @@ void updateUser(User user) async {
           try {
              // Open Session on Login via SessionManager
              final sessionManager = getIt<SessionManager>();
+             await sessionManager.loadSession();
+             final bool hadOpenSession = sessionManager.currentSession?.isOpen == true;
+
              final session = await sessionManager.getOrCreateSession(userName: user.name);
              
              // Log activity
@@ -189,7 +192,11 @@ void updateUser(User user) async {
                userName: user.name
              );
              
-             emit(UserSuccess("تم تسجيل الدخول بنجاح"));
+             if (hadOpenSession) {
+               emit(LoginSuccess("تم تسجيل الدخول. سستم المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.", isExistingSession: true));
+             } else {
+               emit(LoginSuccess("تم تسجيل الدخول وفتح يومية جديدة بنجاح", isExistingSession: false));
+             }
           } catch (e) {
              emit(UserFailure("فشل فتح اليوم: $e"));
           }
@@ -224,10 +231,10 @@ void updateUser(User user) async {
       
       final currentSessionToClose = sessionManager.currentSession!;
 
-      if (currentSessionToClose.id == null) {
-          emit(UserFailure("خطأ في معرف اليوم"));
-          return;
-      }
+      // if (currentSessionToClose.id == null) {
+      //     emit(UserFailure("خطأ في معرف اليوم"));
+      //     return;
+      // }
 
       // Robust Session Capture: Time-Based + ID-Based
       // We explicitly scan recent sales to ensure nothing is missed

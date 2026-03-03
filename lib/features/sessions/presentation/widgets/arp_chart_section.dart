@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/constants/app_colors.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+
 
 class ArpChartSection extends StatelessWidget {
   final Map<String, double> dailySales;

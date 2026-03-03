@@ -48,7 +48,7 @@ class DesktopUserTable extends StatelessWidget {
           },
         ),
         border: TableBorder(
-          horizontalInside: BorderSide(color: AppColors.mutedColor!, width: 1),
+          horizontalInside: BorderSide(color: AppColors.mutedColor, width: 1),
         ),
         columns: const [
           DataColumn2(label: Center(child: Text('الاسم')), size: ColumnSize.L),

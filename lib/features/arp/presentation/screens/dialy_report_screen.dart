@@ -48,10 +48,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     if (widget.initialReport != null) {
       report = widget.initialReport;
       // Extract date from report if available
-      if (report!.date != null) {
-        selectedDate = report!.date!;
-      }
-    } else {
+      selectedDate = report!.date;
+        } else {
       fetchReport();
     }
     

@@ -180,7 +180,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        DateFormat('EEEE, d MMMM yyyy', 'ar').format(report.date ?? DateTime.now()),
+                        DateFormat('EEEE, d MMMM yyyy', 'ar').format(report.date),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 12,

@@ -9,7 +9,7 @@ import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../../../core/session/session_manager.dart';
-import '../../../notifications/presentation/cubit/notifications_cubit.dart';
+
 import 'product_states.dart';
 
 class ProductCubit extends Cubit<ProductStates> {

@@ -28,7 +28,6 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
   late final TextEditingController addressCtrl;
   String? logoPath;
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {

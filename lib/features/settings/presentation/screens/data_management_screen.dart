@@ -24,8 +24,15 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   bool _isLoading = false;
   List<Directory> _backups = [];
   List<Map<String, dynamic>> _checkpoints = [];
+  bool _isPersistenceReady = false;
 
-  final _backupManager = getIt<BackupManager>();
+  BackupManager? get _backupManager {
+    if (getIt.isRegistered<BackupManager>()) {
+      return getIt<BackupManager>();
+    }
+    return null;
+  }
+
   final _checkpointService = CheckpointService();
 
   @override
@@ -33,13 +40,21 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() => setState(() {}));
-    _loadData();
+    _isPersistenceReady = getIt.isRegistered<BackupManager>();
+    if (_isPersistenceReady) {
+      _loadData();
+    }
   }
 
   Future<void> _loadData() async {
+    final manager = _backupManager;
+    if (manager == null) {
+      setState(() => _isPersistenceReady = false);
+      return;
+    }
     setState(() => _isLoading = true);
     try {
-      final backups = await _backupManager.getAllBackups();
+      final backups = await manager.getAllBackups();
       final checkpoints = await _checkpointService.getAllCheckpoints();
       setState(() {
         _backups = backups;
@@ -59,9 +74,11 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Future<void> _createBackup() async {
+    final manager = _backupManager;
+    if (manager == null) return;
     setState(() => _isLoading = true);
     try {
-      final success = await _backupManager.createBackup();
+      final success = await manager.createBackup();
       if (success) {
         if (mounted) MotionSnackBarSuccess(context, 'تم إنشاء النسخة الاحتياطية بنجاح');
         await _loadData();
@@ -86,7 +103,9 @@ class _DataManagementScreenState extends State<DataManagementScreen>
 
     setState(() => _isLoading = true);
     try {
-      final success = await _backupManager.restoreFromBackup(backupPath);
+      final manager = _backupManager;
+      if (manager == null) return;
+      final success = await manager.restoreFromBackup(backupPath);
       if (success) {
         if (mounted) {
           MotionSnackBarSuccess(context, 'تمت الاستعادة بنجاح. جارٍ إعادة التشغيل...');
@@ -236,7 +255,38 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        body: Column(
+        body: !_isPersistenceReady
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(LucideIcons.shieldOff, size: 64, color: Colors.orange.shade300),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'نظام الحماية غير مُفعّل',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'يجب تفعيل نظام الحماية أولاً من الإعدادات',
+                      style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(LucideIcons.arrowRight),
+                      label: const Text('رجوع'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : Column(
           children: [
             // Custom header
             _buildHeader(),

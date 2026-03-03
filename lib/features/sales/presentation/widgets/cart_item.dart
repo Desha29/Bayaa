@@ -37,7 +37,6 @@ class CartItemRow extends StatefulWidget {
 }
 
 class _CartItemRowState extends State<CartItemRow> {
-  bool _isEditingPrice = false;
   late TextEditingController _priceController;
 
   @override

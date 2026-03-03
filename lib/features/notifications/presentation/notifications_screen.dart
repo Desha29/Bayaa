@@ -8,8 +8,7 @@ import '../../../core/components/empty_state.dart';
 import '../../../core/components/section_card.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/di/dependency_injection.dart';
-import '../../dashboard/data/models/notify_model.dart';
-import '../../stock/presentation/cubit/stock_cubit.dart';
+
 import 'widgets/filters_bar.dart';
 import 'widgets/notification_card.dart';
 import 'widgets/summary_row.dart';

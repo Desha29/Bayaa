@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../../sessions/presentation/screens/daily_report_preview_screen.dart';
+
 
 class CloseDayCard extends StatelessWidget {
   final bool isMobile;
@@ -65,42 +65,4 @@ class CloseDayCard extends StatelessWidget {
     );
   }
 
-  void _showReportDialog(BuildContext context, dynamic report) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 28),
-            const SizedBox(width: 12),
-            const Text('تم إغلاق اليومية بنجاح'),
-          ],
-        ),
-        content: const Text(
-          'تم إنشاء تقرير الإغلاق. هل ترغب في عرض التقرير الآن؟',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('إغلاق'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-            ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => DailyReportPreviewScreen(report: report),
-                ),
-              );
-            },
-            child: const Text('عرض التقرير'),
-          ),
-        ],
-      ),
-    );
-  }
 }

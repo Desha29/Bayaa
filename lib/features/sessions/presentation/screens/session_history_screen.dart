@@ -1,10 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:lucide_icons/lucide_icons.dart';
-
-import 'package:printing/printing.dart';
-
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/services/activity_logger.dart';
@@ -13,18 +12,13 @@ import '../../data/repositories/session_repository_impl.dart';
 import '../../data/models/session_model.dart';
 import '../../data/models/daily_report_model.dart';
 import '../../domain/arp_repository.dart';
-import '../../domain/daily_report_pdf_service.dart';
+
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../../auth/data/models/user_model.dart';
 import 'daily_report_preview_screen.dart';
 import 'daily_report_datasheet_screen.dart';
 
-/// Consolidated Session History Screen
-/// Features:
-/// - Master-Detail layout for Sessions
-/// - Activity Logs with filtering
-/// - Daily Report Preview (Embedded)
-/// - Session Management (Delete, Print)
+
 class SessionHistoryScreen extends StatefulWidget {
   final bool isEmbedded;
 

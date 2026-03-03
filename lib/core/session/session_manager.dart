@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:uuid/uuid.dart';
+
 import '../../features/sessions/data/models/session_model.dart';
 import '../../features/sessions/data/models/daily_report_model.dart';
 import '../../features/sessions/data/repositories/session_repository_impl.dart';
@@ -17,7 +17,6 @@ class SessionManager {
   factory SessionManager() => _instance;
   SessionManager._internal();
 
-  final _uuid = const Uuid();
 
   SessionRepositoryImpl? _sessionRepo;
   Completer<Session>? _pendingCreate;

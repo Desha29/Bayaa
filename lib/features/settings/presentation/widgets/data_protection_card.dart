@@ -48,7 +48,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
           builder: (context) => AlertDialog(
             title: const Text('إعادة تشغيل التطبيق'),
             content: const Text(
-              'تم تفعيل نظام الحماية بنجاح!\\n\\n'
+              'تم تفعيل نظام الحماية بنجاح!\n\n'
               'للاستفادة الكاملة من النظام، يُفضل إعادة تشغيل التطبيق.',
             ),
             actions: [
@@ -63,6 +63,44 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
     } else {
       if (mounted) {
         MotionSnackBarError(context, 'تم إلغاء العملية');
+      }
+    }
+  }
+
+  Future<void> _changeDataLocation() async {
+    final success = await PersistenceInitializer.changeDataLocation(context);
+    
+    if (success) {
+      _checkStatus();
+      if (mounted) {
+        MotionSnackBarSuccess(context, 'تم نقل البيانات بنجاح');
+        
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.green, size: 28),
+                SizedBox(width: 10),
+                Text('تم النقل بنجاح'),
+              ],
+            ),
+            content: Text(
+              'تم نقل البيانات إلى:\n$_dataPath\n\nيُفضل إعادة تشغيل التطبيق.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('حسناً'),
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        MotionSnackBarError(context, 'فشل نقل البيانات أو تم الإلغاء');
       }
     }
   }
@@ -161,7 +199,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                     _buildFeature('الأعطال والانهيارات', Icons.error_outline),
                     _buildFeature('انقطاع الكهرباء', Icons.power_off),
                     _buildFeature('إعادة تثبيت Windows', Icons.refresh),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
                         Icon(Icons.folder_outlined, 
@@ -171,7 +209,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'موقع البيانات:\\n$_dataPath',
+                            'موقع البيانات:\n$_dataPath',
                             style: TextStyle(
                               fontSize: 11,
                               color: Colors.green.shade800,
@@ -179,6 +217,26 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _changeDataLocation,
+                        icon: const Icon(Icons.drive_file_move_outline, size: 18),
+                        label: const Text('تغيير مكان الحفظ'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.orange.shade800,
+                          side: BorderSide(color: Colors.orange.shade300, width: 1.5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

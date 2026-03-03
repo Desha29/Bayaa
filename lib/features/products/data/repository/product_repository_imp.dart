@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:crazy_phone_pos/core/data/services/persistence_initializer.dart';
 import 'package:crazy_phone_pos/core/data/services/repository_persistence_mixin.dart';
 import 'package:crazy_phone_pos/core/error/failure.dart';
@@ -268,7 +270,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         },
       );
       return const Right(null);
-    } on Exception catch (e) {
+    } on Exception {
       return Left(NetworkFailure("خطأ في حذف الفئة"));
     }
   }

@@ -1,5 +1,9 @@
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/error/failure.dart';
+import '../../data/models/daily_report_model.dart';
+import '../../data/models/product_performance_model.dart';
 import '../../domain/arp_repository.dart';
 import '../../data/models/arp_summary_model.dart';
 import 'arp_state.dart';
@@ -34,11 +38,18 @@ class ArpCubit extends Cubit<ArpState> {
   }
 
   Future<void> _loadSessionAnalytics(String sessionId, DateTime startDate, DateTime endDate) async {
-    // Load session-specific data
-    final reportResult = await repository.getReportForSession(sessionId);
-    final topProductsResult = await repository.getTopProductsForSession(sessionId, 10);
-    final hourlyResult = await repository.getHourlySalesForSession(sessionId);
-    final categoryResult = await repository.getCategorySalesForSession(sessionId);
+    // Load session-specific data concurrently
+    final results = await Future.wait([
+      repository.getReportForSession(sessionId),
+      repository.getTopProductsForSession(sessionId, 10),
+      repository.getHourlySalesForSession(sessionId),
+      repository.getCategorySalesForSession(sessionId),
+    ]);
+
+    final reportResult = results[0] as dartz.Either<Failure, DailyReport?>;
+    final topProductsResult = results[1] as dartz.Either<Failure, List<ProductPerformanceModel>>;
+    final hourlyResult = results[2] as dartz.Either<Failure, Map<int, double>>;
+    final categoryResult = results[3] as dartz.Either<Failure, Map<String, double>>;
 
     reportResult.fold(
       (_) => emit(ArpError('فشل تحميل بيانات اليوم')),
@@ -79,23 +90,32 @@ class ArpCubit extends Cubit<ArpState> {
   }
 
   Future<void> _loadAggregateAnalytics(DateTime startDate, DateTime endDate) async {
-    final summaryResult = await repository.getSummary(startDate, endDate);
-    final topProductsResult = await repository.getTopProducts(10, startDate, endDate);
-    final dailySalesResult = await repository.getDailySales(startDate, endDate);
+    final results = await Future.wait([
+      repository.getSummary(startDate, endDate),
+      repository.getTopProducts(10, startDate, endDate),
+      repository.getDailySales(startDate, endDate),
+      repository.getHourlySales(startDate, endDate),
+      repository.getSalesByCategory(startDate, endDate),
+      repository.getDailyTimeSeries(startDate, endDate),
+      repository.getMonthlySales(startDate, endDate),
+      repository.getYearlySales(startDate, endDate),
+    ]);
+
+    final summaryResult = results[0] as dartz.Either<Failure, ArpSummaryModel>;
+    final topProductsResult = results[1] as dartz.Either<Failure, List<ProductPerformanceModel>>;
+    final dailySalesResult = results[2] as dartz.Either<Failure, Map<String, double>>;
+    final hourlyResult = results[3] as dartz.Either<Failure, Map<int, double>>;
+    final categoryResult = results[4] as dartz.Either<Failure, Map<String, double>>;
+    final timeSeriesResult = results[5] as dartz.Either<Failure, Map<String, double>>;
+    final monthlyResult = results[6] as dartz.Either<Failure, Map<String, double>>;
+    final yearlyResult = results[7] as dartz.Either<Failure, Map<String, double>>;
 
     summaryResult.fold(
       (_) => emit(ArpError('فشل تحميل البيانات')),
       (summary) {
         topProductsResult.fold(
           (_) => emit(ArpError('فشل تحميل المنتجات')),
-          (topProducts) async {
-            // Fetch new charts
-            final hourlyResult = await repository.getHourlySales(startDate, endDate);
-            final categoryResult = await repository.getSalesByCategory(startDate, endDate);
-            final timeSeriesResult = await repository.getDailyTimeSeries(startDate, endDate);
-            final monthlyResult = await repository.getMonthlySales(startDate, endDate);
-            final yearlyResult = await repository.getYearlySales(startDate, endDate);
-            
+          (topProducts) {
             dailySalesResult.fold(
               (_) => emit(ArpError('فشل تحميل المبيعات اليومية')),
               (dailySales) => emit(ArpLoaded(

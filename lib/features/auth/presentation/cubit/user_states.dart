@@ -23,6 +23,12 @@ class UserSuccessWithReport extends UserStates {
   UserSuccessWithReport(this.message, this.report, this.session);
 }
 
+class LoginSuccess extends UserStates {
+  final String message;
+  final bool isExistingSession;
+  LoginSuccess(this.message, {this.isExistingSession = false});
+}
+
 class UserFailure extends UserStates {
   final String error;
   UserFailure(this.error);

@@ -6,10 +6,9 @@ import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.da
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_states.dart';
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_states.dart';
 import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_states.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:either_dart/either.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';

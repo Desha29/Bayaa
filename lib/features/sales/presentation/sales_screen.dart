@@ -2,10 +2,10 @@
 import 'dart:async';
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:crazy_phone_pos/core/functions/messege.dart';
-import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart'; // Explicit absolute import
+import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
 
 import '../../../core/components/screen_header.dart';
 import '../../../core/constants/app_colors.dart';
@@ -120,7 +120,7 @@ class _SalesScreenState extends State<SalesScreen>
         var score = 0;
         final name = p.name.toLowerCase();
         final barcode = p.barcode.toLowerCase();
-        final category = (p.category ?? '').toLowerCase();
+        final category = (p.category).toLowerCase();
         final priceStr = p.price.toStringAsFixed(2).toLowerCase();
 
         if (barcode == query) score += 100;
