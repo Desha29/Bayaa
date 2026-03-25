@@ -163,7 +163,10 @@ class _CartItemRowState extends State<CartItemRow> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           'تاريخ: ${widget.date.year}/${widget.date.month}/${widget.date.day}',
@@ -172,7 +175,6 @@ class _CartItemRowState extends State<CartItemRow> {
                             fontSize: 12,
                           ),
                         ),
-                        const SizedBox(width: 8),
                         // Remaining quantity indicator
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -224,22 +226,25 @@ class _CartItemRowState extends State<CartItemRow> {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: AppColors.borderColor),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${widget.price.toStringAsFixed(0)} ج.م',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 14),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${widget.price.toStringAsFixed(0)} ج.م',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.edit,
+                              size: 14,
+                              color: AppColors.primaryColor,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.edit,
-                          size: 14,
-                          color: AppColors.primaryColor,
-                        ),
-                      ],
-                    ),
+                      ),
                   ),
                 ),
               ),
@@ -250,7 +255,7 @@ class _CartItemRowState extends State<CartItemRow> {
                   children: [
                     _buildQtyButton(Icons.remove, widget.onDecrease),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: EdgeInsets.symmetric(horizontal: isWide ? 12 : 6),
                       child: Text(
                         '${widget.quantity}',
                         style: const TextStyle(
@@ -266,12 +271,15 @@ class _CartItemRowState extends State<CartItemRow> {
               if (isWide) const SizedBox(width: 12),
               Expanded(
                 flex: isWide ? 2 : 2,
-                child: Text(
-                  '${total.toStringAsFixed(0)} ج.م',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    '${total.toStringAsFixed(0)} ج.م',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),

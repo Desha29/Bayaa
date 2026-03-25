@@ -135,39 +135,41 @@ class CartSection extends StatelessWidget {
 
   Widget _buildEmptyState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceColor,
-              shape: BoxShape.circle,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceColor,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.shopping_cart_outlined,
+                size: 64,
+                color: AppColors.mutedColor,
+              ),
             ),
-            child: Icon(
-              Icons.shopping_cart_outlined,
-              size: 64,
-              color: AppColors.mutedColor,
+            const SizedBox(height: 16),
+            Text(
+              'السلة فارغة',
+              style: TextStyle(
+                color: AppColors.mutedColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'السلة فارغة',
-            style: TextStyle(
-              color: AppColors.mutedColor,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+            const SizedBox(height: 8),
+            Text(
+              'قم بمسح المنتجات لإضافتها',
+              style: TextStyle(
+                color: AppColors.mutedColor.withOpacity(0.7),
+                fontSize: 14,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'قم بمسح المنتجات لإضافتها',
-            style: TextStyle(
-              color: AppColors.mutedColor.withOpacity(0.7),
-              fontSize: 14,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -26,6 +26,7 @@ import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/session/session_manager.dart';
 import 'package:crazy_phone_pos/features/invoice/presentation/cubit/invoice_cubit.dart';
+import '../../settings/presentation/cubit/settings_cubit.dart';
 
 class SalesScreen extends StatefulWidget {
   final SalesRepository? repository; // optional, create if not passed
@@ -325,9 +326,9 @@ class _SalesScreenState extends State<SalesScreen>
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
-      storeName: '',
-      storeAddress: '',
-      storePhone: '',
+      storeName: getIt<SettingsCubit>().currentStoreInfo?.name ?? 'Bayaa',
+      storeAddress: getIt<SettingsCubit>().currentStoreInfo?.address ?? 'AlKhanaka',
+      storePhone: getIt<SettingsCubit>().currentStoreInfo?.phone ?? '0100000000',
       cashierName: cashierName,
       lines: sale.saleItems
           .map((it) => InvoiceLine(

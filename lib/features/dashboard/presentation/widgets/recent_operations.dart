@@ -21,15 +21,16 @@ class RecentOperations extends StatefulWidget {
 class _RecentOperationsState extends State<RecentOperations> {
   List<SessionActivityGroup> _groups = [];
   bool _loading = true;
+  bool _loadingMore = false;
+  int _sessionLimit = 5;
   StreamSubscription? _activitySub;
 
   @override
   void initState() {
     super.initState();
     _loadGrouped();
-    // Listen to stream for live updates — store subscription for proper disposal
-    _activitySub =
-        ActivityLogger().activitiesStream.listen((_) => _loadGrouped());
+    // Listen to stream for live updates
+    _activitySub = ActivityLogger().activitiesStream.listen((_) => _loadGrouped(silent: true));
   }
 
   @override
@@ -38,10 +39,11 @@ class _RecentOperationsState extends State<RecentOperations> {
     super.dispose();
   }
 
-  Future<void> _loadGrouped() async {
+  Future<void> _loadGrouped({bool silent = false}) async {
+    if (!silent && !mounted) return;
+    if (!silent) setState(() => _loading = true);
     try {
-      final groups =
-          await ActivityLogger().getActivitiesGroupedBySession(sessionLimit: 5);
+      final groups = await ActivityLogger().getActivitiesGroupedBySession(sessionLimit: _sessionLimit);
       if (mounted) {
         setState(() {
           _groups = groups;
@@ -50,6 +52,23 @@ class _RecentOperationsState extends State<RecentOperations> {
       }
     } catch (e) {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_loadingMore) return;
+    setState(() => _loadingMore = true);
+    _sessionLimit += 5;
+    try {
+      final groups = await ActivityLogger().getActivitiesGroupedBySession(sessionLimit: _sessionLimit);
+      if (mounted) {
+        setState(() {
+          _groups = groups;
+          _loadingMore = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _loadingMore = false);
     }
   }
 
@@ -257,8 +276,11 @@ class _RecentOperationsState extends State<RecentOperations> {
 
     return ListView.builder(
       padding: EdgeInsets.zero,
-      itemCount: _groups.length,
+      itemCount: _groups.length + 1,
       itemBuilder: (context, groupIndex) {
+        if (groupIndex == _groups.length) {
+          return _buildLoadMoreButton();
+        }
         final group = _groups[groupIndex];
 
         // Filter activities for cashier
@@ -555,6 +577,32 @@ class _RecentOperationsState extends State<RecentOperations> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreButton() {
+    if (_groups.isEmpty) return const SizedBox.shrink();
+    
+    if (_loadingMore) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Center(
+        child: TextButton.icon(
+          onPressed: _loadMore,
+          icon: const Icon(LucideIcons.plus, size: 14),
+          label: const Text('عرض المزيد'),
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primaryColor,
+            visualDensity: VisualDensity.compact,
+            textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+          ),
+        ),
       ),
     );
   }

@@ -77,8 +77,8 @@ class InvoicePdfService {
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
           name: 'Bayaa', // Updated Default Name
-          address: '',
-          phone: '',
+          address: 'AlKhanaka',
+          phone: '0100000000',
           vat: '', email: '',
         ));
     
@@ -205,8 +205,8 @@ class InvoicePdfService {
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
           name: 'Bayaa',
-          address: '',
-          phone: '',
+          address: 'AlKhanaka',
+          phone: '0100000000',
           vat: '', email: '',
         ));
     final logoProvider = await _loadLogo(storeInfo.logoPath);
