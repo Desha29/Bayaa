@@ -127,7 +127,3 @@ app.*.map.json
 *.iml
 *.ipr
 *.iws
-#folder database
-data/
-# End of .gitignore
-lib/secrets.dart
