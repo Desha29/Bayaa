@@ -1,6 +1,6 @@
 import 'package:crazy_phone_pos/core/functions/messege.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
@@ -33,7 +33,7 @@ class LogoutWarningBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  LucideIcons.alertOctagon,
+                  LucideIcons.octagonAlert,
                   color: AppColors.errorColor,
                   size: isMobile ? 20 : 24,
                 ),

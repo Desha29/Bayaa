@@ -1,0 +1,15 @@
+================================================================================
+BAYAA POS - CRASH REPORT
+================================================================================
+Timestamp: 2026-06-20T14:49:15.859984
+Platform: windows "Windows 10 Home Single Language" 10.0 (Build 26100)
+Dart Version: 3.12.0 (stable) (Fri May 8 01:51:14 2026 -0700) on "windows_x64"
+Library: Flutter framework
+
+ERROR:
+--------------------------------------------------------------------------------
+ListTile background color or ink splashes may be invisible.
+The ListTile is wrapped in a DecoratedBox that has a background color. Because ListTile paints its background and ink splashes on the nearest Material ancestor, this DecoratedBox will hide those effects.
+To fix this, wrap the ListTile in its own Material widget, or remove the background color from the intermediate DecoratedBox.
+
+================================================================================

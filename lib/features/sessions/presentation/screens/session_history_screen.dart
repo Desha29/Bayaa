@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/services/activity_logger.dart';
@@ -176,7 +176,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> with Ticker
                 color: AppColors.errorColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(LucideIcons.alertTriangle, color: AppColors.errorColor, size: 20),
+              child: const Icon(LucideIcons.triangleAlert, color: AppColors.errorColor, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('تأكيد حذف اليوم', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -1158,7 +1158,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> with Ticker
                         color: AppColors.errorColor.withOpacity(0.06),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(LucideIcons.alertTriangle, size: 40, color: AppColors.errorColor.withOpacity(0.6)),
+                      child: Icon(LucideIcons.triangleAlert, size: 40, color: AppColors.errorColor.withOpacity(0.6)),
                     ),
                     const SizedBox(height: 16),
                     Text('فشل تحميل التقرير', style: TextStyle(color: AppColors.errorColor, fontWeight: FontWeight.w600, fontSize: 15)),
@@ -1403,7 +1403,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> with Ticker
       case ActivityType.sale: return LucideIcons.shoppingCart;
       case ActivityType.refund: return LucideIcons.cornerUpLeft;
       case ActivityType.productAdd: return LucideIcons.packagePlus;
-      case ActivityType.productUpdate: return LucideIcons.edit3;
+      case ActivityType.productUpdate: return LucideIcons.pencil;
       case ActivityType.productDelete: return LucideIcons.trash2;
       case ActivityType.productQuantityUpdate: return LucideIcons.package;
       case ActivityType.userAdd: return LucideIcons.userPlus;

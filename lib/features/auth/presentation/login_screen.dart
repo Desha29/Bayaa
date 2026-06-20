@@ -8,7 +8,7 @@ import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/components/logo.dart';
 import '../../../core/data/services/persistence_initializer.dart';

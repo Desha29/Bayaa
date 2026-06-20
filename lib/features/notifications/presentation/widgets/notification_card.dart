@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
 
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
@@ -92,7 +92,7 @@ class NotificationCard extends StatelessWidget {
                       tooltip: checked ? 'إلغاء التحديد' : 'تحديد',
                       onPressed: onToggleCheck,
                       icon: Icon(
-                        checked ? LucideIcons.checkSquare : LucideIcons.square,
+                        checked ? LucideIcons.squareCheck : LucideIcons.square,
                         size: isMobile ? 16 : 18,
                       ),
                       color: AppColors.mutedColor,

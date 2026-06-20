@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
@@ -37,7 +37,7 @@ class SummaryRow extends StatelessWidget {
           SummaryCard(
             label: 'عاجلة',
             value: urgent,
-            icon: LucideIcons.alertTriangle,
+            icon: LucideIcons.triangleAlert,
             bg: AppColors.errorColor.withOpacity(0.1),
             fg: AppColors.errorColor,
             isMobile: isMobile,

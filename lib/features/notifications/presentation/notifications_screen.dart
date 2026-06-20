@@ -2,7 +2,7 @@ import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifi
 import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import '../../../core/components/empty_state.dart';
 import '../../../core/components/section_card.dart';

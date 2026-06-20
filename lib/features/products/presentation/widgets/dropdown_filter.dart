@@ -1,6 +1,6 @@
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../cubit/product_cubit.dart';
 

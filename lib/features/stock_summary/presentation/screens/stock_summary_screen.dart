@@ -7,7 +7,7 @@ import 'package:crazy_phone_pos/features/stock_summary/presentation/cubit/stock_
 import 'package:crazy_phone_pos/features/stock_summary/presentation/widgets/product_details_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class StockSummaryScreen extends StatefulWidget {
   const StockSummaryScreen({super.key});
@@ -396,7 +396,7 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                                 message: "منتجات محذوفة ولكن لها سجل مبيعات",
                                 child: Padding(
                                   padding: EdgeInsets.only(left: 8.0),
-                                  child: Icon(LucideIcons.alertTriangle,
+                                  child: Icon(LucideIcons.triangleAlert,
                                       size: 16, color: AppColors.warningColor),
                                 ),
                               ),

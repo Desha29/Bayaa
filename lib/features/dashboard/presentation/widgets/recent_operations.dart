@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/services/activity_logger.dart';
@@ -81,7 +81,7 @@ class _RecentOperationsState extends State<RecentOperations> {
       case ActivityType.productAdd:
         return LucideIcons.packagePlus;
       case ActivityType.productUpdate:
-        return LucideIcons.edit3;
+        return LucideIcons.pencil;
       case ActivityType.productDelete:
         return LucideIcons.trash2;
       case ActivityType.productQuantityUpdate:
@@ -403,7 +403,7 @@ class _RecentOperationsState extends State<RecentOperations> {
       child: Row(
         children: [
           Icon(
-            group.isOpen ? LucideIcons.playCircle : LucideIcons.checkCircle,
+            group.isOpen ? LucideIcons.circlePlay : LucideIcons.circleCheck,
             size: 16,
             color: group.isOpen ? Colors.green : Colors.grey,
           ),

@@ -2,7 +2,7 @@ import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 
 

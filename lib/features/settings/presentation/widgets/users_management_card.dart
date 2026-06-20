@@ -2,7 +2,7 @@
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/components/section_card.dart';
 import '../../../../core/functions/messege.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';

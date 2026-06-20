@@ -1,7 +1,7 @@
 // desktop_user_table.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
 import '../../../../core/di/dependency_injection.dart';
 
@@ -170,7 +170,7 @@ class DesktopUserTable extends StatelessWidget {
                             ? null
                             : () => _showEditDialog(context, userData),
                         icon: Icon(
-                          LucideIcons.edit,
+                          LucideIcons.pencil,
                           size: 18,
                           color:  getIt<UserCubit>().currentUser.userType ==
                                 UserType.cashier ? AppColors.mutedColor : theme.colorScheme.primary,

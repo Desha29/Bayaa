@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:path/path.dart' as path;
 
@@ -96,7 +96,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     final confirm = await _showConfirmDialog(
       'تأكيد الاستعادة',
       'سيتم استبدال البيانات الحالية بالبيانات الموجودة في النسخة المختارة.\n\nسيتم إعادة تشغيل التطبيق بعد الاستعادة.',
-      icon: LucideIcons.alertTriangle,
+      icon: LucideIcons.triangleAlert,
       iconColor: AppColors.warningColor,
     );
     if (!confirm) return;
@@ -126,7 +126,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     final confirm = await _showConfirmDialog(
       'تأكيد استعادة نقطة الحفظ',
       'سيتم الرجوع إلى نقطة الحفظ هذه وفقدان أي بيانات مسجلة بعدها.\n\nسيتم إعادة تشغيل التطبيق.',
-      icon: LucideIcons.alertTriangle,
+      icon: LucideIcons.triangleAlert,
       iconColor: AppColors.warningColor,
     );
     if (!confirm) return;
@@ -177,7 +177,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   Future<bool> _showConfirmDialog(
     String title,
     String content, {
-    IconData icon = LucideIcons.alertCircle,
+    IconData icon = LucideIcons.circleAlert,
     Color iconColor = AppColors.primaryColor,
   }) async {
     return await showDialog<bool>(

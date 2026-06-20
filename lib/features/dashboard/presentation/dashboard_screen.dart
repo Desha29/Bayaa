@@ -5,7 +5,7 @@ import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifi
 import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/di/dependency_injection.dart';
@@ -94,7 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       SidebarItem(
         id: 'stock_alerts',
-        icon: LucideIcons.alertTriangle,
+        icon: LucideIcons.triangleAlert,
         title: "المنتجات الناقصة",
         screen: const StockScreen(),
       ),
@@ -111,7 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (curUser.userType == UserType.manager)
         SidebarItem(
           id: 'reports',
-          icon: LucideIcons.pieChart,
+          icon: LucideIcons.chartPie,
           title: "الإحصائيات",
           screen: BlocProvider(
             create: (context) => ArpCubit(_arpRepository),

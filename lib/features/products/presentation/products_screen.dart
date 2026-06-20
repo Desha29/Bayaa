@@ -9,7 +9,7 @@ import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cub
 import 'package:crazy_phone_pos/features/products/presentation/cubit/product_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../core/components/anim_wrappers.dart';
 import '../../../core/constants/app_colors.dart';
 import 'widgets/dropdown_filter.dart';
@@ -318,7 +318,7 @@ Future<Map<String, String>?> showCategoryActionDialog({
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    LucideIcons.alertTriangle,
+                    LucideIcons.triangleAlert,
                     color: AppColors.warningColor,
                     size: 28,
                   ),

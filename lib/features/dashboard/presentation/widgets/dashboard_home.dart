@@ -1,7 +1,7 @@
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart'
@@ -90,7 +90,7 @@ class _DashboardHomeState extends State<DashboardHome>
       },
       {
         "id": "stock_alerts",
-        "icon": LucideIcons.alertTriangle,
+        "icon": LucideIcons.triangleAlert,
         "title": "المنتجات الناقصة",
         "subtitle": "تنبيهات المخزون",
         "color": AppColors.warningColor,
@@ -105,7 +105,7 @@ class _DashboardHomeState extends State<DashboardHome>
       if (widget.isManager) ...[
         {
           "id": "reports",
-          "icon": LucideIcons.pieChart,
+          "icon": LucideIcons.chartPie,
           "title": "الإحصائيات",
           "subtitle": "تحليلات النظام",
           "color": AppColors.primaryColor,
@@ -223,7 +223,7 @@ class _DashboardHomeState extends State<DashboardHome>
                       ),
                       child: Row(
                         children: [
-                          Icon(LucideIcons.alertTriangle,
+                          Icon(LucideIcons.triangleAlert,
                               color: Colors.orange.shade700, size: 20),
                           const SizedBox(width: 10),
                           Expanded(
