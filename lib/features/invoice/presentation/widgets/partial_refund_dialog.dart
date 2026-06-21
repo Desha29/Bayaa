@@ -150,7 +150,7 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                           ),
                         ),
                         Text(
-                          'فاتورة #${widget.originalSale.id.substring(0, 8)}',
+                          'فاتورة #${widget.originalSale.id.length > 8 ? widget.originalSale.id.substring(0, 8) : widget.originalSale.id}',
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.mutedColor,

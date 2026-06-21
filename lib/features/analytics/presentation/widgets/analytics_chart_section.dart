@@ -5,10 +5,11 @@ import '../../../../core/constants/app_colors.dart';
 
 
 
-class ArpChartSection extends StatelessWidget {
+class AnalyticsChartSection extends StatelessWidget {
   final Map<String, double> dailySales;
+  final bool usePadding;
 
-  const ArpChartSection({super.key, required this.dailySales});
+  const AnalyticsChartSection({super.key, required this.dailySales, this.usePadding = true});
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +17,17 @@ class ArpChartSection extends StatelessWidget {
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
 
+    final values = dailySales.values.toList();
+    final double maxVal = values.isEmpty
+        ? 10.0
+        : values.reduce((curr, next) => curr > next ? curr : next);
+    final double maxY = maxVal > 0 ? maxVal : 10.0;
+    final double interval = maxY / 4;
+    final double safeInterval = interval <= 0 ? 1.0 : interval;
+
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 32 : isTablet ? 24 : 16,
+        horizontal: usePadding ? (isDesktop ? 32 : isTablet ? 24 : 16) : 0.0,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -64,7 +73,7 @@ class ArpChartSection extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               SizedBox(
-                height: isDesktop ? 300 : isTablet ? 250 : 200,
+                height: isDesktop ? 200 : isTablet ? 160 : 150,
                 child: dailySales.isEmpty
                     ? const Center(
                         child: Text(
@@ -74,6 +83,7 @@ class ArpChartSection extends StatelessWidget {
                       )
                     : LineChart(
                         LineChartData(
+                          maxY: maxY * 1.15,
                           lineTouchData: LineTouchData(
                             handleBuiltInTouches: true,
                             touchTooltipData: LineTouchTooltipData(
@@ -98,7 +108,7 @@ class ArpChartSection extends StatelessWidget {
                           gridData: FlGridData(
                             show: true,
                             drawVerticalLine: false,
-                            horizontalInterval: 1,
+                            horizontalInterval: safeInterval,
                             getDrawingHorizontalLine: (value) {
                               return FlLine(
                                 color: AppColors.mutedColor.withOpacity(0.1),
@@ -142,6 +152,7 @@ class ArpChartSection extends StatelessWidget {
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
+                                interval: safeInterval,
                                 reservedSize: 45,
                                 getTitlesWidget: (value, meta) {
                                   if (value == meta.min || value == meta.max) return const SizedBox();

@@ -50,24 +50,28 @@ class NotificationsScreen extends StatelessWidget {
                             title: 'التنبيهات',
                             subtitle: 'إدارة التنبيهات والإشعارات',
                             icon: LucideIcons.bell,
-                            titleColor: AppColors.kDarkChip,
+                            titleColor: AppColors.textPrimary,
                             iconColor: AppColors.primaryColor,
                           ),
                           SizedBox(height: spacing),
 
-                          // Summary
-                          SectionCard(
-                            child: SummaryRow(
-                              total: getIt<NotificationsCubit>().total,
-                              opened: getIt<NotificationsCubit>().opened,
-                              urgent: getIt<NotificationsCubit>().urgent,
-                              unread: getIt<NotificationsCubit>().unread,
-                            ),
+                          // Summary Row (Render directly on background for a premium flat feel)
+                          SummaryRow(
+                            total: getIt<NotificationsCubit>().total,
+                            opened: getIt<NotificationsCubit>().opened,
+                            urgent: getIt<NotificationsCubit>().urgent,
+                            unread: getIt<NotificationsCubit>().unread,
                           ),
                           SizedBox(height: spacing),
 
-                          // Filters
-                          SectionCard(
+                          // Filters (Clean Container with thin border instead of double nesting)
+                          Container(
+                            padding: EdgeInsets.all(isMobile ? 12 : 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.borderColor.withOpacity(0.6)),
+                            ),
                             child: FiltersBar(
                               filter: getIt<NotificationsCubit>().filter,
                               onFilterChanged: (f) {
@@ -88,16 +92,22 @@ class NotificationsScreen extends StatelessWidget {
                                         },
                             ),
                           ),
-                          SizedBox(height: isMobile ? 8 : 12),
+                          SizedBox(height: spacing),
 
                           // Notifications list
                           Expanded(
-                            child: SectionCard(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.borderColor.withOpacity(0.6)),
+                              ),
                               child: state.notifications.isEmpty
-                                  ? EmptyState()
+                                  ? Center(
+                                      child: EmptyState(),
+                                    )
                                   : ListView.separated(
-                                      padding:
-                                          EdgeInsets.all(isMobile ? 8 : 12),
+                                      padding: EdgeInsets.all(isMobile ? 12 : 16),
                                       itemCount: state.notifications.length,
                                       separatorBuilder: (_, __) => SizedBox(
                                         height: isMobile ? 8 : 12,
@@ -141,9 +151,10 @@ class NotificationsScreen extends StatelessWidget {
                       child: Text(
                         'حدث خطأ غير متوقع',
                         style: TextStyle(
-                          color: AppColors.kDarkChip,
-                          fontSize: isMobile ? 16 : 18,
-                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Cairo',
+                          color: AppColors.textPrimary,
+                          fontSize: isMobile ? 15 : 17,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     );

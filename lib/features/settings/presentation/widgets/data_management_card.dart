@@ -1,4 +1,4 @@
-
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
@@ -13,14 +13,16 @@ class DataManagementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.kCardBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderColor),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.borderColor.withOpacity(0.5),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.015),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -34,24 +36,27 @@ class DataManagementCard extends StatelessWidget {
               ),
             );
           },
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.primaryColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.primaryColor.withOpacity(0.15),
+                    ),
                   ),
                   child: Icon(
                     LucideIcons.database,
                     color: AppColors.primaryColor,
-                    size: 24,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,25 +64,36 @@ class DataManagementCard extends StatelessWidget {
                       Text(
                         'إدارة البيانات والنسخ الاحتياطي',
                         style: TextStyle(
-                          fontSize: isMobile ? 16 : 18,
-                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Cairo',
+                          fontSize: isMobile ? 14 : 15,
+                          fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         'عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة',
                         style: TextStyle(
-                          fontSize: isMobile ? 12 : 14,
+                          fontFamily: 'Cairo',
+                          fontSize: 11,
                           color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Icon(
-                  LucideIcons.chevronRight,
-                  color: AppColors.textSecondary.withOpacity(0.5),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.mutedColor.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    LucideIcons.chevronLeft,
+                    size: 16,
+                    color: AppColors.mutedColor,
+                  ),
                 ),
               ],
             ),

@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 
-class ArpHourlyChart extends StatelessWidget {
+class AnalyticsHourlyChart extends StatelessWidget {
   final Map<int, double> hourlySales;
+  final bool usePadding;
 
-  const ArpHourlyChart({super.key, required this.hourlySales});
+  const AnalyticsHourlyChart({super.key, required this.hourlySales, this.usePadding = true});
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1024;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+
     // Fill missing hours
     final List<BarChartGroupData> barGroups = [];
     double maxY = 0;
@@ -46,6 +51,7 @@ class ArpHourlyChart extends StatelessWidget {
     if (maxY == 0) maxY = 100;
 
     return _ResponsivePadding(
+      usePadding: usePadding,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -72,7 +78,7 @@ class ArpHourlyChart extends StatelessWidget {
             const SizedBox(height: 24),
             // Fix: Use SizedBox height instead of AspectRatio to avoid stretch
             SizedBox(
-              height: 300,
+              height: isDesktop ? 200 : isTablet ? 160 : 150,
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
@@ -106,6 +112,7 @@ class ArpHourlyChart extends StatelessWidget {
                         interval: 4, 
                         getTitlesWidget: (value, meta) {
                           final hour = value.toInt();
+                          if (hour % 4 != 0) return const SizedBox();
                           final period = hour < 12 ? 'ص' : 'م';
                           final h12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
                           return Padding(
@@ -143,20 +150,25 @@ class ArpHourlyChart extends StatelessWidget {
   }
 }
 
-class ArpCategoryPieChart extends StatefulWidget {
+class AnalyticsCategoryPieChart extends StatefulWidget {
   final Map<String, double> categorySales;
+  final bool usePadding;
 
-  const ArpCategoryPieChart({super.key, required this.categorySales});
+  const AnalyticsCategoryPieChart({super.key, required this.categorySales, this.usePadding = true});
 
   @override
-  State<ArpCategoryPieChart> createState() => _ArpCategoryPieChartState();
+  State<AnalyticsCategoryPieChart> createState() => _AnalyticsCategoryPieChartState();
 }
 
-class _ArpCategoryPieChartState extends State<ArpCategoryPieChart> {
+class _AnalyticsCategoryPieChartState extends State<AnalyticsCategoryPieChart> {
   int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1024;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+
     if (widget.categorySales.isEmpty) return const SizedBox();
 
     final List<PieChartSectionData> sections = [];
@@ -174,8 +186,8 @@ class _ArpCategoryPieChartState extends State<ArpCategoryPieChart> {
     
     widget.categorySales.forEach((key, value) {
       final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 16.0 : 13.0;
-      final radius = isTouched ? 110.0 : 100.0; // Increased radius
+      final fontSize = isTouched ? 14.0 : 11.0;
+      final radius = isTouched ? 60.0 : 50.0;
       
       sections.add(PieChartSectionData(
         color: colors[i % colors.length],
@@ -192,6 +204,7 @@ class _ArpCategoryPieChartState extends State<ArpCategoryPieChart> {
     });
 
     return _ResponsivePadding(
+      usePadding: widget.usePadding,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -217,7 +230,7 @@ class _ArpCategoryPieChartState extends State<ArpCategoryPieChart> {
              const SizedBox(height: 24),
              // Fix: Use SizedBox height for responsive consistency
              SizedBox(
-               height: 300,
+               height: isDesktop ? 200 : isTablet ? 160 : 180,
                child: Row(
                  children: [
                    Expanded(
@@ -237,10 +250,10 @@ class _ArpCategoryPieChartState extends State<ArpCategoryPieChart> {
                              });
                            },
                          ),
-                         borderData: FlBorderData(show: false),
-                         sectionsSpace: 2,
-                         centerSpaceRadius: 40,
-                         sections: sections,
+                          borderData: FlBorderData(show: false),
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 25,
+                          sections: sections,
                        ),
                      ),
                    ),
@@ -280,21 +293,31 @@ class _ArpCategoryPieChartState extends State<ArpCategoryPieChart> {
 }
 
 
-class ArpSalesVsRefundChart extends StatefulWidget {
+class AnalyticsSalesVsRefundChart extends StatefulWidget {
   final double grossSales;
   final double refunds;
+  final bool usePadding;
 
-  const ArpSalesVsRefundChart({super.key, required this.grossSales, required this.refunds});
+  const AnalyticsSalesVsRefundChart({
+    super.key,
+    required this.grossSales,
+    required this.refunds,
+    this.usePadding = true,
+  });
 
   @override
-  State<ArpSalesVsRefundChart> createState() => _ArpSalesVsRefundChartState();
+  State<AnalyticsSalesVsRefundChart> createState() => _AnalyticsSalesVsRefundChartState();
 }
 
-class _ArpSalesVsRefundChartState extends State<ArpSalesVsRefundChart> {
+class _AnalyticsSalesVsRefundChartState extends State<AnalyticsSalesVsRefundChart> {
   int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1024;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+
     // If no data
     if (widget.grossSales == 0 && widget.refunds == 0) return const SizedBox();
 
@@ -305,8 +328,8 @@ class _ArpSalesVsRefundChartState extends State<ArpSalesVsRefundChart> {
          color: AppColors.successColor,
          value: netSales,
          title: '${((netSales / widget.grossSales) * 100).toInt()}%',
-         radius: touchedIndex == 0 ? 110 : 100, // Increased radius
-         titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+         radius: touchedIndex == 0 ? 60 : 50,
+         titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
          badgeWidget: _Badge(Icons.check_circle_outline, AppColors.successColor),
          badgePositionPercentageOffset: .98,
        ),
@@ -314,14 +337,15 @@ class _ArpSalesVsRefundChartState extends State<ArpSalesVsRefundChart> {
          color: AppColors.errorColor,
          value: widget.refunds,
          title: '${((widget.refunds / widget.grossSales) * 100).toInt()}%',
-         radius: touchedIndex == 1 ? 110 : 100, // Increased radius
-         titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+         radius: touchedIndex == 1 ? 60 : 50,
+         titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
          badgeWidget: _Badge(Icons.assignment_return_outlined, AppColors.errorColor),
          badgePositionPercentageOffset: .98,
        ),
     ];
 
     return _ResponsivePadding(
+      usePadding: widget.usePadding,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -346,7 +370,7 @@ class _ArpSalesVsRefundChartState extends State<ArpSalesVsRefundChart> {
             ),
             const SizedBox(height: 24),
             SizedBox(
-              height: 300,
+              height: isDesktop ? 200 : isTablet ? 160 : 180,
               child: Row(
                 children: [
                   Expanded(
@@ -367,7 +391,7 @@ class _ArpSalesVsRefundChartState extends State<ArpSalesVsRefundChart> {
                         ),
                         borderData: FlBorderData(show: false),
                         sectionsSpace: 2,
-                        centerSpaceRadius: 40,
+                        centerSpaceRadius: 25,
                         sections: sections,
                       ),
                     ),
@@ -430,10 +454,12 @@ class _Badge extends StatelessWidget {
 
 class _ResponsivePadding extends StatelessWidget {
   final Widget child;
-  const _ResponsivePadding({required this.child});
+  final bool usePadding;
+  const _ResponsivePadding({required this.child, this.usePadding = true});
 
   @override
   Widget build(BuildContext context) {
+    if (!usePadding) return child;
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;

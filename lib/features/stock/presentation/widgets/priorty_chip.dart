@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class PriorityChip extends StatelessWidget {
@@ -9,40 +8,38 @@ class PriorityChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color bg;
-    Color textColor;
+    Color color;
     switch (priority) {
       case "عاجل جداً":
-        bg = AppColors.errorColor.withOpacity(0.15);
-        textColor = AppColors.errorColor;
+        color = AppColors.errorColor;
         break;
       case "عاجل":
-        bg = AppColors.warningColor.withOpacity(0.15);
-        textColor = AppColors.warningColor;
+        color = AppColors.warningColor;
         break;
       case "متوسط":
-        bg = AppColors.primaryColor.withOpacity(0.15);
-        textColor = AppColors.primaryColor;
+        color = AppColors.primaryColor;
         break;
       default:
-        bg = AppColors.successColor.withOpacity(0.15);
-        textColor = AppColors.successColor;
+        color = AppColors.successColor;
     }
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(20),
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 0.5,
+        ),
       ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          priority,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: textColor,
-          ),
+      child: Text(
+        priority,
+        style: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: color,
         ),
       ),
     );

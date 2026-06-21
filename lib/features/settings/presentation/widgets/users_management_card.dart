@@ -1,9 +1,9 @@
+// ignore_for_file: deprecated_member_use
 // users_management_card.dart
 import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../../../core/components/section_card.dart';
 import '../../../../core/functions/messege.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../../auth/presentation/cubit/user_states.dart';
@@ -25,8 +25,6 @@ class UsersManagementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return BlocConsumer<UserCubit, UserStates>(
       listener: (context, state) {
         if (state is UserSuccess) {
@@ -49,72 +47,153 @@ class UsersManagementCard extends StatelessWidget {
         
         userRows = _convertUsersToRows(usersData);
 
-        return SectionCard(
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: AppColors.borderColor.withOpacity(0.5),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.015),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    LucideIcons.users,
-                    size: 18,
-                    color: AppColors.mutedColor,
+              // Card header
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(14),
+                    topRight: Radius.circular(14),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'إدارة المستخدمين',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: AppColors.borderColor.withOpacity(0.4),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  FilledButton.icon(
-                    onPressed: getIt<UserCubit>().currentUser.userType ==
-                            UserType.cashier
-                        ? null
-                        : () => _showAddUserDialog(context),
-                    icon: const Icon(LucideIcons.plus, size: 18),
-                    label: Text(isMobile ? 'إضافة' : 'إضافة مستخدم جديد'),
-                    style: FilledButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? 12 : 16,
-                        vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        LucideIcons.users,
+                        size: 16,
+                        color: AppColors.primaryColor,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: isMobile ? 12 : 16),
-              if (userRows.isEmpty)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(48.0),
-                    child: Column(
-                      children: [
-                        Icon(
-                          LucideIcons.users,
-                          size: 48,
-                          color: AppColors.mutedColor,
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'إدارة المستخدمين',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                          color: AppColors.textPrimary,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'لا يوجد مستخدمين',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppColors.mutedColor,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: getIt<UserCubit>().currentUser.userType ==
+                                UserType.cashier
+                            ? null
+                            : () => _showAddUserDialog(context),
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primaryColor.withOpacity(0.2),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(LucideIcons.plus, size: 14, color: Colors.white),
+                              const SizedBox(width: 6),
+                              Text(
+                                isMobile ? 'إضافة' : 'إضافة مستخدم',
+                                style: const TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                )
-              else
-                DesktopUserTable(
-                  users: userRows,
-                  usersData: usersData,
+                  ],
                 ),
+              ),
+              // Card body
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: userRows.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.mutedColor.withOpacity(0.05),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  LucideIcons.users,
+                                  size: 36,
+                                  color: AppColors.mutedColor.withOpacity(0.5),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'لا يوجد مستخدمين',
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 13,
+                                  color: AppColors.mutedColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : DesktopUserTable(
+                        users: userRows,
+                        usersData: usersData,
+                      ),
+              ),
             ],
           ),
         );

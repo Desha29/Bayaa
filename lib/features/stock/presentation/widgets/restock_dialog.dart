@@ -2,10 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../products/data/models/product_model.dart';
-
-
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class RestockDialog extends StatefulWidget {
@@ -45,154 +44,392 @@ class _RestockDialogState extends State<RestockDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
-        child: Padding(
-          padding: const EdgeInsets.all(18),
+    final isOut = widget.product.quantity == 0;
+    final needed = (widget.product.minQuantity - widget.product.quantity);
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(width: 1),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'إعادة تخزين المنتج',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+              // Header
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withOpacity(0.03),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: AppColors.borderColor.withOpacity(0.5),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.mutedColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.mutedColor.withOpacity(0.3)),
                 ),
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        widget.product.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.successColor.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        LucideIcons.refreshCw,
+                        color: AppColors.successColor,
+                        size: 18,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'الكمية الحالية: ${widget.product.quantity}',
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text(
+                        'إعادة تخزين المنتج',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => Navigator.of(context).pop(),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.mutedColor.withOpacity(0.06),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            LucideIcons.x,
+                            size: 16,
+                            color: AppColors.mutedColor,
                           ),
                         ),
-                        Expanded(
-                          child: Text('الحد الأدنى: ${widget.product.minQuantity}'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'الكمية المطلوبة: ${(widget.product.minQuantity - widget.product.quantity) > 0 ? (widget.product.minQuantity - widget.product.quantity).toString() : '0'}',
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
-              const Text(
-                'كمية إعادة التخزين',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 6),
-              TextField(
-                controller: controller,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
-                  ),
-                  hintText: 'أدخل الكمية',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  errorText: error,
-                ),
-                onChanged: (_) => computeAfter(),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'الكمية بعد التخزين:',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    after.toString(),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final v = int.tryParse(controller.text);
-                        if (v == null || v <= 0) {
-                          setState(() {
-                            error = 'الرجاء إدخال كمية صحيحة أكبر من صفر';
-                          });
-                          return;
-                        }
-                        Navigator.of(context).pop(v);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accentGold,
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text('تأكيد إعادة التخزين'),
+
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Product info card
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.borderColor.withOpacity(0.5),
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 6,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.product.name,
+                            style: const TextStyle(
+                              fontFamily: 'Cairo',
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              _buildInfoBadge(
+                                LucideIcons.package,
+                                'الكمية الحالية',
+                                '${widget.product.quantity}',
+                                isOut ? AppColors.errorColor : AppColors.warningColor,
+                              ),
+                              const SizedBox(width: 10),
+                              _buildInfoBadge(
+                                LucideIcons.shieldAlert,
+                                'الحد الأدنى',
+                                '${widget.product.minQuantity}',
+                                AppColors.primaryColor,
+                              ),
+                              if (needed > 0) ...[
+                                const SizedBox(width: 10),
+                                _buildInfoBadge(
+                                  LucideIcons.arrowUp,
+                                  'المطلوب',
+                                  '$needed',
+                                  AppColors.successColor,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
                       ),
-                      child: Text('إلغاء'),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 18),
+
+                    // Input field
+                    const Text(
+                      'كمية إعادة التخزين',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      style: const TextStyle(
+                        fontFamily: 'Cairo',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 14,
+                        ),
+                        hintText: 'أدخل الكمية',
+                        hintStyle: TextStyle(
+                          fontFamily: 'Cairo',
+                          color: AppColors.mutedColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        prefixIcon: Icon(
+                          LucideIcons.hash,
+                          size: 18,
+                          color: AppColors.mutedColor,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.surfaceColor,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.borderColor.withOpacity(0.5),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.borderColor.withOpacity(0.5),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.primaryColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.errorColor,
+                          ),
+                        ),
+                        errorText: error,
+                        errorStyle: const TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 11,
+                        ),
+                      ),
+                      onChanged: (_) => computeAfter(),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // After restock preview
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.successColor.withOpacity(0.04),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.successColor.withOpacity(0.15),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                LucideIcons.packagePlus,
+                                size: 16,
+                                color: AppColors.successColor,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'الكمية بعد التخزين:',
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            after.toString(),
+                            style: const TextStyle(
+                              fontFamily: 'Cairo',
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16,
+                              color: AppColors.successColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Action buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                final v = int.tryParse(controller.text);
+                                if (v == null || v <= 0) {
+                                  setState(() {
+                                    error = 'الرجاء إدخال كمية صحيحة أكبر من صفر';
+                                  });
+                                  return;
+                                }
+                                Navigator.of(context).pop(v);
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primaryColor.withOpacity(0.2),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(LucideIcons.check, size: 16, color: Colors.white),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'تأكيد إعادة التخزين',
+                                      style: TextStyle(
+                                        fontFamily: 'Cairo',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => Navigator.of(context).pop(),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.mutedColor.withOpacity(0.06),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.borderColor.withOpacity(0.5),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoBadge(IconData icon, String label, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: color.withOpacity(0.12),
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 14, color: color),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: AppColors.mutedColor,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
+            ),
+          ],
         ),
       ),
     );

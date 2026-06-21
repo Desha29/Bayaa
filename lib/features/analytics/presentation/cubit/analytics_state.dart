@@ -1,20 +1,25 @@
-
 import 'package:equatable/equatable.dart';
-import '../../data/models/arp_summary_model.dart';
-import '../../data/models/product_performance_model.dart';
+import '../../data/models/analytics_summary_model.dart';
+import '../../../sessions/data/models/product_performance_model.dart';
 
-
-abstract class ArpState extends Equatable {
+abstract class AnalyticsState extends Equatable {
   @override
   List<Object?> get props => [];
 }
 
-class ArpInitial extends ArpState {}
+class AnalyticsInitial extends AnalyticsState {}
 
-class ArpLoading extends ArpState {}
+class AnalyticsLoading extends AnalyticsState {
+  final AnalyticsLoaded? previousData;
 
-class ArpLoaded extends ArpState {
-  final ArpSummaryModel summary;
+  AnalyticsLoading({this.previousData});
+
+  @override
+  List<Object?> get props => [previousData];
+}
+
+class AnalyticsLoaded extends AnalyticsState {
+  final AnalyticsSummaryModel summary;
   final List<ProductPerformanceModel> topProducts;
   final Map<String, double> dailySales; // Legacy summary (Revenue/Cost/Profit)
   final Map<int, double> hourlySales;
@@ -23,7 +28,7 @@ class ArpLoaded extends ArpState {
   final Map<String, double> monthlySales;
   final Map<String, double> yearlySales;
 
-  ArpLoaded({
+  AnalyticsLoaded({
     required this.summary,
     required this.topProducts,
     required this.dailySales,
@@ -47,12 +52,11 @@ class ArpLoaded extends ArpState {
       ];
 }
 
-class ArpError extends ArpState {
+class AnalyticsError extends AnalyticsState {
   final String message;
 
-  ArpError(this.message);
+  AnalyticsError(this.message);
 
   @override
   List<Object?> get props => [message];
 }
-

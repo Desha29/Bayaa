@@ -29,7 +29,7 @@ import 'package:crazy_phone_pos/features/invoice/presentation/cubit/invoice_cubi
 import '../../settings/presentation/cubit/settings_cubit.dart';
 
 class SalesScreen extends StatefulWidget {
-  final SalesRepository? repository; // optional, create if not passed
+  final SalesRepository? repository;
 
   const SalesScreen({super.key, this.repository});
 
@@ -38,27 +38,18 @@ class SalesScreen extends StatefulWidget {
 }
 
 class _SalesScreenState extends State<SalesScreen>
-    with TickerProviderStateMixin {
-  // Animations
+    with SingleTickerProviderStateMixin {
   late final AnimationController _fadeController;
-  late final AnimationController _slideController;
   late final Animation<double> _fadeAnimation;
-  late final Animation<Offset> _slideAnimation;
 
-  // TextField controller
   final TextEditingController _barcodeController = TextEditingController();
   final FocusNode _barcodeFocusNode = FocusNode();
 
-  // HID keyboard-wedge listener (scanners that type like a keyboard)
   final StringBuffer _hidBuffer = StringBuffer();
   Timer? _hidTimer;
 
-  // No local products box
-  
-  // Repository for scanning/lookup
   late final SalesRepository _repository;
 
-  // Simple in-memory cart
   final List<Map<String, dynamic>> _cartItems = [];
   List<Map<String, dynamic>> _recentSales = [];
   List<Product> _filteredProducts = [];
@@ -69,7 +60,7 @@ class _SalesScreenState extends State<SalesScreen>
         (sum, e) => sum + (e['price'] as double) * (e['qty'] as int),
       );
   Timer? _searchDebounce;
-  
+
   @override
   void initState() {
     super.initState();
@@ -78,20 +69,11 @@ class _SalesScreenState extends State<SalesScreen>
 
     _fadeController = AnimationController(
         duration: const Duration(milliseconds: 800), vsync: this);
-    _slideController = AnimationController(
-        duration: const Duration(milliseconds: 1000), vsync: this);
     _fadeAnimation =
         CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-            CurvedAnimation(
-                parent: _slideController, curve: Curves.easeOutCubic));
     _fadeController.forward();
-    _slideController.forward();
 
-    // Global HID listener: commits on Enter or brief idle after burst
     RawKeyboard.instance.addListener(_onRawKey);
-    // Load recent sales
     _loadRecentSales();
   }
 
@@ -103,19 +85,13 @@ class _SalesScreenState extends State<SalesScreen>
         setState(() => _filteredProducts = []);
         return;
       }
-      
-      // Use ProductCubit or Repository to search (for now using ProductCubit's cached list if available or repository search)
-      // Since we want to search broadly, let's use the loaded products in ProductCubit if available
+
       final productCubit = getIt<ProductCubit>();
-      
-      // If products are loaded in memory, filter them. Else we might need a search API.
-      // Assuming small catalogue for now as per previous logic.
-      final allProducts = productCubit.allProducts; 
-      
+      final allProducts = productCubit.allProducts;
+
       final query = q.toLowerCase();
       final parsedNumber = double.tryParse(q.replaceAll(',', '.'));
 
-      // Collect matches and score them
       final List<Map<String, dynamic>> scored = [];
       for (final p in allProducts) {
         var score = 0;
@@ -146,9 +122,8 @@ class _SalesScreenState extends State<SalesScreen>
   Future<void> _commitBarcode(String code) async {
     if (code.isEmpty) return;
 
-    // Look up product by barcode via Repository (SQLite)
     final result = await _repository.findProductByBarcode(code);
-    
+
     result.fold(
       (failure) {
          MotionSnackBarError(context, "خطأ في البحث: ${failure.message}");
@@ -162,7 +137,6 @@ class _SalesScreenState extends State<SalesScreen>
           return;
         }
 
-        // Check strict availability
         if (product.quantity <= 0) {
           MotionSnackBarError(context, "الكمية نفذت من المخزن لهذا المنتج");
           _barcodeController.clear();
@@ -171,7 +145,6 @@ class _SalesScreenState extends State<SalesScreen>
           return;
         }
 
-        // Already in cart? increase qty
         final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
         if (idx != -1) {
           final currentQty = _cartItems[idx]['qty'] as int;
@@ -201,37 +174,29 @@ class _SalesScreenState extends State<SalesScreen>
     );
   }
 
-
-
-  /// Checkout with invoice auto-open
   Future<void> _onCheckout() async {
     if (_cartItems.isEmpty) {
       MotionSnackBarError(context, 'السلة فارغة');
       return;
     }
 
-    // Capture values before async operations
     final total = _totalAmount;
     final itemCount = _cartItems.length;
     final itemNames = _cartItems.map((e) => e['name'] as String).toList();
     final userName = getIt<UserCubit>().currentUser.name;
 
-    // Update stock via Repository
     for (final item in _cartItems) {
       final productBarcode = item['id'] as String;
       final qtySold = item['qty'] as int;
       final stockQuantity = item['quantity'] as int;
-      
+
       final newQuant = stockQuantity - qtySold;
-      
-      // Update DB
+
       await _repository.updateProductQuantity(productBarcode, newQuant < 0 ? 0 : newQuant);
     }
-    
-    // Refresh Product Cubit to reflect stock changes across app
+
     getIt<ProductCubit>().getAllProducts();
 
-    // Get or create session for activity logging
     String? sessionId;
     try {
       sessionId = await getIt<SessionManager>().ensureSessionId(
@@ -274,7 +239,6 @@ class _SalesScreenState extends State<SalesScreen>
           'تمت عملية البيع - الإجمالي: ${total.toStringAsFixed(2)} ج.م',
         );
 
-        // ✅ Log sale activity
         if (sessionId != null) {
           try {
             await getIt<ActivityLogger>().logActivity(
@@ -294,7 +258,6 @@ class _SalesScreenState extends State<SalesScreen>
           }
         }
 
-        // Update recent sales
         _recentSales = [
           {
             'total': total,
@@ -305,20 +268,16 @@ class _SalesScreenState extends State<SalesScreen>
           ..._recentSales,
         ];
 
-        // Clear cart
         _cartItems.clear();
         setState(() {});
 
-        // Refresh InvoiceCubit for dashboard stats
         getIt<InvoiceCubit>().loadSales();
 
-        // Auto-open invoice
         _openInvoice(sale);
       },
     );
   }
 
-  // Open invoice preview screen
   Future<void> _openInvoice(Sale sale) async {
     final subtotal = sale.saleItems.fold<double>(0, (s, it) => s + it.total);
     final cashierName = sale.cashierName ?? 'الكاشير';
@@ -371,11 +330,11 @@ class _SalesScreenState extends State<SalesScreen>
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final isDesktop = constraints.maxWidth > 1200;
+            final isDesktop = constraints.maxWidth > 1100;
             final isTablet =
-                constraints.maxWidth >= 768 && constraints.maxWidth <= 1200;
+                constraints.maxWidth >= 768 && constraints.maxWidth <= 1100;
             return Padding(
-              padding: EdgeInsets.all(isDesktop ? 32 : (isTablet ? 24 : 16)),
+              padding: EdgeInsets.all(isDesktop ? 24 : (isTablet ? 16 : 12)),
               child: (isDesktop || isTablet)
                   ? _buildDesktopTabletLayout(isDesktop)
                   : _buildMobileLayout(),
@@ -390,6 +349,7 @@ class _SalesScreenState extends State<SalesScreen>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Left Column (POS Scanner + Cart Table)
         Expanded(
           flex: isDesktop ? 7 : 6,
           child: Column(
@@ -398,32 +358,19 @@ class _SalesScreenState extends State<SalesScreen>
               const ScreenHeader(
                 title: 'شاشة المبيعات',
                 subtitle: 'إدارة عمليات البيع والفواتير',
-                fontSize: 32,
+                fontSize: 30,
                 icon: Icons.point_of_sale,
                 iconColor: AppColors.primaryColor,
-                titleColor: AppColors.kDarkChip,
+                titleColor: AppColors.textPrimary,
               ),
               const SizedBox(height: 16),
-              TotalSectionCard(
-                totalAmount: _totalAmount,
-                itemCount: _cartItems.length,
-                onCheckout: _onCheckout,
-                onClearCart: () {
-                  _cartItems.clear();
-                  setState(() {});
-                },
-              ),
-              const SizedBox(height: 12),
-              const SizedBox(height: 12),
               Expanded(
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    // Layout Column with Phantom Widget to reserve space
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Phantom ScanCard
                         Visibility(
                           maintainSize: true,
                           maintainAnimation: true,
@@ -432,7 +379,6 @@ class _SalesScreenState extends State<SalesScreen>
                           child: const BarcodeScanCard(),
                         ),
                         const SizedBox(height: 16),
-                        // The CartSection
                         Expanded(
                           child: CartSection(
                             cartItems: _cartItems,
@@ -471,8 +417,6 @@ class _SalesScreenState extends State<SalesScreen>
                         ),
                       ],
                     ),
-
-                    // The Real Interactive Elements (ScanCard + Overlay) on Top
                     Positioned(
                       top: 0,
                       left: 0,
@@ -501,69 +445,14 @@ class _SalesScreenState extends State<SalesScreen>
             ],
           ),
         ),
-        SizedBox(width: isDesktop ? 32 : 24),
-        if (!_isRecentSalesCollapsed)
-          Expanded(
-            flex: isDesktop ? 3 : 4,
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: RecentSalesSection(
-                recentSales: _recentSales,
-                onToggleCollapse: () {
-                  setState(() {
-                    _isRecentSalesCollapsed = !_isRecentSalesCollapsed;
-                  });
-                },
-              ),
-            ),
-          ),
-        // Toggle button when collapsed
-        if (_isRecentSalesCollapsed)
-          Container(
-            width: 40,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderColor),
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                IconButton(
-                  icon: const Icon(
-                    Icons.chevron_left,
-                    color: AppColors.primaryColor,
-                  ),
-                  tooltip: 'عرض المبيعات الأخيرة',
-                  onPressed: () {
-                    setState(() {
-                      _isRecentSalesCollapsed = false;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildMobileLayout() {
-    return Column(
-      children: [
+        SizedBox(width: isDesktop ? 24 : 16),
+        // Right Column (Checkout totals + Recent sales)
         Expanded(
+          flex: isDesktop ? 3 : 4,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ScreenHeader(
-                title: 'شاشة المبيعات',
-                subtitle: 'إدارة عمليات البيع والفواتير',
-                fontSize: 28,
-                icon: Icons.point_of_sale,
-                iconColor: AppColors.primaryColor,
-                titleColor: AppColors.kDarkChip,
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 86),
               TotalSectionCard(
                 totalAmount: _totalAmount,
                 itemCount: _cartItems.length,
@@ -573,112 +462,218 @@ class _SalesScreenState extends State<SalesScreen>
                   setState(() {});
                 },
               ),
-              const SizedBox(height: 12),
-              const SizedBox(height: 12),
-              Expanded(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    // Layout with Phantom
-                    Column(
-                      children: [
-                        Visibility(
-                          maintainSize: true,
-                          maintainAnimation: true,
-                          maintainState: true,
-                          visible: false,
-                          child: const BarcodeScanCard(),
+              const SizedBox(height: 16),
+              if (!_isRecentSalesCollapsed)
+                Expanded(
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: RecentSalesSection(
+                      recentSales: _recentSales,
+                      onToggleCollapse: () {
+                        setState(() {
+                          _isRecentSalesCollapsed = !_isRecentSalesCollapsed;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              if (_isRecentSalesCollapsed)
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _isRecentSalesCollapsed = false;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.kCardBackground,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.borderColor),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.01),
+                          blurRadius: 10,
                         ),
-                        const SizedBox(height: 12),
-                        Expanded(
-                          child: CartSection(
-                            cartItems: _cartItems,
-                            onRemoveItem: (i) {
-                              _cartItems.removeAt(i);
-                              setState(() {});
-                            },
-                            onIncreaseQty: (i) {
-                              final currentQty = _cartItems[i]['qty'] as int;
-                              final stockQuantity =
-                                  _cartItems[i]['quantity'] as int;
-
-                              if (currentQty < stockQuantity) {
-                                _cartItems[i]['qty'] = currentQty + 1;
-                                setState(() {});
-                              } else {
-                                MotionSnackBarWarning(context,
-                                    "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
-                              }
-                            },
-                            onDecreaseQty: (i) {
-                              final q = _cartItems[i]['qty'] as int;
-                              if (q > 1) {
-                                _cartItems[i]['qty'] = q - 1;
-                                setState(() {});
-                              } else {
-                                _cartItems.removeAt(i);
-                                setState(() {});
-                              }
-                            },
-                            onEditPrice: (i, newPrice) {
-                              _cartItems[i]['price'] = newPrice;
-                              setState(() {});
-                            },
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.chevron_left, color: AppColors.primaryColor, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          "عرض المبيعات الأخيرة",
+                          style: TextStyle(
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
                           ),
                         ),
                       ],
                     ),
-                    // Real Interactive Elements on Top
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BarcodeScanCard(
-                            controller: _barcodeController,
-                            focusNode: _barcodeFocusNode,
-                            onSubmitted: (val) => _commitBarcode(val),
-                            onChanged: _onSearchChanged,
-                          ),
-                          if (_filteredProducts.isNotEmpty)
-                            ProductSearchOverlay(
-                              products: _filteredProducts,
-                              allProducts: getIt<ProductCubit>().allProducts,
-                              onProductSelected: _addProductFromSearch,
-                            ),
-                        ],
-                      ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const ScreenHeader(
+          title: 'شاشة المبيعات',
+          subtitle: 'إدارة عمليات البيع والفواتير',
+          fontSize: 26,
+          icon: Icons.point_of_sale,
+          iconColor: AppColors.primaryColor,
+          titleColor: AppColors.textPrimary,
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Visibility(
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    visible: false,
+                    child: const BarcodeScanCard(),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: CartSection(
+                      cartItems: _cartItems,
+                      onRemoveItem: (i) {
+                        _cartItems.removeAt(i);
+                        setState(() {});
+                      },
+                      onIncreaseQty: (i) {
+                        final currentQty = _cartItems[i]['qty'] as int;
+                        final stockQuantity =
+                            _cartItems[i]['quantity'] as int;
+
+                        if (currentQty < stockQuantity) {
+                          _cartItems[i]['qty'] = currentQty + 1;
+                          setState(() {});
+                        } else {
+                          MotionSnackBarWarning(context,
+                              "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
+                        }
+                      },
+                      onDecreaseQty: (i) {
+                        final q = _cartItems[i]['qty'] as int;
+                        if (q > 1) {
+                          _cartItems[i]['qty'] = q - 1;
+                          setState(() {});
+                        } else {
+                          _cartItems.removeAt(i);
+                          setState(() {});
+                        }
+                      },
+                      onEditPrice: (i, newPrice) {
+                        _cartItems[i]['price'] = newPrice;
+                        setState(() {});
+                      },
                     ),
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    BarcodeScanCard(
+                      controller: _barcodeController,
+                      focusNode: _barcodeFocusNode,
+                      onSubmitted: (val) => _commitBarcode(val),
+                      onChanged: _onSearchChanged,
+                    ),
+                    if (_filteredProducts.isNotEmpty)
+                      ProductSearchOverlay(
+                        products: _filteredProducts,
+                        allProducts: getIt<ProductCubit>().allProducts,
+                        onProductSelected: _addProductFromSearch,
+                      ),
                   ],
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        SlideTransition(
-          position: _slideAnimation,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: RecentSalesSection(recentSales: _recentSales),
+        const SizedBox(height: 12),
+        TotalSectionCard(
+          totalAmount: _totalAmount,
+          itemCount: _cartItems.length,
+          onCheckout: _onCheckout,
+          onClearCart: () {
+            _cartItems.clear();
+            setState(() {});
+          },
+        ),
+        const SizedBox(height: 12),
+        InkWell(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (context) => Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.backgroundColor,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: RecentSalesSection(
+                  recentSales: _recentSales,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primaryColor.withOpacity(0.2)),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.history, color: AppColors.primaryColor, size: 18),
+                SizedBox(width: 8),
+                Text(
+                  "المبيعات الأخيرة",
+                  style: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
     );
   }
-  // Capture scanner keystrokes and commit to search
+
   void _onRawKey(RawKeyEvent event) {
     if (event is! RawKeyDownEvent) return;
-    // If the text field has focus, let the system/TextField handle the input.
     if (_barcodeFocusNode.hasFocus) return;
 
-    // If another widget has focus (e.g. dialog TextField), suppress HID handling
     final primary = FocusManager.instance.primaryFocus;
     if (primary != null && primary != _barcodeFocusNode) return;
 
-    // Commit as soon as scanner sends Enter/NumpadEnter
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
       _hidTimer?.cancel();
@@ -688,19 +683,16 @@ class _SalesScreenState extends State<SalesScreen>
       return;
     }
 
-    // Prefer character; fallback to keyLabel for digits/letters on Windows
     String? ch = event.character;
     if ((ch == null || ch.isEmpty) && event.logicalKey.keyLabel.length == 1) {
       ch = event.logicalKey.keyLabel;
     }
 
-    // Accept visible characters only
     if (ch != null && ch.isNotEmpty && ch.codeUnitAt(0) >= 32) {
       _hidBuffer.write(ch);
-      _barcodeController.text = _hidBuffer.toString(); // mirror to TextField
+      _barcodeController.text = _hidBuffer.toString();
     }
 
-    // If no Enter suffix, commit shortly after the burst ends
     _hidTimer?.cancel();
     _hidTimer = Timer(const Duration(milliseconds: 120), () {
       final code = _hidBuffer.toString().trim();
@@ -710,7 +702,6 @@ class _SalesScreenState extends State<SalesScreen>
   }
 
   void _addProductFromSearch(Product product) {
-    // Add directly to cart like scanning
     _commitBarcode(product.barcode);
     setState(() {
       _filteredProducts = [];
@@ -723,16 +714,16 @@ class _SalesScreenState extends State<SalesScreen>
       (_) {},
       (sales) {
         if (mounted) {
-           setState(() {
-          _recentSales = sales
-              .map((s) => {
-                    'total': s.total,
-                    'items': s.items,
-                    'date': s.date,
-                    'isRefund': s.isRefund,
-                  })
-              .toList();
-        });
+          setState(() {
+            _recentSales = sales
+                .map((s) => {
+                      'total': s.total,
+                      'items': s.items,
+                      'date': s.date,
+                      'isRefund': s.isRefund,
+                    })
+                .toList();
+          });
         }
       },
     );
@@ -746,7 +737,6 @@ class _SalesScreenState extends State<SalesScreen>
     _barcodeController.dispose();
     _barcodeFocusNode.dispose();
     _fadeController.dispose();
-    _slideController.dispose();
     super.dispose();
   }
-} // End of class
+}

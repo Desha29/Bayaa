@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
-
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class FiltersBar extends StatelessWidget {
@@ -26,7 +25,7 @@ class FiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -44,16 +43,18 @@ class FiltersBar extends StatelessWidget {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: onMarkAllRead,
-                      icon: const Icon(LucideIcons.checkCheck, size: 16),
-                      label: FittedBox(
+                      icon: const Icon(LucideIcons.checkCheck, size: 15),
+                      label: const FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: const Text('كمقروءة'),
+                        child: Text(
+                          'تحديد المقروءة',
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
                       ),
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
+                        backgroundColor: AppColors.secondaryColor,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                   ),
@@ -61,16 +62,19 @@ class FiltersBar extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: onDeleteSelected,
-                      icon: const Icon(LucideIcons.trash2, size: 16),
-                      label: FittedBox(
+                      icon: const Icon(LucideIcons.trash2, size: 15),
+                      label: const FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: const Text('حذف'),
+                        child: Text(
+                          'حذف المحدد',
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
+                        foregroundColor: AppColors.errorColor,
+                        side: const BorderSide(color: AppColors.errorColor),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                   ),
@@ -87,7 +91,7 @@ class FiltersBar extends StatelessWidget {
                     onTap: () => onFilterChanged(NotifyFilter.all),
                     label: 'الكل',
                     count: total,
-                    color: c.primary,
+                    color: AppColors.primaryColor,
                     compact: true,
                   ),
                   _FilterChip(
@@ -118,29 +122,40 @@ class FiltersBar extends StatelessWidget {
             // Action buttons
             FilledButton.icon(
               onPressed: onMarkAllRead,
-              icon: const Icon(LucideIcons.checkCheck, size: 18),
-              label: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(isTablet ? 'مقروءة' : 'تحديد الكل كمقروءة'),
+              icon: const Icon(LucideIcons.checkCheck, size: 16),
+              label: Text(
+                isTablet ? 'تحديد المقروءة' : 'تحديد الكل كمقروءة',
+                style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.secondaryColor,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
             const SizedBox(width: 8),
             OutlinedButton.icon(
               onPressed: onDeleteSelected,
-              icon: const Icon(LucideIcons.trash2, size: 18),
-              label: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: const Text('حذف المحدد'),
+              icon: const Icon(LucideIcons.trash2, size: 16),
+              label: const Text(
+                'حذف المحدد',
+                style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.errorColor,
+                side: BorderSide(color: onDeleteSelected != null ? AppColors.errorColor : AppColors.borderColor),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
-            const Spacer(), // Now safely inside a Row
+            const Spacer(),
             // Filter chips
             _FilterChip(
               selected: filter == NotifyFilter.all,
               onTap: () => onFilterChanged(NotifyFilter.all),
               label: 'الكل',
               count: total,
-              color: c.primary,
+              color: AppColors.primaryColor,
               compact: isTablet,
             ),
             const SizedBox(width: 8),
@@ -187,54 +202,52 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final base = selected ? color : color.withOpacity(0.15);
-    final fg = selected ? Colors.white : color;
+    final baseColor = selected ? color : color.withOpacity(0.06);
+    final textColor = selected ? Colors.white : color;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(20),
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(
-          horizontal: compact ? 10 : 12,
+          horizontal: compact ? 12 : 16,
           vertical: compact ? 6 : 8,
         ),
         decoration: BoxDecoration(
-          color: base,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.25)),
+          color: baseColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: selected ? Colors.transparent : color.withOpacity(0.24)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Flexible(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: fg,
-                    fontWeight: FontWeight.w600,
-                    fontSize: compact ? 13 : 14,
-                  ),
-                ),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                color: textColor,
+                fontWeight: FontWeight.w700,
+                fontSize: compact ? 12 : 13,
               ),
             ),
             const SizedBox(width: 6),
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: compact ? 5 : 6,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 6,
                 vertical: 2,
               ),
               decoration: BoxDecoration(
-                color: selected ? Colors.white.withOpacity(0.2) : Colors.white,
+                color: selected ? Colors.white.withOpacity(0.2) : color.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 '$count',
                 style: TextStyle(
+                  fontFamily: 'Cairo',
                   color: selected ? Colors.white : color,
-                  fontWeight: FontWeight.w700,
-                  fontSize: compact ? 11 : 12,
+                  fontWeight: FontWeight.bold,
+                  fontSize: compact ? 10 : 11,
                 ),
               ),
             ),

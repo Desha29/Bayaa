@@ -9,51 +9,39 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color color;
+    final String label;
+
     if (isOut) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.errorColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'غير متوفر',
-            style: TextStyle(color: AppColors.errorColor, fontSize: 13),
-          ),
-        ),
-      );
+      color = AppColors.errorColor;
+      label = 'نفذ';
     } else if (isLow) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.warningColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'مخزون منخفض',
-            style: TextStyle(color: AppColors.warningColor, fontSize: 13),
-          ),
-        ),
-      );
+      color = AppColors.warningColor;
+      label = 'منخفض';
     } else {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.successColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'متوفر',
-            style: TextStyle(color: AppColors.successColor, fontSize: 13),
-          ),
-        ),
-      );
+      color = AppColors.successColor;
+      label = 'متوفر';
     }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 0.5,
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontFamily: 'Cairo',
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
   }
 }

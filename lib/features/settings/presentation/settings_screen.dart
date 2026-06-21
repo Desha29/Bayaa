@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:crazy_phone_pos/core/components/screen_header.dart';
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
@@ -86,44 +87,46 @@ class _SettingsScreenContent extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final isMobile = constraints.maxWidth < 600;
-                final padding = isMobile ? 16.0 : 24.0;
 
-                return Padding(
-                  padding: EdgeInsets.all(padding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const ScreenHeader(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Header
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                      child: ScreenHeader(
                         title: 'الإعدادات',
                         subtitle: 'إعدادات النظام وإدارة المستخدمين',
-                        icon: Icons.settings,
+                        icon: LucideIcons.settings,
                         titleColor: AppColors.kDarkChip,
                         iconColor: AppColors.primaryColor,
                       ),
-                      SizedBox(height: isMobile ? 12 : 16),
-                      LogoutWarningBanner(isMobile: isMobile),
-                      SizedBox(height: isMobile ? 12 : 16),
-                      Expanded(
-                        child: ListView(
-                          children: [
-                            // DataProtectionCard(isMobile: isMobile),
-                            // SizedBox(height: isMobile ? 12 : 16),
-                            if (getIt<UserCubit>().currentUser.userType == UserType.manager) ...[
-                               DataManagementCard(isMobile: isMobile),
-                               SizedBox(height: isMobile ? 12 : 16),
-                            ],
-                            StoreInfoCard(isMobile: isMobile),
-                            SizedBox(height: isMobile ? 12 : 16),
-                            CloseDayCard(isMobile: isMobile),
-                            SizedBox(height: isMobile ? 12 : 16),
-                            if (getIt<UserCubit>().currentUser.userType !=
-                                UserType.cashier)
-                              UsersManagementCard(isMobile: isMobile),
+                    ),
+                    const SizedBox(height: 12),
+                    // Content
+                    Expanded(
+                      child: ListView(
+                        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+                        children: [
+                          LogoutWarningBanner(isMobile: isMobile),
+                          const SizedBox(height: 12),
+                          // DataProtectionCard(isMobile: isMobile),
+                          // SizedBox(height: isMobile ? 12 : 16),
+                          if (getIt<UserCubit>().currentUser.userType == UserType.manager) ...[
+                             DataManagementCard(isMobile: isMobile),
+                             const SizedBox(height: 12),
                           ],
-                        ),
+                          StoreInfoCard(isMobile: isMobile),
+                          const SizedBox(height: 12),
+                          CloseDayCard(isMobile: isMobile),
+                          const SizedBox(height: 12),
+                          if (getIt<UserCubit>().currentUser.userType !=
+                              UserType.cashier)
+                            UsersManagementCard(isMobile: isMobile),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -140,40 +143,122 @@ class _SettingsScreenContent extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Text('تم إغلاق اليوم بنجاح'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('تم حفظ تقرير اليوم بنجاح.'),
-            const SizedBox(height: 16),
-            Text(
-              isManager
-                  ? 'يمكنك الآن عرض التقرير التفصيلي لليوم.'
-                  : 'سيتم تسجيل الخروج الآن.',
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              if (isManager) {
-                // Navigate to Daily Report Preview Screen
-                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => DailyReportPreviewScreen(report: report), // Use Preview Screen
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Colors.white,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Dialog header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.successColor.withOpacity(0.04),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
                   ),
-                );
-              } else {
-                userCubit.logout();
-                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-              }
-            },
-            child: Text(isManager ? 'عرض تقرير اليوم' : 'حسناً'),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.successColor.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          LucideIcons.checkCircle,
+                          color: AppColors.successColor,
+                          size: 32,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      const Text(
+                        'تم إغلاق اليوم بنجاح',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontWeight: FontWeight.w800,
+                          fontSize: 18,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        isManager
+                            ? 'تم حفظ تقرير اليوم. يمكنك عرض التقرير التفصيلي.'
+                            : 'تم حفظ تقرير اليوم. سيتم تسجيل الخروج الآن.',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+                // Action
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          if (isManager) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => DailyReportPreviewScreen(report: report),
+                              ),
+                            );
+                          } else {
+                            userCubit.logout();
+                            Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isManager ? LucideIcons.fileText : LucideIcons.check,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                isManager ? 'عرض تقرير اليوم' : 'حسناً',
+                                style: const TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

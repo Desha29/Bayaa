@@ -28,9 +28,9 @@ import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../../settings/presentation/cubit/settings_states.dart';
 
 import '../../sessions/presentation/screens/sessions_dashboard_screen.dart';
-import '../../arp/presentation/screens/arp_screen.dart';
-import '../../sessions/presentation/cubit/arp_cubit.dart';
-import '../../sessions/data/arp_repository_impl.dart';
+import '../../analytics/presentation/screens/analytics_screen.dart';
+import '../../analytics/presentation/cubit/analytics_cubit.dart';
+import '../../analytics/data/analytics_repository_impl.dart';
 
 import 'widgets/dashboard_home.dart';
 import 'widgets/side_bar.dart';
@@ -49,7 +49,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isSidebarCollapsed = false;
 
   late final SalesRepositoryImpl _salesRepository;
-  late final ArpRepositoryImpl _arpRepository;
+  late final AnalyticsRepositoryImpl _analyticsRepository;
   late final User curUser = getIt<UserCubit>().currentUser;
   late final List<SidebarItem> sidebarItems;
 
@@ -58,7 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
 
     _salesRepository = getIt<SalesRepositoryImpl>();
-    _arpRepository = ArpRepositoryImpl();
+    _analyticsRepository = AnalyticsRepositoryImpl();
 
     final allSidebarItems = [
       SidebarItem(
@@ -114,8 +114,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           icon: LucideIcons.chartPie,
           title: "الإحصائيات",
           screen: BlocProvider(
-            create: (context) => ArpCubit(_arpRepository),
-            child: const ArpScreen(),
+            create: (context) => AnalyticsCubit(_analyticsRepository),
+            child: const AnalyticsScreen(),
           ),
         ),
       if (curUser.userType == UserType.manager)
@@ -124,7 +124,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           icon: LucideIcons.history,
           title: "الايام",
           screen: BlocProvider(
-            create: (context) => ArpCubit(_arpRepository),
+            create: (context) => AnalyticsCubit(_analyticsRepository),
             child: const SessionsDashboardScreen(),
           ),
         ),

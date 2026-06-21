@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
-
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class NotificationCard extends StatelessWidget {
@@ -20,25 +19,25 @@ class NotificationCard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onMarkReadToggle;
 
-  Color _priorityTint() {
+  Color _priorityBg() {
     switch (item.priority) {
       case NotifyPriority.high:
-        return AppColors.errorColor.withOpacity(0.1);
+        return const Color(0xFFFEF2F2); // Soft light red
       case NotifyPriority.medium:
-        return AppColors.warningColor.withOpacity(0.1);
+        return const Color(0xFFFFF7ED); // Soft light orange
     }
   }
 
   Color _priorityBorder() {
     switch (item.priority) {
       case NotifyPriority.high:
-        return AppColors.errorColor.withOpacity(0.3);
+        return const Color(0xFFFCA5A5).withOpacity(0.6); // Soft red border
       case NotifyPriority.medium:
-        return AppColors.warningColor.withOpacity(0.3);
+        return const Color(0xFFFED7AA).withOpacity(0.6); // Soft orange border
     }
   }
 
-  Color _iconColor() {
+  Color _priorityPrimary() {
     switch (item.priority) {
       case NotifyPriority.high:
         return AppColors.errorColor;
@@ -49,7 +48,7 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -57,70 +56,110 @@ class NotificationCard extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: _priorityTint(),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _priorityBorder()),
+            color: _priorityBg(),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: _priorityBorder(), width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.015),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             children: [
-              // Action bar
+              // Top Action bar
               Padding(
                 padding: EdgeInsetsDirectional.only(
                   top: isMobile ? 6 : 8,
-                  start: isMobile ? 6 : 8,
-                  end: isMobile ? 6 : 8,
+                  start: isMobile ? 8 : 12,
+                  end: isMobile ? 8 : 12,
                 ),
                 child: Row(
                   children: [
-                    IconButton(
-                      tooltip: 'حذف',
-                      onPressed: onDelete,
-                      icon: Icon(
-                        LucideIcons.trash2,
-                        size: isMobile ? 16 : 18,
-                      ),
-                      color: AppColors.errorColor,
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColors.errorColor.withOpacity(0.1),
-                        padding: EdgeInsets.all(isMobile ? 6 : 8),
-                        minimumSize:
-                            Size(isMobile ? 32 : 40, isMobile ? 32 : 40),
+                    // Custom Checkbox
+                    InkWell(
+                      onTap: onToggleCheck,
+                      borderRadius: BorderRadius.circular(6),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: checked ? AppColors.secondaryColor : Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: checked ? AppColors.secondaryColor : AppColors.borderColor.withOpacity(0.8),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: checked
+                            ? const Icon(
+                                LucideIcons.check,
+                                color: Colors.white,
+                                size: 14,
+                              )
+                            : null,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    IconButton(
-                      tooltip: checked ? 'إلغاء التحديد' : 'تحديد',
-                      onPressed: onToggleCheck,
-                      icon: Icon(
-                        checked ? LucideIcons.squareCheck : LucideIcons.square,
-                        size: isMobile ? 16 : 18,
+                    const Spacer(),
+                    // Mark as read/unread
+                    Tooltip(
+                      message: item.read ? 'وضع كغير مقروء' : 'وضع كمقروء',
+                      child: IconButton(
+                        onPressed: onMarkReadToggle,
+                        icon: Icon(
+                          item.read ? LucideIcons.eye : LucideIcons.eyeOff,
+                          size: 16,
+                        ),
+                        color: AppColors.mutedColor,
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          padding: const EdgeInsets.all(6),
+                          minimumSize: const Size(30, 30),
+                        ),
                       ),
-                      color: AppColors.mutedColor,
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColors.mutedColor.withOpacity(0.15),
-                        padding: EdgeInsets.all(isMobile ? 6 : 8),
-                        minimumSize:
-                            Size(isMobile ? 32 : 40, isMobile ? 32 : 40),
+                    ),
+                    const SizedBox(width: 8),
+                    // Trash Delete Button
+                    Tooltip(
+                      message: 'حذف التنبيه',
+                      child: IconButton(
+                        onPressed: onDelete,
+                        icon: const Icon(
+                          LucideIcons.trash2,
+                          size: 16,
+                        ),
+                        color: AppColors.errorColor,
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppColors.errorColor.withOpacity(0.08),
+                          padding: const EdgeInsets.all(6),
+                          minimumSize: const Size(30, 30),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              // Card body
+              // Card Body
               if (isMobile)
                 Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.fromLTRB(12, 6, 12, 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundColor: _iconColor().withOpacity(0.12),
-                            child:
-                                Icon(item.icon, color: _iconColor(), size: 20),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: _priorityPrimary().withOpacity(0.08),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(item.icon, color: _priorityPrimary(), size: 20),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -132,16 +171,19 @@ class NotificationCard extends StatelessWidget {
                                     Flexible(
                                       child: Text(
                                         item.title,
-                                        style: text.titleSmall?.copyWith(
-                                          fontWeight: FontWeight.w700,
+                                        style: const TextStyle(
+                                          fontFamily: 'Cairo',
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 13,
+                                          color: AppColors.textPrimary,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
+                                    const SizedBox(width: 8),
                                     _Badge(
                                       label: item.badge,
-                                      color: _iconColor(),
+                                      color: _priorityPrimary(),
                                       compact: true,
                                     ),
                                   ],
@@ -149,7 +191,12 @@ class NotificationCard extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Text(
                                   item.message,
-                                  style: text.bodySmall,
+                                  style: const TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                    height: 1.3,
+                                  ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -159,103 +206,107 @@ class NotificationCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: [
-                          _MetaChip(
-                            icon: LucideIcons.hash,
-                            text: item.sku,
-                            compact: true,
-                          ),
-                          if (item.quantityHint != null)
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
                             _MetaChip(
-                              icon: LucideIcons.packageOpen,
-                              text: item.quantityHint!,
+                              icon: LucideIcons.hash,
+                              text: item.sku,
                               compact: true,
                             ),
-                          _MetaChip(
-                            icon: LucideIcons.clock3,
-                            text: item.createdAgo,
-                            compact: true,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: IconButton(
-                          tooltip: item.read ? 'وضع كغير مقروء' : 'وضع كمقروء',
-                          onPressed: onMarkReadToggle,
-                          icon: Icon(
-                            item.read ? LucideIcons.eye : LucideIcons.eyeOff,
-                            size: 18,
-                          ),
-                          color: AppColors.mutedColor,
+                            if (item.quantityHint != null) ...[
+                              const SizedBox(width: 6),
+                              _MetaChip(
+                                icon: LucideIcons.package2,
+                                text: item.quantityHint!,
+                                compact: true,
+                              ),
+                            ],
+                            const SizedBox(width: 6),
+                            _MetaChip(
+                              icon: LucideIcons.clock,
+                              text: item.createdAgo,
+                              compact: true,
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 )
               else
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  leading: CircleAvatar(
-                    radius: 22,
-                    backgroundColor: _iconColor().withOpacity(0.12),
-                    child: Icon(item.icon, color: _iconColor()),
-                  ),
-                  title: Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          item.title,
-                          style: text.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      _Badge(label: item.badge, color: _iconColor()),
-                    ],
-                  ),
-                  subtitle: Column(
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 16),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 4),
-                      Text(item.message, style: text.bodyMedium),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 6,
-                        children: [
-                          _MetaChip(
-                            icon: LucideIcons.hash,
-                            text: 'كود المنتج: ${item.sku}',
-                          ),
-                          if (item.quantityHint != null)
-                            _MetaChip(
-                              icon: LucideIcons.packageOpen,
-                              text: item.quantityHint!,
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _priorityPrimary().withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(item.icon, color: _priorityPrimary(), size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      fontFamily: 'Cairo',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                _Badge(label: item.badge, color: _priorityPrimary()),
+                              ],
                             ),
-                          _MetaChip(
-                            icon: LucideIcons.clock3,
-                            text: item.createdAgo,
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            Text(
+                              item.message,
+                              style: const TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                                height: 1.3,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                _MetaChip(
+                                  icon: LucideIcons.hash,
+                                  text: 'كود المنتج: ${item.sku}',
+                                ),
+                                if (item.quantityHint != null) ...[
+                                  const SizedBox(width: 8),
+                                  _MetaChip(
+                                    icon: LucideIcons.package2,
+                                    text: item.quantityHint!,
+                                  ),
+                                ],
+                                const SizedBox(width: 8),
+                                _MetaChip(
+                                  icon: LucideIcons.clock,
+                                  text: item.createdAgo,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
-                  ),
-                  trailing: IconButton(
-                    tooltip: item.read ? 'وضع كغير مقروء' : 'وضع كمقروء',
-                    onPressed: onMarkReadToggle,
-                    icon:
-                        Icon(item.read ? LucideIcons.eye : LucideIcons.eyeOff),
-                    color: AppColors.mutedColor,
                   ),
                 ),
             ],
@@ -281,12 +332,12 @@ class _Badge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? 6 : 8,
-        vertical: compact ? 2 : 3,
+        horizontal: compact ? 8 : 10,
+        vertical: compact ? 2 : 4,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        border: Border.all(color: color.withOpacity(0.35)),
+        color: color.withOpacity(0.08),
+        border: Border.all(color: color.withOpacity(0.24)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: FittedBox(
@@ -295,8 +346,9 @@ class _Badge extends StatelessWidget {
           label,
           style: TextStyle(
             color: color,
-            fontWeight: FontWeight.w700,
-            fontSize: compact ? 10 : 12,
+            fontWeight: FontWeight.w800,
+            fontFamily: 'Cairo',
+            fontSize: compact ? 10 : 11,
           ),
         ),
       ),
@@ -319,13 +371,13 @@ class _MetaChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? 6 : 8,
-        vertical: compact ? 3 : 4,
+        horizontal: compact ? 8 : 10,
+        vertical: compact ? 4 : 6,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.mutedColor.withOpacity(0.4)),
+        border: Border.all(color: AppColors.borderColor.withOpacity(0.8)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -335,13 +387,15 @@ class _MetaChip extends StatelessWidget {
             size: compact ? 12 : 14,
             color: AppColors.mutedColor,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 6),
           Flexible(
             child: Text(
               text,
               style: TextStyle(
-                color: AppColors.mutedColor,
-                fontSize: compact ? 11 : 12,
+                fontFamily: 'Cairo',
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+                fontSize: compact ? 10 : 11,
               ),
               overflow: TextOverflow.ellipsis,
             ),

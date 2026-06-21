@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
-class ArpYearlySummary extends StatelessWidget {
+class AnalyticsYearlySummary extends StatelessWidget {
   final Map<String, double> yearlySales;
 
-  const ArpYearlySummary({super.key, required this.yearlySales});
+  const AnalyticsYearlySummary({super.key, required this.yearlySales});
 
   @override
   Widget build(BuildContext context) {

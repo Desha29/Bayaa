@@ -403,7 +403,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
           SizedBox(
             width: 90,
             child: Text(
-              '#${sale.id.substring(0, 8)}',
+              '#${sale.id.length > 8 ? sale.id.substring(0, 8) : sale.id}',
               style: const TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 13,

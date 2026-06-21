@@ -9,9 +9,9 @@ import '../../features/sales/domain/sales_repository.dart';
 import '../../features/stock_summary/presentation/cubit/stock_summary_cubit.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../features/sessions/data/arp_repository_impl.dart';
-import '../../features/sessions/domain/arp_repository.dart';
-import '../../features/sessions/presentation/cubit/arp_cubit.dart';
+import '../../features/analytics/data/analytics_repository_impl.dart';
+import '../../features/analytics/domain/analytics_repository.dart';
+import '../../features/analytics/presentation/cubit/analytics_cubit.dart';
 import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
 import '../../features/sales/data/repository/sales_repository_impl.dart';
 
@@ -63,10 +63,10 @@ void setup() {
 
   getIt.registerSingleton<NotificationsCubit>(NotificationsCubit());
 
-  final arpRepo = ArpRepositoryImpl();
-  getIt.registerSingleton<ArpRepository>(arpRepo);
+  final analyticsRepo = AnalyticsRepositoryImpl();
+  getIt.registerSingleton<AnalyticsRepository>(analyticsRepo);
 
-  getIt.registerSingleton<ArpCubit>(ArpCubit(arpRepo));
+  getIt.registerSingleton<AnalyticsCubit>(AnalyticsCubit(analyticsRepo));
 
   getIt.registerFactory<StockSummaryCubit>(
       () => StockSummaryCubit()); 

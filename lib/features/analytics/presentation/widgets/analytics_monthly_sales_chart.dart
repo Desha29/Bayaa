@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/constants/app_colors.dart';
 
-class ArpMonthlySalesChart extends StatefulWidget {
+class AnalyticsMonthlySalesChart extends StatefulWidget {
   final Map<String, double> monthlySales;
+  final bool usePadding;
 
-  const ArpMonthlySalesChart({super.key, required this.monthlySales});
+  const AnalyticsMonthlySalesChart({super.key, required this.monthlySales, this.usePadding = true});
 
   @override
-  State<ArpMonthlySalesChart> createState() => _ArpMonthlySalesChartState();
+  State<AnalyticsMonthlySalesChart> createState() => _AnalyticsMonthlySalesChartState();
 }
 
-class _ArpMonthlySalesChartState extends State<ArpMonthlySalesChart> {
+class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart> {
   int _touchedIndex = -1;
 
   static const _arabicMonths = [
@@ -68,10 +69,11 @@ class _ArpMonthlySalesChartState extends State<ArpMonthlySalesChart> {
         : entries.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.25;
     final totalSales = entries.fold<double>(0, (sum, e) => sum + e.value);
     final avgMonthly = entries.isNotEmpty ? totalSales / entries.length : 0.0;
+    final double safeInterval = (maxY / 4) <= 0 ? 25.0 : (maxY / 4);
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 32 : isTablet ? 24 : 16,
+        horizontal: widget.usePadding ? (isDesktop ? 32 : isTablet ? 24 : 16) : 0.0,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -177,7 +179,7 @@ class _ArpMonthlySalesChartState extends State<ArpMonthlySalesChart> {
               const SizedBox(height: 20),
               // Chart
               SizedBox(
-                height: isDesktop ? 320 : isTablet ? 270 : 220,
+                height: isDesktop ? 200 : isTablet ? 160 : 150,
                 child: entries.isEmpty
                     ? Center(
                         child: Column(
@@ -235,7 +237,7 @@ class _ArpMonthlySalesChartState extends State<ArpMonthlySalesChart> {
                           gridData: FlGridData(
                             show: true,
                             drawVerticalLine: false,
-                            horizontalInterval: maxY / 4,
+                            horizontalInterval: safeInterval,
                             getDrawingHorizontalLine: (value) {
                               return FlLine(
                                 color: AppColors.mutedColor.withOpacity(0.08),
@@ -282,6 +284,7 @@ class _ArpMonthlySalesChartState extends State<ArpMonthlySalesChart> {
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
+                                interval: safeInterval,
                                 reservedSize: 50,
                                 getTitlesWidget: (value, meta) {
                                   if (value == meta.min || value == meta.max) return const SizedBox();

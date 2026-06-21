@@ -1,5 +1,5 @@
 import 'dart:async';
-import '../../../../core/components/screen_header.dart';
+import 'package:crazy_phone_pos/core/components/screen_header.dart';
 
 
 import 'package:flutter/material.dart';
@@ -7,14 +7,16 @@ import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import '../../../../core/constants/app_colors.dart';
 
-import '../../data/models/daily_report_model.dart';
-import '../../data/models/product_performance_model.dart';
-import '../../domain/daily_report_pdf_service.dart';
-import 'daily_report_preview_screen.dart';
-import 'daily_report_datasheet_screen.dart';
+import '../../../sessions/data/models/daily_report_model.dart';
+import '../../../sessions/data/models/product_performance_model.dart';
+import '../../domain/analytics_repository.dart';
+import '../../../sessions/domain/daily_report_pdf_service.dart';
+import '../../../sessions/presentation/screens/daily_report_datasheet_screen.dart';
+import '../../../sessions/presentation/screens/daily_report_preview_screen.dart';
+
 import '../../../../core/components/message_overlay.dart';
 import '../../../../core/di/dependency_injection.dart';
-import '../../domain/arp_repository.dart';
+
 
 
 
@@ -66,7 +68,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     });
 
 
-    final repo = getIt<ArpRepository>();
+    final repo = getIt<AnalyticsRepository>();
     final result = await repo.getDailyReport(selectedDate);
 
     result.fold((failure) {

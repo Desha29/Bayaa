@@ -24,6 +24,7 @@ import 'core/services/activity_logger.dart';
 import 'core/data/services/recovery_service.dart';
 import 'core/data/services/checkpoint_service.dart';
 import 'core/data/services/backup_manager.dart';
+import 'core/data/services/debug_seeder.dart';
 
 Future<void> _initializePersistenceSystem() async {
   try {
@@ -44,6 +45,16 @@ Future<void> _initializePersistenceSystem() async {
             source: 'Init');
       } catch (e) {
         FileLogger.warning('Store settings error', error: e, source: 'Init');
+      }
+
+      // Seed mock data if in debug mode
+      final appMode = PersistenceInitializer.persistenceManager?.config.appMode;
+      if (appMode == 'debug') {
+        try {
+          await DebugSeeder.seedIfNeeded();
+        } catch (e, stack) {
+          FileLogger.error('Failed to seed debug data', error: e, stackTrace: stack, source: 'Init');
+        }
       }
 
       // Load current session

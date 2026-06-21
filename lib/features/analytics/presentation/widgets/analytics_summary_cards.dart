@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../data/models/arp_summary_model.dart';
+import '../../data/models/analytics_summary_model.dart';
 
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
-class ArpSummaryCards extends StatelessWidget {
-  final ArpSummaryModel summary;
+class AnalyticsSummaryCards extends StatelessWidget {
+  final AnalyticsSummaryModel summary;
 
-  const ArpSummaryCards({super.key, required this.summary});
+  const AnalyticsSummaryCards({super.key, required this.summary});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
-
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../sales/data/models/sale_model.dart';
 
@@ -32,11 +31,12 @@ class _InvoiceCardState extends State<InvoiceCard> {
 
   @override
   Widget build(BuildContext context) {
-    final df = DateFormat('yyyy-MM-dd  hh:mm a');
+    final df = DateFormat('yyyy-MM-dd  hh:mm a', 'en');
     final cashierName = widget.sale.cashierName ?? 'الكاشير';
     final sale = widget.sale;
     final screenWidth = MediaQuery.of(context).size.width;
     final isCompact = screenWidth < 700;
+    final statusColor = sale.isRefund ? AppColors.errorColor : AppColors.primaryColor;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -47,29 +47,51 @@ class _InvoiceCardState extends State<InvoiceCard> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: _isHovered
-                ? AppColors.primaryColor.withOpacity(0.25)
-                : AppColors.borderColor.withOpacity(0.4),
-            width: _isHovered ? 1.5 : 1,
+            color: _isHovered 
+                ? AppColors.primaryColor.withOpacity(0.3) 
+                : AppColors.borderColor.withOpacity(0.5),
+            width: 1,
           ),
           boxShadow: [
             BoxShadow(
               color: _isHovered
-                  ? AppColors.primaryColor.withOpacity(0.08)
-                  : Colors.black.withOpacity(0.03),
-              blurRadius: _isHovered ? 16 : 8,
-              offset: Offset(0, _isHovered ? 6 : 2),
+                  ? AppColors.primaryColor.withOpacity(0.06)
+                  : Colors.black.withOpacity(0.02),
+              blurRadius: _isHovered ? 12 : 6,
+              offset: Offset(0, _isHovered ? 4 : 2),
             ),
           ],
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: widget.onOpen,
-            borderRadius: BorderRadius.circular(14),
-            child: Padding(
-              padding: EdgeInsets.all(isCompact ? 12 : 16),
-              child: isCompact ? _buildCompactLayout(sale, df, cashierName) : _buildDesktopLayout(sale, df, cashierName),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Right-side indicator strip (first element in RTL)
+                Container(
+                  width: 4,
+                  color: statusColor,
+                ),
+                Expanded(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: widget.onOpen,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(14),
+                        bottomLeft: Radius.circular(14),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(isCompact ? 12 : 16),
+                        child: isCompact 
+                            ? _buildCompactLayout(sale, df, cashierName) 
+                            : _buildDesktopLayout(sale, df, cashierName),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -82,22 +104,16 @@ class _InvoiceCardState extends State<InvoiceCard> {
       children: [
         // Icon
         Container(
-          width: 52,
-          height: 52,
+          width: 48,
+          height: 48,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: sale.isRefund
-                  ? [AppColors.errorColor.withOpacity(0.12), AppColors.errorColor.withOpacity(0.05)]
-                  : [AppColors.primaryColor.withOpacity(0.12), AppColors.primaryColor.withOpacity(0.05)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
+            color: (sale.isRefund ? AppColors.errorColor : AppColors.primaryColor).withOpacity(0.06),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
-            sale.isRefund ? Icons.undo_rounded : Icons.receipt_long_rounded,
+            sale.isRefund ? LucideIcons.undo2 : LucideIcons.fileSpreadsheet,
             color: sale.isRefund ? AppColors.errorColor : AppColors.primaryColor,
-            size: 24,
+            size: 22,
           ),
         ),
         const SizedBox(width: 16),
@@ -111,8 +127,9 @@ class _InvoiceCardState extends State<InvoiceCard> {
                   Text(
                     'فاتورة #${sale.id.length > 8 ? sale.id.substring(0, 8) : sale.id}',
                     style: const TextStyle(
+                      fontFamily: 'Cairo',
                       fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -121,16 +138,15 @@ class _InvoiceCardState extends State<InvoiceCard> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppColors.errorColor.withOpacity(0.12), AppColors.errorColor.withOpacity(0.06)],
-                        ),
+                        color: AppColors.errorColor.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: AppColors.errorColor.withOpacity(0.2)),
                       ),
                       child: const Text(
                         'مرتجع',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontFamily: 'Cairo',
+                          fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: AppColors.errorColor,
                         ),
@@ -142,11 +158,11 @@ class _InvoiceCardState extends State<InvoiceCard> {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  _buildInfoChip(Icons.person_outline_rounded, cashierName),
+                  _buildInfoChip(LucideIcons.user, cashierName),
                   _buildDot(),
-                  _buildInfoChip(Icons.inventory_2_outlined, '${sale.items} صنف'),
+                  _buildInfoChip(LucideIcons.package, '${sale.items} أصناف'),
                   _buildDot(),
-                  _buildInfoChip(Icons.access_time_rounded, df.format(sale.date)),
+                  _buildInfoChip(LucideIcons.clock, df.format(sale.date)),
                 ],
               ),
             ],
@@ -159,12 +175,13 @@ class _InvoiceCardState extends State<InvoiceCard> {
             Text(
               '${sale.total.toStringAsFixed(2)} ج.م',
               style: TextStyle(
+                fontFamily: 'Cairo',
                 fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w800,
                 color: sale.isRefund ? AppColors.errorColor : AppColors.primaryColor,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: _buildActions(),
@@ -182,20 +199,16 @@ class _InvoiceCardState extends State<InvoiceCard> {
         Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: sale.isRefund
-                      ? [AppColors.errorColor.withOpacity(0.12), AppColors.errorColor.withOpacity(0.05)]
-                      : [AppColors.primaryColor.withOpacity(0.12), AppColors.primaryColor.withOpacity(0.05)],
-                ),
-                borderRadius: BorderRadius.circular(10),
+                color: (sale.isRefund ? AppColors.errorColor : AppColors.primaryColor).withOpacity(0.06),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
-                sale.isRefund ? Icons.undo_rounded : Icons.receipt_long_rounded,
+                sale.isRefund ? LucideIcons.undo2 : LucideIcons.fileSpreadsheet,
                 color: sale.isRefund ? AppColors.errorColor : AppColors.primaryColor,
-                size: 20,
+                size: 18,
               ),
             ),
             const SizedBox(width: 12),
@@ -207,30 +220,47 @@ class _InvoiceCardState extends State<InvoiceCard> {
                     children: [
                       Text(
                         'فاتورة #${sale.id.length > 8 ? sale.id.substring(0, 8) : sale.id}',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                        style: const TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       if (sale.isRefund) ...[
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.errorColor.withOpacity(0.1),
+                            color: AppColors.errorColor.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text('مرتجع', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.errorColor)),
+                          child: const Text(
+                            'مرتجع',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.errorColor,
+                            ),
+                          ),
                         ),
                       ],
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text(df.format(sale.date), style: TextStyle(fontSize: 11, color: AppColors.mutedColor)),
+                  Text(
+                    df.format(sale.date),
+                    style: const TextStyle(fontFamily: 'Cairo', fontSize: 10, color: AppColors.mutedColor),
+                  ),
                 ],
               ),
             ),
             Text(
               '${sale.total.toStringAsFixed(2)} ج.م',
               style: TextStyle(
-                fontSize: 16,
+                fontFamily: 'Cairo',
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: sale.isRefund ? AppColors.errorColor : AppColors.primaryColor,
               ),
@@ -240,13 +270,13 @@ class _InvoiceCardState extends State<InvoiceCard> {
         const SizedBox(height: 10),
         Row(
           children: [
-            _buildInfoChip(Icons.person_outline_rounded, cashierName),
+            _buildInfoChip(LucideIcons.user, cashierName),
             _buildDot(),
-            _buildInfoChip(Icons.inventory_2_outlined, '${sale.items} صنف'),
+            _buildInfoChip(LucideIcons.package, '${sale.items} أصناف'),
             const Spacer(),
             ...List.generate(_buildActions().length, (i) {
               final actions = _buildActions();
-              if (i > 0) return Padding(padding: const EdgeInsets.only(right: 4), child: actions[i]);
+              if (i > 0) return Padding(padding: const EdgeInsets.only(right: 6), child: actions[i]);
               return actions[i];
             }),
           ],
@@ -259,11 +289,16 @@ class _InvoiceCardState extends State<InvoiceCard> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 13, color: AppColors.mutedColor.withOpacity(0.7)),
+        Icon(icon, size: 12, color: AppColors.mutedColor.withOpacity(0.8)),
         const SizedBox(width: 4),
         Text(
           text,
-          style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 11,
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
@@ -272,7 +307,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
   Widget _buildDot() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Text('·', style: TextStyle(color: AppColors.mutedColor, fontWeight: FontWeight.bold)),
+      child: Text('·', style: TextStyle(color: AppColors.mutedColor.withOpacity(0.5), fontWeight: FontWeight.bold, fontSize: 14)),
     );
   }
 
@@ -280,7 +315,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
     return [
       if (widget.onReturn != null)
         _buildActionButton(
-          Icons.undo_rounded,
+          LucideIcons.undo2,
           'مرتجع',
           AppColors.warningColor,
           widget.onReturn!,
@@ -288,7 +323,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
       if (widget.isManager && widget.onDelete != null) ...[
         const SizedBox(width: 6),
         _buildActionButton(
-          Icons.delete_outline_rounded,
+          LucideIcons.trash2,
           'حذف',
           AppColors.errorColor,
           widget.onDelete!,
@@ -296,7 +331,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
       ],
       const SizedBox(width: 6),
       _buildActionButton(
-        Icons.print_rounded,
+        LucideIcons.printer,
         'طباعة',
         AppColors.primaryColor,
         widget.onPrint,
@@ -313,13 +348,13 @@ class _InvoiceCardState extends State<InvoiceCard> {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(8),
           child: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.08),
+              color: color.withOpacity(0.06),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: color.withOpacity(0.12)),
             ),
-            child: Icon(icon, color: color, size: 18),
+            child: Icon(icon, color: color, size: 16),
           ),
         ),
       ),

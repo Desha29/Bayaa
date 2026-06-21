@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
 import 'package:crazy_phone_pos/core/constants/app_colors.dart';
 
 class SummaryRow extends StatelessWidget {
@@ -30,15 +29,15 @@ class SummaryRow extends StatelessWidget {
             label: 'مقروءة',
             value: opened,
             icon: LucideIcons.eye,
-            bg: AppColors.successColor.withOpacity(0.1),
+            bg: const Color(0xFFECFDF5), // Soft green
             fg: AppColors.successColor,
             isMobile: isMobile,
           ),
           SummaryCard(
             label: 'عاجلة',
             value: urgent,
-            icon: LucideIcons.triangleAlert,
-            bg: AppColors.errorColor.withOpacity(0.1),
+            icon: LucideIcons.alertTriangle,
+            bg: const Color(0xFFFEF2F2), // Soft red
             fg: AppColors.errorColor,
             isMobile: isMobile,
           ),
@@ -46,7 +45,7 @@ class SummaryRow extends StatelessWidget {
             label: 'غير مقروءة',
             value: unread,
             icon: LucideIcons.eyeOff,
-            bg: AppColors.warningColor.withOpacity(0.1),
+            bg: const Color(0xFFFFFBEB), // Soft yellow
             fg: AppColors.warningColor,
             isMobile: isMobile,
           ),
@@ -57,7 +56,7 @@ class SummaryRow extends StatelessWidget {
             children: [
               for (var i = 0; i < children.length; i++) ...[
                 children[i],
-                if (i < children.length - 1) const SizedBox(height: 12),
+                if (i < children.length - 1) const SizedBox(height: 10),
               ],
             ],
           );
@@ -69,11 +68,11 @@ class SummaryRow extends StatelessWidget {
               Row(
                 children: [
                   Expanded(child: children[0]),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(child: children[1]),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               children[2],
             ],
           );
@@ -102,7 +101,6 @@ class SummaryCard extends StatelessWidget {
     required this.bg,
     required this.fg,
     required this.isMobile,
-    this.val,
   });
 
   final String label;
@@ -110,60 +108,61 @@ class SummaryCard extends StatelessWidget {
   final IconData icon;
   final Color bg;
   final Color fg;
-  final Color? val;
   final bool isMobile;
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 12 : 16,
-        vertical: isMobile ? 14 : 18,
+        vertical: isMobile ? 12 : 16,
       ),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: fg.withOpacity(0.15)),
+        border: Border.all(color: fg.withOpacity(0.2), width: 1.2),
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: fg,
-            size: isMobile ? 20 : 24,
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.8),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: fg,
+              size: isMobile ? 18 : 22,
+            ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerRight,
-              child: Text(
-                label,
-                style: text.labelLarge?.copyWith(
-                  color: fg,
-                  fontSize: isMobile ? 13 : null,
-                ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                color: fg,
+                fontWeight: FontWeight.w700,
+                fontSize: isMobile ? 13 : 14,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           const SizedBox(width: 10),
-          CircleAvatar(
-            radius: isMobile ? 14 : 16,
-            backgroundColor: Colors.white,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Padding(
-                padding: const EdgeInsets.all(4),
-                child: Text(
-                  '$value',
-                  style: text.titleMedium?.copyWith(
-                    color: fg,
-                    fontWeight: FontWeight.w700,
-                    fontSize: isMobile ? 13 : null,
-                  ),
-                ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: fg,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              '$value',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Cairo',
+                fontSize: 12,
               ),
             ),
           ),

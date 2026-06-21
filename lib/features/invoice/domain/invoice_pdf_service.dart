@@ -44,25 +44,24 @@ class InvoicePdfService {
       }
     }
     
- 
-    // Fallback
+    // Fallback logo
     try {
-      final bytes = await rootBundle.load('assets/images/logo.png'); // Updated asset
+      final bytes = await rootBundle.load('assets/images/logo.png');
       _cachedLogo = pw.MemoryImage(bytes.buffer.asUint8List());
       return _cachedLogo;
     } catch (e) {
-       return null;
+      return null;
     }
   }
 
   static Future<Uint8List> buildReceipt80mm(InvoiceData data) async {
     final doc = pw.Document();
     
-    // 80mm thermal paper is usually around 72mm printable width
+    // 80mm thermal paper page format
     final pageFormat = const PdfPageFormat(
       80 * PdfPageFormat.mm,
       double.infinity,
-      marginAll: 5 * PdfPageFormat.mm,
+      marginAll: 4 * PdfPageFormat.mm,
     );
 
     final arabicFont = await _loadArabicFont();
@@ -71,21 +70,20 @@ class InvoicePdfService {
     // Brand Colors
     final brandBlue = PdfColor.fromInt(0xFF1E3A8A);
     final brandOrange = PdfColor.fromInt(0xFFF97316);
+    final textDark = PdfColor.fromInt(0xFF0F172A);
+    final borderLight = PdfColor.fromInt(0xFFE2E8F0);
 
-    // Get dynamic store info
+    // Get store info
     final storeRepo = getIt<StoreInfoRepository>();
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
-          name: 'Bayaa', // Updated Default Name
-          address: 'AlKhanaka',
+          name: 'بياع POS',
+          address: 'القاهرة، مصر',
           phone: '0100000000',
           vat: '', email: '',
         ));
     
     final logoProvider = await _loadLogo(storeInfo.logoPath); 
-
-    // Styles...
-    final dividerColor = PdfColors.grey400;
 
     doc.addPage(
       pw.Page(
@@ -95,80 +93,122 @@ class InvoicePdfService {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.center,
             children: [
+              // Receipt Logo
               if (logoProvider != null) 
                 pw.Container(
-                  width: 50,
-                  height: 50,
+                  width: 44,
+                  height: 44,
+                  margin: const pw.EdgeInsets.only(bottom: 6),
                   child: pw.Image(logoProvider),
                 ),
-              pw.Text(storeInfo.name, 
-                  style: pw.TextStyle(font: boldFont, fontSize: 16, fontWeight: pw.FontWeight.bold, color: brandBlue)),
+              
+              // Store Header
+              pw.Text(
+                storeInfo.name, 
+                style: pw.TextStyle(font: boldFont, fontSize: 13, color: brandBlue),
+                textAlign: pw.TextAlign.center,
+              ),
               if (storeInfo.address.isNotEmpty)
-                pw.Text(storeInfo.address, 
-                    style: pw.TextStyle(font: arabicFont, fontSize: 8), textAlign: pw.TextAlign.center),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.only(top: 2),
+                  child: pw.Text(
+                    storeInfo.address, 
+                    style: pw.TextStyle(font: arabicFont, fontSize: 8, color: PdfColors.grey700), 
+                    textAlign: pw.TextAlign.center,
+                  ),
+                ),
               if (storeInfo.phone.isNotEmpty)
-                pw.Text('هاتف: ${storeInfo.phone}', 
-                    style: pw.TextStyle(font: arabicFont, fontSize: 8)),
+                pw.Text(
+                  'هاتف: ${storeInfo.phone}', 
+                  style: pw.TextStyle(font: arabicFont, fontSize: 8, color: PdfColors.grey700),
+                ),
               if (storeInfo.vat.isNotEmpty)
-                pw.Text('الرقم الضريبي: ${storeInfo.vat}', 
-                    style: pw.TextStyle(font: arabicFont, fontSize: 7)),
+                pw.Text(
+                  'الرقم الضريبي: ${storeInfo.vat}', 
+                  style: pw.TextStyle(font: arabicFont, fontSize: 7.5, color: PdfColors.grey600),
+                ),
               
               pw.Padding(
-                padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                child: pw.Divider(color: brandOrange, thickness: 1), // Orange Divider
+                padding: const pw.EdgeInsets.symmetric(vertical: 6),
+                child: pw.Divider(color: brandOrange, thickness: 1.2),
               ),
 
-              pw.Text('فاتورة مبيعات', style: pw.TextStyle(font: boldFont, fontSize: 12, color: brandBlue)),
-              pw.SizedBox(height: 4),
-              _row('رقم الفاتورة:', data.invoiceId, arabicFont, boldFont),
-              _row('التاريخ:', _fmt(data.date), arabicFont, boldFont),
-              _row('الكاشير:', data.cashierName, arabicFont, boldFont),
+              // Invoice Type Title
+              pw.Text(
+                'إيصال مبيعات ضريبي', 
+                style: pw.TextStyle(font: boldFont, fontSize: 10, color: brandBlue),
+              ),
+              pw.SizedBox(height: 6),
+
+              // Metadata Row
+              _receiptMetaRow('رقم الفاتورة:', data.invoiceId, arabicFont, boldFont),
+              _receiptMetaRow('التاريخ والوقت:', _fmt(data.date), arabicFont, boldFont),
+              _receiptMetaRow('الكاشير المسؤول:', data.cashierName, arabicFont, boldFont),
               
               pw.Padding(
-                padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                child: pw.Divider(color: dividerColor, thickness: 0.5),
+                padding: const pw.EdgeInsets.symmetric(vertical: 6),
+                child: pw.Divider(color: borderLight, thickness: 0.8),
               ),
 
               // Items Table
               pw.TableHelper.fromTextArray(
                 context: null,
-                headers: ['المنتج', 'ك', 'س', 'ج'],
+                headers: ['المنتج', 'ك', 'سعر', 'إجمالي'],
                 data: data.lines.map((l) => [
                   l.name,
                   l.qty.toString(),
                   l.price.toStringAsFixed(0),
                   l.total.toStringAsFixed(0),
                 ]).toList(),
-                headerStyle: pw.TextStyle(font: boldFont, fontSize: 9, color: PdfColors.white),
-                cellStyle: pw.TextStyle(font: arabicFont, fontSize: 9),
+                headerStyle: pw.TextStyle(font: boldFont, fontSize: 8, color: PdfColors.white),
+                cellStyle: pw.TextStyle(font: arabicFont, fontSize: 8.5, color: textDark),
                 columnWidths: {
                   0: const pw.FlexColumnWidth(3),
-                  1: const pw.FlexColumnWidth(1),
-                  2: const pw.FlexColumnWidth(1.5),
-                  3: const pw.FlexColumnWidth(1.5),
+                  1: const pw.FlexColumnWidth(0.8),
+                  2: const pw.FlexColumnWidth(1.2),
+                  3: const pw.FlexColumnWidth(1.4),
                 },
-                headerDecoration: pw.BoxDecoration(color: brandBlue), // Blue Header
+                headerDecoration: pw.BoxDecoration(color: brandBlue),
                 border: null,
                 cellAlignment: pw.Alignment.centerRight,
               ),
 
               pw.Padding(
-                padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                child: pw.Divider(color: dividerColor, thickness: 0.5),
+                padding: const pw.EdgeInsets.symmetric(vertical: 6),
+                child: pw.Divider(color: borderLight, thickness: 0.8),
               ),
 
-              _row('الإجمالي:', '${data.grandTotal.toStringAsFixed(2)}', arabicFont, boldFont, fontSize: 12, color: brandBlue),
+              // Totals
+              _receiptMetaRow('إجمالي السلع:', '${data.subtotal.toStringAsFixed(2)} ج.م', arabicFont, boldFont, fontSize: 8.5),
+              if (data.discount > 0)
+                _receiptMetaRow('الخصم المطبق:', '- ${data.discount.toStringAsFixed(2)} ج.م', arabicFont, boldFont, fontSize: 8.5, color: brandOrange),
+              if (data.tax > 0)
+                _receiptMetaRow('ضريبة القيمة المضافة:', '${data.tax.toStringAsFixed(2)} ج.م', arabicFont, boldFont, fontSize: 8.5),
               
-              pw.SizedBox(height: 10),
-              pw.Text('شكراً لزيارتكم!', style: pw.TextStyle(font: arabicFont, fontSize: 10)),
-              pw.Text('Powered by Bayaa', style: pw.TextStyle(font: arabicFont, fontSize: 6, color: PdfColors.grey500)), 
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                child: pw.Divider(color: PdfColor.fromInt(0x4D1E3A8A), thickness: 0.5),
+              ),
+
+              _receiptMetaRow(
+                'الصافي الكلي:', 
+                '${data.grandTotal.toStringAsFixed(2)} ج.م', 
+                boldFont, 
+                boldFont, 
+                fontSize: 11, 
+                color: brandBlue,
+              ),
               
-              pw.SizedBox(height: 5),
+              pw.SizedBox(height: 12),
+              pw.Text('شكراً لتسوقكم معنا!', style: pw.TextStyle(font: boldFont, fontSize: 8.5, color: textDark), textAlign: pw.TextAlign.center),
+              pw.Text('نظام بياع لإدارة المبيعات POS', style: pw.TextStyle(font: arabicFont, fontSize: 6.5, color: PdfColors.grey600)), 
+              
+              pw.SizedBox(height: 8),
               pw.BarcodeWidget(
                 barcode: Barcode.code128(),
                 data: data.invoiceId,
-                width: 100,
-                height: 30,
+                width: 90,
+                height: 25,
                 drawText: false,
               ),
             ],
@@ -180,32 +220,38 @@ class InvoicePdfService {
     return doc.save();
   }
 
-  static pw.Widget _row(String label, String value, pw.Font font, pw.Font bold, {double fontSize = 9, PdfColor? color}) {
-    return pw.Row(
-      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-      children: [
-        pw.Text(label, style: pw.TextStyle(font: font, fontSize: fontSize, color: color)),
-        pw.Text(value, style: pw.TextStyle(font: bold, fontSize: fontSize, color: color)),
-      ],
+  static pw.Widget _receiptMetaRow(String label, String value, pw.Font font, pw.Font bold, {double fontSize = 8, PdfColor? color}) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 1.5),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Text(label, style: pw.TextStyle(font: font, fontSize: fontSize, color: color ?? PdfColors.grey800)),
+          pw.Text(value, style: pw.TextStyle(font: bold, fontSize: fontSize, color: color ?? PdfColor.fromInt(0xFF0F172A))),
+        ],
+      ),
     );
   }
 
   static Future<Uint8List> buildA4(InvoiceData data, {PdfPageFormat? format}) async {
-    // For A4 we can use a more elaborate layout
     final doc = pw.Document();
     
     final arabicFont = await _loadArabicFont();
     final boldFont = await _loadBoldFont();
     
-    // Brand Colors
-    final brandBlue = PdfColor.fromInt(0xFF1E3A8A);
-    final brandOrange = PdfColor.fromInt(0xFFF97316);
+    // Premium Corporate Colors
+    final brandBlue = PdfColor.fromInt(0xFF1E3A8A); // Deep Navy Blue
+    final brandOrange = PdfColor.fromInt(0xFFF97316); // Accent Orange
+    final bgLight = PdfColor.fromInt(0xFFF8FAFC); // Very light slate
+    final borderLight = PdfColor.fromInt(0xFFE2E8F0); // Border slate
+    final textDark = PdfColor.fromInt(0xFF0F172A); // Dark slate text
+    final textMuted = PdfColor.fromInt(0xFF64748B); // Muted slate text
 
     final storeRepo = getIt<StoreInfoRepository>();
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
-          name: 'Bayaa',
-          address: 'AlKhanaka',
+          name: 'بياع POS',
+          address: 'القاهرة، جمهورية مصر العربية',
           phone: '0100000000',
           vat: '', email: '',
         ));
@@ -214,19 +260,32 @@ class InvoicePdfService {
     doc.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(1 * PdfPageFormat.cm),
+        margin: const pw.EdgeInsets.all(1.5 * PdfPageFormat.cm),
         textDirection: pw.TextDirection.rtl,
         theme: pw.ThemeData.withFont(base: arabicFont, bold: boldFont),
         build: (context) => [
-          _buildA4Header(storeInfo, logoProvider, boldFont, brandBlue),
-          pw.Divider(color: brandOrange, thickness: 2),
-          _buildA4InvoiceInfo(data, boldFont),
+          // 1. Header Banner
+          _buildA4Header(storeInfo, logoProvider, boldFont, arabicFont, brandBlue, brandOrange, textMuted),
+          
+          pw.SizedBox(height: 18),
+          
+          // 2. Invoice Details Box
+          _buildA4InvoiceInfoBox(data, boldFont, arabicFont, bgLight, borderLight, brandBlue),
+          
           pw.SizedBox(height: 20),
-          _buildA4ItemsTable(data, boldFont, arabicFont, brandBlue),
+          
+          // 3. Products Table
+          _buildA4ItemsTable(data, boldFont, arabicFont, brandBlue, borderLight, bgLight, textDark),
+          
           pw.SizedBox(height: 20),
-          _buildA4Summary(data, boldFont, brandBlue),
+          
+          // 4. Totals and Summary Box
+          _buildA4SummaryRow(data, boldFont, arabicFont, brandBlue, brandOrange, bgLight, borderLight, textDark),
+          
           pw.Spacer(),
-          _buildA4Footer(arabicFont),
+          
+          // 5. Barcode & Footer
+          _buildA4Footer(data, arabicFont, boldFont, textMuted),
         ],
       ),
     );
@@ -234,82 +293,301 @@ class InvoicePdfService {
     return doc.save();
   }
 
-  static pw.Widget _buildA4Header(StoreInfo store, pw.ImageProvider? logo, pw.Font bold, PdfColor brandColor) {
+  static pw.Widget _buildA4Header(
+    StoreInfo store, 
+    pw.ImageProvider? logo, 
+    pw.Font bold, 
+    pw.Font regular, 
+    PdfColor brandColor, 
+    PdfColor accentColor,
+    PdfColor textMuted,
+  ) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
+        // Store info
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text(store.name, style: pw.TextStyle(font: bold, fontSize: 24, color: brandColor)),
-            if (store.address.isNotEmpty) pw.Text(store.address),
-            if (store.phone.isNotEmpty) pw.Text('هاتف: ${store.phone}'),
-            if (store.vat.isNotEmpty) pw.Text('الرقم الضريبي: ${store.vat}'),
+            if (logo != null)
+              pw.Container(
+                width: 64,
+                height: 64,
+                margin: const pw.EdgeInsets.only(bottom: 8),
+                child: pw.Image(logo),
+              ),
+            pw.Text(store.name, style: pw.TextStyle(font: bold, fontSize: 20, color: brandColor)),
+            pw.SizedBox(height: 4),
+            if (store.address.isNotEmpty) 
+              pw.Text(store.address, style: pw.TextStyle(font: regular, fontSize: 9.5, color: textMuted)),
+            if (store.phone.isNotEmpty) 
+              pw.Text('هاتف: ${store.phone}', style: pw.TextStyle(font: regular, fontSize: 9.5, color: textMuted)),
+            if (store.vat.isNotEmpty) 
+              pw.Text('الرقم الضريبي للمنشأة: ${store.vat}', style: pw.TextStyle(font: regular, fontSize: 9.5, color: textMuted)),
           ],
         ),
-        if (logo != null)
-          pw.Container(width: 80, height: 80, child: pw.Image(logo)),
-      ],
-    );
-  }
-
-  static pw.Widget _buildA4InvoiceInfo(InvoiceData data, pw.Font bold) {
-    return pw.Row(
-      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-      children: [
-        pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text('فاتورة رقم: ${data.invoiceId}', style: pw.TextStyle(font: bold)),
-            pw.Text('التاريخ: ${_fmt(data.date)}'),
-          ],
-        ),
+        
+        // Document Title
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [
-            pw.Text('الكاشير: ${data.cashierName}'),
+            pw.Text('فاتورة مبيعات ضريبية', style: pw.TextStyle(font: bold, fontSize: 22, color: brandColor)),
+            pw.Text('TAX INVOICE', style: pw.TextStyle(font: bold, fontSize: 13, color: accentColor)),
+            pw.SizedBox(height: 12),
+            pw.Container(
+              width: 140,
+              height: 3,
+              color: accentColor,
+            ),
           ],
         ),
       ],
     );
   }
 
-  static pw.Widget _buildA4ItemsTable(InvoiceData data, pw.Font bold, pw.Font regular, PdfColor brandColor) {
-     return pw.TableHelper.fromTextArray(
-      headers: ['المنتج', 'الكمية', 'السعر', 'الإجمالي'],
-      data: data.lines.map((l) => [
-        l.name,
-        l.qty.toString(),
-        l.price.toStringAsFixed(2),
-        l.total.toStringAsFixed(2),
-      ]).toList(),
-      headerStyle: pw.TextStyle(font: bold, color: PdfColors.white),
-      cellStyle: pw.TextStyle(font: regular),
-      headerDecoration: pw.BoxDecoration(color: brandColor), // Blue Header
-      cellAlignment: pw.Alignment.center,
-    );
-    }
-
-  static pw.Widget _buildA4Summary(InvoiceData data, pw.Font bold, PdfColor brandColor) {
-    return pw.Align(
-      alignment: pw.Alignment.centerLeft,
-      child: pw.Container(
-        width: 200,
-        child: pw.Column(
-          children: [
-            _row('الإجمالي الفرعي:', data.subtotal.toStringAsFixed(2), bold, bold),
-            pw.Divider(),
-            _row('الإجمالي الكلي:', '${data.grandTotal.toStringAsFixed(2)} ج.م', bold, bold, fontSize: 14, color: brandColor),
-          ],
-        ),
+  static pw.Widget _buildA4InvoiceInfoBox(
+    InvoiceData data, 
+    pw.Font bold, 
+    pw.Font regular, 
+    PdfColor bgLight, 
+    PdfColor borderLight,
+    PdfColor brandColor,
+  ) {
+    return pw.Container(
+      decoration: pw.BoxDecoration(
+        color: bgLight,
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(10)),
+        border: pw.Border.all(color: borderLight, width: 1),
+      ),
+      padding: const pw.EdgeInsets.all(16),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Row(
+                children: [
+                  pw.Text('رقم الفاتورة: ', style: pw.TextStyle(font: bold, fontSize: 11, color: brandColor)),
+                  pw.Text(data.invoiceId, style: pw.TextStyle(font: bold, fontSize: 11)),
+                ],
+              ),
+              pw.SizedBox(height: 6),
+              pw.Row(
+                children: [
+                  pw.Text('تاريخ الإصدار: ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
+                  pw.Text(_fmt(data.date), style: const pw.TextStyle(fontSize: 10)),
+                ],
+              ),
+            ],
+          ),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.end,
+            children: [
+              pw.Row(
+                children: [
+                  pw.Text('الكاشير المسؤول: ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
+                  pw.Text(data.cashierName, style: pw.TextStyle(font: bold, fontSize: 10)),
+                ],
+              ),
+              pw.SizedBox(height: 6),
+              pw.Row(
+                children: [
+                  pw.Text('حالة الفاتورة: ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
+                  pw.Text('مدفوعة بالكامل', style: pw.TextStyle(font: bold, fontSize: 10, color: PdfColor.fromInt(0xFF22C55E))),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  static pw.Widget _buildA4Footer(pw.Font regular) {
-    return pw.Container(
-      alignment: pw.Alignment.center,
-      child: pw.Text('شكراً لتعاملكم معنا', style: pw.TextStyle(font: regular, fontSize: 10)),
+  static pw.Widget _buildA4ItemsTable(
+    InvoiceData data, 
+    pw.Font bold, 
+    pw.Font regular, 
+    PdfColor brandColor, 
+    PdfColor borderLight,
+    PdfColor bgLight,
+    PdfColor textDark,
+  ) {
+    return pw.Table(
+      border: pw.TableBorder(
+        horizontalInside: pw.BorderSide(color: borderLight, width: 0.8),
+        bottom: pw.BorderSide(color: brandColor, width: 1.5),
+      ),
+      columnWidths: {
+        0: const pw.FlexColumnWidth(4), // Product name
+        1: const pw.FlexColumnWidth(1), // Quantity
+        2: const pw.FlexColumnWidth(1.5), // Price
+        3: const pw.FlexColumnWidth(1.8), // Total
+      },
+      defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
+      children: [
+        // Table Header
+        pw.TableRow(
+          decoration: pw.BoxDecoration(
+            color: brandColor,
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+          ),
+          children: [
+            _tableHeaderCell('المنتج / السلعة', bold),
+            _tableHeaderCell('الكمية', bold),
+            _tableHeaderCell('سعر الوحدة', bold),
+            _tableHeaderCell('الإجمالي الكلي', bold),
+          ],
+        ),
+        
+        // Table Rows
+        ...List.generate(data.lines.length, (index) {
+          final line = data.lines[index];
+          final isEven = index % 2 == 0;
+          return pw.TableRow(
+            decoration: pw.BoxDecoration(
+              color: isEven ? bgLight : PdfColors.white,
+            ),
+            children: [
+              _tableCell(line.name, regular, align: pw.TextAlign.right, textDark: textDark),
+              _tableCell(line.qty.toString(), regular, textDark: textDark),
+              _tableCell('${line.price.toStringAsFixed(2)} ج.م', regular, textDark: textDark),
+              _tableCell('${line.total.toStringAsFixed(2)} ج.م', bold, textDark: textDark),
+            ],
+          );
+        }),
+      ],
+    );
+  }
+
+  static pw.Widget _tableHeaderCell(String text, pw.Font font) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(font: font, color: PdfColors.white, fontSize: 10),
+        textAlign: pw.TextAlign.center,
+      ),
+    );
+  }
+
+  static pw.Widget _tableCell(String text, pw.Font font, {pw.TextAlign align = pw.TextAlign.center, PdfColor? textDark}) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(font: font, fontSize: 9.5, color: textDark),
+        textAlign: align,
+      ),
+    );
+  }
+
+  static pw.Widget _buildA4SummaryRow(
+    InvoiceData data, 
+    pw.Font bold, 
+    pw.Font regular, 
+    PdfColor brandColor, 
+    PdfColor accentColor,
+    PdfColor bgLight, 
+    PdfColor borderLight,
+    PdfColor textDark,
+  ) {
+    return pw.Row(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        // Terms & signature
+        pw.Expanded(
+          flex: 1,
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text('الشروط والأحكام:', style: pw.TextStyle(font: bold, fontSize: 9.5, color: brandColor)),
+              pw.SizedBox(height: 4),
+              pw.Text('1. البضاعة المباعة لا ترد ولا تستبدل بعد 14 يوماً من تاريخ الفاتورة.', style: pw.TextStyle(font: regular, fontSize: 8, color: PdfColors.grey700)),
+              pw.Text('2. يجب إحضار الفاتورة الأصلية عند طلب الاسترجاع أو الصيانة.', style: pw.TextStyle(font: regular, fontSize: 8, color: PdfColors.grey700)),
+            ],
+          ),
+        ),
+        pw.SizedBox(width: 40),
+        
+        // Totals Box
+        pw.Container(
+          width: 240,
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: borderLight, width: 1),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(10)),
+          ),
+          child: pw.Column(
+            children: [
+              _summaryRow('الإجمالي الفرعي:', '${data.subtotal.toStringAsFixed(2)} ج.م', regular, regular, textDark),
+              if (data.discount > 0)
+                _summaryRow('خصومات الفاتورة:', '- ${data.discount.toStringAsFixed(2)} ج.م', regular, regular, accentColor),
+              if (data.tax > 0)
+                _summaryRow('ضريبة القيمة المضافة:', '${data.tax.toStringAsFixed(2)} ج.م', regular, regular, textDark),
+              
+              pw.Container(
+                decoration: pw.BoxDecoration(
+                  color: brandColor,
+                  borderRadius: const pw.BorderRadius.vertical(bottom: pw.Radius.circular(9)),
+                ),
+                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'الإجمالي النهائي:', 
+                      style: pw.TextStyle(font: bold, fontSize: 11, color: PdfColors.white),
+                    ),
+                    pw.Text(
+                      '${data.grandTotal.toStringAsFixed(2)} ج.م', 
+                      style: pw.TextStyle(font: bold, fontSize: 12, color: PdfColors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static pw.Widget _summaryRow(String label, String value, pw.Font labelFont, pw.Font valueFont, PdfColor? color) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Text(label, style: pw.TextStyle(font: labelFont, fontSize: 9.5, color: PdfColors.grey700)),
+          pw.Text(value, style: pw.TextStyle(font: valueFont, fontSize: 9.5, color: color)),
+        ],
+      ),
+    );
+  }
+
+  static pw.Widget _buildA4Footer(InvoiceData data, pw.Font regular, pw.Font bold, PdfColor textMuted) {
+    return pw.Column(
+      children: [
+        pw.Divider(color: PdfColors.grey300, thickness: 0.5),
+        pw.SizedBox(height: 6),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text(
+              'شكراً لتعاملكم معنا ودمتم سالمين!', 
+              style: pw.TextStyle(font: bold, fontSize: 9.5, color: PdfColor.fromInt(0xFF1E3A8A)),
+            ),
+            pw.BarcodeWidget(
+              barcode: Barcode.code128(),
+              data: data.invoiceId,
+              width: 110,
+              height: 25,
+              drawText: false,
+            ),
+          ],
+        ),
+      ],
     );
   }
 

@@ -18,7 +18,7 @@ class InvoiceRouter {
     double tax = 0.0,
     String? footerNote,
     String? logoAsset,
-    bool receiptMode = false,
+    bool receiptMode = true,
   }) async {
     final dto = InvoiceMapper.fromCart(
       invoiceId: invoiceId,

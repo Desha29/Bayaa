@@ -10,6 +10,8 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/data/services/backup_manager.dart';
 import '../../../../core/data/services/checkpoint_service.dart';
 import '../../../../core/functions/messege.dart';
+import '../../../../core/data/services/persistence_initializer.dart';
+import '../../../../core/data/services/debug_seeder.dart';
 
 class DataManagementScreen extends StatefulWidget {
   const DataManagementScreen({super.key});
@@ -38,7 +40,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() => setState(() {}));
     _isPersistenceReady = getIt.isRegistered<BackupManager>();
     if (_isPersistenceReady) {
@@ -313,6 +315,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                       children: [
                         _buildBackupsTab(dateFormat, timeFormat),
                         _buildCheckpointsTab(dateFormat, timeFormat),
+                        _buildAppModeTab(),
                       ],
                     ),
             ),
@@ -483,6 +486,16 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                 Icon(LucideIcons.clock, size: 16),
                 const SizedBox(width: 8),
                 const Text('نقاط الحفظ التلقائي'),
+              ],
+            ),
+          ),
+          Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(LucideIcons.settings, size: 16),
+                const SizedBox(width: 8),
+                const Text('وضع النظام'),
               ],
             ),
           ),
@@ -958,5 +971,328 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       }
     } catch (_) {}
     return size;
+  }
+
+  Widget _buildAppModeTab() {
+    final currentMode = PersistenceInitializer.persistenceManager?.config.appMode ?? 'release';
+    final isDebug = currentMode == 'debug';
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Mode switch card
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.borderColor),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        LucideIcons.settings,
+                        color: AppColors.primaryColor,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'وضع تشغيل النظام الحالي',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            isDebug
+                                ? 'التطبيق يعمل حالياً في وضع التطوير (بيانات تجريبية مُفعّلة)'
+                                : 'التطبيق يعمل حالياً في وضع الإنتاج الفعلي',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDebug ? Colors.orange.shade700 : AppColors.successColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+                const Text(
+                  'اختر وضع التشغيل:',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModeOptionCard(
+                        title: 'وضع الإنتاج الفعلي (Release)',
+                        description: 'استخدام قاعدة البيانات الحقيقية فقط بدون أي بيانات تجريبية.',
+                        icon: LucideIcons.shieldCheck,
+                        isActive: !isDebug,
+                        activeColor: AppColors.successColor,
+                        onTap: () => _changeMode('release'),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildModeOptionCard(
+                        title: 'وضع التطوير والتحقق (Debug)',
+                        description: 'توليد بيانات تجريبية تلقائياً للمنتجات والمبيعات لاختبار النظام.',
+                        icon: LucideIcons.code,
+                        isActive: isDebug,
+                        activeColor: Colors.orange,
+                        onTap: () => _changeMode('debug'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Debug actions card (only visible in debug mode)
+          if (isDebug)
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.red.shade100),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Icon(
+                          LucideIcons.triangleAlert,
+                          color: Colors.red.shade700,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'منطقة خطر البيانات التجريبية',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'أدوات التحكم بقاعدة البيانات وتوليد البيانات التجريبية.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.mutedColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'يتيح لك هذا الزر مسح جميع المدخلات وتوليد مبيعات تجريبية كاملة لفترة الـ 7 أيام الماضية، بالإضافة إلى 7 منتجات ذات كميات وتصنيفات مختلفة ومستخدمين تجريبيين لتمكينك من فحص لوحة التحكم والرسوم البيانية.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.6,
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: _isLoading ? null : _resetAndSeedData,
+                    icon: const Icon(LucideIcons.rotateCcw),
+                    label: const Text(
+                      'تهيئة قاعدة البيانات وتوليد البيانات التجريبية',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeOptionCard({
+    required String title,
+    required String description,
+    required IconData icon,
+    required bool isActive,
+    required Color activeColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: isActive ? null : onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isActive ? activeColor.withOpacity(0.05) : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isActive ? activeColor : AppColors.borderColor,
+            width: isActive ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isActive ? activeColor : AppColors.textSecondary,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isActive ? activeColor : AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                if (isActive)
+                  Icon(
+                    LucideIcons.checkCircle2,
+                    color: activeColor,
+                    size: 18,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.5,
+                color: isActive ? activeColor.withOpacity(0.8) : AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _changeMode(String mode) async {
+    final manager = PersistenceInitializer.persistenceManager;
+    if (manager == null) return;
+    setState(() => _isLoading = true);
+    try {
+      manager.config.appMode = mode;
+      await manager.config.save();
+      
+      if (mode == 'debug') {
+        await DebugSeeder.seedIfNeeded();
+      }
+      
+      if (mounted) {
+        MotionSnackBarSuccess(context, 'تم تغيير وضع النظام إلى: ${mode == 'debug' ? "وضع التطوير" : "وضع الإنتاج"}');
+      }
+    } catch (e) {
+      if (mounted) MotionSnackBarError(context, 'فشل حفظ الإعدادات: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _resetAndSeedData() async {
+    final confirm = await _showConfirmDialog(
+      'تأكيد إعادة تهيئة البيانات',
+      'سيتم مسح جميع البيانات الحالية (المستخدمين، المنتجات، الفواتير، اليوميات، وسجلات النشاط) بشكل كامل وتوليد بيانات تجريبية جديدة.\n\nلا يمكن التراجع عن هذا الإجراء.',
+      icon: LucideIcons.triangleAlert,
+      iconColor: AppColors.errorColor,
+    );
+    if (!confirm) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await DebugSeeder.clearAndReSeed();
+      if (mounted) {
+        MotionSnackBarSuccess(context, 'تمت إعادة تهيئة البيانات وتوليد البيانات التجريبية بنجاح');
+      }
+    } catch (e) {
+      if (mounted) MotionSnackBarError(context, 'خطأ أثناء تهيئة البيانات: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 }

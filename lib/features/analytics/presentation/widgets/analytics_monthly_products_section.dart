@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
-import '../../data/arp_repository_impl.dart';
-import '../../data/models/product_performance_model.dart';
+import '../../data/analytics_repository_impl.dart';
+import '../../../sessions/data/models/product_performance_model.dart';
 
-class ArpMonthlyProductsSection extends StatefulWidget {
+class AnalyticsMonthlyProductsSection extends StatefulWidget {
   final Map<String, double> monthlySales;
 
-  const ArpMonthlyProductsSection({super.key, required this.monthlySales});
+  const AnalyticsMonthlyProductsSection({super.key, required this.monthlySales});
 
   @override
-  State<ArpMonthlyProductsSection> createState() => _ArpMonthlyProductsSectionState();
+  State<AnalyticsMonthlyProductsSection> createState() => _AnalyticsMonthlyProductsSectionState();
 }
 
-class _ArpMonthlyProductsSectionState extends State<ArpMonthlyProductsSection> {
+class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProductsSection> {
   String? _selectedMonth;
   List<ProductPerformanceModel> _products = [];
   bool _loading = false;
@@ -42,7 +42,7 @@ class _ArpMonthlyProductsSectionState extends State<ArpMonthlyProductsSection> {
     });
 
     try {
-      final repo = getIt<ArpRepositoryImpl>();
+      final repo = getIt<AnalyticsRepositoryImpl>();
       final result = await repo.getTopProductsForMonth(yearMonth, 10);
       result.fold(
         (_) => setState(() => _loading = false),
@@ -67,7 +67,7 @@ class _ArpMonthlyProductsSectionState extends State<ArpMonthlyProductsSection> {
   }
 
   @override
-  void didUpdateWidget(ArpMonthlyProductsSection oldWidget) {
+  void didUpdateWidget(AnalyticsMonthlyProductsSection oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.monthlySales != oldWidget.monthlySales && widget.monthlySales.isNotEmpty) {
       final latestMonth = widget.monthlySales.keys.last;
@@ -314,31 +314,13 @@ class _ArpMonthlyProductsSectionState extends State<ArpMonthlyProductsSection> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: LinearProgressIndicator(
-                            value: ratio,
-                            minHeight: 6,
-                            backgroundColor: Colors.grey.shade100,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              rank <= 3 ? AppColors.secondaryColor : Colors.grey.shade400,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${product.quantitySold} قطعة',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.mutedColor,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 2),
+                  Text(
+                    'بيع: ${product.quantitySold} قطعة',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.mutedColor,
+                    ),
                   ),
                 ],
               ),

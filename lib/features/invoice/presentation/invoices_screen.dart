@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:printing/printing.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -315,7 +316,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
     await Navigator.of(context).push(PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          InvoicePreviewScreen(data: data, receiptMode: false),
+          InvoicePreviewScreen(data: data, receiptMode: true),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(
           opacity: animation,
@@ -385,7 +386,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
                       )),
                       child: ScreenHeader(
                         title: 'الفواتير',
-                        icon: Icons.receipt_long,
+                        icon: LucideIcons.fileSpreadsheet,
                         subtitle: 'عرض وطباعة الفواتير الصادرة',
                         subtitleColor: AppColors.mutedColor,
                         iconColor: AppColors.primaryColor,

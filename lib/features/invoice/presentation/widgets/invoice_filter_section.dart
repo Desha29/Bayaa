@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
-
 import '../cubit/invoice_state.dart';
 
 class InvoiceFilterSection extends StatelessWidget {
@@ -45,11 +45,11 @@ class InvoiceFilterSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderColor.withOpacity(0.3)),
+        border: Border.all(color: AppColors.borderColor.withOpacity(0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 12,
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
@@ -82,9 +82,9 @@ class InvoiceFilterSection extends StatelessWidget {
             _buildFilterTypeSelector(),
             const SizedBox(width: 20),
             Container(
-              width: 1,
+              width: 1.2,
               height: 36,
-              color: AppColors.borderColor.withOpacity(0.3),
+              color: AppColors.borderColor.withOpacity(0.6),
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -96,7 +96,7 @@ class InvoiceFilterSection extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             _buildClearButton(),
             if (isManager) ...[
               const SizedBox(width: 8),
@@ -123,7 +123,7 @@ class InvoiceFilterSection extends StatelessWidget {
         _buildDateButton('من تاريخ', startDate, true),
         const SizedBox(height: 10),
         _buildDateButton('إلى تاريخ', endDate, false),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(child: _buildClearButton()),
@@ -142,16 +142,20 @@ class InvoiceFilterSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.backgroundColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderColor.withOpacity(0.4)),
+        border: Border.all(color: AppColors.borderColor.withOpacity(0.6)),
       ),
       child: TextField(
         focusNode: focusNode,
         controller: barcodeSearchController,
+        style: const TextStyle(fontFamily: 'Cairo', fontSize: 14, color: AppColors.textPrimary),
         decoration: InputDecoration(
           hintText: 'امسح الباركود أو اكتب رقم الفاتورة...',
-          hintStyle: TextStyle(color: AppColors.mutedColor.withOpacity(0.6), fontSize: 13),
-          prefixIcon: Icon(Icons.search_rounded, color: AppColors.primaryColor.withOpacity(0.6), size: 20),
+          hintStyle: TextStyle(color: AppColors.mutedColor.withOpacity(0.6), fontSize: 13, fontFamily: 'Cairo'),
+          prefixIcon: Icon(LucideIcons.search, color: AppColors.primaryColor.withOpacity(0.6), size: 18),
           border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         ),
         onSubmitted: onSearch,
@@ -162,29 +166,30 @@ class InvoiceFilterSection extends StatelessWidget {
 
   Widget _buildSearchBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.primaryColor.withOpacity(0.08),
+        color: AppColors.primaryColor.withOpacity(0.06),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.primaryColor.withOpacity(0.15)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.search_rounded, color: AppColors.primaryColor, size: 14),
+          const Icon(LucideIcons.search, color: AppColors.primaryColor, size: 13),
           const SizedBox(width: 6),
           Text(
             'بحث: $searchQuery',
             style: const TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'Cairo',
               color: AppColors.primaryColor,
             ),
           ),
           const SizedBox(width: 6),
           InkWell(
             onTap: onClearSearch,
-            child: Icon(Icons.close_rounded, size: 14, color: AppColors.primaryColor),
+            child: const Icon(LucideIcons.x, size: 13, color: AppColors.primaryColor),
           ),
         ],
       ),
@@ -211,7 +216,7 @@ class InvoiceFilterSection extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         decoration: BoxDecoration(
           gradient: isSelected
               ? const LinearGradient(
@@ -221,14 +226,15 @@ class InvoiceFilterSection extends StatelessWidget {
           color: isSelected ? null : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? Colors.transparent : AppColors.borderColor.withOpacity(0.4),
+            color: isSelected ? Colors.transparent : AppColors.borderColor.withOpacity(0.8),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.textSecondary,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'Cairo',
             fontSize: 13,
           ),
         ),
@@ -241,24 +247,24 @@ class InvoiceFilterSection extends StatelessWidget {
       onTap: () => onSelectDate(isStart),
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: date != null
               ? AppColors.primaryColor.withOpacity(0.04)
               : AppColors.backgroundColor,
           border: Border.all(
             color: date != null
-                ? AppColors.primaryColor.withOpacity(0.2)
-                : AppColors.borderColor.withOpacity(0.4),
+                ? AppColors.primaryColor.withOpacity(0.24)
+                : AppColors.borderColor.withOpacity(0.6),
           ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
             Icon(
-              Icons.calendar_today_rounded,
-              color: date != null ? AppColors.primaryColor : AppColors.mutedColor.withOpacity(0.5),
-              size: 18,
+              LucideIcons.calendar,
+              color: date != null ? AppColors.primaryColor : AppColors.mutedColor.withOpacity(0.6),
+              size: 16,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -267,7 +273,7 @@ class InvoiceFilterSection extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(fontSize: 11, color: AppColors.mutedColor, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 10, color: AppColors.mutedColor, fontWeight: FontWeight.w600, fontFamily: 'Cairo'),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -275,8 +281,9 @@ class InvoiceFilterSection extends StatelessWidget {
                         ? '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'
                         : 'اختر التاريخ',
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Cairo',
                       color: date != null ? AppColors.textPrimary : AppColors.mutedColor,
                     ),
                   ),
@@ -296,23 +303,24 @@ class InvoiceFilterSection extends StatelessWidget {
         onTap: onClearFilters,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: AppColors.backgroundColor,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.borderColor.withOpacity(0.4)),
+            border: Border.all(color: AppColors.borderColor.withOpacity(0.6)),
           ),
-          child: Row(
+          child: const Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.clear_all_rounded, size: 18, color: AppColors.textSecondary),
-              const SizedBox(width: 6),
-              const Text(
+              Icon(LucideIcons.rotateCcw, size: 16, color: AppColors.textSecondary),
+              const SizedBox(width: 8),
+              Text(
                 'مسح الفلاتر',
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'Cairo',
                   color: AppColors.textSecondary,
                 ),
               ),
@@ -334,7 +342,7 @@ class InvoiceFilterSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: enabled ? AppColors.errorColor : AppColors.mutedColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
@@ -343,13 +351,14 @@ class InvoiceFilterSection extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.delete_sweep_rounded, size: 18, color: enabled ? Colors.white : AppColors.mutedColor),
-                const SizedBox(width: 6),
+                Icon(LucideIcons.trash2, size: 16, color: enabled ? Colors.white : AppColors.mutedColor),
+                const SizedBox(width: 8),
                 Text(
                   'مسح الفواتير',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Cairo',
                     color: enabled ? Colors.white : AppColors.mutedColor,
                   ),
                 ),

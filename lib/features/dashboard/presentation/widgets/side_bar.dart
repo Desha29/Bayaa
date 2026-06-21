@@ -10,17 +10,21 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart';
 import '../../../settings/presentation/cubit/settings_states.dart';
+import '../../../auth/presentation/cubit/user_cubit.dart';
+import '../../../auth/data/models/user_model.dart';
+import '../../../../core/data/services/persistence_initializer.dart';
 
 class SidebarItem {
   final String id;
   final IconData icon;
   final String title;
   final Widget screen;
-  SidebarItem(
-      {required this.id,
-      required this.icon,
-      required this.title,
-      required this.screen});
+  SidebarItem({
+    required this.id,
+    required this.icon,
+    required this.title,
+    required this.screen,
+  });
 }
 
 class CustomSidebar extends StatefulWidget {
@@ -43,287 +47,595 @@ class CustomSidebar extends StatefulWidget {
   State<CustomSidebar> createState() => _CustomSidebarState();
 }
 
-class _CustomSidebarState extends State<CustomSidebar>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _widthAnimation;
+class _CustomSidebarState extends State<CustomSidebar> {
   int _hoveredIndex = -1;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _widthAnimation = Tween<double>(
-      begin: 240,
-      end: 70,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-    if (widget.isCollapsed) _controller.forward();
-  }
+  List<dynamic> get _filteredItems {
+    final List<dynamic> filtered = [];
 
-  @override
-  void didUpdateWidget(CustomSidebar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isCollapsed) {
-      _controller.forward();
-    } else {
-      _controller.reverse();
+    SidebarItem? findItem(String id) {
+      for (var item in widget.items) {
+        if (item.id == id) return item;
+      }
+      return null;
     }
+
+    void addSection(String sectionTitle, List<String> itemIds) {
+      final List<SidebarItem> sectionItems = [];
+      for (var id in itemIds) {
+        final item = findItem(id);
+        if (item != null) {
+          sectionItems.add(item);
+        }
+      }
+      if (sectionItems.isNotEmpty) {
+        filtered.add(sectionTitle);
+        filtered.addAll(sectionItems);
+      }
+    }
+
+    addSection('الرئيسية', ['dashboard']);
+    addSection('المبيعات والفواتير', ['sales', 'invoices']);
+    addSection('المخازن والمنتجات', ['products', 'stock_alerts', 'stock_summary']);
+    addSection('النظام والتقارير', ['reports', 'sessions', 'notifications', 'settings']);
+
+    return filtered;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _widthAnimation,
-      builder: (context, child) {
-        final w = _widthAnimation.value.clamp(56.0, 320.0);
-        final compact = w < 100;
+  Widget _buildUserInfo(bool isNarrow) {
+    final user = getIt<UserCubit>().currentUser;
+    final firstLetter = user.name.isNotEmpty ? user.name.substring(0, 1) : '?';
+    final roleName = user.userType == UserType.manager ? 'مدير النظام' : 'كاشير';
 
-        return Container(
-          width: w,
-          decoration: BoxDecoration(
-            color: AppColors.primaryForeground,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(2, 0),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 20),
-
-              SizedBox(
-                height: 96,
-                child: Center(
-                  child: _SidebarHeader(compact: compact, maxW: w),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Toggle button
-              if (widget.onToggleCollapse != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: IconButton(
-                    icon: Icon(
-                      widget.isCollapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft,
-                      color: AppColors.primaryColor,
-                      size: 20,
-                    ),
-                    tooltip: widget.isCollapsed ? 'توسيع القائمة' : 'تصغير القائمة',
-                    onPressed: widget.onToggleCollapse,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.all(isNarrow ? 8 : 12),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: isNarrow
+          ? Center(
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: AppColors.primaryColor.withOpacity(0.2),
+                child: Text(
+                  firstLetter,
+                  style: const TextStyle(
+                    color: AppColors.primaryColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              const SizedBox(height: 8),
-
-              // Items
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  itemCount: widget.items.length,
-                  itemBuilder: (context, index) {
-                    final item = widget.items[index];
-                    final isSelected = index == widget.selectedIndex;
-                    final isHovered = index == _hoveredIndex;
-
-                    final bgColor = isSelected
-                        ? AppColors.primaryColor.withOpacity(0.95)
-                        : isHovered
-                            ? AppColors.primaryColor.withOpacity(0.08)
-                            : Colors.transparent;
-
-                    final fgIcon = isSelected
-                        ? AppColors.primaryForeground
-                        : AppColors.mutedColor;
-
-                    final titleStyle = TextStyle(
-                      fontSize: 15,
-                      color: isSelected
-                          ? AppColors.primaryForeground
-                          : AppColors.secondaryColor,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.w500,
-                    );
-
-                    return MouseRegion(
-                      onEnter: (_) => setState(() => _hoveredIndex = index),
-                      onExit: (_) => setState(() => _hoveredIndex = -1),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 160),
-                        curve: Curves.easeInOut,
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: bgColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          dense: true,
-                          horizontalTitleGap: 12,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 2,
-                          ),
-                          leading: Icon(item.icon, size: 22, color: fgIcon),
-                          title: w > 100
-                              ? BlocBuilder<NotificationsCubit,
-                                  NotificationsStates>(
-                                  builder: (context, state) {
-                                    return Row(
-                                      children: [
-                                        // Fitted text to avoid overflow at tight widths
-                                        Flexible(
-                                          child: FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            alignment: Alignment.centerRight,
-                                            child: Text(
-                                              item.title,
-                                              style: titleStyle,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 8),
-                                        (item.title == 'التنبيهات')
-                                            ? Container(
-                                                padding: EdgeInsets.all(6),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: AppColors.errorColor,
-                                                ),
-                                                child: Text(
-                                                  getIt<NotificationsCubit>()
-                                                      .total
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                    color: AppColors
-                                                        .backgroundColor,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              )
-                                            : SizedBox()
-                                      ],
-                                    );
-                                  },
-                                )
-                              : null,
-                          onTap: () => widget.onItemSelected(index),
+              ),
+            )
+          : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              child: SizedBox(
+                width: 192, // 240 max width - 24 margin - 24 padding
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: AppColors.primaryColor.withOpacity(0.2),
+                      child: Text(
+                        firstLetter,
+                        style: const TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    );
-                  },
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            user.name,
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          Text(
+                            roleName,
+                            style: const TextStyle(
+                              color: AppColors.mutedColor,
+                              fontSize: 10,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildConnectivityStatus(),
+                              if (PersistenceInitializer.persistenceManager?.config.appMode == 'debug') ...[
+                                const SizedBox(width: 4),
+                                _buildDebugBadge(),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
+            ),
+    );
+  }
 
-              const Divider(
-                color: AppColors.borderColor,
-                height: 1,
-                thickness: 0.8,
-              ),
-              ListTile(
-                dense: true,
-                leading: const Icon(
-                  LucideIcons.logOut,
-                  color: AppColors.errorColor,
-                  size: 22,
+  Widget _buildConnectivityStatus() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.green.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: Colors.green.withOpacity(0.3),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: Colors.green,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withOpacity(0.5),
+                  blurRadius: 4,
                 ),
-                title: w > 100
-                    ? const FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          "تسجيل الخروج",
-                          style: TextStyle(
-                            color: AppColors.errorColor,
-                            fontWeight: FontWeight.w600,
+              ],
+            ),
+          ),
+          const SizedBox(width: 4),
+          const Text(
+            'متصل',
+            style: TextStyle(
+              color: Colors.green,
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDebugBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: Colors.orange.withOpacity(0.3),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.5),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 4),
+          const Text(
+            'تجريبي',
+            style: TextStyle(
+              color: Colors.orange,
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton(bool isNarrow) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: InkWell(
+        onTap: () {
+          handleLogout(context);
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: EdgeInsets.symmetric(
+            horizontal: isNarrow ? 0 : 16,
+            vertical: 12,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.errorColor.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: isNarrow
+              ? const Center(
+                  child: Icon(
+                    LucideIcons.logOut,
+                    color: AppColors.errorColor,
+                    size: 20,
+                  ),
+                )
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: SizedBox(
+                    width: 184, // 240 width - 24 padding - 32 internal padding
+                    child: Row(
+                      children: [
+                        const Icon(
+                          LucideIcons.logOut,
+                          color: AppColors.errorColor,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 14),
+                        const Expanded(
+                          child: Text(
+                            'تسجيل الخروج',
+                            style: TextStyle(
+                              color: AppColors.errorColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      )
-                    : null,
-                onTap: () {
-                  handleLogout(context);
-                },
-              ),
-              const SizedBox(height: 12),
-            ],
+                      ],
+                    ),
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, bool isNarrow) {
+    if (isNarrow) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Divider(
+          color: AppColors.borderColor.withOpacity(0.5),
+          indent: 8,
+          endIndent: 8,
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 8, right: 16),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: AppColors.mutedColor.withOpacity(0.7),
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationsBadge({required bool mini}) {
+    return BlocBuilder<NotificationsCubit, NotificationsStates>(
+      builder: (context, state) {
+        final total = getIt<NotificationsCubit>().total;
+        if (total == 0) return const SizedBox.shrink();
+        if (mini) {
+          return Container(
+            width: 8,
+            height: 8,
+            decoration: const BoxDecoration(
+              color: AppColors.errorColor,
+              shape: BoxShape.circle,
+            ),
+          );
+        }
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: AppColors.errorColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            '$total',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         );
       },
     );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-}
+  Widget _buildMenuItem(SidebarItem item, bool isNarrow) {
+    final originalIndex = widget.items.indexOf(item);
+    final isSelected = widget.selectedIndex == originalIndex;
+    final isHovered = _hoveredIndex == originalIndex;
 
-class _SidebarHeader extends StatelessWidget {
-  const _SidebarHeader({required this.compact, required this.maxW});
-
-  final bool compact;
-  final double maxW;
-
-  @override
-  Widget build(BuildContext context) {
-    final radius = compact ? 20.0 : 30.0;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: FittedBox(
-            child: SizedBox(
-              height: radius * 3,
-              width: radius * 3,
-              child: ClipOval(
-                child: AppLogo(width: 160, height: 160, fit: BoxFit.cover),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hoveredIndex = originalIndex),
+        onExit: (_) => setState(() => _hoveredIndex = -1),
+        child: Tooltip(
+          message: isNarrow ? item.title : '',
+          preferBelow: false,
+          waitDuration: const Duration(milliseconds: 400),
+          child: GestureDetector(
+            onTap: () => widget.onItemSelected(originalIndex),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: EdgeInsets.symmetric(
+                horizontal: isNarrow ? 0 : 16,
+                vertical: 12,
               ),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primaryColor.withOpacity(0.15)
+                    : isHovered
+                        ? AppColors.primaryColor.withOpacity(0.05)
+                        : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                border: isSelected
+                    ? Border.all(
+                        color: AppColors.primaryColor.withOpacity(0.3),
+                        width: 1,
+                      )
+                    : null,
+              ),
+              child: isNarrow
+                  ? Center(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Icon(
+                            item.icon,
+                            color: isSelected
+                                ? AppColors.primaryColor
+                                : isHovered
+                                    ? AppColors.textPrimary
+                                    : AppColors.mutedColor,
+                            size: 22,
+                          ),
+                          if (item.title == 'التنبيهات')
+                            Positioned(
+                              right: -4,
+                              top: -4,
+                              child: _buildNotificationsBadge(mini: true),
+                            ),
+                        ],
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: SizedBox(
+                        width: 184, // 240 width - 24 margin - 32 internal padding
+                        child: Row(
+                          children: [
+                            Icon(
+                              item.icon,
+                              color: isSelected
+                                  ? AppColors.primaryColor
+                                  : isHovered
+                                      ? AppColors.textPrimary
+                                      : AppColors.mutedColor,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                item.title,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? AppColors.primaryColor
+                                      : isHovered
+                                          ? AppColors.textPrimary
+                                          : AppColors.secondaryColor,
+                                  fontSize: 14,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            if (item.title == 'التنبيهات')
+                              _buildNotificationsBadge(mini: false)
+                            else if (isSelected)
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
             ),
           ),
         ),
-        if (!compact) ...[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: BlocBuilder<SettingsCubit, SettingsStates>(
-                      bloc: getIt<SettingsCubit>(),
-                      builder: (context, state) {
-                        final name =
-                            getIt<SettingsCubit>().currentStoreInfo?.name ??
-                                'Bayaa';
-                        return Text(
-                          name.isNotEmpty ? name : 'Bayaa',
-                          style:
-                              Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.primaryColor,
-                                    fontSize: 16,
-                                    height: 1.2,
-                                  ),
-                        );
-                      }),
+      ),
+    );
+  }
+
+  Widget _buildHeader(bool isNarrow) {
+    return Container(
+      height: 80,
+      padding: EdgeInsets.symmetric(horizontal: isNarrow ? 8 : 16),
+      child: isNarrow
+          ? Center(
+              child: InkWell(
+                onTap: widget.onToggleCollapse,
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(
+                    LucideIcons.menu,
+                    color: AppColors.primaryColor,
+                    size: 22,
+                  ),
                 ),
               ),
-            ],
+            )
+          : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              child: SizedBox(
+                width: 208, // 240 width - 32 padding
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: const AppLogo(
+                        width: 42,
+                        height: 42,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BlocBuilder<SettingsCubit, SettingsStates>(
+                            bloc: getIt<SettingsCubit>(),
+                            builder: (context, state) {
+                              final name = getIt<SettingsCubit>().currentStoreInfo?.name ?? 'Bayaa';
+                              return Text(
+                                name.isNotEmpty ? name : 'Bayaa',
+                                style: const TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              );
+                            },
+                          ),
+                          const Text(
+                            "نظام إدارة المبيعات",
+                            style: TextStyle(
+                              color: AppColors.mutedColor,
+                              fontSize: 10,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    if (widget.onToggleCollapse != null)
+                      InkWell(
+                        onTap: widget.onToggleCollapse,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          child: const Icon(
+                            LucideIcons.chevronLeft,
+                            color: AppColors.primaryColor,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = widget.isCollapsed ? 72.0 : 240.0;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      width: width,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: AppColors.primaryForeground,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(2, 0),
           ),
-          const SizedBox(height: 2),
         ],
-      ],
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 140;
+
+          return Column(
+            children: [
+              _buildHeader(isNarrow),
+              const SizedBox(height: 8),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  itemCount: _filteredItems.length,
+                  itemBuilder: (context, index) {
+                    final item = _filteredItems[index];
+                    if (item is String) {
+                      return _buildSectionHeader(item, isNarrow);
+                    }
+                    return _buildMenuItem(item as SidebarItem, isNarrow);
+                  },
+                ),
+              ),
+              _buildUserInfo(isNarrow),
+              _buildLogoutButton(isNarrow),
+              const SizedBox(height: 12),
+            ],
+          );
+        },
+      ),
     );
   }
 }

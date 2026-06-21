@@ -1,71 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:motion_toast/motion_toast.dart';
-
 import '../../features/auth/presentation/login_screen.dart';
+import '../constants/app_colors.dart';
+
+/// Renders a premium, floating, custom-styled SnackBar
+void _showCustomSnackBar(BuildContext context, String message, IconData icon, Color color) {
+  // Clear any existing snackbars to keep notifications instant and snappy
+  ScaffoldMessenger.of(context).clearSnackBars();
+  
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isDesktop = screenWidth > 600;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      duration: const Duration(seconds: 3),
+      // Position SnackBar at bottom right on desktop/tablet, bottom center on mobile
+      margin: EdgeInsets.only(
+        bottom: 20,
+        left: isDesktop ? screenWidth * 0.6 : 16,
+        right: 16,
+      ),
+      padding: EdgeInsets.zero,
+      content: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.98),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withOpacity(0.24), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  color: AppColors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  height: 1.2,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
 void MotionSnackBarSuccess(BuildContext context, String message) {
-  MotionToast.success(
-    title: Text(
-      message,
-      style: TextStyle(fontWeight: FontWeight.w700),
-    ),
-    toastDuration: Duration(seconds: 2),
-    toastAlignment: Alignment.bottomRight,
-    animationType: AnimationType.slideInFromLeft,
-    description: SizedBox(),
-    animationDuration: Duration(milliseconds: 400),
-    animationCurve: Curves.easeInOut,
-    opacity: 0.95,
-  ).show(context);
+  _showCustomSnackBar(context, message, LucideIcons.checkCircle2, AppColors.successColor);
 }
 
 void MotionSnackBarError(BuildContext context, String message) {
-  MotionToast.error(
-    title: Text(
-      message,
-      style: TextStyle(fontWeight: FontWeight.w700),
-    ),
-    toastDuration: Duration(seconds: 2),
-    toastAlignment: Alignment.topRight,
-    animationType: AnimationType.slideInFromLeft,
-    description: SizedBox(),
-    animationDuration: Duration(seconds: 400),
-    animationCurve: Curves.easeInOut,
-    opacity: 0.95,
-  ).show(context);
+  _showCustomSnackBar(context, message, LucideIcons.xCircle, AppColors.errorColor);
 }
 
 void MotionSnackBarInfo(BuildContext context, String message) {
-  MotionToast.info(
-    title: Text(
-      message,
-      style: TextStyle(fontWeight: FontWeight.w700),
-    ),
-    toastDuration: Duration(seconds: 2),
-    toastAlignment: Alignment.bottomRight,
-    animationType: AnimationType.slideInFromLeft,
-    description: SizedBox(),
-    animationDuration: Duration(milliseconds: 400),
-    animationCurve: Curves.easeInOut,
-    opacity: 0.95,
-  ).show(context);
+  _showCustomSnackBar(context, message, LucideIcons.info, AppColors.secondaryColor);
 }
 
 void MotionSnackBarWarning(BuildContext context, String message) {
-  MotionToast.warning(
-    title: Text(
-      message,
-      style: TextStyle(fontWeight: FontWeight.w700),
-    ),
-    toastDuration: Duration(seconds: 3),
-    toastAlignment: Alignment.topRight,
-    animationType: AnimationType.slideInFromLeft,
-    description: SizedBox(),
-    animationDuration: Duration(milliseconds: 400),
-    animationCurve: Curves.easeInOut,
-    opacity: 0.95,
-  ).show(context);
+  _showCustomSnackBar(context, message, LucideIcons.alertTriangle, AppColors.warningColor);
 }
 
 Future<void> handleLogout(BuildContext context) async {
@@ -76,7 +101,7 @@ Future<void> handleLogout(BuildContext context) async {
 
     try {
       if (context.mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context); // Close loading dialog
 
         Navigator.pushAndRemoveUntil(
           context,
@@ -92,8 +117,7 @@ Future<void> handleLogout(BuildContext context) async {
       }
     } catch (e) {
       if (context.mounted) {
-        Navigator.pop(context);
-
+        Navigator.pop(context); // Close loading dialog
         MotionSnackBarError(context, "فشل تسجيل الخروج: $e");
       }
     }
@@ -106,29 +130,33 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
     barrierDismissible: false,
     builder: (context) => AlertDialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
       ),
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
       title: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.red.shade100,
+              color: AppColors.errorColor.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               LucideIcons.logOut,
-              color: Colors.red.shade700,
-              size: 28,
+              color: AppColors.errorColor,
+              size: 24,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           const Expanded(
             child: Text(
               'تأكيد تسجيل الخروج',
               style: TextStyle(
-                fontSize: 20,
+                fontFamily: 'Cairo',
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
             ),
           ),
@@ -140,46 +168,74 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
         children: [
           Text(
             'هل أنت متأكد من تسجيل الخروج؟',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
           ),
           SizedBox(height: 8),
           Text(
             'سيتم إنهاء يوم العمل الحالي والعودة إلى شاشة تسجيل الدخول.',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 13,
+              color: AppColors.mutedColor,
+            ),
           ),
         ],
       ),
-      actionsAlignment: MainAxisAlignment.spaceEvenly,
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       actions: [
-        OutlinedButton.icon(
-          onPressed: () => Navigator.pop(context, false),
-          icon: const Icon(LucideIcons.x),
-          label: const Text('إلغاء'),
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            textStyle:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-          ),
-        ),
-        ElevatedButton.icon(
-          onPressed: () => Navigator.pop(context, true),
-          icon: const Icon(LucideIcons.logOut),
-          label: const Text('تسجيل الخروج'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red.shade700,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            textStyle:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(context, false),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.borderColor),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: const Text(
+                  'إلغاء',
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.errorColor,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: const Text(
+                  'تسجيل الخروج',
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     ),
   );
-  
 }
-
-
 
 void _showLoadingDialog(BuildContext context) {
   showDialog(
@@ -189,18 +245,27 @@ void _showLoadingDialog(BuildContext context) {
       canPop: false,
       child: Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 16),
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
+              ),
+              const SizedBox(height: 20),
               Text(
                 'جاري تسجيل الخروج...',
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ],
           ),
