@@ -1,9 +1,9 @@
-import 'package:crazy_phone_pos/features/auth/data/repository/user_repository_imp.dart';
-import 'package:crazy_phone_pos/features/auth/domain/repository/user_repository_int.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
-import 'package:crazy_phone_pos/features/products/data/repository/product_repository_imp.dart';
-import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
-import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
+import 'package:bayaa_pos/features/auth/data/repository/user_repository_imp.dart';
+import 'package:bayaa_pos/features/auth/domain/repository/user_repository_int.dart';
+import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:bayaa_pos/features/products/data/repository/product_repository_imp.dart';
+import 'package:bayaa_pos/features/products/presentation/cubit/product_cubit.dart';
+import 'package:bayaa_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import '../../features/invoice/presentation/cubit/invoice_cubit.dart';
 import '../../features/sales/domain/sales_repository.dart';
 import '../../features/stock_summary/presentation/cubit/stock_summary_cubit.dart';

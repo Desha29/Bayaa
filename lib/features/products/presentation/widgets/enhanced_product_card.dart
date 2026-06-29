@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/features/products/data/models/product_model.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';

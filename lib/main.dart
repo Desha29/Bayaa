@@ -1,6 +1,6 @@
-import 'package:crazy_phone_pos/features/activation/activation_screen.dart'
+import 'package:bayaa_pos/features/activation/activation_screen.dart'
     show ActivationScreen;
-import 'package:crazy_phone_pos/features/auth/presentation/login_screen.dart';
+import 'package:bayaa_pos/features/auth/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

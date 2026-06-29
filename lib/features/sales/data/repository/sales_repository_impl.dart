@@ -1,7 +1,7 @@
-import 'package:crazy_phone_pos/core/data/services/persistence_initializer.dart';
-import 'package:crazy_phone_pos/core/data/services/repository_persistence_mixin.dart';
-import 'package:crazy_phone_pos/core/error/error_handler.dart';
-import 'package:crazy_phone_pos/core/state/state_synchronizer.dart';
+import 'package:bayaa_pos/core/data/services/persistence_initializer.dart';
+import 'package:bayaa_pos/core/data/services/repository_persistence_mixin.dart';
+import 'package:bayaa_pos/core/error/error_handler.dart';
+import 'package:bayaa_pos/core/state/state_synchronizer.dart';
 import 'package:dartz/dartz.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../../../../core/error/failure.dart';

@@ -10,7 +10,7 @@ import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
 import 'add_edit_user_dialog.dart';
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 
 class DesktopUserTable extends StatelessWidget {
   const DesktopUserTable({

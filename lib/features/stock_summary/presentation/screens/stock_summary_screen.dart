@@ -6,12 +6,12 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
-import 'package:crazy_phone_pos/core/components/screen_header.dart';
-import 'package:crazy_phone_pos/features/stock_summary/data/models/stock_summary_category_model.dart';
-import 'package:crazy_phone_pos/features/stock_summary/presentation/cubit/stock_summary_cubit.dart';
-import 'package:crazy_phone_pos/features/stock_summary/presentation/cubit/stock_summary_state.dart';
-import 'package:crazy_phone_pos/features/stock_summary/presentation/widgets/product_details_dialog.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/components/screen_header.dart';
+import 'package:bayaa_pos/features/stock_summary/data/models/stock_summary_category_model.dart';
+import 'package:bayaa_pos/features/stock_summary/presentation/cubit/stock_summary_cubit.dart';
+import 'package:bayaa_pos/features/stock_summary/presentation/cubit/stock_summary_state.dart';
+import 'package:bayaa_pos/features/stock_summary/presentation/widgets/product_details_dialog.dart';
 
 class StockSummaryScreen extends StatefulWidget {
   const StockSummaryScreen({super.key});

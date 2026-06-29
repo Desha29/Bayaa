@@ -2,9 +2,9 @@
 
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
-import 'package:crazy_phone_pos/features/sessions/data/models/session_model.dart';
+import 'package:bayaa_pos/core/di/dependency_injection.dart';
+import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:bayaa_pos/features/sessions/data/models/session_model.dart';
 
 import '../../../sales/data/models/sale_model.dart';
 import '../../../sales/domain/sales_repository.dart';

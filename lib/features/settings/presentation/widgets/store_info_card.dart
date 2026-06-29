@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:crazy_phone_pos/core/components/app_logo.dart';
+import 'package:bayaa_pos/core/components/app_logo.dart';
 
 import '../../../../core/functions/messege.dart';
 import '../../data/models/store_info_model.dart';
@@ -12,7 +12,7 @@ import '../cubit/settings_cubit.dart';
 import '../cubit/settings_states.dart';
 import 'edit_store_info_dialog.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 
 class StoreInfoCard extends StatelessWidget {
   const StoreInfoCard({

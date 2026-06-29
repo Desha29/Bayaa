@@ -1,4 +1,4 @@
-import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
+import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/components/empty_state.dart';

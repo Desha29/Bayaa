@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:crazy_phone_pos/core/data/services/persistence_initializer.dart';
+import 'package:bayaa_pos/core/data/services/persistence_initializer.dart';
 import '../../data/models/stock_summary_category_model.dart';
 import '../../data/models/product_sales_detail.dart';
 import 'stock_summary_state.dart';

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 
 class ActivationScreen extends StatelessWidget {
   const ActivationScreen({super.key});

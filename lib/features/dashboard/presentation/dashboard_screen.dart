@@ -1,8 +1,8 @@
 // lib/features/dashboard/presentation/dashboard_screen.dart
-import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
-import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
-import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
-import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
+import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
+import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
+import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_states.dart';
+import 'package:bayaa_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../sales/data/models/sale_model.dart';
 import 'invoice_card.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 
 class InvoiceListSection extends StatelessWidget {
   final bool loading;

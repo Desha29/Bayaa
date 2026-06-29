@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../data/models/store_info_model.dart';
 import '../../domain/repository/settings_repository_int.dart';

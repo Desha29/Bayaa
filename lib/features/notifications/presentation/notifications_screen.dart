@@ -1,11 +1,11 @@
-import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
-import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
+import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
+import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:crazy_phone_pos/core/components/screen_header.dart';
+import 'package:bayaa_pos/core/components/screen_header.dart';
 import '../../../core/components/empty_state.dart';
-import '../../../core/components/section_card.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/di/dependency_injection.dart';
 
@@ -70,7 +70,9 @@ class NotificationsScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.borderColor.withOpacity(0.6)),
+                              border: Border.all(
+                                  color:
+                                      AppColors.borderColor.withOpacity(0.6)),
                             ),
                             child: FiltersBar(
                               filter: getIt<NotificationsCubit>().filter,
@@ -100,14 +102,17 @@ class NotificationsScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColors.borderColor.withOpacity(0.6)),
+                                border: Border.all(
+                                    color:
+                                        AppColors.borderColor.withOpacity(0.6)),
                               ),
                               child: state.notifications.isEmpty
                                   ? Center(
                                       child: EmptyState(),
                                     )
                                   : ListView.separated(
-                                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                                      padding:
+                                          EdgeInsets.all(isMobile ? 12 : 16),
                                       itemCount: state.notifications.length,
                                       separatorBuilder: (_, __) => SizedBox(
                                         height: isMobile ? 8 : 12,

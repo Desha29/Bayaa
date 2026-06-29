@@ -1,4 +1,4 @@
-import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
+import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:either_dart/either.dart';
 
 import '../../../core/error/failure.dart';

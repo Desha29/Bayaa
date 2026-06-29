@@ -1,5 +1,5 @@
-import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
-import 'package:crazy_phone_pos/features/products/data/models/product_model.dart';
+import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_states.dart';
+import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 

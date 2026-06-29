@@ -1,12 +1,12 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
-import 'package:crazy_phone_pos/core/functions/messege.dart';
-import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:bayaa_pos/core/di/dependency_injection.dart';
+import 'package:bayaa_pos/core/functions/messege.dart';
+import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
+import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 import '../../../products/data/models/product_model.dart';
 import 'priorty_chip.dart';
 import 'status_chip.dart';

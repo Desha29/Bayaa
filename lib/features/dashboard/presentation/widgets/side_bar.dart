@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use
-import 'package:crazy_phone_pos/core/functions/messege.dart';
-import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_states.dart';
+import 'package:bayaa_pos/core/functions/messege.dart';
+import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

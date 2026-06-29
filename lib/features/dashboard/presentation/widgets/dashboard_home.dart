@@ -1,5 +1,5 @@
-import 'package:crazy_phone_pos/core/components/screen_header.dart';
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/components/screen_header.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

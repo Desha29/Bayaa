@@ -5,7 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:barcode/barcode.dart';
 import '../data/invoice_models.dart';
 import '../../settings/data/models/store_info_model.dart';
-import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
+import 'package:bayaa_pos/core/di/dependency_injection.dart';
 import '../../settings/data/repository/settings_repository_imp.dart';
 
 class InvoicePdfService {

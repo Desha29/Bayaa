@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:crazy_phone_pos/core/components/app_logo.dart';
+import 'package:bayaa_pos/core/components/app_logo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../../features/settings/presentation/cubit/settings_states.dart';

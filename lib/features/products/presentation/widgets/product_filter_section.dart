@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'desktop_layout_filter.dart';
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 
 class ProductsFilterSection extends StatelessWidget {
   final TextEditingController searchController;

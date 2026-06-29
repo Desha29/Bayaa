@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:crazy_phone_pos/core/data/services/persistence_initializer.dart';
-import 'package:crazy_phone_pos/core/functions/messege.dart';
+import 'package:bayaa_pos/core/data/services/persistence_initializer.dart';
+import 'package:bayaa_pos/core/functions/messege.dart';
 
 class DataProtectionCard extends StatefulWidget {
   final bool isMobile;

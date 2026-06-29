@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:crazy_phone_pos/core/components/screen_header.dart';
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:bayaa_pos/core/components/screen_header.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 
-import 'package:crazy_phone_pos/features/settings/presentation/cubit/settings_cubit.dart';
-import 'package:crazy_phone_pos/core/functions/messege.dart';
+import 'package:bayaa_pos/features/settings/presentation/cubit/settings_cubit.dart';
+import 'package:bayaa_pos/core/functions/messege.dart';
 import '../../../core/di/dependency_injection.dart';
 
 

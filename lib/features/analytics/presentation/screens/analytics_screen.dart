@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart' hide TextDirection;
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/components/screen_header.dart';
 
 import '../cubit/analytics_cubit.dart';
 import '../cubit/analytics_state.dart';
@@ -44,7 +46,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   DateTime? endDate;
   String? selectedSessionId;
   List<Session> availableSessions = [];
-  AnalyticsPeriod _selectedPeriod = AnalyticsPeriod.last30Days;
+  AnalyticsPeriod _selectedPeriod = AnalyticsPeriod.today;
   int _selectedTabIndex = 0;
 
   bool get _hasAnyFilter => selectedSessionId != null;
@@ -52,7 +54,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   void initState() {
     super.initState();
-    _applyPeriod(AnalyticsPeriod.last30Days, notify: true);
+    _applyPeriod(AnalyticsPeriod.today, notify: true);
   }
 
   /// Apply a period preset and optionally trigger data reload.
@@ -654,46 +656,16 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildHeaderRow(bool isDesktop) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(
-            Icons.analytics_outlined,
-            color: AppColors.primaryColor,
-            size: 28,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'التحليلات والتقارير',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.kDarkChip,
-                ),
-              ),
-              Text(
-                _getDateRangeText(),
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.mutedColor,
-                ),
-              ),
-            ],
-          ),
-        ),
+    return ScreenHeader(
+      title: 'التحليلات والإحصائيات',
+      subtitle: _getDateRangeText(),
+      icon: LucideIcons.barChart2,
+      iconColor: AppColors.primaryColor,
+      titleColor: AppColors.textPrimary,
+      actions: [
         if (availableSessions.isNotEmpty) ...[
           _buildSessionFilter(),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
         ],
       ],
     );

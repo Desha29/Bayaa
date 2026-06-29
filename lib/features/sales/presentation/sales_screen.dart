@@ -1,11 +1,11 @@
 // lib/features/sales/presentation/sales_screen.dart
 import 'dart:async';
-import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
-import 'package:crazy_phone_pos/core/functions/messege.dart';
+import 'package:bayaa_pos/core/di/dependency_injection.dart';
+import 'package:bayaa_pos/core/functions/messege.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:crazy_phone_pos/features/products/presentation/cubit/product_cubit.dart';
+import 'package:bayaa_pos/features/products/presentation/cubit/product_cubit.dart';
 
 import '../../../core/components/screen_header.dart';
 import '../../../core/constants/app_colors.dart';
@@ -25,7 +25,7 @@ import 'widgets/product_search_overlay.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/session/session_manager.dart';
-import 'package:crazy_phone_pos/features/invoice/presentation/cubit/invoice_cubit.dart';
+import 'package:bayaa_pos/features/invoice/presentation/cubit/invoice_cubit.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 
 class SalesScreen extends StatefulWidget {

@@ -1,8 +1,8 @@
 // add_edit_user_dialog.dart
-import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:bayaa_pos/core/di/dependency_injection.dart';
+import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
+import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
 

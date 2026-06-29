@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
-import 'package:crazy_phone_pos/features/stock/presentation/cubit/stock_cubit.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

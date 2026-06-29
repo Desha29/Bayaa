@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
@@ -48,8 +48,6 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
@@ -87,10 +85,13 @@ class NotificationCard extends StatelessWidget {
                         width: 20,
                         height: 20,
                         decoration: BoxDecoration(
-                          color: checked ? AppColors.secondaryColor : Colors.white,
+                          color:
+                              checked ? AppColors.secondaryColor : Colors.white,
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color: checked ? AppColors.secondaryColor : AppColors.borderColor.withOpacity(0.8),
+                            color: checked
+                                ? AppColors.secondaryColor
+                                : AppColors.borderColor.withOpacity(0.8),
                             width: 1.5,
                           ),
                         ),
@@ -133,7 +134,8 @@ class NotificationCard extends StatelessWidget {
                         ),
                         color: AppColors.errorColor,
                         style: IconButton.styleFrom(
-                          backgroundColor: AppColors.errorColor.withOpacity(0.08),
+                          backgroundColor:
+                              AppColors.errorColor.withOpacity(0.08),
                           padding: const EdgeInsets.all(6),
                           minimumSize: const Size(30, 30),
                         ),
@@ -159,7 +161,8 @@ class NotificationCard extends StatelessWidget {
                               color: _priorityPrimary().withOpacity(0.08),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(item.icon, color: _priorityPrimary(), size: 20),
+                            child: Icon(item.icon,
+                                color: _priorityPrimary(), size: 20),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -247,7 +250,8 @@ class NotificationCard extends StatelessWidget {
                           color: _priorityPrimary().withOpacity(0.08),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Icon(item.icon, color: _priorityPrimary(), size: 24),
+                        child: Icon(item.icon,
+                            color: _priorityPrimary(), size: 24),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -269,7 +273,9 @@ class NotificationCard extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                _Badge(label: item.badge, color: _priorityPrimary()),
+                                _Badge(
+                                    label: item.badge,
+                                    color: _priorityPrimary()),
                               ],
                             ),
                             const SizedBox(height: 4),

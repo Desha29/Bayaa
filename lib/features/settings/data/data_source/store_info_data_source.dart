@@ -1,4 +1,4 @@
-import 'package:crazy_phone_pos/core/data/services/persistence_initializer.dart';
+import 'package:bayaa_pos/core/data/services/persistence_initializer.dart';
 import '../models/store_info_model.dart';
 
 class StoreInfoDataSource {

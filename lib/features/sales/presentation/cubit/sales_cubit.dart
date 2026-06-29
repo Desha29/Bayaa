@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:crazy_phone_pos/core/di/dependency_injection.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:bayaa_pos/core/di/dependency_injection.dart';
+import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:crazy_phone_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
+import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
 import '../../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';

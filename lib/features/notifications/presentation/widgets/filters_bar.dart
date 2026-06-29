@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
-import 'package:crazy_phone_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/core/constants/app_colors.dart';
 
 class FiltersBar extends StatelessWidget {
   const FiltersBar({
@@ -25,7 +25,7 @@ class FiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    Theme.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -48,13 +48,18 @@ class FiltersBar extends StatelessWidget {
                         fit: BoxFit.scaleDown,
                         child: Text(
                           'تحديد المقروءة',
-                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 12),
+                          style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12),
                         ),
                       ),
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.secondaryColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                   ),
@@ -67,14 +72,19 @@ class FiltersBar extends StatelessWidget {
                         fit: BoxFit.scaleDown,
                         child: Text(
                           'حذف المحدد',
-                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 12),
+                          style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12),
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.errorColor,
                         side: const BorderSide(color: AppColors.errorColor),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                   ),
@@ -125,12 +135,17 @@ class FiltersBar extends StatelessWidget {
               icon: const Icon(LucideIcons.checkCheck, size: 16),
               label: Text(
                 isTablet ? 'تحديد المقروءة' : 'تحديد الكل كمقروءة',
-                style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 13),
+                style: const TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13),
               ),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.secondaryColor,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
             ),
             const SizedBox(width: 8),
@@ -139,13 +154,21 @@ class FiltersBar extends StatelessWidget {
               icon: const Icon(LucideIcons.trash2, size: 16),
               label: const Text(
                 'حذف المحدد',
-                style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 13),
+                style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13),
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.errorColor,
-                side: BorderSide(color: onDeleteSelected != null ? AppColors.errorColor : AppColors.borderColor),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                side: BorderSide(
+                    color: onDeleteSelected != null
+                        ? AppColors.errorColor
+                        : AppColors.borderColor),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
             ),
             const Spacer(),
@@ -217,7 +240,8 @@ class _FilterChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: baseColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: selected ? Colors.transparent : color.withOpacity(0.24)),
+          border: Border.all(
+              color: selected ? Colors.transparent : color.withOpacity(0.24)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -238,7 +262,9 @@ class _FilterChip extends StatelessWidget {
                 vertical: 2,
               ),
               decoration: BoxDecoration(
-                color: selected ? Colors.white.withOpacity(0.2) : color.withOpacity(0.12),
+                color: selected
+                    ? Colors.white.withOpacity(0.2)
+                    : color.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(

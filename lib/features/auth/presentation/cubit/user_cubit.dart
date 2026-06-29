@@ -1,8 +1,8 @@
 
-import 'package:crazy_phone_pos/features/auth/data/models/user_model.dart';
-import 'package:crazy_phone_pos/features/auth/domain/repository/user_repository_int.dart';
-import 'package:crazy_phone_pos/features/auth/presentation/cubit/user_states.dart';
-import 'package:crazy_phone_pos/features/sessions/data/repositories/session_repository_impl.dart';
+import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
+import 'package:bayaa_pos/features/auth/domain/repository/user_repository_int.dart';
+import 'package:bayaa_pos/features/auth/presentation/cubit/user_states.dart';
+import 'package:bayaa_pos/features/sessions/data/repositories/session_repository_impl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/dependency_injection.dart';

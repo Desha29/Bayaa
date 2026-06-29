@@ -8,20 +8,33 @@ import '../../../sessions/data/models/product_performance_model.dart';
 class AnalyticsMonthlyProductsSection extends StatefulWidget {
   final Map<String, double> monthlySales;
 
-  const AnalyticsMonthlyProductsSection({super.key, required this.monthlySales});
+  const AnalyticsMonthlyProductsSection(
+      {super.key, required this.monthlySales});
 
   @override
-  State<AnalyticsMonthlyProductsSection> createState() => _AnalyticsMonthlyProductsSectionState();
+  State<AnalyticsMonthlyProductsSection> createState() =>
+      _AnalyticsMonthlyProductsSectionState();
 }
 
-class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProductsSection> {
+class _AnalyticsMonthlyProductsSectionState
+    extends State<AnalyticsMonthlyProductsSection> {
   String? _selectedMonth;
   List<ProductPerformanceModel> _products = [];
   bool _loading = false;
 
   static const _arabicMonths = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+    'يناير',
+    'فبراير',
+    'مارس',
+    'أبريل',
+    'مايو',
+    'يونيو',
+    'يوليو',
+    'أغسطس',
+    'سبتمبر',
+    'أكتوبر',
+    'نوفمبر',
+    'ديسمبر',
   ];
 
   String _monthLabel(String key) {
@@ -69,7 +82,8 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
   @override
   void didUpdateWidget(AnalyticsMonthlyProductsSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.monthlySales != oldWidget.monthlySales && widget.monthlySales.isNotEmpty) {
+    if (widget.monthlySales != oldWidget.monthlySales &&
+        widget.monthlySales.isNotEmpty) {
       final latestMonth = widget.monthlySales.keys.last;
       _loadProducts(latestMonth);
     }
@@ -84,7 +98,11 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 32 : isTablet ? 24 : 16,
+        horizontal: isDesktop
+            ? 32
+            : isTablet
+                ? 24
+                : 16,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -143,11 +161,15 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
                       onTap: () => _loadProducts(month),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           gradient: isSelected
                               ? const LinearGradient(
-                                  colors: [AppColors.secondaryColor, AppColors.primaryColor],
+                                  colors: [
+                                    AppColors.secondaryColor,
+                                    AppColors.primaryColor
+                                  ],
                                 )
                               : null,
                           color: isSelected ? null : Colors.grey.shade100,
@@ -155,7 +177,8 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: AppColors.primaryColor.withOpacity(0.3),
+                                    color:
+                                        AppColors.primaryColor.withOpacity(0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -167,7 +190,9 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : AppColors.mutedColor,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.mutedColor,
                           ),
                         ),
                       ),
@@ -177,7 +202,8 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
               ),
               const SizedBox(height: 20),
               // Selected month total
-              if (_selectedMonth != null && widget.monthlySales.containsKey(_selectedMonth))
+              if (_selectedMonth != null &&
+                  widget.monthlySales.containsKey(_selectedMonth))
                 Container(
                   padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.only(bottom: 16),
@@ -190,7 +216,8 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.monetization_on_rounded, color: AppColors.primaryColor, size: 20),
+                      const Icon(Icons.monetization_on_rounded,
+                          color: AppColors.primaryColor, size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'إجمالي ${_monthLabel(_selectedMonth!)}:',
@@ -216,7 +243,8 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.all(24),
-                    child: CircularProgressIndicator(color: AppColors.primaryColor),
+                    child: CircularProgressIndicator(
+                        color: AppColors.primaryColor),
                   ),
                 )
               else if (_products.isEmpty)
@@ -226,7 +254,9 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.inventory_2_outlined, size: 48, color: AppColors.mutedColor.withOpacity(0.4)),
+                        Icon(Icons.inventory_2_outlined,
+                            size: 48,
+                            color: AppColors.mutedColor.withOpacity(0.4)),
                         const SizedBox(height: 8),
                         const Text(
                           'لا توجد منتجات في هذا الشهر',
@@ -246,8 +276,6 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
   }
 
   Widget _buildProductsList() {
-    final maxRev = _products.isNotEmpty ? _products.first.revenue : 0.0;
-
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -255,7 +283,6 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final product = _products[index];
-        final ratio = maxRev > 0 ? (product.revenue / maxRev) : 0.0;
         final rank = index + 1;
 
         return Row(
@@ -267,7 +294,10 @@ class _AnalyticsMonthlyProductsSectionState extends State<AnalyticsMonthlyProduc
               decoration: BoxDecoration(
                 gradient: rank <= 3
                     ? const LinearGradient(
-                        colors: [AppColors.secondaryColor, AppColors.primaryColor],
+                        colors: [
+                          AppColors.secondaryColor,
+                          AppColors.primaryColor
+                        ],
                       )
                     : null,
                 color: rank > 3 ? Colors.grey.shade100 : null,
