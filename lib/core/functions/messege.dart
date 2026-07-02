@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 /// Renders a premium, floating, custom-styled SnackBar
 void _showCustomSnackBar(BuildContext context, String message, IconData icon, Color color) {
@@ -94,6 +95,7 @@ void MotionSnackBarWarning(BuildContext context, String message) {
 }
 
 Future<void> handleLogout(BuildContext context) async {
+  final l10n = AppLocalizations.of(context);
   final shouldLogout = await _showLogoutConfirmation(context);
 
   if (shouldLogout == true && context.mounted) {
@@ -111,20 +113,21 @@ Future<void> handleLogout(BuildContext context) async {
 
         Future.delayed(const Duration(milliseconds: 300), () {
           if (context.mounted) {
-            MotionSnackBarSuccess(context, "تم تسجيل الخروج بنجاح");
+            MotionSnackBarSuccess(context, l10n.logoutSuccess);
           }
         });
       }
     } catch (e) {
       if (context.mounted) {
         Navigator.pop(context); // Close loading dialog
-        MotionSnackBarError(context, "فشل تسجيل الخروج: $e");
+        MotionSnackBarError(context, "${l10n.logoutFailed}: $e");
       }
     }
   }
 }
 
 Future<bool?> _showLogoutConfirmation(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
   return showDialog<bool>(
     context: context,
     barrierDismissible: false,
@@ -149,10 +152,10 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Text(
-              'تأكيد تسجيل الخروج',
-              style: TextStyle(
+              l10n.logoutConfirmTitle,
+              style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -162,23 +165,23 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
           ),
         ],
       ),
-      content: const Column(
+      content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'هل أنت متأكد من تسجيل الخروج؟',
-            style: TextStyle(
+            l10n.logoutConfirmMessage,
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'سيتم إنهاء يوم العمل الحالي والعودة إلى شاشة تسجيل الدخول.',
-            style: TextStyle(
+            l10n.logoutConfirmSub,
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 13,
               color: AppColors.mutedColor,
@@ -198,9 +201,9 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text(
-                  'إلغاء',
-                  style: TextStyle(
+                child: Text(
+                  l10n.cancel,
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -220,9 +223,9 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text(
-                  'تسجيل الخروج',
-                  style: TextStyle(
+                child: Text(
+                  l10n.logout,
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -238,6 +241,7 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
 }
 
 void _showLoadingDialog(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -259,8 +263,8 @@ void _showLoadingDialog(BuildContext context) {
               ),
               const SizedBox(height: 20),
               Text(
-                'جاري تسجيل الخروج...',
-                style: TextStyle(
+                l10n.loggingOut,
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 15,
                   fontWeight: FontWeight.bold,

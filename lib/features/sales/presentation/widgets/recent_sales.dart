@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class RecentSalesSection extends StatelessWidget {
   final List<Map<String, dynamic>> recentSales;
@@ -15,6 +16,7 @@ class RecentSalesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       height: double.infinity,
       constraints: const BoxConstraints(minHeight: 500),
@@ -54,9 +56,9 @@ class RecentSalesSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'المبيعات الأخيرة',
-                style: TextStyle(
+              Text(
+                l10n.recentSalesTitle,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -69,7 +71,7 @@ class RecentSalesSection extends StatelessWidget {
                     LucideIcons.chevronRight,
                     color: AppColors.primaryColor,
                   ),
-                  tooltip: 'إخفاء المبيعات الأخيرة',
+                  tooltip: l10n.hideRecentSales,
                   onPressed: onToggleCollapse,
                 ),
             ],
@@ -77,7 +79,7 @@ class RecentSalesSection extends StatelessWidget {
           const SizedBox(height: 20),
           Expanded(
             child: recentSales.isEmpty
-                ? _buildEmptyState()
+                ? _buildEmptyState(context)
                 : ListView.separated(
                     itemCount: recentSales.length,
                     separatorBuilder: (_, __) => Divider(
@@ -87,7 +89,7 @@ class RecentSalesSection extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final sale = recentSales[index];
                       final date = sale['date'] as DateTime;
-                      return _buildRecentSaleItem(sale, date);
+                      return _buildRecentSaleItem(context, sale, date);
                     },
                   ),
           ),
@@ -96,7 +98,8 @@ class RecentSalesSection extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -115,7 +118,7 @@ class RecentSalesSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'لا توجد مبيعات',
+            l10n.noSales,
             style: TextStyle(
               color: AppColors.mutedColor,
               fontWeight: FontWeight.w600,
@@ -126,7 +129,8 @@ class RecentSalesSection extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentSaleItem(Map<String, dynamic> sale, DateTime date) {
+  Widget _buildRecentSaleItem(BuildContext context, Map<String, dynamic> sale, DateTime date) {
+    final l10n = AppLocalizations.of(context);
     final isRefund = sale['isRefund'] == true;
     final color = isRefund ? AppColors.warningColor : AppColors.successColor;
     final icon = isRefund ? LucideIcons.cornerUpLeft : LucideIcons.shoppingCart;
@@ -159,7 +163,7 @@ class RecentSalesSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isRefund ? 'عملية استرجاع' : 'عملية بيع',
+                  isRefund ? l10n.refundProcess : l10n.saleProcess,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -168,7 +172,7 @@ class RecentSalesSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                   '${sale['items']} عنصر • ${sale['total'].toStringAsFixed(0)} ج.م',
+                  l10n.saleItemsSummary(sale['items'], sale['total'].toStringAsFixed(0), l10n.currencyEg),
                   style: TextStyle(
                     fontSize: 12,
                     color: color,

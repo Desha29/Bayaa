@@ -1,5 +1,6 @@
 // lib/features/sales/presentation/sales_screen.dart
 import 'dart:async';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import 'package:bayaa_pos/core/di/dependency_injection.dart';
 import 'package:bayaa_pos/core/functions/messege.dart';
 
@@ -115,7 +116,8 @@ class _SalesScreenState extends State<SalesScreen>
 
       scored.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
 
-      setState(() => _filteredProducts = scored.map((s) => s['product'] as Product).toList());
+      setState(() => _filteredProducts =
+          scored.map((s) => s['product'] as Product).toList());
     });
   }
 
@@ -124,59 +126,58 @@ class _SalesScreenState extends State<SalesScreen>
 
     final result = await _repository.findProductByBarcode(code);
 
-    result.fold(
-      (failure) {
-         MotionSnackBarError(context, "خطأ في البحث: ${failure.message}");
-      },
-      (product) {
-        if (product == null) {
-          MotionSnackBarError(context, "المنتج غير موجود: $code");
-          _barcodeController.clear();
-          setState(() {});
-          _barcodeFocusNode.requestFocus();
-          return;
-        }
-
-        if (product.quantity <= 0) {
-          MotionSnackBarError(context, "الكمية نفذت من المخزن لهذا المنتج");
-          _barcodeController.clear();
-          setState(() {});
-          _barcodeFocusNode.requestFocus();
-          return;
-        }
-
-        final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
-        if (idx != -1) {
-          final currentQty = _cartItems[idx]['qty'] as int;
-          if (currentQty >= product.quantity) {
-             MotionSnackBarWarning(
-                 context, "لقد وصلت إلى الحد الأقصى للكمية المتاحة (${product.quantity})");
-          } else {
-             _cartItems[idx]['qty'] = currentQty + 1;
-          }
-        } else {
-          _cartItems.add({
-            'id': product.barcode,
-            'name': product.name,
-            'price': product.price,
-            'qty': 1,
-            'quantity': product.quantity,
-            'wholesalePrice': product.wholesalePrice,
-            'date': DateTime.now(),
-            'minPrice': product.minPrice,
-          });
-        }
-
+    result.fold((failure) {
+      MotionSnackBarError(context,
+          AppLocalizations.of(context).searchErrorMsg(failure.message));
+    }, (product) {
+      if (product == null) {
+        MotionSnackBarError(
+            context, AppLocalizations.of(context).productNotFound(code));
         _barcodeController.clear();
         setState(() {});
         _barcodeFocusNode.requestFocus();
+        return;
       }
-    );
+
+      if (product.quantity <= 0) {
+        MotionSnackBarError(context, AppLocalizations.of(context).outOfStock);
+        _barcodeController.clear();
+        setState(() {});
+        _barcodeFocusNode.requestFocus();
+        return;
+      }
+
+      final idx = _cartItems.indexWhere((e) => e['id'] == product.barcode);
+      if (idx != -1) {
+        final currentQty = _cartItems[idx]['qty'] as int;
+        if (currentQty >= product.quantity) {
+          MotionSnackBarWarning(context,
+              AppLocalizations.of(context).maxQtyReached(product.quantity));
+        } else {
+          _cartItems[idx]['qty'] = currentQty + 1;
+        }
+      } else {
+        _cartItems.add({
+          'id': product.barcode,
+          'name': product.name,
+          'price': product.price,
+          'qty': 1,
+          'quantity': product.quantity,
+          'wholesalePrice': product.wholesalePrice,
+          'date': DateTime.now(),
+          'minPrice': product.minPrice,
+        });
+      }
+
+      _barcodeController.clear();
+      setState(() {});
+      _barcodeFocusNode.requestFocus();
+    });
   }
 
   Future<void> _onCheckout() async {
     if (_cartItems.isEmpty) {
-      MotionSnackBarError(context, 'السلة فارغة');
+      MotionSnackBarError(context, AppLocalizations.of(context).cartEmpty);
       return;
     }
 
@@ -192,7 +193,8 @@ class _SalesScreenState extends State<SalesScreen>
 
       final newQuant = stockQuantity - qtySold;
 
-      await _repository.updateProductQuantity(productBarcode, newQuant < 0 ? 0 : newQuant);
+      await _repository.updateProductQuantity(
+          productBarcode, newQuant < 0 ? 0 : newQuant);
     }
 
     getIt<ProductCubit>().getAllProducts();
@@ -230,20 +232,24 @@ class _SalesScreenState extends State<SalesScreen>
 
     result.fold(
       (failure) {
-        MotionSnackBarError(context, "فشل حفظ البيع: ${failure.message}");
+        MotionSnackBarError(context,
+            AppLocalizations.of(context).saveSaleFailed(failure.message));
         setState(() {});
       },
       (_) async {
         MotionSnackBarSuccess(
           context,
-          'تمت عملية البيع - الإجمالي: ${total.toStringAsFixed(2)} ج.م',
+          AppLocalizations.of(context).saleCompleted(total.toStringAsFixed(2),
+              AppLocalizations.of(context).currencyEg),
         );
 
         if (sessionId != null) {
           try {
             await getIt<ActivityLogger>().logActivity(
               type: ActivityType.sale,
-              description: 'عملية بيع: ${total.toStringAsFixed(2)} ج.م',
+              description: AppLocalizations.of(context).saleActivityDesc(
+                  total.toStringAsFixed(2),
+                  AppLocalizations.of(context).currencyEg),
               userName: userName,
               sessionId: sessionId,
               details: {
@@ -280,14 +286,16 @@ class _SalesScreenState extends State<SalesScreen>
 
   Future<void> _openInvoice(Sale sale) async {
     final subtotal = sale.saleItems.fold<double>(0, (s, it) => s + it.total);
-    final cashierName = sale.cashierName ?? 'الكاشير';
+    final cashierName = sale.cashierName ?? 'Cashier';
 
     final data = InvoiceData(
       invoiceId: sale.id,
       date: sale.date,
       storeName: getIt<SettingsCubit>().currentStoreInfo?.name ?? 'Bayaa',
-      storeAddress: getIt<SettingsCubit>().currentStoreInfo?.address ?? 'AlKhanaka',
-      storePhone: getIt<SettingsCubit>().currentStoreInfo?.phone ?? '0100000000',
+      storeAddress:
+          getIt<SettingsCubit>().currentStoreInfo?.address ?? 'AlKhanaka',
+      storePhone:
+          getIt<SettingsCubit>().currentStoreInfo?.phone ?? '0100000000',
       cashierName: cashierName,
       lines: sale.saleItems
           .map((it) => InvoiceLine(
@@ -346,178 +354,186 @@ class _SalesScreenState extends State<SalesScreen>
   }
 
   Widget _buildDesktopTabletLayout(bool isDesktop) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Left Column (POS Scanner + Cart Table)
-        Expanded(
-          flex: isDesktop ? 7 : 6,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const ScreenHeader(
-                title: 'شاشة المبيعات',
-                subtitle: 'إدارة عمليات البيع والفواتير',
-                fontSize: 30,
-                icon: Icons.point_of_sale,
-                iconColor: AppColors.primaryColor,
-                titleColor: AppColors.textPrimary,
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Visibility(
-                          maintainSize: true,
-                          maintainAnimation: true,
-                          maintainState: true,
-                          visible: false,
-                          child: const BarcodeScanCard(),
-                        ),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: CartSection(
-                            cartItems: _cartItems,
-                            onRemoveItem: (i) {
-                              _cartItems.removeAt(i);
-                              setState(() {});
-                            },
-                            onIncreaseQty: (i) {
-                              final currentQty = _cartItems[i]['qty'] as int;
-                              final stockQuantity =
-                                  _cartItems[i]['quantity'] as int;
-
-                              if (currentQty < stockQuantity) {
-                                _cartItems[i]['qty'] = currentQty + 1;
-                                setState(() {});
-                              } else {
-                                MotionSnackBarWarning(context,
-                                    "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
-                              }
-                            },
-                            onDecreaseQty: (i) {
-                              final q = _cartItems[i]['qty'] as int;
-                              if (q > 1) {
-                                _cartItems[i]['qty'] = q - 1;
-                                setState(() {});
-                              } else {
+    final l10n = AppLocalizations.of(context);
+    return Directionality(
+      textDirection:
+          l10n!.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left Column (POS Scanner + Cart Table)
+          Expanded(
+            flex: isDesktop ? 7 : 6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ScreenHeader(
+                  title: AppLocalizations.of(context).salesScreenTitle,
+                  subtitle: AppLocalizations.of(context).salesScreenSubtitle,
+                  fontSize: 30,
+                  icon: Icons.point_of_sale,
+                  iconColor: AppColors.primaryColor,
+                  titleColor: AppColors.textPrimary,
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Visibility(
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            visible: false,
+                            child: const BarcodeScanCard(),
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: CartSection(
+                              cartItems: _cartItems,
+                              onRemoveItem: (i) {
                                 _cartItems.removeAt(i);
                                 setState(() {});
-                              }
-                            },
-                            onEditPrice: (i, newPrice) {
-                              _cartItems[i]['price'] = newPrice;
-                              setState(() {});
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BarcodeScanCard(
-                            controller: _barcodeController,
-                            focusNode: _barcodeFocusNode,
-                            onSubmitted: (val) => _commitBarcode(val),
-                            onChanged: _onSearchChanged,
-                          ),
-                          if (_filteredProducts.isNotEmpty)
-                            ProductSearchOverlay(
-                              products: _filteredProducts,
-                              allProducts: getIt<ProductCubit>().allProducts,
-                              onProductSelected: _addProductFromSearch,
+                              },
+                              onIncreaseQty: (i) {
+                                final currentQty = _cartItems[i]['qty'] as int;
+                                final stockQuantity =
+                                    _cartItems[i]['quantity'] as int;
+
+                                if (currentQty < stockQuantity) {
+                                  _cartItems[i]['qty'] = currentQty + 1;
+                                  setState(() {});
+                                } else {
+                                  MotionSnackBarWarning(
+                                      context,
+                                      AppLocalizations.of(context)
+                                          .cantAddMoreStock(stockQuantity));
+                                }
+                              },
+                              onDecreaseQty: (i) {
+                                final q = _cartItems[i]['qty'] as int;
+                                if (q > 1) {
+                                  _cartItems[i]['qty'] = q - 1;
+                                  setState(() {});
+                                } else {
+                                  _cartItems.removeAt(i);
+                                  setState(() {});
+                                }
+                              },
+                              onEditPrice: (i, newPrice) {
+                                _cartItems[i]['price'] = newPrice;
+                                setState(() {});
+                              },
                             ),
+                          ),
+                        ],
+                      ),
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            BarcodeScanCard(
+                              controller: _barcodeController,
+                              focusNode: _barcodeFocusNode,
+                              onSubmitted: (val) => _commitBarcode(val),
+                              onChanged: _onSearchChanged,
+                            ),
+                            if (_filteredProducts.isNotEmpty)
+                              ProductSearchOverlay(
+                                products: _filteredProducts,
+                                allProducts: getIt<ProductCubit>().allProducts,
+                                onProductSelected: _addProductFromSearch,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: isDesktop ? 24 : 16),
+          // Right Column (Checkout totals + Recent sales)
+          Expanded(
+            flex: isDesktop ? 3 : 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 86),
+                TotalSectionCard(
+                  totalAmount: _totalAmount,
+                  itemCount: _cartItems.length,
+                  onCheckout: _onCheckout,
+                  onClearCart: () {
+                    _cartItems.clear();
+                    setState(() {});
+                  },
+                ),
+                const SizedBox(height: 16),
+                if (!_isRecentSalesCollapsed)
+                  Expanded(
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: RecentSalesSection(
+                        recentSales: _recentSales,
+                        onToggleCollapse: () {
+                          setState(() {
+                            _isRecentSalesCollapsed = !_isRecentSalesCollapsed;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                if (_isRecentSalesCollapsed)
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _isRecentSalesCollapsed = false;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppColors.kCardBackground,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.borderColor),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.01),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.chevron_left,
+                              color: AppColors.primaryColor, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            AppLocalizations.of(context).showRecentSales,
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(width: isDesktop ? 24 : 16),
-        // Right Column (Checkout totals + Recent sales)
-        Expanded(
-          flex: isDesktop ? 3 : 4,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 86),
-              TotalSectionCard(
-                totalAmount: _totalAmount,
-                itemCount: _cartItems.length,
-                onCheckout: _onCheckout,
-                onClearCart: () {
-                  _cartItems.clear();
-                  setState(() {});
-                },
-              ),
-              const SizedBox(height: 16),
-              if (!_isRecentSalesCollapsed)
-                Expanded(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: RecentSalesSection(
-                      recentSales: _recentSales,
-                      onToggleCollapse: () {
-                        setState(() {
-                          _isRecentSalesCollapsed = !_isRecentSalesCollapsed;
-                        });
-                      },
-                    ),
                   ),
-                ),
-              if (_isRecentSalesCollapsed)
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      _isRecentSalesCollapsed = false;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: AppColors.kCardBackground,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.borderColor),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.01),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.chevron_left, color: AppColors.primaryColor, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          "عرض المبيعات الأخيرة",
-                          style: TextStyle(
-                            color: AppColors.primaryColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -525,9 +541,9 @@ class _SalesScreenState extends State<SalesScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const ScreenHeader(
-          title: 'شاشة المبيعات',
-          subtitle: 'إدارة عمليات البيع والفواتير',
+        ScreenHeader(
+          title: AppLocalizations.of(context).salesScreenTitle,
+          subtitle: AppLocalizations.of(context).salesScreenSubtitle,
           fontSize: 26,
           icon: Icons.point_of_sale,
           iconColor: AppColors.primaryColor,
@@ -558,15 +574,16 @@ class _SalesScreenState extends State<SalesScreen>
                       },
                       onIncreaseQty: (i) {
                         final currentQty = _cartItems[i]['qty'] as int;
-                        final stockQuantity =
-                            _cartItems[i]['quantity'] as int;
+                        final stockQuantity = _cartItems[i]['quantity'] as int;
 
                         if (currentQty < stockQuantity) {
                           _cartItems[i]['qty'] = currentQty + 1;
                           setState(() {});
                         } else {
-                          MotionSnackBarWarning(context,
-                              "لا يمكن إضافة المزيد! الكمية المتاحة في المخزون: $stockQuantity");
+                          MotionSnackBarWarning(
+                              context,
+                              AppLocalizations.of(context)
+                                  .cantAddMoreStock(stockQuantity));
                         }
                       },
                       onDecreaseQty: (i) {
@@ -645,16 +662,18 @@ class _SalesScreenState extends State<SalesScreen>
             decoration: BoxDecoration(
               color: AppColors.primaryColor.withOpacity(0.08),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.primaryColor.withOpacity(0.2)),
+              border:
+                  Border.all(color: AppColors.primaryColor.withOpacity(0.2)),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.history, color: AppColors.primaryColor, size: 18),
-                SizedBox(width: 8),
+                const Icon(Icons.history,
+                    color: AppColors.primaryColor, size: 18),
+                const SizedBox(width: 8),
                 Text(
-                  "المبيعات الأخيرة",
-                  style: TextStyle(
+                  AppLocalizations.of(context).recentSalesLabel,
+                  style: const TextStyle(
                     color: AppColors.primaryColor,
                     fontWeight: FontWeight.bold,
                   ),

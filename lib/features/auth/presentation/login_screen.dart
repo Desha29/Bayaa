@@ -6,6 +6,8 @@ import 'package:bayaa_pos/core/functions/messege.dart';
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import 'package:bayaa_pos/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:bayaa_pos/core/components/app_logo.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
+import 'package:bayaa_pos/core/localization/locale_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -72,12 +74,13 @@ class _LoginScreenState extends State<LoginScreen> {
   void _onLoginPressed() {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
+    final l10n = AppLocalizations.of(context);
     if (username.isEmpty) {
-      MotionSnackBarError(context, "الرجاء إدخال اسم المستخدم");
+      MotionSnackBarError(context, l10n.enterUsername);
       return;
     }
     if (password.isEmpty) {
-      MotionSnackBarError(context, "الرجاء إدخال كلمة المرور");
+      MotionSnackBarError(context, l10n.enterPassword);
       return;
     }
     getIt<UserCubit>().login(username, password);
@@ -121,12 +124,12 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Scaffold(
           backgroundColor: AppColors.backgroundColor,
           body: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: isDesktop
-                  ? _buildDesktopLayout(context)
-                  : _buildMobileLayout(context),
-            ),
+            child: isDesktop
+                ? _buildDesktopLayout(context)
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: _buildMobileLayout(context),
+                  ),
           ),
         ),
       ),
@@ -206,23 +209,49 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginForm(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Language Toggle Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox.shrink(),
+            TextButton.icon(
+              icon: const Icon(Icons.language,
+                  size: 18, color: Color(0xFFD77E46)),
+              label: Text(
+                l10n.localeName == 'ar' ? 'English' : 'العربية',
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFD77E46),
+                ),
+              ),
+              onPressed: () {
+                getIt<LocaleProvider>().toggleLocale();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
         // Welcome text
-        const Text(
-          'أهلاً بك مجدداً!',
-          style: TextStyle(
+        Text(
+          l10n.loginWelcome,
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'الرجاء إدخال بيانات حسابك للوصول إلى النظام',
-          style: TextStyle(
+        Text(
+          l10n.loginSubtitle,
+          style: const TextStyle(
             fontSize: 14,
             color: AppColors.mutedColor,
           ),
@@ -250,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(width: 10),
                     Flexible(
                       child: Text(
-                        'يوجد يومية مفتوحة حالياً. تسجيل الدخول سيتابع عليها.',
+                        l10n.sessionOpenWarning,
                         style: TextStyle(
                           color: Colors.blue.shade900,
                           fontWeight: FontWeight.w600,
@@ -267,9 +296,9 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
 
         // Username Field Labeled
-        const Text(
-          'اسم المستخدم',
-          style: TextStyle(
+        Text(
+          l10n.username,
+          style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.bold,
             color: AppColors.textSecondary,
@@ -282,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
           style: const TextStyle(fontSize: 15),
           cursorColor: const Color(0xFFD77E46),
           decoration: InputDecoration(
-            hintText: 'أدخل اسم المستخدم',
+            hintText: l10n.usernameHint,
             hintStyle: TextStyle(
                 color: AppColors.mutedColor.withOpacity(0.4), fontSize: 14),
             prefixIcon: const Icon(LucideIcons.user,
@@ -310,9 +339,9 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 20),
 
         // Password Field Labeled
-        const Text(
-          'كلمة المرور',
-          style: TextStyle(
+        Text(
+          l10n.password,
+          style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.bold,
             color: AppColors.textSecondary,
@@ -327,7 +356,7 @@ class _LoginScreenState extends State<LoginScreen> {
           style: const TextStyle(fontSize: 15),
           cursorColor: const Color(0xFFD77E46),
           decoration: InputDecoration(
-            hintText: '••••••••',
+            hintText: l10n.passwordHint,
             hintStyle: TextStyle(
                 color: AppColors.mutedColor.withOpacity(0.4), fontSize: 14),
             prefixIcon: const Icon(LucideIcons.lock,
@@ -386,9 +415,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
-              'تذكرني على هذا الجهاز',
-              style: TextStyle(
+            Text(
+              l10n.rememberMe,
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -424,14 +453,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Row(
+                    : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(LucideIcons.logIn, size: 20),
-                          SizedBox(width: 8),
+                          const Icon(LucideIcons.logIn, size: 20),
+                          const SizedBox(width: 8),
                           Text(
-                            'دخول النظام',
-                            style: TextStyle(
+                            l10n.loginButton,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -450,9 +479,9 @@ class _LoginScreenState extends State<LoginScreen> {
             const Icon(LucideIcons.sparkles,
                 size: 16, color: Color(0xFFD77E46)),
             const SizedBox(width: 8),
-            const Text(
-              'تجربة سريعة للنظام بأدوار مختلفة:',
-              style: TextStyle(
+            Text(
+              l10n.quickLoginHeader,
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFD77E46),
@@ -477,9 +506,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
               }
-              return const Text(
-                "لا يوجد مستخدمين متاحين للـدخول السريع.",
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+              return Text(
+                l10n.noData,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               );
             }
 
@@ -518,10 +547,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildBrandingBanner(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final storeName =
         getIt<SettingsCubit>().currentStoreInfo?.name.isNotEmpty == true
             ? getIt<SettingsCubit>().currentStoreInfo!.name
-            : 'بياع';
+            : l10n.appName;
 
     return Container(
       decoration: const BoxDecoration(
@@ -530,7 +560,8 @@ class _LoginScreenState extends State<LoginScreen> {
           end: Alignment.bottomLeft,
           colors: [
             Color(0xFF2F557D), // Soft Steel Blue
-            Color(0xFF142233), // Deep Dark Slate Blue (Slightly darker for premium contrast)
+            Color(
+                0xFF142233), // Deep Dark Slate Blue (Slightly darker for premium contrast)
           ],
           stops: [0.0, 1.0],
         ),
@@ -577,9 +608,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         letterSpacing: 0.5,
                       ),
                     ),
-                    const Text(
-                      'نظام نقاط البيع وإدارة مبيعات التجزئة',
-                      style: TextStyle(
+                    Text(
+                      l10n.systemSubtitle,
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 11,
                       ),
@@ -592,9 +623,9 @@ class _LoginScreenState extends State<LoginScreen> {
           const Spacer(flex: 3),
 
           // Main Call to Action Header
-          const Text(
-            'Bayaa POS',
-            style: TextStyle(
+          Text(
+            l10n.appName,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 32,
               fontWeight: FontWeight.w900,
@@ -603,7 +634,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'نظام نقاط البيع الاحترافي وإدارة التجزئة لجميع المحلات التجارية ومحلات الهواتف الذكية. يعمل بالكامل أوفلاين دون الحاجة للإنترنت مع حماية كاملة ومزامنة محلية لبياناتك.',
+            l10n.systemDescription,
             style: TextStyle(
               color: Colors.white.withOpacity(0.85),
               fontSize: 14,
@@ -615,17 +646,17 @@ class _LoginScreenState extends State<LoginScreen> {
           // Bullet Highlights
           _buildFeatureItem(
             icon: LucideIcons.wifiOff,
-            title: 'عمل كامل دون اتصال بالإنترنت (أوفلاين)',
+            title: l10n.offlineFeature,
           ),
           const SizedBox(height: 16),
           _buildFeatureItem(
             icon: LucideIcons.barcode,
-            title: 'فحص مبيعات سريع بالباركود وطباعة فواتير PDF',
+            title: l10n.barcodeFeature,
           ),
           const SizedBox(height: 16),
           _buildFeatureItem(
             icon: LucideIcons.trendingUp,
-            title: 'تقارير أرباح يومية ومراقبة وتتبع حركة المبيعات',
+            title: l10n.reportsFeature,
           ),
           const Spacer(flex: 4),
 
@@ -633,15 +664,15 @@ class _LoginScreenState extends State<LoginScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'إصدار 2.2',
-                style: TextStyle(
+              Text(
+                '${l10n.version} 2.2',
+                style: const TextStyle(
                   color: Colors.white60,
                   fontSize: 12,
                 ),
               ),
               Text(
-                '© 2026 $storeName. جميع الحقوق محفوظة.',
+                '© 2026 $storeName. ${l10n.copyright}',
                 style: const TextStyle(
                   color: Colors.white60,
                   fontSize: 12,

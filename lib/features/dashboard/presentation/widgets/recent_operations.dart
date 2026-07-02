@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/services/activity_logger.dart';
 import 'package:intl/intl.dart';
@@ -147,44 +148,46 @@ class _RecentOperationsState extends State<RecentOperations> {
   }
 
   String _getTypeName(ActivityType type) {
+    final l10n = AppLocalizations.of(context);
     switch (type) {
       case ActivityType.sale:
-        return 'بيع';
+        return l10n.actSale;
       case ActivityType.refund:
-        return 'استرجاع';
+        return l10n.actRefund;
       case ActivityType.productAdd:
-        return 'إضافة منتج';
+        return l10n.actProductAdd;
       case ActivityType.productUpdate:
-        return 'تعديل منتج';
+        return l10n.actProductUpdate;
       case ActivityType.productDelete:
-        return 'حذف منتج';
+        return l10n.actProductDelete;
       case ActivityType.productQuantityUpdate:
-        return 'تعديل كمية';
+        return l10n.actProductQtyUpdate;
       case ActivityType.userAdd:
-        return 'إضافة مستخدم';
+        return l10n.actUserAdd;
       case ActivityType.userUpdate:
-        return 'تعديل مستخدم';
+        return l10n.actUserUpdate;
       case ActivityType.userDelete:
-        return 'حذف مستخدم';
+        return l10n.actUserDelete;
       case ActivityType.sessionOpen:
-        return 'فتح يوم';
+        return l10n.actSessionOpen;
       case ActivityType.sessionClose:
-        return 'إغلاق يوم';
+        return l10n.actSessionClose;
       case ActivityType.restock:
-        return 'شحنة جديدة';
+        return l10n.actRestock;
       case ActivityType.expense:
-        return 'مصروفات';
+        return l10n.actExpense;
       case ActivityType.invoiceDelete:
-        return 'حذف فاتورة';
+        return l10n.actInvoiceDelete;
       case ActivityType.printReport:
-        return 'طباعة تقرير';
+        return l10n.actPrintReport;
       case ActivityType.login:
-        return 'تسجيل دخول';
+        return l10n.actLogin;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.all(20),
@@ -224,9 +227,9 @@ class _RecentOperationsState extends State<RecentOperations> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'العمليات الأخيرة',
-                style: TextStyle(
+              Text(
+                l10n.recentOperationsTitle,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -248,6 +251,7 @@ class _RecentOperationsState extends State<RecentOperations> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -258,9 +262,9 @@ class _RecentOperationsState extends State<RecentOperations> {
             color: AppColors.mutedColor.withOpacity(0.5),
           ),
           const SizedBox(height: 12),
-          const Text(
-            'لا توجد عمليات حديثة',
-            style: TextStyle(
+          Text(
+            l10n.noRecentOperations,
+            style: const TextStyle(
               color: AppColors.mutedColor,
               fontSize: 14,
             ),
@@ -271,6 +275,7 @@ class _RecentOperationsState extends State<RecentOperations> {
   }
 
   Widget _buildGroupedList() {
+    final l10n = AppLocalizations.of(context);
     final userCubit = getIt<UserCubit>();
     final isCashier = userCubit.currentUser.userType == UserType.cashier;
 
@@ -331,7 +336,7 @@ class _RecentOperationsState extends State<RecentOperations> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                 child: Text(
-                  'لا توجد عمليات في هذا اليوم بعد',
+                  l10n.noOperationsToday,
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.mutedColor,
@@ -355,6 +360,7 @@ class _RecentOperationsState extends State<RecentOperations> {
   }
 
   Widget _buildLoginSummary(int count) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -367,7 +373,7 @@ class _RecentOperationsState extends State<RecentOperations> {
           Icon(LucideIcons.key, size: 13, color: Colors.cyan.shade600),
           const SizedBox(width: 8),
           Text(
-            '$count تسجيل دخول',
+            l10n.loginsCount(count),
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -381,6 +387,7 @@ class _RecentOperationsState extends State<RecentOperations> {
 
   Widget _buildSessionHeader(SessionActivityGroup group,
       {int operationCount = 0}) {
+    final l10n = AppLocalizations.of(context);
     final timeFormat = DateFormat('hh:mm a');
     final dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -414,8 +421,8 @@ class _RecentOperationsState extends State<RecentOperations> {
               children: [
                 Text(
                   group.isOpen
-                      ? 'يوم نشط • ${group.openedBy}'
-                      : 'يوم مغلق • ${group.openedBy}',
+                      ? l10n.activeDayUser(group.openedBy)
+                      : l10n.closedDayUser(group.openedBy),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -426,7 +433,7 @@ class _RecentOperationsState extends State<RecentOperations> {
                 ),
                 if (operationCount > 0)
                   Text(
-                    '$operationCount عملية',
+                    l10n.operationsCount(operationCount),
                     style: TextStyle(
                       fontSize: 10,
                       color: AppColors.mutedColor,
@@ -461,6 +468,7 @@ class _RecentOperationsState extends State<RecentOperations> {
   }
 
   Widget _buildActivityTile(ActivityLog activity) {
+    final l10n = AppLocalizations.of(context);
     final timeFormat = DateFormat('hh:mm a');
     final activityColor = _getColorForType(activity.type);
 
@@ -553,8 +561,8 @@ class _RecentOperationsState extends State<RecentOperations> {
                     activity.details!.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
-                    ActivityLogger.formatDetailsArabic(
-                        activity.type, activity.details),
+                    ActivityLogger.formatDetails(
+                        context, activity.type, activity.details),
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -582,6 +590,7 @@ class _RecentOperationsState extends State<RecentOperations> {
   }
 
   Widget _buildLoadMoreButton() {
+    final l10n = AppLocalizations.of(context);
     if (_groups.isEmpty) return const SizedBox.shrink();
     
     if (_loadingMore) {
@@ -596,7 +605,7 @@ class _RecentOperationsState extends State<RecentOperations> {
         child: TextButton.icon(
           onPressed: _loadMore,
           icon: const Icon(LucideIcons.plus, size: 14),
-          label: const Text('عرض المزيد'),
+          label: Text(l10n.showMore),
           style: TextButton.styleFrom(
             foregroundColor: AppColors.primaryColor,
             visualDensity: VisualDensity.compact,

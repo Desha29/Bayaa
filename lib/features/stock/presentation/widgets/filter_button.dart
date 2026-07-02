@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/components/hover_wrapper.dart';
 import '../../../../core/constants/app_colors.dart';
 
@@ -23,11 +24,12 @@ class FilterButtonsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(
           child: _buildFilterChip(
-            'الكل',
+            l10n.all,
             totalCount,
             'all',
             LucideIcons.layers,
@@ -37,7 +39,7 @@ class FilterButtonsWidget extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _buildFilterChip(
-            'منخفض',
+            l10n.lowStock,
             lowStockCount,
             'low',
             LucideIcons.triangleAlert,
@@ -47,7 +49,7 @@ class FilterButtonsWidget extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _buildFilterChip(
-            'نفذ',
+            l10n.outOfStock,
             outOfStockCount,
             'out',
             LucideIcons.xCircle,

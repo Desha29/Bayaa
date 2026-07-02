@@ -23,6 +23,7 @@ import '../../../../core/services/activity_logger.dart';
 class DashboardCard extends StatefulWidget {
   const DashboardCard({
     super.key,
+    required this.id,
     required this.icon,
     required this.title,
     required this.subtitle,
@@ -30,6 +31,7 @@ class DashboardCard extends StatefulWidget {
     required this.onTap,
   });
 
+  final String id;
   final IconData icon;
   final String title;
   final String subtitle;
@@ -134,14 +136,14 @@ class _DashboardCardState extends State<DashboardCard> {
                       ),
                       const Spacer(),
                       // Badge position for stats
-                      (widget.title == 'التنبيهات')
+                      (widget.id == 'notifications')
                           ? BlocBuilder<NotificationsCubit, NotificationsStates>(
                               builder: (context, state) {
                                 final count = getIt<NotificationsCubit>().total;
                                 return _buildBadge(count.toString());
                               },
                             )
-                          : (widget.title == 'المنتجات')
+                          : (widget.id == 'products')
                               ? BlocBuilder<ProductCubit, ProductStates>(
                                   builder: (context, state) {
                                     final count =
@@ -149,7 +151,7 @@ class _DashboardCardState extends State<DashboardCard> {
                                     return _buildBadge(count.toString());
                                   },
                                 )
-                              : (widget.title == 'المنتجات الناقصة')
+                              : (widget.id == 'stock_alerts')
                                   ? BlocBuilder<StockCubit, StockStates>(
                                       builder: (context, state) {
                                         final count =
@@ -157,7 +159,7 @@ class _DashboardCardState extends State<DashboardCard> {
                                         return _buildBadge(count.toString());
                                       },
                                     )
-                                  : (widget.title == 'المبيعات')
+                                  : (widget.id == 'sales')
                                       ? BlocBuilder<InvoiceCubit, InvoiceState>(
                                           bloc: getIt<InvoiceCubit>(),
                                           builder: (context, state) {
@@ -165,7 +167,7 @@ class _DashboardCardState extends State<DashboardCard> {
                                             return _buildBadge(count.toString());
                                           },
                                         )
-                                      : (widget.title == 'الفواتير')
+                                      : (widget.id == 'invoices')
                                           ? BlocBuilder<InvoiceCubit,
                                               InvoiceState>(
                                               bloc: getIt<InvoiceCubit>(),
@@ -175,7 +177,7 @@ class _DashboardCardState extends State<DashboardCard> {
                                                 return _buildBadge(count.toString());
                                               },
                                             )
-                                          : (widget.title == 'ملخص المخزون')
+                                          : (widget.id == 'stock_summary')
                                               ? BlocBuilder<ProductCubit,
                                                   ProductStates>(
                                                   bloc: getIt<ProductCubit>(),
@@ -186,7 +188,7 @@ class _DashboardCardState extends State<DashboardCard> {
                                                     return _buildBadge(count.toString());
                                                   },
                                                 )
-                                              : (widget.title == 'الجلسات')
+                                              : (widget.id == 'sessions')
                                                   ? StreamBuilder(
                                                       stream: getIt<ActivityLogger>().activitiesStream,
                                                       builder: (context, snapshot) {
@@ -203,7 +205,7 @@ class _DashboardCardState extends State<DashboardCard> {
                                                         );
                                                       },
                                                     )
-                                                  : (widget.title == 'الإحصائيات')
+                                                  : (widget.id == 'reports')
                                                       ? BlocBuilder<InvoiceCubit,
                                                           InvoiceState>(
                                                           bloc: getIt<InvoiceCubit>(),

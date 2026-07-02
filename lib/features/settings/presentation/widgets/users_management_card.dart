@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/functions/messege.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../../auth/presentation/cubit/user_states.dart';
 import '../../../auth/data/models/user_model.dart';
@@ -12,6 +13,8 @@ import '../../data/models/user_row.dart';
 
 import 'desktop_user_table.dart';
 import 'add_edit_user_dialog.dart';
+
+import 'package:bayaa_pos/core/localization/translation_helper.dart';
 
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 
@@ -28,9 +31,11 @@ class UsersManagementCard extends StatelessWidget {
     return BlocConsumer<UserCubit, UserStates>(
       listener: (context, state) {
         if (state is UserSuccess) {
-          MotionSnackBarSuccess(context, state.message);
+          MotionSnackBarSuccess(
+              context, TranslationHelper.translate(context, state.message));
         } else if (state is UserFailure) {
-          MotionSnackBarError(context, state.error);
+          MotionSnackBarError(
+              context, TranslationHelper.translate(context, state.error));
         }
       },
       builder: (context, state) {
@@ -44,8 +49,8 @@ class UsersManagementCard extends StatelessWidget {
         } else {
           usersData = context.read<UserCubit>().users;
         }
-        
-        userRows = _convertUsersToRows(usersData);
+
+        userRows = _convertUsersToRows(context, usersData);
 
         return Container(
           decoration: BoxDecoration(
@@ -67,7 +72,8 @@ class UsersManagementCard extends StatelessWidget {
             children: [
               // Card header
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceColor,
                   borderRadius: const BorderRadius.only(
@@ -95,10 +101,10 @@ class UsersManagementCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'إدارة المستخدمين',
-                        style: TextStyle(
+                        AppLocalizations.of(context).usersManagement,
+                        style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
@@ -135,10 +141,13 @@ class UsersManagementCard extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(LucideIcons.plus, size: 14, color: Colors.white),
+                              const Icon(LucideIcons.plus,
+                                  size: 14, color: Colors.white),
                               const SizedBox(width: 6),
                               Text(
-                                isMobile ? 'إضافة' : 'إضافة مستخدم',
+                                isMobile
+                                    ? AppLocalizations.of(context).add
+                                    : AppLocalizations.of(context).addUser,
                                 style: const TextStyle(
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.w700,
@@ -177,7 +186,7 @@ class UsersManagementCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                'لا يوجد مستخدمين',
+                                AppLocalizations.of(context).noUsers,
                                 style: TextStyle(
                                   fontFamily: 'Cairo',
                                   fontSize: 13,
@@ -201,19 +210,20 @@ class UsersManagementCard extends StatelessWidget {
     );
   }
 
-  List<UserRow> _convertUsersToRows(List<User> users) {
+  List<UserRow> _convertUsersToRows(BuildContext context, List<User> users) {
+    final l10n = AppLocalizations.of(context);
     return users.map((user) {
       final isManager =
           user.userType == UserType.manager; // ✅ Fixed: was UserType.manager
       return UserRow(
         name: user.name,
         email: user.username,
-        roleLabel: isManager ? 'مدير النظام' : 'كاشير',
+        roleLabel: isManager ? l10n.roleManager : l10n.roleCashier,
         roleTint: isManager ? const Color(0xFFFEE2E2) : const Color(0xFFE0F2FE),
         roleColor:
             isManager ? const Color(0xFFDC2626) : const Color(0xFF0369A1),
         active: true,
-        lastLogin: 'اليوم',
+        lastLogin: l10n.today,
       );
     }).toList();
   }
@@ -225,8 +235,8 @@ class UsersManagementCard extends StatelessWidget {
     );
 
     if (result != null && context.mounted) {
-       // Dialog handles checking context and saving internally.
-       // Do not call saveUser here to avoid duplicates.
+      // Dialog handles checking context and saving internally.
+      // Do not call saveUser here to avoid duplicates.
     }
   }
 }

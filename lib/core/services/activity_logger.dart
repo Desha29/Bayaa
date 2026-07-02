@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
+import 'package:flutter/material.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../data/models/activity_log.dart';
 import '../data/services/persistence_initializer.dart';
 
@@ -315,6 +317,72 @@ class ActivityLogger {
         case ActivityType.userDelete:
           if (details['targetUser'] != null) parts.add('المستخدم: ${details['targetUser']}');
           if (details['role'] != null) parts.add('الصلاحية: ${details['role']}');
+          break;
+
+        default:
+          // Fallback: join all keys and values
+          details.forEach((key, value) {
+            if (value != null && value.toString().isNotEmpty) {
+              parts.add('$key: $value');
+            }
+          });
+      }
+
+      return parts.join(' • ');
+    } catch (e) {
+      return details.toString();
+    }
+  }
+
+  /// Formats activity details into a human-readable localized string.
+  static String formatDetails(BuildContext context, ActivityType type, Map<String, dynamic>? details) {
+    if (details == null || details.isEmpty) return '';
+
+    try {
+      final l10n = AppLocalizations.of(context);
+      final parts = <String>[];
+
+      switch (type) {
+        case ActivityType.sale:
+        case ActivityType.refund:
+          if (details['items'] != null && details['items'] is List) {
+            parts.add(l10n.detailsItems((details['items'] as List).join('، ')));
+          } else if (details['refundedItems'] != null && details['refundedItems'] is List) {
+            parts.add(l10n.detailsItems((details['refundedItems'] as List).join('، ')));
+          }
+          if (details['total'] != null) {
+            parts.add(l10n.detailsTotal(details['total'].toString(), l10n.currencyEg));
+          }
+          break;
+
+        case ActivityType.productUpdate:
+        case ActivityType.productQuantityUpdate:
+          if (details['name'] != null) parts.add(l10n.detailsProduct(details['name'].toString()));
+          if (details['oldQty'] != null && details['newQty'] != null) {
+            parts.add(l10n.detailsQty(details['oldQty'].toString(), details['newQty'].toString()));
+          }
+          if (details['oldPrice'] != null && details['newPrice'] != null) {
+            parts.add(l10n.detailsPrice(details['oldPrice'].toString(), details['newPrice'].toString()));
+          }
+          break;
+
+        case ActivityType.restock:
+          if (details['productName'] != null) parts.add(l10n.detailsProduct(details['productName'].toString()));
+          if (details['addedQty'] != null) parts.add(l10n.detailsAddedQty(details['addedQty'].toString()));
+          break;
+
+        case ActivityType.expense:
+          if (details['category'] != null) parts.add(l10n.detailsCategory(details['category'].toString()));
+          if (details['amount'] != null) {
+            parts.add(l10n.detailsAmount(details['amount'].toString(), l10n.currencyEg));
+          }
+          break;
+
+        case ActivityType.userAdd:
+        case ActivityType.userUpdate:
+        case ActivityType.userDelete:
+          if (details['targetUser'] != null) parts.add(l10n.detailsUser(details['targetUser'].toString()));
+          if (details['role'] != null) parts.add(l10n.detailsRole(details['role'].toString()));
           break;
 
         default:

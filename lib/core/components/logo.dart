@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../../features/settings/presentation/cubit/settings_states.dart';
 import '../di/dependency_injection.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class Logo extends StatefulWidget {
   const Logo({
@@ -47,7 +48,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-  
+    final l10n = AppLocalizations.of(context);
     final maxW = MediaQuery.of(context).size.width;
     final isMobile = widget.isMobile ?? maxW < 520;
     final avatarRadius = widget.avatarRadius ?? (isMobile ? 72.0 : 100.0);
@@ -85,8 +86,8 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
           bloc: getIt<SettingsCubit>(),
           builder: (context, state) {
              final store = getIt<SettingsCubit>().currentStoreInfo;
-             final name = store?.name.isNotEmpty == true ? store!.name : 'Bayaa';
-             final slogan  = 'نظام نقاط البيع الاحترافي';
+             final name = store?.name.isNotEmpty == true ? store!.name : l10n.appName;
+             final slogan  = l10n.systemSlogan;
              
              return Column(
                children: [

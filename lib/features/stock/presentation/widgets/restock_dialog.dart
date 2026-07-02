@@ -6,6 +6,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../products/data/models/product_model.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class RestockDialog extends StatefulWidget {
   final Product product;
@@ -44,11 +45,12 @@ class _RestockDialogState extends State<RestockDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isOut = widget.product.quantity == 0;
     final needed = (widget.product.minQuantity - widget.product.quantity);
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Dialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -89,10 +91,10 @@ class _RestockDialogState extends State<RestockDialog> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'إعادة تخزين المنتج',
-                        style: TextStyle(
+                        l10n.restockProduct,
+                        style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
@@ -155,14 +157,14 @@ class _RestockDialogState extends State<RestockDialog> {
                             children: [
                               _buildInfoBadge(
                                 LucideIcons.package,
-                                'الكمية الحالية',
+                                l10n.currentQuantity,
                                 '${widget.product.quantity}',
                                 isOut ? AppColors.errorColor : AppColors.warningColor,
                               ),
                               const SizedBox(width: 10),
                               _buildInfoBadge(
                                 LucideIcons.shieldAlert,
-                                'الحد الأدنى',
+                                l10n.minLimit,
                                 '${widget.product.minQuantity}',
                                 AppColors.primaryColor,
                               ),
@@ -170,7 +172,7 @@ class _RestockDialogState extends State<RestockDialog> {
                                 const SizedBox(width: 10),
                                 _buildInfoBadge(
                                   LucideIcons.arrowUp,
-                                  'المطلوب',
+                                  l10n.needed,
                                   '$needed',
                                   AppColors.successColor,
                                 ),
@@ -183,9 +185,9 @@ class _RestockDialogState extends State<RestockDialog> {
                     const SizedBox(height: 18),
 
                     // Input field
-                    const Text(
-                      'كمية إعادة التخزين',
-                      style: TextStyle(
+                    Text(
+                      l10n.restockQuantity,
+                      style: const TextStyle(
                         fontFamily: 'Cairo',
                         fontWeight: FontWeight.w700,
                         fontSize: 13,
@@ -207,7 +209,7 @@ class _RestockDialogState extends State<RestockDialog> {
                           horizontal: 14,
                           vertical: 14,
                         ),
-                        hintText: 'أدخل الكمية',
+                        hintText: l10n.enterQuantity,
                         hintStyle: TextStyle(
                           fontFamily: 'Cairo',
                           color: AppColors.mutedColor,
@@ -276,9 +278,9 @@ class _RestockDialogState extends State<RestockDialog> {
                                 color: AppColors.successColor,
                               ),
                               const SizedBox(width: 8),
-                              const Text(
-                                'الكمية بعد التخزين:',
-                                style: TextStyle(
+                              Text(
+                                l10n.quantityAfterRestock,
+                                style: const TextStyle(
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
@@ -312,7 +314,7 @@ class _RestockDialogState extends State<RestockDialog> {
                                 final v = int.tryParse(controller.text);
                                 if (v == null || v <= 0) {
                                   setState(() {
-                                    error = 'الرجاء إدخال كمية صحيحة أكبر من صفر';
+                                    error = l10n.enterValidQuantity;
                                   });
                                   return;
                                 }
@@ -332,14 +334,14 @@ class _RestockDialogState extends State<RestockDialog> {
                                     ),
                                   ],
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(LucideIcons.check, size: 16, color: Colors.white),
-                                    SizedBox(width: 8),
+                                    const Icon(LucideIcons.check, size: 16, color: Colors.white),
+                                    const SizedBox(width: 8),
                                     Text(
-                                      'تأكيد إعادة التخزين',
-                                      style: TextStyle(
+                                      l10n.confirmRestock,
+                                      style: const TextStyle(
                                         fontFamily: 'Cairo',
                                         fontWeight: FontWeight.w700,
                                         fontSize: 14,
@@ -370,9 +372,9 @@ class _RestockDialogState extends State<RestockDialog> {
                                   color: AppColors.borderColor.withOpacity(0.5),
                                 ),
                               ),
-                              child: const Text(
-                                'إلغاء',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.cancel,
+                                style: const TextStyle(
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,

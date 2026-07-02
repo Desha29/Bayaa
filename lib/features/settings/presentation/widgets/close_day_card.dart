@@ -1,8 +1,8 @@
-// ignore_for_file: deprecated_member_use
-import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../auth/presentation/cubit/user_cubit.dart';
 
 class CloseDayCard extends StatelessWidget {
   final bool isMobile;
@@ -56,7 +56,7 @@ class CloseDayCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'إغلاق اليومية',
+                        AppLocalizations.of(context).closeSession,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w800,
@@ -66,7 +66,7 @@ class CloseDayCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'إنهاء الوردية الحالية وإصدار تقرير الإغلاق',
+                        AppLocalizations.of(context).closeSessionSub,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 11,

@@ -22,12 +22,14 @@ import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../../features/sessions/data/repositories/session_repository_impl.dart';
 import '../../core/services/activity_logger.dart';
 import '../../core/session/session_manager.dart';
+import '../../core/localization/locale_provider.dart';
 
 final getIt = GetIt.instance;
 
 void setup() {
   // Core Services
   getIt.registerSingleton<ActivityLogger>(ActivityLogger());
+  getIt.registerSingleton<LocaleProvider>(LocaleProvider());
   
   // Repositories
   getIt.registerSingleton<SessionRepositoryImpl>(SessionRepositoryImpl());

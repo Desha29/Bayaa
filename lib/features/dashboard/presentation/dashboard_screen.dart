@@ -3,6 +3,7 @@ import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_states.dart';
 import 'package:bayaa_pos/features/stock/presentation/cubit/stock_cubit.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -51,7 +52,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late final SalesRepositoryImpl _salesRepository;
   late final AnalyticsRepositoryImpl _analyticsRepository;
   late final User curUser = getIt<UserCubit>().currentUser;
-  late final List<SidebarItem> sidebarItems;
+
+  List<SidebarItem> get sidebarItems => _getSidebarItems(context);
 
   @override
   void initState() {
@@ -59,12 +61,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     _salesRepository = getIt<SalesRepositoryImpl>();
     _analyticsRepository = AnalyticsRepositoryImpl();
+  }
 
-    final allSidebarItems = [
+  List<SidebarItem> _getSidebarItems(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return [
       SidebarItem(
         id: 'dashboard',
         icon: LucideIcons.layoutDashboard,
-        title: "لوحة التحكم",
+        title: l10n.dashboard,
         screen: DashboardHome(
           onCardTap: (id) => handleCardTap(id),
           isManager: curUser.userType == UserType.manager,
@@ -73,13 +78,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       SidebarItem(
         id: 'sales',
         icon: LucideIcons.shoppingCart,
-        title: "المبيعات",
+        title: l10n.sales,
         screen: SalesScreen(repository: _salesRepository),
       ),
       SidebarItem(
         id: 'invoices',
         icon: LucideIcons.fileText,
-        title: "الفواتير",
+        title: l10n.invoices,
         screen: BlocProvider<InvoiceCubit>(
           create: (_) => InvoiceCubit(_salesRepository),
           child:
@@ -89,20 +94,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       SidebarItem(
         id: 'products',
         icon: LucideIcons.box,
-        title: "المنتجات",
+        title: l10n.products,
         screen: const ProductsScreen(),
       ),
       SidebarItem(
         id: 'stock_alerts',
         icon: LucideIcons.triangleAlert,
-        title: "المنتجات الناقصة",
+        title: l10n.stockAlerts,
         screen: const StockScreen(),
       ),
       if (curUser.userType != UserType.cashier)
         SidebarItem(
           id: 'stock_summary',
           icon: LucideIcons.clipboardList,
-          title: "ملخص المخزون",
+          title: l10n.stockSummary,
           screen: BlocProvider(
             create: (_) => getIt<StockSummaryCubit>()..init(),
             child: const StockSummaryScreen(),
@@ -112,7 +117,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         SidebarItem(
           id: 'reports',
           icon: LucideIcons.chartPie,
-          title: "الإحصائيات",
+          title: l10n.reports,
           screen: BlocProvider(
             create: (context) => AnalyticsCubit(_analyticsRepository),
             child: const AnalyticsScreen(),
@@ -122,7 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         SidebarItem(
           id: 'sessions',
           icon: LucideIcons.history,
-          title: "الايام",
+          title: l10n.sessions,
           screen: BlocProvider(
             create: (context) => AnalyticsCubit(_analyticsRepository),
             child: const SessionsDashboardScreen(),
@@ -131,22 +136,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
       SidebarItem(
         id: 'notifications',
         icon: LucideIcons.bell,
-        title: "التنبيهات",
+        title: l10n.notifications,
         screen: const NotificationsScreen(),
       ),
       SidebarItem(
         id: 'settings',
         icon: LucideIcons.settings,
-        title: "الإعدادات",
+        title: l10n.settings,
         screen: const SettingsScreen(),
       ),
     ];
-
-    sidebarItems = allSidebarItems;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isMobileOrTablet = MediaQuery.of(context).size.width < 1000;
 
     return MultiBlocProvider(
@@ -180,7 +184,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
         child: Directionality(
-          textDirection: TextDirection.rtl,
+          textDirection:
+              l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
           child: Scaffold(
             appBar: isMobileOrTablet
                 ? AppBar(
@@ -266,7 +271,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (index != -1) {
       _onSidebarSelected(context, index);
     } else {
-      MotionSnackBarWarning(context, "الشاشة غير متاحة");
+      MotionSnackBarWarning(
+          context, AppLocalizations.of(context).screenUnavailable);
     }
   }
 }

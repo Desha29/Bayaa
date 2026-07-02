@@ -1,8 +1,8 @@
-// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 import '../screens/data_management_screen.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class DataManagementCard extends StatelessWidget {
   final bool isMobile;
@@ -62,7 +62,7 @@ class DataManagementCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'إدارة البيانات والنسخ الاحتياطي',
+                        AppLocalizations.of(context).dataManagement,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: isMobile ? 14 : 15,
@@ -72,7 +72,7 @@ class DataManagementCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة',
+                        AppLocalizations.of(context).dataManagementSub,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 11,

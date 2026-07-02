@@ -1,12 +1,10 @@
-// add_edit_user_dialog.dart
 import 'package:bayaa_pos/core/di/dependency_injection.dart';
 import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
-
-
+import '../../../../l10n/app_localizations.dart';
 
 class AddEditUserDialog extends StatefulWidget {
   final User? userToEdit;
@@ -51,12 +49,13 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   bool _isSubmitting = false;
 
   void _submit() {
+    final l10n = AppLocalizations.of(context);
     if (_isSubmitting) return;
 
     if (nameCtrl.text.trim().isEmpty ||
         usernameCtrl.text.trim().isEmpty ||
         passwordCtrl.text.trim().isEmpty) {
-      MotionSnackBarError(context, 'يرجى ملء الحقول المطلوبة');
+      MotionSnackBarError(context, l10n.fillRequiredFields);
       return;
     }
 
@@ -72,20 +71,20 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
 
     if (widget.userToEdit == null) {
       getIt<UserCubit>().saveUser(user);
-      MotionSnackBarSuccess(context, 'تم إضافة المستخدم بنجاح');
+      MotionSnackBarSuccess(context, l10n.msgUserCreated);
       getIt<UserCubit>().getAllUsers();
     } else {
       getIt<UserCubit>().updateUser(user);
-      MotionSnackBarSuccess(context, 'تم تعديل المستخدم بنجاح');
-      getIt<UserCubit>().getAllUsers(); 
+      MotionSnackBarSuccess(context, l10n.msgUserUpdated);
+      getIt<UserCubit>().getAllUsers();
     }
 
     Navigator.of(context).pop(user);
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
@@ -123,8 +122,8 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                   Expanded(
                     child: Text(
                       widget.userToEdit == null
-                          ? 'إضافة مستخدم جديد'
-                          : 'تعديل المستخدم',
+                          ? l10n.addNewUser
+                          : l10n.editUser,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -144,21 +143,22 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      _buildTextField(nameCtrl, 'الاسم *', Icons.person),
+                      _buildTextField(
+                          nameCtrl, l10n.nameRequired, Icons.person),
                       const SizedBox(height: 16),
-                      _buildTextField(phoneCtrl, 'رقم الهاتف', Icons.phone,
+                      _buildTextField(phoneCtrl, l10n.storePhone, Icons.phone,
                           keyboardType: TextInputType.phone),
                       const SizedBox(height: 16),
                       _buildTextField(
                         usernameCtrl,
-                        'اسم المستخدم *',
+                        l10n.usernameRequired,
                         Icons.account_circle,
                         readOnly: widget.userToEdit != null,
                       ),
                       const SizedBox(height: 16),
-                      _buildPasswordField(),
+                      _buildPasswordField(l10n),
                       const SizedBox(height: 16),
-                      _buildUserTypeDropdown(),
+                      _buildUserTypeDropdown(l10n),
                     ],
                   ),
                 ),
@@ -177,33 +177,33 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('إلغاء'),
+                      child: Text(l10n.cancel),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                      child: ElevatedButton(
-                        onPressed: _isSubmitting ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          foregroundColor: AppColors.primaryForeground,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: AppColors.primaryForeground,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: _isSubmitting 
+                      ),
+                      child: _isSubmitting
                           ? const SizedBox(
-                              height: 20, 
-                              width: 20, 
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
-                            )
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
                           : Text(
                               widget.userToEdit == null
-                                  ? 'إضافة المستخدم'
-                                  : 'حفظ التعديلات',
+                                  ? l10n.addUserButton
+                                  : l10n.saveChanges,
                             ),
-                      ),
+                    ),
                   ),
                 ],
               ),
@@ -247,7 +247,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -265,7 +265,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
         controller: passwordCtrl,
         obscureText: !_isPasswordVisible,
         decoration: InputDecoration(
-          labelText: 'كلمة المرور *',
+          labelText: l10n.passwordRequired,
           prefixIcon: Icon(Icons.lock, color: AppColors.primaryColor),
           suffixIcon: IconButton(
             icon: Icon(
@@ -288,7 +288,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
     );
   }
 
-  Widget _buildUserTypeDropdown() {
+  Widget _buildUserTypeDropdown(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -307,18 +307,18 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
         items: [
           DropdownMenuItem(
             value: UserType.manager,
-            child: const Text('مدير النظام'),
+            child: Text(l10n.roleManager),
           ),
           DropdownMenuItem(
             value: UserType.cashier,
-            child: const Text('كاشير'),
+            child: Text(l10n.roleCashier),
           ),
         ],
         onChanged: (v) =>
             setState(() => selectedUserType = v ?? UserType.cashier),
         decoration: InputDecoration(
           border: InputBorder.none,
-          labelText: 'نوع المستخدم',
+          labelText: l10n.userType,
           prefixIcon:
               Icon(Icons.admin_panel_settings, color: AppColors.primaryColor),
           contentPadding: const EdgeInsets.symmetric(

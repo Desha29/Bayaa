@@ -7,10 +7,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:bayaa_pos/core/components/app_logo.dart';
 
 import '../../../../core/functions/messege.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/models/store_info_model.dart';
 import '../cubit/settings_cubit.dart';
 import '../cubit/settings_states.dart';
 import 'edit_store_info_dialog.dart';
+
+import 'package:bayaa_pos/core/localization/translation_helper.dart';
 
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 
@@ -27,9 +30,11 @@ class StoreInfoCard extends StatelessWidget {
     return BlocConsumer<SettingsCubit, SettingsStates>(
       listener: (context, state) {
         if (state is StoreInfoUpdateSuccess) {
-          MotionSnackBarSuccess(context, state.message);
+          MotionSnackBarSuccess(
+              context, TranslationHelper.translate(context, state.message));
         } else if (state is StoreInfoUpdateFailure) {
-          MotionSnackBarError(context, state.message);
+          MotionSnackBarError(
+              context, TranslationHelper.translate(context, state.message));
         }
       },
       builder: (context, state) {
@@ -67,7 +72,8 @@ class StoreInfoCard extends StatelessWidget {
             children: [
               // Card header
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceColor,
                   borderRadius: const BorderRadius.only(
@@ -95,10 +101,10 @@ class StoreInfoCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'معلومات المتجر',
-                        style: TextStyle(
+                        AppLocalizations.of(context).storeInfo,
+                        style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
@@ -116,7 +122,8 @@ class StoreInfoCard extends StatelessWidget {
                               : () => _showEditDialog(context, store!.toMap()),
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
                               color: AppColors.primaryColor.withOpacity(0.06),
                               borderRadius: BorderRadius.circular(8),
@@ -127,11 +134,12 @@ class StoreInfoCard extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(LucideIcons.pencil, size: 13, color: AppColors.primaryColor),
+                                Icon(LucideIcons.pencil,
+                                    size: 13, color: AppColors.primaryColor),
                                 const SizedBox(width: 4),
-                                const Text(
-                                  'تعديل',
-                                  style: TextStyle(
+                                Text(
+                                  AppLocalizations.of(context).edit,
+                                  style: const TextStyle(
                                     fontFamily: 'Cairo',
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
@@ -166,11 +174,12 @@ class StoreInfoCard extends StatelessWidget {
                                   Icon(
                                     LucideIcons.store,
                                     size: 36,
-                                    color: AppColors.mutedColor.withOpacity(0.5),
+                                    color:
+                                        AppColors.mutedColor.withOpacity(0.5),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'لا توجد معلومات متجر',
+                                    AppLocalizations.of(context).noStoreInfo,
                                     style: TextStyle(
                                       fontFamily: 'Cairo',
                                       color: AppColors.mutedColor,
@@ -189,7 +198,8 @@ class StoreInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStoreContent(BuildContext context, StoreInfo store, SettingsCubit cubit) {
+  Widget _buildStoreContent(
+      BuildContext context, StoreInfo store, SettingsCubit cubit) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 500;
@@ -229,8 +239,7 @@ class StoreInfoCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: AppColors.primaryColor,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                              color: Colors.white, width: 2),
+                          border: Border.all(color: Colors.white, width: 2),
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.primaryColor.withOpacity(0.3),
@@ -252,15 +261,14 @@ class StoreInfoCard extends StatelessWidget {
               Wrap(
                 spacing: 12,
                 runSpacing: 10,
-                children: _buildInfoItems(store)
+                children: _buildInfoItems(context, store)
                     .map((item) => SizedBox(
-                        width: (constraints.maxWidth - 12) / 2,
-                        child: item))
+                        width: (constraints.maxWidth - 12) / 2, child: item))
                     .toList(),
               )
             else
               Column(
-                children: _buildInfoItems(store)
+                children: _buildInfoItems(context, store)
                     .map((item) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: item))
@@ -272,31 +280,32 @@ class StoreInfoCard extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildInfoItems(StoreInfo store) {
+  List<Widget> _buildInfoItems(BuildContext context, StoreInfo store) {
+    final l10n = AppLocalizations.of(context);
     return [
       _StoreInfoRow(
         icon: LucideIcons.store,
-        label: 'اسم المتجر',
+        label: l10n.storeName,
         value: store.name,
       ),
       _StoreInfoRow(
         icon: LucideIcons.mapPin,
-        label: 'العنوان',
+        label: l10n.storeAddress,
         value: store.address,
       ),
       _StoreInfoRow(
         icon: LucideIcons.phone,
-        label: 'رقم الهاتف',
+        label: l10n.storePhone,
         value: store.phone,
       ),
       _StoreInfoRow(
         icon: LucideIcons.mail,
-        label: 'البريد الإلكتروني',
+        label: l10n.storeEmail,
         value: store.email,
       ),
       _StoreInfoRow(
         icon: LucideIcons.fileText,
-        label: 'الرقم الضريبي',
+        label: l10n.storeVat,
         value: store.vat,
       ),
     ];
@@ -331,7 +340,7 @@ class StoreInfoCard extends StatelessWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        MotionSnackBarError(context, "حدث خطأ أثناء اختيار الصورة");
+        MotionSnackBarError(context, AppLocalizations.of(context).error);
       }
     }
   }

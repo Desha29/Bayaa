@@ -1,6 +1,8 @@
 // ignore_for_file: deprecated_member_use
 import 'package:bayaa_pos/core/functions/messege.dart';
 import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_states.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
+import 'package:bayaa_pos/core/localization/locale_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -50,7 +52,8 @@ class CustomSidebar extends StatefulWidget {
 class _CustomSidebarState extends State<CustomSidebar> {
   int _hoveredIndex = -1;
 
-  List<dynamic> get _filteredItems {
+  List<dynamic> _getFilteredItems(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final List<dynamic> filtered = [];
 
     SidebarItem? findItem(String id) {
@@ -74,18 +77,19 @@ class _CustomSidebarState extends State<CustomSidebar> {
       }
     }
 
-    addSection('الرئيسية', ['dashboard']);
-    addSection('المبيعات والفواتير', ['sales', 'invoices']);
-    addSection('المخازن والمنتجات', ['products', 'stock_alerts', 'stock_summary']);
-    addSection('النظام والتقارير', ['reports', 'sessions', 'notifications', 'settings']);
+    addSection(l10n.homeSection, ['dashboard']);
+    addSection(l10n.salesSection, ['sales', 'invoices']);
+    addSection(l10n.stockSection, ['products', 'stock_alerts', 'stock_summary']);
+    addSection(l10n.systemSection, ['reports', 'sessions', 'notifications', 'settings']);
 
     return filtered;
   }
 
   Widget _buildUserInfo(bool isNarrow) {
+    final l10n = AppLocalizations.of(context);
     final user = getIt<UserCubit>().currentUser;
     final firstLetter = user.name.isNotEmpty ? user.name.substring(0, 1) : '?';
-    final roleName = user.userType == UserType.manager ? 'مدير النظام' : 'كاشير';
+    final roleName = user.userType == UserType.manager ? l10n.roleManager : l10n.roleCashier;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -203,9 +207,9 @@ class _CustomSidebarState extends State<CustomSidebar> {
             ),
           ),
           const SizedBox(width: 4),
-          const Text(
-            'متصل',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context).connected,
+            style: const TextStyle(
               color: Colors.green,
               fontSize: 8,
               fontWeight: FontWeight.bold,
@@ -245,15 +249,72 @@ class _CustomSidebarState extends State<CustomSidebar> {
             ),
           ),
           const SizedBox(width: 4),
-          const Text(
-            'تجريبي',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context).trial,
+            style: const TextStyle(
               color: Colors.orange,
               fontSize: 8,
               fontWeight: FontWeight.bold,
             ),
           ),
         ],
+      ),
+    );
+  }
+  Widget _buildLanguageToggle(bool isNarrow) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: InkWell(
+        onTap: () {
+          getIt<LocaleProvider>().toggleLocale();
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: EdgeInsets.symmetric(
+            horizontal: isNarrow ? 0 : 16,
+            vertical: 12,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: isNarrow
+              ? const Center(
+                  child: Icon(
+                    Icons.language,
+                    color: AppColors.primaryColor,
+                    size: 20,
+                  ),
+                )
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: SizedBox(
+                    width: 184,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.language,
+                          color: AppColors.primaryColor,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context).localeName == 'ar' ? 'English' : 'العربية',
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+        ),
       ),
     );
   }
@@ -297,10 +358,10 @@ class _CustomSidebarState extends State<CustomSidebar> {
                           size: 20,
                         ),
                         const SizedBox(width: 14),
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'تسجيل الخروج',
-                            style: TextStyle(
+                            AppLocalizations.of(context).logout,
+                            style: const TextStyle(
                               color: AppColors.errorColor,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -425,7 +486,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
                                     : AppColors.mutedColor,
                             size: 22,
                           ),
-                          if (item.title == 'التنبيهات')
+                          if (item.id == 'notifications')
                             Positioned(
                               right: -4,
                               top: -4,
@@ -469,7 +530,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
                                 maxLines: 1,
                               ),
                             ),
-                            if (item.title == 'التنبيهات')
+                            if (item.id == 'notifications')
                               _buildNotificationsBadge(mini: false)
                             else if (isSelected)
                               Container(
@@ -553,9 +614,9 @@ class _CustomSidebarState extends State<CustomSidebar> {
                               );
                             },
                           ),
-                          const Text(
-                            "نظام إدارة المبيعات",
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context).systemSubtitle,
+                            style: const TextStyle(
                               color: AppColors.mutedColor,
                               fontSize: 10,
                             ),
@@ -609,6 +670,8 @@ class _CustomSidebarState extends State<CustomSidebar> {
         builder: (context, constraints) {
           final isNarrow = constraints.maxWidth < 140;
 
+          final filteredItems = _getFilteredItems(context);
+
           return Column(
             children: [
               _buildHeader(isNarrow),
@@ -619,9 +682,9 @@ class _CustomSidebarState extends State<CustomSidebar> {
                     horizontal: 12,
                     vertical: 4,
                   ),
-                  itemCount: _filteredItems.length,
+                  itemCount: filteredItems.length,
                   itemBuilder: (context, index) {
-                    final item = _filteredItems[index];
+                    final item = filteredItems[index];
                     if (item is String) {
                       return _buildSectionHeader(item, isNarrow);
                     }
@@ -630,6 +693,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
                 ),
               ),
               _buildUserInfo(isNarrow),
+              _buildLanguageToggle(isNarrow),
               _buildLogoutButton(isNarrow),
               const SizedBox(height: 12),
             ],

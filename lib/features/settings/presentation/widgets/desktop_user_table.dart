@@ -1,11 +1,10 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
 
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
@@ -24,6 +23,7 @@ class DesktopUserTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SizedBox(
       height: 400,
       child: DataTable2(
@@ -32,7 +32,8 @@ class DesktopUserTable extends StatelessWidget {
         minWidth: 900,
         headingRowHeight: 52,
         dataRowHeight: 64,
-        headingRowColor: WidgetStateProperty.all(AppColors.borderColor.withOpacity(0.24)),
+        headingRowColor:
+            WidgetStateProperty.all(AppColors.borderColor.withOpacity(0.24)),
         headingTextStyle: const TextStyle(
           fontFamily: 'Cairo',
           color: AppColors.textPrimary,
@@ -48,16 +49,27 @@ class DesktopUserTable extends StatelessWidget {
           },
         ),
         border: TableBorder(
-          horizontalInside: BorderSide(color: AppColors.borderColor.withOpacity(0.8), width: 1),
-          bottom: BorderSide(color: AppColors.borderColor.withOpacity(0.8), width: 1),
+          horizontalInside: BorderSide(
+              color: AppColors.borderColor.withOpacity(0.8), width: 1),
+          bottom: BorderSide(
+              color: AppColors.borderColor.withOpacity(0.8), width: 1),
         ),
-        columns: const [
-          DataColumn2(label: Center(child: Text('الاسم الكامل')), size: ColumnSize.L),
-          DataColumn2(label: Center(child: Text('اسم المستخدم')), size: ColumnSize.L),
-          DataColumn2(label: Center(child: Text('الصلاحية')), size: ColumnSize.M),
-          DataColumn2(label: Center(child: Text('حالة الحساب')), size: ColumnSize.S),
-          DataColumn2(label: Center(child: Text('آخر تسجيل دخول')), size: ColumnSize.M),
-          DataColumn2(label: Center(child: Text('العمليات')), fixedWidth: 140),
+        columns: [
+          DataColumn2(
+              label: Center(child: Text(l10n.fullName)), size: ColumnSize.L),
+          DataColumn2(
+              label: Center(child: Text(l10n.usernameColumn)),
+              size: ColumnSize.L),
+          DataColumn2(
+              label: Center(child: Text(l10n.permission)), size: ColumnSize.M),
+          DataColumn2(
+              label: Center(child: Text(l10n.accountStatus)),
+              size: ColumnSize.S),
+          DataColumn2(
+              label: Center(child: Text(l10n.lastLoginColumn)),
+              size: ColumnSize.M),
+          DataColumn2(
+              label: Center(child: Text(l10n.actions)), fixedWidth: 140),
         ],
         rows: List.generate(users.length, (index) {
           final user = users[index];
@@ -102,7 +114,8 @@ class DesktopUserTable extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: user.roleColor.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: user.roleColor.withOpacity(0.24)),
+                      border:
+                          Border.all(color: user.roleColor.withOpacity(0.24)),
                     ),
                     child: Text(
                       user.roleLabel,
@@ -136,7 +149,7 @@ class DesktopUserTable extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      user.active ? 'نشط' : 'معطل',
+                      user.active ? l10n.active : l10n.disabled,
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         color: user.active
@@ -169,9 +182,10 @@ class DesktopUserTable extends StatelessWidget {
                       _buildActionButton(
                         context: context,
                         icon: LucideIcons.pencil,
-                        tooltip: 'تعديل الصلاحيات',
+                        tooltip: l10n.editPermissions,
                         color: AppColors.primaryColor,
-                        onPressed: getIt<UserCubit>().currentUser.userType == UserType.cashier
+                        onPressed: getIt<UserCubit>().currentUser.userType ==
+                                UserType.cashier
                             ? null
                             : () => _showEditDialog(context, userData),
                       ),
@@ -179,9 +193,10 @@ class DesktopUserTable extends StatelessWidget {
                       _buildActionButton(
                         context: context,
                         icon: LucideIcons.trash2,
-                        tooltip: 'حذف الحساب',
+                        tooltip: l10n.deleteAccount,
                         color: AppColors.errorColor,
-                        onPressed: getIt<UserCubit>().currentUser.userType == UserType.cashier
+                        onPressed: getIt<UserCubit>().currentUser.userType ==
+                                UserType.cashier
                             ? null
                             : () => _showDeleteDialog(context, userData),
                       ),
@@ -204,7 +219,8 @@ class DesktopUserTable extends StatelessWidget {
     required VoidCallback? onPressed,
   }) {
     final isDisabled = onPressed == null;
-    final finalColor = isDisabled ? AppColors.mutedColor.withOpacity(0.4) : color;
+    final finalColor =
+        isDisabled ? AppColors.mutedColor.withOpacity(0.4) : color;
 
     return Tooltip(
       message: tooltip,
@@ -216,7 +232,7 @@ class DesktopUserTable extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: isDisabled 
+              color: isDisabled
                   ? AppColors.borderColor.withOpacity(0.3)
                   : color.withOpacity(0.06),
               borderRadius: BorderRadius.circular(8),
@@ -247,75 +263,92 @@ class DesktopUserTable extends StatelessWidget {
   void _showDeleteDialog(BuildContext context, User user) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.errorColor.withOpacity(0.08),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(LucideIcons.userMinus, color: AppColors.errorColor, size: 24),
-            ),
-            const SizedBox(width: 14),
-            const Expanded(
-              child: Text(
-                'تأكيد حذف المستخدم',
-                style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          'هل أنت متأكد من حذف حساب المستخدم "${user.name}"؟ لا يمكن التراجع عن هذا الإجراء.',
-          style: const TextStyle(fontFamily: 'Cairo', fontSize: 14, color: AppColors.textSecondary),
-        ),
-        actions: [
-          Row(
+      builder: (dialogContext) {
+        final l10n = AppLocalizations.of(context);
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
             children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.borderColor),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: const Text(
-                    'إلغاء',
-                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: AppColors.textSecondary),
-                  ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.errorColor.withOpacity(0.08),
+                  shape: BoxShape.circle,
                 ),
+                child: const Icon(LucideIcons.userMinus,
+                    color: AppColors.errorColor, size: 24),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(dialogContext);
-                    context.read<UserCubit>().deleteUser(user.username);
-                    if (context.mounted) {
-                      context.read<UserCubit>().getAllUsers();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.errorColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'حذف',
-                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
-                  ),
+                child: Text(
+                  l10n.confirmDeleteUser,
+                  style: const TextStyle(
+                      fontFamily: 'Cairo',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18),
                 ),
               ),
             ],
           ),
-        ],
-      ),
+          content: Text(
+            l10n.confirmDeleteUserMessage(user.name),
+            style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 14,
+                color: AppColors.textSecondary),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.borderColor),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      l10n.cancel,
+                      style: const TextStyle(
+                          fontFamily: 'Cairo',
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      context.read<UserCubit>().deleteUser(user.username);
+                      if (context.mounted) {
+                        context.read<UserCubit>().getAllUsers();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.errorColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      l10n.delete,
+                      style: const TextStyle(
+                          fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

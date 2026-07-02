@@ -4,6 +4,8 @@ import 'package:bayaa_pos/features/auth/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
+import 'package:bayaa_pos/core/localization/locale_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'dart:io';
@@ -194,47 +196,57 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<UserCubit>.value(
-      value: getIt<UserCubit>(),
-      child: MessageOverlay(
-        child: MaterialApp(
-          navigatorKey: navigatorKey,
-          title: 'Bayaa',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          home: const LoginScreen(),
-          locale: const Locale('ar'),
-          supportedLocales: const [
-            Locale('ar'),
-            Locale('en'),
-          ],
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          builder: (context, child) {
-            // Initialize global message context
-            GlobalMessage.initialize(context);
+    final localeProvider = getIt<LocaleProvider>();
 
-            return BlocListener<UserCubit, UserStates>(
-              listener: (context, state) {
-                if (state is UserInitial) {
-                  // Global logout handler
-                  navigatorKey.currentState?.pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    (route) => false,
-                  );
-                }
+    return ListenableBuilder(
+      listenable: localeProvider,
+      builder: (context, _) {
+        return BlocProvider<UserCubit>.value(
+          value: getIt<UserCubit>(),
+          child: MessageOverlay(
+            child: MaterialApp(
+              navigatorKey: navigatorKey,
+              title: localeProvider.isArabic ? 'بياع' : 'Bayaa POS',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              home: const LoginScreen(),
+              locale: localeProvider.locale,
+              supportedLocales: const [
+                Locale('ar'),
+                Locale('en'),
+              ],
+              localizationsDelegates: [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              builder: (context, child) {
+                // Initialize global message context
+                GlobalMessage.initialize(context);
+
+                return BlocListener<UserCubit, UserStates>(
+                  listener: (context, state) {
+                    if (state is UserInitial) {
+                      // Global logout handler
+                      navigatorKey.currentState?.pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        (route) => false,
+                      );
+                    }
+                  },
+                  child: Directionality(
+                    textDirection: localeProvider.isArabic
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
+                    child: child!,
+                  ),
+                );
               },
-              child: Directionality(
-                textDirection: TextDirection.rtl,
-                child: child!,
-              ),
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

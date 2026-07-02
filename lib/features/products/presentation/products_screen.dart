@@ -7,6 +7,7 @@ import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:bayaa_pos/features/products/presentation/cubit/product_cubit.dart';
 import 'package:bayaa_pos/features/products/presentation/cubit/product_states.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -17,7 +18,6 @@ import 'widgets/enhanced_add_edit_dialog.dart';
 import 'widgets/product_filter_section.dart';
 import 'widgets/product_grid_view.dart';
 import 'widgets/product_table_view.dart';
-
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -30,12 +30,12 @@ class ProductsScreenState extends State<ProductsScreen> {
   final TextEditingController searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
-  
+
   // State for view mode
   bool isTableView = false;
-  
+
   // Filter state - initialized to null for "Select Category" (requested change)
-  String? categoryFilter; 
+  String? categoryFilter;
   String? availabilityFilter;
   List<String> categories = []; // Start empty, will load from cubit
   final List<String> availabilities = ['الكل', 'متوفر', 'منخفض', 'غير متوفر'];
@@ -69,11 +69,11 @@ class ProductsScreenState extends State<ProductsScreen> {
     super.initState();
     _scrollController.addListener(_onScroll);
     searchController.addListener(_onSearchChanged);
-    
+
     // Clear any previous state (singleton cubit)
     final cubit = getIt<ProductCubit>();
     cubit.clearProducts();
-    
+
     // Only load categories
     cubit.getAllCategories();
   }
@@ -102,10 +102,12 @@ class ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return BlocProvider<ProductCubit>.value(
       value: getIt<ProductCubit>(),
       child: Directionality(
-        textDirection: TextDirection.rtl, // Fixed rtl getter
+        textDirection:
+            l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
         child: Scaffold(
           backgroundColor: AppColors.backgroundColor,
           body: SafeArea(
@@ -132,145 +134,169 @@ class ProductsScreenState extends State<ProductsScreen> {
                       const SizedBox(height: 12),
                       Expanded(
                         child: BlocConsumer<ProductCubit, ProductStates>(
-                        listener: (context, state) {
-                          if (state is ProductSuccessState) {
-                            MotionSnackBarSuccess(context, state.msg);
-                          }
-                          if (state is ProductErrorState) {
-                            MotionSnackBarError(context, state.message);
-                          }
-                          if (state is CategorySuccessState) {
-                            MotionSnackBarSuccess(context, state.msg);
-                          }
-                          if (state is CategoryErrorState) {
-                            MotionSnackBarError(context, state.message);
-                          }
-                          if (state is CategoryErrorDeleteState) {
-                            MotionSnackBarError(context, state.message);
-                            showCategoryActionDialog(
-                              categorie: categories,
-                              category: state.category,
-                              categoryFilter: categoryFilter,
-                              context: context,
-                            );
-                          }
-                          if (state is ProductLoadedState) {
-                            products = state.products;
-                            
-                    
-                            final cubit = context.read<ProductCubit>();
-                            if (categoryFilter != cubit.selectedCategory) {
-                          
-                                if (products.isNotEmpty || cubit.selectedCategory != 'الكل') {
-                                   categoryFilter = cubit.selectedCategory;
-                                } else if (cubit.selectedCategory == 'الكل' && products.isEmpty) {
-                                  
+                          listener: (context, state) {
+                            if (state is ProductSuccessState) {
+                              MotionSnackBarSuccess(context, state.msg);
+                            }
+                            if (state is ProductErrorState) {
+                              MotionSnackBarError(context, state.message);
+                            }
+                            if (state is CategorySuccessState) {
+                              MotionSnackBarSuccess(context, state.msg);
+                            }
+                            if (state is CategoryErrorState) {
+                              MotionSnackBarError(context, state.message);
+                            }
+                            if (state is CategoryErrorDeleteState) {
+                              MotionSnackBarError(context, state.message);
+                              showCategoryActionDialog(
+                                categorie: categories,
+                                category: state.category,
+                                categoryFilter: categoryFilter,
+                                context: context,
+                              );
+                            }
+                            if (state is ProductLoadedState) {
+                              products = state.products;
+
+                              final cubit = context.read<ProductCubit>();
+                              if (categoryFilter != cubit.selectedCategory) {
+                                if (products.isNotEmpty ||
+                                    cubit.selectedCategory != 'الكل') {
+                                  categoryFilter = cubit.selectedCategory;
+                                } else if (cubit.selectedCategory == 'الكل' &&
+                                    products.isEmpty) {
                                   categoryFilter = null;
                                 }
-                            }
-                            
-                            // Repeat for Availability Filter
-                            if (availabilityFilter != cubit.selectedAvailability) {
-                                if (products.isNotEmpty || cubit.selectedAvailability != 'الكل') {
-                                   availabilityFilter = cubit.selectedAvailability;
-                                } else if (cubit.selectedAvailability == 'الكل' && products.isEmpty) {
+                              }
+
+                              // Repeat for Availability Filter
+                              if (availabilityFilter !=
+                                  cubit.selectedAvailability) {
+                                if (products.isNotEmpty ||
+                                    cubit.selectedAvailability != 'الكل') {
+                                  availabilityFilter =
+                                      cubit.selectedAvailability;
+                                } else if (cubit.selectedAvailability ==
+                                        'الكل' &&
+                                    products.isEmpty) {
                                   availabilityFilter = null;
                                 }
+                              }
                             }
-                          }
-                        },
-                        buildWhen: (previous, current) =>
-                            current is CategoryLoadedState ||
-                            current is CategoryErrorState ||
-                            current is ProductLoadedState,
-                        builder: (context, state) {
-                          if (state is CategoryLoadedState) {
-                            categories = ['الكل', ...state.categories];
-                          }
-                          
-                          // Use products list directly as it's filtered by server
-                          final currentFilteredProducts = products;
-                          
-                          return Column(
-                            children: [
-                              FadeSlideIn(
-                                beginOffset: const Offset(0.06, 0),
-                                child: ProductsFilterSection(
-                                  searchController: searchController,
-                                  categoryFilter: categoryFilter,
-                                  availabilityFilter: availabilityFilter,
-                                  categories: categories,
-                                  availabilities: availabilities,
-                                  onCategoryChanged: (v) {
-                                    setState(() => categoryFilter = v);
-                                    ProductCubit.get(context)
-                                        .filterByCategory(v);
-                                  },
-                                  onAvailabilityChanged: (v) {
+                          },
+                          buildWhen: (previous, current) =>
+                              current is CategoryLoadedState ||
+                              current is CategoryErrorState ||
+                              current is ProductLoadedState,
+                          builder: (context, state) {
+                            if (state is CategoryLoadedState) {
+                              categories = ['الكل', ...state.categories];
+                            }
+
+                            // Use products list directly as it's filtered by server
+                            final currentFilteredProducts = products;
+
+                            return Column(
+                              children: [
+                                FadeSlideIn(
+                                  beginOffset: const Offset(0.06, 0),
+                                  child: ProductsFilterSection(
+                                    searchController: searchController,
+                                    categoryFilter: categoryFilter,
+                                    availabilityFilter: availabilityFilter,
+                                    categories: categories,
+                                    availabilities: availabilities,
+                                    onCategoryChanged: (v) {
+                                      setState(() => categoryFilter = v);
+                                      ProductCubit.get(context)
+                                          .filterByCategory(v);
+                                    },
+                                    onAvailabilityChanged: (v) {
                                       setState(() => availabilityFilter = v);
                                       ProductCubit.get(context)
                                           .filterByAvailability(v);
-                                  },
-                                  onAddPressed: () {
-                                    showAddEditDialog();
-                                  },
-                                  onSearchChanged: () {},
-                                  productCount: currentFilteredProducts.length,
-                                  isTableView: isTableView,
-                                  onViewToggle: (v) => setState(() => isTableView = v),
+                                    },
+                                    onAddPressed: () {
+                                      showAddEditDialog();
+                                    },
+                                    onSearchChanged: () {},
+                                    productCount:
+                                        currentFilteredProducts.length,
+                                    isTableView: isTableView,
+                                    onViewToggle: (v) =>
+                                        setState(() => isTableView = v),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Expanded(
-                                child: SubtleSwitcher(
-                                  child: KeyedSubtree(
-                                    key: ValueKey('${currentFilteredProducts.length}_$isTableView'),
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                        side: const BorderSide(
-                                          color: AppColors.borderColor,
+                                const SizedBox(height: 8),
+                                Expanded(
+                                  child: SubtleSwitcher(
+                                    child: KeyedSubtree(
+                                      key: ValueKey(
+                                          '${currentFilteredProducts.length}_$isTableView'),
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          side: const BorderSide(
+                                            color: AppColors.borderColor,
+                                          ),
                                         ),
-                                      ),
-                                      color: Colors.white,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(16),
-                                        child: isTableView 
-                                          ? ProductsTableView(
-                                              products: currentFilteredProducts,
-                                              onDelete: (p) => getIt<ProductCubit>()
-                                                  .deleteProduct(p.barcode),
-                                              onEdit: (p) => showAddEditDialog(p),
-                                              statusColorFn: statusColor,
-                                              statusTextFn: statusText,
-                                              scrollController: _scrollController,
-                                              isLoadingMore: ProductCubit.get(context).isLoadingMore,
-                                              isManager: getIt<UserCubit>().currentUser.userType == UserType.manager,
-                                            )
-                                          : ProductsGridView(
-                                              products: currentFilteredProducts,
-                                              onDelete: (p) => getIt<ProductCubit>()
-                                                  .deleteProduct(p.barcode),
-                                              onEdit: (p) {
-                                                showAddEditDialog(p);
-                                              },
-                                              statusColorFn: statusColor,
-                                              statusTextFn: statusText,
-                                              scrollController: _scrollController,
-                                              isLoadingMore: ProductCubit.get(context).isLoadingMore,
-                                            ),
+                                        color: Colors.white,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          child: isTableView
+                                              ? ProductsTableView(
+                                                  products:
+                                                      currentFilteredProducts,
+                                                  onDelete: (p) =>
+                                                      getIt<ProductCubit>()
+                                                          .deleteProduct(
+                                                              p.barcode),
+                                                  onEdit: (p) =>
+                                                      showAddEditDialog(p),
+                                                  statusColorFn: statusColor,
+                                                  statusTextFn: statusText,
+                                                  scrollController:
+                                                      _scrollController,
+                                                  isLoadingMore:
+                                                      ProductCubit.get(context)
+                                                          .isLoadingMore,
+                                                  isManager: getIt<UserCubit>()
+                                                          .currentUser
+                                                          .userType ==
+                                                      UserType.manager,
+                                                )
+                                              : ProductsGridView(
+                                                  products:
+                                                      currentFilteredProducts,
+                                                  onDelete: (p) =>
+                                                      getIt<ProductCubit>()
+                                                          .deleteProduct(
+                                                              p.barcode),
+                                                  onEdit: (p) {
+                                                    showAddEditDialog(p);
+                                                  },
+                                                  statusColorFn: statusColor,
+                                                  statusTextFn: statusText,
+                                                  scrollController:
+                                                      _scrollController,
+                                                  isLoadingMore:
+                                                      ProductCubit.get(context)
+                                                          .isLoadingMore,
+                                                ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
+                              ],
+                            );
+                          },
+                        ),
                       ),
-                    ),
                     ],
-                    
                   ),
                 );
               },

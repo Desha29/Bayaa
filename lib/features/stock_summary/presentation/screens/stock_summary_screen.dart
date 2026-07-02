@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -21,7 +22,7 @@ class StockSummaryScreen extends StatefulWidget {
 }
 
 class _StockSummaryScreenState extends State<StockSummaryScreen> {
-  String _sortOption = 'القيمة الإجمالية'; // Default sort
+  String _sortOption = 'totalValue'; // Default sort
   bool _sortAscending = false;
   String? _selectedCategory;
 
@@ -81,19 +82,19 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
     displayedList.sort((a, b) {
       int compareResult = 0;
       switch (_sortOption) {
-        case 'الاسم':
+        case 'name':
           compareResult = a.categoryName.compareTo(b.categoryName);
           break;
-        case 'الكمية':
+        case 'quantity':
           compareResult = a.totalQuantity.compareTo(b.totalQuantity);
           break;
-        case 'هامش الربح %':
+        case 'profitMargin':
           compareResult = a.profitMarginPercent.compareTo(b.profitMarginPercent);
           break;
-        case 'القيمة التاريخية':
+        case 'historicValue':
           compareResult = a.totalHistoricValue.compareTo(b.totalHistoricValue);
           break;
-        case 'القيمة الإجمالية':
+        case 'totalValue':
         default:
           compareResult = a.totalCurrentWholesaleValue.compareTo(b.totalCurrentWholesaleValue);
           break;
@@ -101,8 +102,9 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
       return _sortAscending ? compareResult : -compareResult;
     });
 
+    final l10n = AppLocalizations.of(context);
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
@@ -115,9 +117,9 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Premium Screen Header
-                const ScreenHeader(
-                  title: 'تحليلات وملخص المخزون',
-                  subtitle: 'متابعة حركة رأس المال في السلع، الأرباح المتوقعة، وقيم المخازن الكلية والتاريخية',
+                ScreenHeader(
+                  title: l10n.stockSummaryTitle,
+                  subtitle: l10n.stockSummarySubtitleLong,
                   icon: LucideIcons.pieChart,
                   iconColor: AppColors.primaryColor,
                   titleColor: AppColors.textPrimary,
@@ -125,7 +127,8 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                 const SizedBox(height: 20),
 
                 // Summary cards row
-                _buildSummaryCardsRow(state),
+                // Summary cards row
+                _buildSummaryCardsRow(state, context),
                 const SizedBox(height: 24),
 
                 // Premium charts for Stock Summary
@@ -133,11 +136,11 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                 const SizedBox(height: 24),
 
                 // Filter & sorting action bar
-                _buildFilterBar(state.categories),
+                _buildFilterBar(state.categories, context),
                 const SizedBox(height: 16),
 
                 // Clean data table
-                _buildDataTable(displayedList),
+                _buildDataTable(displayedList, context),
               ],
             ),
           ),
@@ -146,7 +149,8 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
     );
   }
 
-  Widget _buildSummaryCardsRow(StockSummaryLoaded state) {
+  Widget _buildSummaryCardsRow(StockSummaryLoaded state, BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 750;
@@ -156,31 +160,31 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
             children: [
               Expanded(
                 child: _SummaryCard(
-                  title: "القيمة الكلية التاريخية",
-                  value: "${state.totalStoreHistoricValue.toStringAsFixed(0)} ج.م",
+                  title: l10n.totalHistoricValue,
+                  value: "${state.totalStoreHistoricValue.toStringAsFixed(0)} ${l10n.currencyEg}",
                   icon: LucideIcons.history,
                   color: AppColors.secondaryColor,
-                  tooltip: "إجمالي تكلفة جميع البضائع التي تم إدخالها للنظام تاريخياً",
+                  tooltip: l10n.historicValueTooltip,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _SummaryCard(
-                  title: "القيمة الحالية (جملة)",
-                  value: "${state.totalStoreCurrentValue.toStringAsFixed(0)} ج.م",
+                  title: l10n.currentWholesaleValue,
+                  value: "${state.totalStoreCurrentValue.toStringAsFixed(0)} ${l10n.currencyEg}",
                   icon: LucideIcons.package,
                   color: AppColors.primaryColor,
-                  tooltip: "قيمة المخزون الحالي بالكامل بسعر الجملة",
+                  tooltip: l10n.currentWholesaleTooltip,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _SummaryCard(
-                  title: "صافي الأرباح المتوقعة",
-                  value: "${state.totalExpectedProfit.toStringAsFixed(0)} ج.م",
+                  title: l10n.expectedProfit,
+                  value: "${state.totalExpectedProfit.toStringAsFixed(0)} ${l10n.currencyEg}",
                   icon: LucideIcons.trendingUp,
                   color: AppColors.successColor,
-                  tooltip: "العائد المالي المتوقع (الفرق بين قيمة البيع وسعر الجملة للمخزون الحالي)",
+                  tooltip: l10n.expectedProfitTooltip,
                 ),
               ),
             ],
@@ -189,27 +193,27 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
           return Column(
             children: [
               _SummaryCard(
-                title: "القيمة الكلية التاريخية",
-                value: "${state.totalStoreHistoricValue.toStringAsFixed(0)} ج.م",
+                title: l10n.totalHistoricValue,
+                value: "${state.totalStoreHistoricValue.toStringAsFixed(0)} ${l10n.currencyEg}",
                 icon: LucideIcons.history,
                 color: AppColors.secondaryColor,
-                tooltip: "إجمالي تكلفة جميع البضائع التي تم إدخالها للنظام تاريخياً",
+                tooltip: l10n.historicValueTooltip,
               ),
               const SizedBox(height: 12),
               _SummaryCard(
-                title: "القيمة الحالية (جملة)",
-                value: "${state.totalStoreCurrentValue.toStringAsFixed(0)} ج.م",
+                title: l10n.currentWholesaleValue,
+                value: "${state.totalStoreCurrentValue.toStringAsFixed(0)} ${l10n.currencyEg}",
                 icon: LucideIcons.package,
                 color: AppColors.primaryColor,
-                tooltip: "قيمة المخزون الحالي بالكامل بسعر الجملة",
+                tooltip: l10n.currentWholesaleTooltip,
               ),
               const SizedBox(height: 12),
               _SummaryCard(
-                title: "صافي الأرباح المتوقعة",
-                value: "${state.totalExpectedProfit.toStringAsFixed(0)} ج.م",
+                title: l10n.expectedProfit,
+                value: "${state.totalExpectedProfit.toStringAsFixed(0)} ${l10n.currencyEg}",
                 icon: LucideIcons.trendingUp,
                 color: AppColors.successColor,
-                tooltip: "العائد المالي المتوقع (الفرق بين قيمة البيع وسعر الجملة للمخزون الحالي)",
+                tooltip: l10n.expectedProfitTooltip,
               ),
             ],
           );
@@ -218,8 +222,16 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
     );
   }
 
-  Widget _buildFilterBar(List<StockSummaryCategoryModel> allCategories) {
+  Widget _buildFilterBar(List<StockSummaryCategoryModel> allCategories, BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final categories = allCategories.map((e) => e.categoryName).toSet().toList();
+    final sortOptions = {
+      'totalValue': l10n.totalValue,
+      'historicValue': l10n.historicValue,
+      'profitMargin': l10n.profitMarginPercent,
+      'quantity': l10n.qtySort,
+      'name': l10n.nameSort,
+    };
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -239,10 +251,10 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                   child: DropdownButton<String>(
                     value: _selectedCategory,
                     style: const TextStyle(fontFamily: 'Cairo', color: AppColors.textPrimary, fontSize: 13),
-                    hint: const Text("تصفية حسب تصنيف السلع", style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.mutedColor)),
+                    hint: Text(l10n.filterByCategory, style: const TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.mutedColor)),
                     isExpanded: true,
                     items: [
-                      const DropdownMenuItem(value: null, child: Text("كل الأقسام والتصنيفات", style: TextStyle(fontFamily: 'Cairo'))),
+                      DropdownMenuItem(value: null, child: Text(l10n.allCategoriesFilter, style: const TextStyle(fontFamily: 'Cairo'))),
                       ...categories.map((cat) => DropdownMenuItem(
                             value: cat,
                             child: Text(cat, style: const TextStyle(fontFamily: 'Cairo')),
@@ -271,13 +283,7 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                           style: const TextStyle(fontFamily: 'Cairo', color: AppColors.textPrimary, fontSize: 13),
                           icon: const Icon(LucideIcons.arrowUpDown, size: 16, color: AppColors.mutedColor),
                           isExpanded: true,
-                          items: [
-                            'القيمة الإجمالية',
-                            'القيمة التاريخية',
-                            'هامش الربح %',
-                            'الكمية',
-                            'الاسم'
-                          ].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontFamily: 'Cairo')))).toList(),
+                          items: sortOptions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value, style: const TextStyle(fontFamily: 'Cairo')))).toList(),
                           onChanged: (val) {
                             if (val != null) setState(() => _sortOption = val);
                           },
@@ -286,7 +292,7 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  _buildSortIconButton(),
+                  _buildSortIconButton(context),
                 ],
               ),
             ],
@@ -306,10 +312,10 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                     child: DropdownButton<String>(
                       value: _selectedCategory,
                       style: const TextStyle(fontFamily: 'Cairo', color: AppColors.textPrimary, fontSize: 13),
-                      hint: const Text("تصفية حسب تصنيف السلع", style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.mutedColor)),
+                      hint: Text(l10n.filterByCategory, style: const TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.mutedColor)),
                       isExpanded: true,
                       items: [
-                        const DropdownMenuItem(value: null, child: Text("كل الأقسام والتصنيفات", style: TextStyle(fontFamily: 'Cairo'))),
+                        DropdownMenuItem(value: null, child: Text(l10n.allCategoriesFilter, style: const TextStyle(fontFamily: 'Cairo'))),
                         ...categories.map((cat) => DropdownMenuItem(
                               value: cat,
                               child: Text(cat, style: const TextStyle(fontFamily: 'Cairo')),
@@ -337,13 +343,7 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                       style: const TextStyle(fontFamily: 'Cairo', color: AppColors.textPrimary, fontSize: 13),
                       icon: const Icon(LucideIcons.arrowUpDown, size: 16, color: AppColors.mutedColor),
                       isExpanded: true,
-                      items: [
-                        'القيمة الإجمالية',
-                        'القيمة التاريخية',
-                        'هامش الربح %',
-                        'الكمية',
-                        'الاسم'
-                      ].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontFamily: 'Cairo')))).toList(),
+                      items: sortOptions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value, style: const TextStyle(fontFamily: 'Cairo')))).toList(),
                       onChanged: (val) {
                         if (val != null) setState(() => _sortOption = val);
                       },
@@ -352,7 +352,7 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              _buildSortIconButton(),
+              _buildSortIconButton(context),
             ],
           );
         }
@@ -360,9 +360,10 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
     );
   }
 
-  Widget _buildSortIconButton() {
+  Widget _buildSortIconButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Tooltip(
-      message: _sortAscending ? "ترتيب تصاعدي" : "ترتيب تنازلي",
+      message: _sortAscending ? l10n.sortAsc : l10n.sortDesc,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -386,7 +387,8 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
     );
   }
 
-  Widget _buildDataTable(List<StockSummaryCategoryModel> data) {
+  Widget _buildDataTable(List<StockSummaryCategoryModel> data, BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       height: 450,
       decoration: BoxDecoration(
@@ -430,15 +432,15 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
             horizontalInside: BorderSide(color: AppColors.borderColor.withOpacity(0.5), width: 1),
             bottom: BorderSide(color: AppColors.borderColor.withOpacity(0.5), width: 1),
           ),
-          columns: const [
-            DataColumn2(label: Center(child: Text("القسم")), size: ColumnSize.L),
-            DataColumn2(label: Center(child: Text("المنتجات")), size: ColumnSize.S, numeric: true),
-            DataColumn2(label: Center(child: Text("المخزون الحالي")), size: ColumnSize.S, numeric: true),
-            DataColumn2(label: Center(child: Text("المخرجات")), size: ColumnSize.S, numeric: true),
-            DataColumn2(label: Center(child: Text("القيمة التاريخية")), size: ColumnSize.M, numeric: true),
-            DataColumn2(label: Center(child: Text("القيمة الحالية (جملة)")), size: ColumnSize.M, numeric: true),
-            DataColumn2(label: Center(child: Text("القيمة المتوقعة (بيع)")), size: ColumnSize.M, numeric: true),
-            DataColumn2(label: Center(child: Text("هامش الربح %")), size: ColumnSize.S),
+          columns: [
+            DataColumn2(label: Center(child: Text(l10n.sectionColumn)), size: ColumnSize.L),
+            DataColumn2(label: Center(child: Text(l10n.productsColumn)), size: ColumnSize.S, numeric: true),
+            DataColumn2(label: Center(child: Text(l10n.currentStock)), size: ColumnSize.S, numeric: true),
+            DataColumn2(label: Center(child: Text(l10n.outputsColumn)), size: ColumnSize.S, numeric: true),
+            DataColumn2(label: Center(child: Text(l10n.historicValueColumn)), size: ColumnSize.M, numeric: true),
+            DataColumn2(label: Center(child: Text(l10n.currentWholesaleColumn)), size: ColumnSize.M, numeric: true),
+            DataColumn2(label: Center(child: Text(l10n.expectedSellValue)), size: ColumnSize.M, numeric: true),
+            DataColumn2(label: Center(child: Text(l10n.profitMarginPercent)), size: ColumnSize.S),
           ],
           rows: data.map((item) {
             return DataRow2(
@@ -459,9 +461,9 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (item.isDeletedCategory)
-                        const Tooltip(
-                          message: "قسم أرشيفي ممسوح يحتوي على عمليات بيع سابقة",
-                          child: Padding(
+                        Tooltip(
+                          message: l10n.archivedSection,
+                          child: const Padding(
                             padding: EdgeInsets.only(left: 6.0),
                             child: Icon(LucideIcons.alertTriangle, size: 14, color: AppColors.warningColor),
                           ),
@@ -506,19 +508,19 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                 )),
                 DataCell(Center(
                   child: Text(
-                    "${item.totalHistoricValue.toStringAsFixed(0)} ج.م",
+                    "${item.totalHistoricValue.toStringAsFixed(0)} ${l10n.currencyEg}",
                     style: const TextStyle(fontFamily: 'Cairo', fontSize: 12.5, color: AppColors.textSecondary),
                   ),
                 )),
                 DataCell(Center(
                   child: Text(
-                    "${item.totalCurrentWholesaleValue.toStringAsFixed(0)} ج.م",
+                    "${item.totalCurrentWholesaleValue.toStringAsFixed(0)} ${l10n.currencyEg}",
                     style: const TextStyle(fontFamily: 'Cairo', fontSize: 12.5, color: AppColors.primaryColor, fontWeight: FontWeight.bold),
                   ),
                 )),
                 DataCell(Center(
                   child: Text(
-                    "${item.totalDefaultSellValue.toStringAsFixed(0)} ج.م",
+                    "${item.totalDefaultSellValue.toStringAsFixed(0)} ${l10n.currencyEg}",
                     style: const TextStyle(fontFamily: 'Cairo', fontSize: 12.5, color: AppColors.secondaryColor, fontWeight: FontWeight.bold),
                   ),
                 )),

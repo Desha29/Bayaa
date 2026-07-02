@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class TotalSectionCard extends StatelessWidget {
@@ -15,8 +16,8 @@ class TotalSectionCard extends StatelessWidget {
     this.onClearCart,
   });
 
-  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 600),
       tween: Tween(begin: 0.0, end: 1.0),
@@ -47,9 +48,9 @@ class TotalSectionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'خلاصة الفاتورة',
-              style: TextStyle(
+            Text(
+              l10n.invoiceSummaryTitle,
+              style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -59,15 +60,15 @@ class TotalSectionCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'عدد العناصر',
-                  style: TextStyle(
+                Text(
+                  l10n.itemCountLabel,
+                  style: const TextStyle(
                     color: AppColors.mutedColor,
                     fontSize: 13,
                   ),
                 ),
                 Text(
-                  '$itemCount منتج',
+                  l10n.itemCountValue(itemCount),
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 13,
@@ -80,15 +81,15 @@ class TotalSectionCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'المجموع الفرعي',
-                  style: TextStyle(
+                Text(
+                  l10n.subtotalLabel,
+                  style: const TextStyle(
                     color: AppColors.mutedColor,
                     fontSize: 13,
                   ),
                 ),
                 Text(
-                  '${totalAmount.toStringAsFixed(2)} ج.م',
+                  l10n.priceWithCurrency(totalAmount.toStringAsFixed(2), l10n.currencyEg),
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 13,
@@ -104,16 +105,16 @@ class TotalSectionCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'المبلغ الإجمالي',
-                  style: TextStyle(
+                Text(
+                  l10n.grandTotalLabel,
+                  style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  '${totalAmount.toStringAsFixed(2)} ج.م',
+                  l10n.priceWithCurrency(totalAmount.toStringAsFixed(2), l10n.currencyEg),
                   style: const TextStyle(
                     color: AppColors.primaryColor,
                     fontSize: 22,
@@ -126,9 +127,9 @@ class TotalSectionCard extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onCheckout,
               icon: const Icon(Icons.check_circle_outline, size: 20),
-              label: const Text(
-                'إتمام عملية الدفع',
-                style: TextStyle(
+              label: Text(
+                l10n.checkoutBtn,
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
@@ -147,9 +148,9 @@ class TotalSectionCard extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onClearCart,
               icon: const Icon(Icons.delete_outline, size: 18),
-              label: const Text(
-                'إفراغ السلة',
-                style: TextStyle(
+              label: Text(
+                l10n.clearCartBtn,
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),

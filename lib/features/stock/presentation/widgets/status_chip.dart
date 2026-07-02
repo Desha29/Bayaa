@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class StatusChip extends StatelessWidget {
@@ -11,16 +12,17 @@ class StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color color;
     final String label;
+    final l10n = AppLocalizations.of(context);
 
     if (isOut) {
       color = AppColors.errorColor;
-      label = 'نفذ';
+      label = l10n.outOfStock;
     } else if (isLow) {
       color = AppColors.warningColor;
-      label = 'منخفض';
+      label = l10n.lowStock;
     } else {
       color = AppColors.successColor;
-      label = 'متوفر';
+      label = l10n.available;
     }
 
     return Container(
@@ -45,3 +47,4 @@ class StatusChip extends StatelessWidget {
     );
   }
 }
+

@@ -7,6 +7,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:printing/printing.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/data/models/user_model.dart';
 import '../../sales/data/models/sale_model.dart';
 import '../../../core/components/screen_header.dart';
@@ -22,8 +23,6 @@ import 'widgets/invoice_list_section.dart';
 import 'widgets/partial_refund_dialog.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../../../core/di/dependency_injection.dart';
-
-
 
 class InvoiceScreen extends StatefulWidget {
   final SalesRepository repository;
@@ -42,29 +41,29 @@ class InvoiceScreen extends StatefulWidget {
 class _InvoiceScreenState extends State<InvoiceScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  final TextEditingController _barcodeSearchController = TextEditingController();
+  final TextEditingController _barcodeSearchController =
+      TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
 
   final StringBuffer _hidBuffer = StringBuffer();
   Timer? _hidTimer;
   Timer? _debounceTimer;
+  late AppLocalizations localizations;
 
   @override
   void initState() {
     super.initState();
+    localizations = AppLocalizations.of(context);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
     _animationController.forward();
 
-    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<InvoiceCubit>().loadSales();
     });
 
-
-    
     _searchFocusNode.addListener(_onFocusChange);
     RawKeyboard.instance.addListener(_onRawKey);
   }
@@ -91,10 +90,10 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
   void _onRawKey(RawKeyEvent event) {
     if (event is! RawKeyDownEvent) return;
-    
+
     if (ModalRoute.of(context)?.isCurrent != true) return;
-  
-    if (_searchFocusNode.hasFocus) return; 
+
+    if (_searchFocusNode.hasFocus) return;
 
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
@@ -160,8 +159,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     );
     if (picked != null) {
       final cubit = context.read<InvoiceCubit>();
-      cubit.setDate(
-          isStart ? picked : cubit.state.startDate,
+      cubit.setDate(isStart ? picked : cubit.state.startDate,
           !isStart ? picked : cubit.state.endDate);
     }
   }
@@ -171,7 +169,8 @@ class _InvoiceScreenState extends State<InvoiceScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('تأكيد حذف الفاتورة'),
-        content: Text('هل أنت متأكد من حذف الفاتورة (#${sale.id}) نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه.'),
+        content: Text(
+            'هل أنت متأكد من حذف الفاتورة (#${sale.id}) نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه.'),
         actions: [
           TextButton(
             child: const Text('إلغاء'),
@@ -187,12 +186,12 @@ class _InvoiceScreenState extends State<InvoiceScreen>
         ],
       ),
     );
-    
+
     if (confirmed != true) return;
 
     try {
       await context.read<InvoiceCubit>().deleteSale(sale.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم حذف الفاتورة بنجاح')),
@@ -210,7 +209,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
   Future<void> _handleReturnSale(Sale sale) async {
     // Show partial refund dialog
     final refundService = RefundCalculationService(widget.repository);
-    
+
     final selectedItems = await showDialog<List<RefundItem>>(
       context: context,
       builder: (ctx) => PartialRefundDialog(
@@ -223,10 +222,10 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
     // Create partial refund
     await context.read<InvoiceCubit>().createPartialRefund(
-      originalSale: sale,
-      itemsToRefund: selectedItems,
-    );
-    
+          originalSale: sale,
+          itemsToRefund: selectedItems,
+        );
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم المرتجع بنجاح')),
@@ -268,14 +267,14 @@ class _InvoiceScreenState extends State<InvoiceScreen>
         ],
       ),
     );
-    
+
     if (confirmed != true) return;
 
     try {
       await context
           .read<InvoiceCubit>()
           .deleteInvoices(startDate, endDate, searchQuery);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم حذف الفواتير بنجاح')),
@@ -324,7 +323,8 @@ class _InvoiceScreenState extends State<InvoiceScreen>
               position: Tween<Offset>(
                 begin: const Offset(0.0, 0.1),
                 end: Offset.zero,
-              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeOut)),
               child: child),
         );
       },
@@ -362,88 +362,97 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     return BlocBuilder<InvoiceCubit, InvoiceState>(
       builder: (context, state) {
-        return Scaffold(
-          backgroundColor: AppColors.backgroundColor,
-          body: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(isDesktop ? 32 : 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                   FadeTransition(
-                    opacity: _animationController,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, -0.2),
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                        parent: _animationController,
-                        curve: Curves.easeOut,
-                      )),
-                      child: ScreenHeader(
-                        title: 'الفواتير',
-                        icon: LucideIcons.fileSpreadsheet,
-                        subtitle: 'عرض وطباعة الفواتير الصادرة',
-                        subtitleColor: AppColors.mutedColor,
-                        iconColor: AppColors.primaryColor,
+        return Directionality(
+          textDirection:
+              l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+          child: Scaffold(
+            backgroundColor: AppColors.backgroundColor,
+            body: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(isDesktop ? 32 : 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FadeTransition(
+                      opacity: _animationController,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, -0.2),
+                          end: Offset.zero,
+                        ).animate(CurvedAnimation(
+                          parent: _animationController,
+                          curve: Curves.easeOut,
+                        )),
+                        child: ScreenHeader(
+                          title: 'الفواتير',
+                          icon: LucideIcons.fileSpreadsheet,
+                          subtitle: 'عرض وطباعة الفواتير الصادرة',
+                          subtitleColor: AppColors.mutedColor,
+                          iconColor: AppColors.primaryColor,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  FadeTransition(
-                    opacity: _animationController,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, -0.1),
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                        parent: _animationController,
-                        curve: Curves.easeOut,
-                      )),
-                      child: InvoiceFilterSection(
-                        isDesktop: isDesktop,
-                        barcodeSearchController: _barcodeSearchController,
-                        focusNode: _searchFocusNode,
-                        searchQuery: state.searchQuery,
-                        onSearch: _searchByBarcode,
-                        onChanged: _onSearchChanged,
-                        onClearSearch: () {
-                          _barcodeSearchController.clear();
-                          _searchByBarcode('');
-                        },
+                    const SizedBox(height: 24),
+                    FadeTransition(
+                      opacity: _animationController,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, -0.1),
+                          end: Offset.zero,
+                        ).animate(CurvedAnimation(
+                          parent: _animationController,
+                          curve: Curves.easeOut,
+                        )),
+                        child: InvoiceFilterSection(
+                          isDesktop: isDesktop,
+                          barcodeSearchController: _barcodeSearchController,
+                          focusNode: _searchFocusNode,
+                          searchQuery: state.searchQuery,
+                          onSearch: _searchByBarcode,
+                          onChanged: _onSearchChanged,
+                          onClearSearch: () {
+                            _barcodeSearchController.clear();
+                            _searchByBarcode('');
+                          },
+                          startDate: state.startDate,
+                          endDate: state.endDate,
+                          onSelectDate: _selectDate,
+                          onClearFilters: _clearFilters,
+                          onDeleteInvoices: () => _deleteInvoices(
+                              state.startDate,
+                              state.endDate,
+                              state.searchQuery),
+                          filterType: state.filterType,
+                          onFilterTypeChanged: (type) =>
+                              context.read<InvoiceCubit>().setFilterType(type),
+                          isManager:
+                              widget.currentUser.userType == UserType.manager,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Expanded(
+                      child: InvoiceListSection(
+                        loading: state.loading,
+                        sales: state.sales,
                         startDate: state.startDate,
                         endDate: state.endDate,
-                        onSelectDate: _selectDate,
-                        onClearFilters: _clearFilters,
-                        onDeleteInvoices: () =>
-                            _deleteInvoices(state.startDate, state.endDate, state.searchQuery),
-                        filterType: state.filterType,
-                        onFilterTypeChanged: (type) =>
-                            context.read<InvoiceCubit>().setFilterType(type),
-                        isManager: widget.currentUser.userType == UserType.manager,
+                        animationController: _animationController,
+                        onOpenInvoice: _openInvoice,
+                        onDeleteSale: _handleDeleteSale,
+                        onReturnSale: _handleReturnSale,
+                        onPrintInvoice: _handlePrintInvoice,
+                        isManager:
+                            widget.currentUser.userType == UserType.manager,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: InvoiceListSection(
-                      loading: state.loading,
-                      sales: state.sales,
-                      startDate: state.startDate,
-                      endDate: state.endDate,
-                      animationController: _animationController,
-                      onOpenInvoice: _openInvoice,
-                      onDeleteSale: _handleDeleteSale,
-                      onReturnSale: _handleReturnSale,
-                      onPrintInvoice: _handlePrintInvoice,
-                      isManager: widget.currentUser.userType == UserType.manager,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

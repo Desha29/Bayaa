@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // HID suppression handled by SalesScreen via focus checks; don't directly
 // remove global listeners from widgets.
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class CartItemRow extends StatefulWidget {
@@ -61,13 +62,13 @@ class _CartItemRowState extends State<CartItemRow> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('تعديل السعر'),
+          title: Text(AppLocalizations.of(context).editPriceTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'الحد الأدنى للسعر: ${widget.minPrice.toStringAsFixed(2)} ج.م',
+                AppLocalizations.of(context).minPriceLabel(widget.minPrice.toStringAsFixed(2), AppLocalizations.of(context).currencyEg),
                 style: TextStyle(
                   color: AppColors.warningColor,
                   fontSize: 12,
@@ -85,8 +86,8 @@ class _CartItemRowState extends State<CartItemRow> {
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$')),
                 ],
                 decoration: InputDecoration(
-                  labelText: 'السعر الجديد',
-                  suffixText: 'ج.م',
+                  labelText: AppLocalizations.of(context).newPriceLabel,
+                  suffixText: AppLocalizations.of(context).currencyEg,
                   border: const OutlineInputBorder(),
                   filled: true,
                   fillColor: AppColors.surfaceColor,
@@ -97,7 +98,7 @@ class _CartItemRowState extends State<CartItemRow> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: Text(AppLocalizations.of(context).cancelBtn),
             ),
             ElevatedButton(
               onPressed: () {
@@ -109,7 +110,7 @@ class _CartItemRowState extends State<CartItemRow> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'السعر يجب أن يكون أكبر من أو يساوي ${widget.minPrice.toStringAsFixed(2)} ج.م',
+                        AppLocalizations.of(context).priceValidationError(widget.minPrice.toStringAsFixed(2), AppLocalizations.of(context).currencyEg),
                       ),
                       backgroundColor: AppColors.kDangerRed,
                     ),
@@ -119,7 +120,7 @@ class _CartItemRowState extends State<CartItemRow> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.kPrimaryBlue,
               ),
-              child: const Text('حفظ'),
+              child: Text(AppLocalizations.of(context).saveBtn),
             ),
           ],
         );
@@ -156,7 +157,7 @@ class _CartItemRowState extends State<CartItemRow> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${widget.name} (كود: ${widget.id})',
+                      '${widget.name} (${AppLocalizations.of(context).codeLabel(widget.id)})',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -169,7 +170,7 @@ class _CartItemRowState extends State<CartItemRow> {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
-                          'تاريخ: ${widget.date.year}/${widget.date.month}/${widget.date.day}',
+                          AppLocalizations.of(context).dateLabel('${widget.date.year}/${widget.date.month}/${widget.date.day}'),
                           style: TextStyle(
                             color: AppColors.mutedColor,
                             fontSize: 12,
@@ -198,7 +199,7 @@ class _CartItemRowState extends State<CartItemRow> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'متبقي: ${widget.remainingQuantity}',
+                                AppLocalizations.of(context).remainingLabel(widget.remainingQuantity),
                                 style: TextStyle(
                                   color: _getRemainingQuantityColor(),
                                   fontSize: 11,
@@ -232,7 +233,7 @@ class _CartItemRowState extends State<CartItemRow> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '${widget.price.toStringAsFixed(0)} ج.م',
+                              AppLocalizations.of(context).priceWithCurrency(widget.price.toStringAsFixed(0), AppLocalizations.of(context).currencyEg),
                               textAlign: TextAlign.center,
                               style: const TextStyle(fontSize: 14),
                             ),
@@ -274,7 +275,7 @@ class _CartItemRowState extends State<CartItemRow> {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    '${total.toStringAsFixed(0)} ج.م',
+                    AppLocalizations.of(context).priceWithCurrency(total.toStringAsFixed(0), AppLocalizations.of(context).currencyEg),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,

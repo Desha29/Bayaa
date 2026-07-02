@@ -2,6 +2,7 @@
 
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 import 'package:bayaa_pos/features/stock/presentation/cubit/stock_cubit.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -26,14 +27,14 @@ class StockScreen extends StatelessWidget {
       getIt<StockCubit>().restockProduct(product, result);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 900;
+    final l10n = AppLocalizations.of(context);
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
@@ -54,9 +55,9 @@ class StockScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const ScreenHeader(
-                                title: 'إدارة مخزون السلع',
-                                subtitle: 'متابعة المنتجات منخفضة الكمية وتحديث التوريدات وسد العجز بالمخازن',
+                              ScreenHeader(
+                                title: l10n.stockManagement,
+                                subtitle: l10n.stockManagementSubtitle,
                                 icon: LucideIcons.warehouse,
                                 iconColor: AppColors.primaryColor,
                                 titleColor: AppColors.textPrimary,
@@ -93,7 +94,7 @@ class StockScreen extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
-                                        'المنتجات التي تتطلب إعادة تخزين حالياً (${state.products.length})',
+                                        l10n.productsNeedRestock(state.products.length),
                                         style: const TextStyle(
                                           fontFamily: 'Cairo',
                                           fontWeight: FontWeight.bold,
@@ -116,7 +117,7 @@ class StockScreen extends StatelessWidget {
                               horizontal: isDesktop ? 32 : 16,
                             ),
                             child: state.products.isEmpty
-                                ? _buildEmptyState()
+                                ? _buildEmptyState(context)
                                 : ProductsGridView(
                                     products: state.products,
                                     onRestock: (index) {
@@ -138,7 +139,7 @@ class StockScreen extends StatelessWidget {
                   } else if (state is StockErrorState) {
                     return _buildErrorWidget(state, context);
                   } else {
-                    return _buildLoadingWidget();
+                    return _buildLoadingWidget(context);
                   }
                 },
               ),
@@ -149,7 +150,8 @@ class StockScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -167,9 +169,9 @@ class StockScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'المخزون مكتمل ولا توجد عواجز',
-            style: TextStyle(
+          Text(
+            l10n.stockComplete,
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 15,
               fontWeight: FontWeight.bold,
@@ -177,9 +179,9 @@ class StockScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'جميع السلع متوفرة بكميات تتجاوز الحد الأدنى للمخزون الموصى به',
-            style: TextStyle(
+          Text(
+            l10n.allProductsAvailable,
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 12,
               color: AppColors.mutedColor,
@@ -191,7 +193,8 @@ class StockScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingWidget() {
+  Widget _buildLoadingWidget(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -206,8 +209,8 @@ class StockScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'جاري جرد وتحديث بيانات المخزن اليومي...',
-            style: TextStyle(
+            l10n.loadingStockData,
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 12.5,
               color: AppColors.mutedColor,

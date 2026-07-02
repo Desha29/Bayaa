@@ -1,12 +1,10 @@
-// edit_store_info_dialog.dart
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import '../../../../core/components/app_logo.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
-
-
+import '../../../../l10n/app_localizations.dart';
 
 class EditStoreInfoDialog extends StatefulWidget {
   final Map<String, String> storeInfo;
@@ -27,7 +25,6 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
   late final TextEditingController vatCtrl;
   late final TextEditingController addressCtrl;
   String? logoPath;
-
 
   @override
   void initState() {
@@ -52,8 +49,9 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context);
     if (nameCtrl.text.trim().isEmpty) {
-      MotionSnackBarError(context, 'يرجى إدخال اسم المتجر');
+      MotionSnackBarError(context, l10n.enterStoreName);
       return;
     }
 
@@ -66,13 +64,14 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
       'logoPath': logoPath ?? '',
     };
 
-    MotionSnackBarSuccess(context, 'تم حفظ المعلومات بنجاح');
+    MotionSnackBarSuccess(context, l10n.infoSavedSuccess);
 
     Navigator.of(context).pop(updatedInfo);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
@@ -105,10 +104,10 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'تعديل معلومات المتجر',
-                      style: TextStyle(
+                      l10n.editStoreInfo,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -138,12 +137,18 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                                   height: 100,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.borderColor),
+                                    border: Border.all(
+                                        color: AppColors.borderColor),
                                   ),
                                   child: ClipOval(
-                                    child: logoPath != null && logoPath!.isNotEmpty
-                                        ? Image.file(File(logoPath!), fit: BoxFit.cover)
-                                        : const AppLogo(width: 100, height: 100, fit: BoxFit.cover),
+                                    child:
+                                        logoPath != null && logoPath!.isNotEmpty
+                                            ? Image.file(File(logoPath!),
+                                                fit: BoxFit.cover)
+                                            : const AppLogo(
+                                                width: 100,
+                                                height: 100,
+                                                fit: BoxFit.cover),
                                   ),
                                 ),
                                 GestureDetector(
@@ -153,7 +158,8 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                                     decoration: BoxDecoration(
                                       color: AppColors.primaryColor,
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 2),
+                                      border: Border.all(
+                                          color: Colors.white, width: 2),
                                     ),
                                     child: const Icon(Icons.camera_alt,
                                         size: 16, color: Colors.white),
@@ -167,12 +173,12 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                             _buildTwoColumnRow([
                               _buildTextField(
                                 nameCtrl,
-                                'اسم المتجر *',
+                                l10n.storeNameRequired,
                                 Icons.store,
                               ),
                               _buildTextField(
                                 phoneCtrl,
-                                'رقم الهاتف',
+                                l10n.storePhone,
                                 Icons.phone,
                                 TextInputType.phone,
                               ),
@@ -181,52 +187,52 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                             _buildTwoColumnRow([
                               _buildTextField(
                                 emailCtrl,
-                                'البريد الإلكتروني',
+                                l10n.storeEmail,
                                 Icons.email,
                                 TextInputType.emailAddress,
                               ),
                               _buildTextField(
                                 vatCtrl,
-                                'الرقم الضريبي',
+                                l10n.storeVat,
                                 Icons.receipt_long,
                               ),
                             ]),
                             const SizedBox(height: 16),
                             _buildTextField(
                               addressCtrl,
-                              'العنوان',
+                              l10n.storeAddress,
                               Icons.location_on,
                             ),
                           ] else ...[
                             _buildTextField(
                               nameCtrl,
-                              'اسم المتجر *',
+                              l10n.storeNameRequired,
                               Icons.store,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               phoneCtrl,
-                              'رقم الهاتف',
+                              l10n.storePhone,
                               Icons.phone,
                               TextInputType.phone,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               emailCtrl,
-                              'البريد الإلكتروني',
+                              l10n.storeEmail,
                               Icons.email,
                               TextInputType.emailAddress,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               vatCtrl,
-                              'الرقم الضريبي',
+                              l10n.storeVat,
                               Icons.receipt_long,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               addressCtrl,
-                              'العنوان',
+                              l10n.storeAddress,
                               Icons.location_on,
                             ),
                           ],
@@ -249,7 +255,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('إلغاء'),
+                      child: Text(l10n.cancel),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -264,7 +270,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('حفظ التعديلات'),
+                      child: Text(l10n.saveChanges),
                     ),
                   ),
                 ],
@@ -320,6 +326,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
       ),
     );
   }
+
   Future<void> _pickImage() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -333,7 +340,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
       }
     } catch (e) {
       if (mounted) {
-        MotionSnackBarError(context, "حدث خطأ أثناء اختيار الصورة");
+        MotionSnackBarError(context, AppLocalizations.of(context).error);
       }
     }
   }

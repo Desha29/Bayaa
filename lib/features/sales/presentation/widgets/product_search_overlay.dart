@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../products/data/models/product_model.dart';
 
@@ -94,7 +95,7 @@ class ProductSearchOverlay extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${product.price.toStringAsFixed(2)} ج.م',
+                      '${product.price.toStringAsFixed(2)} ${AppLocalizations.of(context).currencyEg}',
                       style: TextStyle(
                         color: AppColors.kPrimaryBlue,
                         fontWeight: FontWeight.bold,
@@ -102,7 +103,7 @@ class ProductSearchOverlay extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'المخزون: ${product.quantity}',
+                      AppLocalizations.of(context).stockLabel(product.quantity),
                       style: TextStyle(
                         color: product.quantity <= (product.minQuantity)
                             ? Colors.red

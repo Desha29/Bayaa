@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart'
@@ -36,10 +38,88 @@ class DashboardHome extends StatefulWidget {
 
 class _DashboardHomeState extends State<DashboardHome>
     with TickerProviderStateMixin {
-  late List<AnimationController> _controllers;
-  late List<Animation<double>> _animations;
+  late final List<AnimationController> _controllers;
+  late final List<Animation<double>> _animations;
   final store = getIt<SettingsCubit>().currentStoreInfo;
-  late List<Map<String, dynamic>> cards;
+  
+  int? _sessionCount;
+
+  List<Map<String, dynamic>> _getCards(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return [
+      {
+        "id": "sales",
+        "icon": LucideIcons.shoppingCart,
+        "title": l10n.sales,
+        "subtitle": l10n.salesSubtitle,
+        "color": AppColors.primaryColor,
+      },
+      {
+        "id": "invoices",
+        "icon": LucideIcons.fileText,
+        "title": l10n.invoices,
+        "subtitle": l10n.invoicesSubtitle,
+        "color": AppColors.accentGold,
+      },
+      {
+        "id": "products",
+        "icon": LucideIcons.package,
+        "title": l10n.products,
+        "subtitle": l10n.productsSubtitle,
+        "color": AppColors.successColor,
+      },
+      {
+        "id": "stock_alerts",
+        "icon": LucideIcons.triangleAlert,
+        "title": l10n.stockAlerts,
+        "subtitle": l10n.stockAlertsSubtitle,
+        "color": AppColors.warningColor,
+      },
+      {
+        "id": "stock_summary",
+        "icon": LucideIcons.layers,
+        "title": l10n.stockSummary,
+        "subtitle": l10n.stockSummarySubtitle,
+        "color": Colors.teal,
+      },
+      if (widget.isManager) ...[
+        {
+          "id": "reports",
+          "icon": LucideIcons.chartPie,
+          "title": l10n.reports,
+          "subtitle": l10n.reportsSubtitle,
+          "color": AppColors.primaryColor,
+        },
+        {
+          "id": "sessions",
+          "icon": LucideIcons.history,
+          "title": l10n.sessions,
+          "subtitle": _sessionCount != null
+              ? l10n.closedSessionsCount(_sessionCount!)
+              : l10n.sessionsSubtitle,
+          "color": Colors.orange,
+        },
+      ] else ...[
+        {
+          "id": "settings",
+          "icon": LucideIcons.settings,
+          "title": l10n.settings,
+          "subtitle": l10n.settingsSubtitle,
+          "color": Colors.blueGrey,
+        },
+      ],
+      if (!widget.isManager)
+        {
+          "id": "notifications",
+          "icon": LucideIcons.bell,
+          "title": l10n.notifications,
+          "subtitle": l10n.notificationsSubtitle,
+          "color": AppColors.darkGold,
+        },
+    ];
+  }
+
+  List<Map<String, dynamic>> get cards => _getCards(context);
 
   @override
   void initState() {
@@ -50,14 +130,12 @@ class _DashboardHomeState extends State<DashboardHome>
     getIt<StockCubit>().loadData();
     getIt<NotificationsCubit>().loadData();
 
-    _initCards();
-
     if (widget.isManager) {
       _loadSessionCount();
     }
 
     _controllers = List.generate(
-      cards.length,
+      7, // Dashboard always contains exactly 7 items
       (index) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 600),
@@ -68,84 +146,12 @@ class _DashboardHomeState extends State<DashboardHome>
         .map((c) => CurvedAnimation(parent: c, curve: Curves.easeOutBack))
         .toList();
 
-    Future.forEach(List.generate(cards.length, (i) => i), (i) async {
+    Future.forEach(List.generate(7, (i) => i), (i) async {
       await Future.delayed(Duration(milliseconds: i * 100));
       if (mounted && i < _controllers.length) {
         _controllers[i].forward();
       }
     });
-  }
-
-  void _initCards() {
-    cards = [
-      {
-        "id": "sales",
-        "icon": LucideIcons.shoppingCart,
-        "title": "المبيعات",
-        "subtitle": "إدارة عمليات البيع",
-        "color": AppColors.primaryColor,
-      },
-      {
-        "id": "invoices",
-        "icon": LucideIcons.fileText,
-        "title": "الفواتير",
-        "subtitle": "إدارة الفواتير",
-        "color": AppColors.accentGold,
-      },
-      {
-        "id": "products",
-        "icon": LucideIcons.package,
-        "title": "المنتجات",
-        "subtitle": "إدارة المخزون",
-        "color": AppColors.successColor,
-      },
-      {
-        "id": "stock_alerts",
-        "icon": LucideIcons.triangleAlert,
-        "title": "المنتجات الناقصة",
-        "subtitle": "تنبيهات المخزون",
-        "color": AppColors.warningColor,
-      },
-      {
-        "id": "stock_summary",
-        "icon": LucideIcons.layers,
-        "title": "ملخص المخزون",
-        "subtitle": "تصنيفات المخزون",
-        "color": Colors.teal,
-      },
-      if (widget.isManager) ...[
-        {
-          "id": "reports",
-          "icon": LucideIcons.chartPie,
-          "title": "الإحصائيات",
-          "subtitle": "تحليلات النظام",
-          "color": AppColors.primaryColor,
-        },
-        {
-          "id": "sessions",
-          "icon": LucideIcons.history,
-          "title": "الايام",
-          "subtitle": "سجل الأيام المغلقة",
-          "color": Colors.orange,
-        },
-      ] else ...[
-        {
-          "id": "settings",
-          "icon": LucideIcons.settings,
-          "title": "الإعدادات",
-          "subtitle": "إدارة إعدادات النظام",
-          "color": Colors.blueGrey,
-        },
-      ],
-      if (!widget.isManager)
-        {
-          "id": "notifications",
-          "icon": LucideIcons.bell,
-          "title": "التنبيهات",
-          "subtitle": "الإشعارات والتنبيهات",
-          "color": AppColors.darkGold,
-        },
-    ];
   }
 
   Future<void> _loadSessionCount() async {
@@ -155,10 +161,7 @@ class _DashboardHomeState extends State<DashboardHome>
 
       if (mounted) {
         setState(() {
-          final index = cards.indexWhere((c) => c['id'] == 'sessions');
-          if (index != -1) {
-            cards[index]['subtitle'] = '$count يوم مغلق';
-          }
+          _sessionCount = count;
         });
       }
     } catch (e) {
@@ -247,6 +250,7 @@ class _DashboardHomeState extends State<DashboardHome>
   }
 
   Widget _buildStatisticalCards() {
+    final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final crossAxisCount = constraints.maxWidth < 600
@@ -281,8 +285,8 @@ class _DashboardHomeState extends State<DashboardHome>
                   }
                 }
                 return _buildStatCard(
-                  title: "مبيعات اليوم (صافي)",
-                  value: "${totalSales.toStringAsFixed(2)} ج.م",
+                  title: l10n.todaySalesNet,
+                  value: "${totalSales.toStringAsFixed(2)} ${l10n.currencyEg}",
                   icon: LucideIcons.trendingUp,
                   color: AppColors.primaryColor,
                 );
@@ -294,8 +298,8 @@ class _DashboardHomeState extends State<DashboardHome>
               builder: (context, state) {
                 final count = getIt<StockCubit>().products.length;
                 return _buildStatCard(
-                  title: "إجمالي المنتجات",
-                  value: "$count منتج",
+                  title: l10n.totalProducts,
+                  value: l10n.productCount(count),
                   icon: LucideIcons.package,
                   color: AppColors.successColor,
                 );
@@ -307,8 +311,8 @@ class _DashboardHomeState extends State<DashboardHome>
               builder: (context, state) {
                 final count = getIt<StockCubit>().totalCount;
                 return _buildStatCard(
-                  title: "تنبيهات النواقص",
-                  value: "$count منتج ناقص",
+                  title: l10n.lowStockAlerts,
+                  value: l10n.lowStockCount(count),
                   icon: LucideIcons.triangleAlert,
                   color: AppColors.warningColor,
                 );
@@ -320,8 +324,8 @@ class _DashboardHomeState extends State<DashboardHome>
               builder: (context, state) {
                 final count = getIt<NotificationsCubit>().total;
                 return _buildStatCard(
-                  title: "تنبيهات غير مقروءة",
-                  value: "$count تنبيه",
+                  title: l10n.unreadNotifications,
+                  value: l10n.notificationsCount(count),
                   icon: LucideIcons.bell,
                   color: AppColors.accentGold,
                 );
@@ -334,6 +338,7 @@ class _DashboardHomeState extends State<DashboardHome>
   }
 
   Widget _buildSalesTrendChart() {
+    final l10n = AppLocalizations.of(context);
     return BlocBuilder<InvoiceCubit, InvoiceState>(
       bloc: getIt<InvoiceCubit>(),
       builder: (context, state) {
@@ -370,25 +375,9 @@ class _DashboardHomeState extends State<DashboardHome>
           maxVal = 100.0;
         }
 
+        // Professional locale-aware day labels using DateFormat
         final dayLabels = days.map((d) {
-          switch (d.weekday) {
-            case DateTime.monday:
-              return 'الإثنين';
-            case DateTime.tuesday:
-              return 'الثلاثاء';
-            case DateTime.wednesday:
-              return 'الأربعاء';
-            case DateTime.thursday:
-              return 'الخميس';
-            case DateTime.friday:
-              return 'الجمعة';
-            case DateTime.saturday:
-              return 'السبت';
-            case DateTime.sunday:
-              return 'الأحد';
-            default:
-              return '';
-          }
+          return DateFormat('EEEE', l10n.localeName).format(d);
         }).toList();
 
         return Container(
@@ -412,9 +401,9 @@ class _DashboardHomeState extends State<DashboardHome>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "مؤشر المبيعات (آخر 7 أيام)",
-                    style: TextStyle(
+                  Text(
+                    l10n.salesTrendTitle,
+                    style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -429,9 +418,9 @@ class _DashboardHomeState extends State<DashboardHome>
                       color: AppColors.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      "صافي المبيعات اليومية",
-                      style: TextStyle(
+                    child: Text(
+                      l10n.dailyNetSales,
+                      style: const TextStyle(
                         color: AppColors.primaryColor,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -456,7 +445,7 @@ class _DashboardHomeState extends State<DashboardHome>
                         getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
                           return touchedBarSpots.map((barSpot) {
                             return LineTooltipItem(
-                              '${barSpot.y.toStringAsFixed(2)} ج.م',
+                              '${barSpot.y.toStringAsFixed(2)} ${l10n.currencyEg}',
                               const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -517,7 +506,7 @@ class _DashboardHomeState extends State<DashboardHome>
                             return Padding(
                               padding: const EdgeInsets.only(right: 6.0),
                               child: Text(
-                                '${value.toInt()} ج.م',
+                                '${value.toInt()} ${l10n.currencyEg}',
                                 style: TextStyle(
                                   color: AppColors.mutedColor.withOpacity(0.8),
                                   fontSize: 9,
@@ -586,6 +575,7 @@ class _DashboardHomeState extends State<DashboardHome>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         int crossAxisCount = 2;
@@ -608,9 +598,8 @@ class _DashboardHomeState extends State<DashboardHome>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ScreenHeader(
-                title: "لوحة التحكم",
-                subtitle:
-                    "مرحباً بك في نظام ${store?.name ?? "Bayaa"} لإدارة نقاط البيع",
+                title: l10n.dashboard,
+                subtitle: l10n.welcomeUser(store?.name ?? l10n.appName),
                 icon: LucideIcons.layoutDashboard,
                 titleColor: AppColors.textPrimary,
                 iconColor: AppColors.primaryColor,
@@ -626,7 +615,7 @@ class _DashboardHomeState extends State<DashboardHome>
                       flex: 6,
                       child: SingleChildScrollView(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Stale session warning banner
                             Builder(
@@ -640,9 +629,13 @@ class _DashboardHomeState extends State<DashboardHome>
                                   final hours = sessionAge.inHours;
                                   final days = hours ~/ 24;
                                   final remainingHours = hours % 24;
-                                  final ageText = days > 0
-                                      ? '$days يوم و $remainingHours ساعة'
-                                      : '$hours ساعة';
+                                  String ageText = '';
+                                  if (days > 0) {
+                                    ageText += '$days ${l10n.daysText} ';
+                                  }
+                                  if (remainingHours > 0 || days == 0) {
+                                    ageText += '$remainingHours ${l10n.hoursText}';
+                                  }
 
                                   return Container(
                                     width: double.infinity,
@@ -661,7 +654,7 @@ class _DashboardHomeState extends State<DashboardHome>
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Text(
-                                            'اليوم الحالي مفتوح منذ $ageText — يُنصح بإغلاقه وفتح يوم جديد',
+                                            l10n.sessionStaleWarning(ageText),
                                             style: TextStyle(
                                               color: Colors.orange.shade900,
                                               fontWeight: FontWeight.w600,
@@ -680,10 +673,10 @@ class _DashboardHomeState extends State<DashboardHome>
 
                                   String ageText = '';
                                   if (hours > 0) {
-                                    ageText += '$hours ساعة ';
+                                    ageText += '$hours ${l10n.hoursText} ';
                                   }
                                   if (minutes > 0 || hours == 0) {
-                                    ageText += '$minutes دقيقة';
+                                    ageText += '$minutes ${l10n.minutesText}';
                                   }
 
                                   return Container(
@@ -703,7 +696,7 @@ class _DashboardHomeState extends State<DashboardHome>
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Text(
-                                            'أنت الآن تعمل على يومية مفتوحة مسبقاً منذ $ageText',
+                                            l10n.sessionOpenInfo(ageText),
                                             style: TextStyle(
                                               color: Colors.blue.shade900,
                                               fontWeight: FontWeight.w600,
@@ -727,11 +720,11 @@ class _DashboardHomeState extends State<DashboardHome>
                             _buildSalesTrendChart(),
 
                             // Quick Actions title
-                            const Padding(
-                              padding: EdgeInsets.only(top: 8, bottom: 12),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8, bottom: 12),
                               child: Text(
-                                "إجراءات سريعة",
-                                style: TextStyle(
+                                l10n.quickActions,
+                                style: const TextStyle(
                                   color: AppColors.textPrimary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -752,6 +745,7 @@ class _DashboardHomeState extends State<DashboardHome>
                                 return _buildAnimatedCard(
                                   index: index,
                                   child: DashboardCard(
+                                    id: card["id"],
                                     icon: card["icon"],
                                     title: card["title"],
                                     subtitle: card["subtitle"],

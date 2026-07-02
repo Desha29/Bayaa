@@ -7,6 +7,7 @@ import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../products/data/models/product_model.dart';
 import 'priorty_chip.dart';
 import 'status_chip.dart';
@@ -30,6 +31,7 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final product = widget.product;
     final isOut = product.quantity == 0;
     final isLow = product.quantity > 0 && product.quantity < product.minQuantity;
@@ -159,9 +161,9 @@ class _ProductCardState extends State<ProductCard> {
                                 children: [
                                   Icon(LucideIcons.banknote, size: 12, color: AppColors.mutedColor.withOpacity(0.8)),
                                   const SizedBox(width: 4),
-                                  const Text(
-                                    "سعر البيع",
-                                    style: TextStyle(
+                                  Text(
+                                    l10n.sellingPrice,
+                                    style: const TextStyle(
                                       fontFamily: 'Cairo',
                                       fontSize: 11,
                                       color: AppColors.mutedColor,
@@ -172,7 +174,7 @@ class _ProductCardState extends State<ProductCard> {
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                "${product.price.toStringAsFixed(2)} ج.م",
+                                "${product.price.toStringAsFixed(2)} ${l10n.currencyEg}",
                                 style: const TextStyle(
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.w800,
@@ -195,9 +197,9 @@ class _ProductCardState extends State<ProductCard> {
                                 children: [
                                   Icon(LucideIcons.package, size: 12, color: AppColors.mutedColor.withOpacity(0.8)),
                                   const SizedBox(width: 4),
-                                  const Text(
-                                    "المخزون المتبقي",
-                                    style: TextStyle(
+                                  Text(
+                                    l10n.remaining,
+                                    style: const TextStyle(
                                       fontFamily: 'Cairo',
                                       fontSize: 11,
                                       color: AppColors.mutedColor,
@@ -210,7 +212,7 @@ class _ProductCardState extends State<ProductCard> {
                               Row(
                                 children: [
                                   Text(
-                                    "${product.quantity} وحدة",
+                                    l10n.unitCount(product.quantity),
                                     style: TextStyle(
                                       fontFamily: 'Cairo',
                                       fontWeight: FontWeight.w800,
@@ -270,7 +272,7 @@ class _ProductCardState extends State<ProductCard> {
                                     FittedBox(
                                       fit: BoxFit.scaleDown,
                                       child: Text(
-                                        'إعادة التخزين',
+                                        l10n.restock,
                                         style: TextStyle(
                                           fontFamily: 'Cairo',
                                           fontSize: 11.5,
@@ -298,6 +300,7 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   void disableMesg() {
-    MotionSnackBarWarning(context, "لا تملك الصلاحيات لإعادة تخزين المنتجات");
+    final l10n = AppLocalizations.of(context);
+    MotionSnackBarWarning(context, l10n.errAccessDenied);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class BarcodeScanCard extends StatelessWidget {
@@ -69,7 +70,7 @@ class BarcodeScanCard extends StatelessWidget {
                 onSubmitted: onSubmitted,
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
-                  hintText: 'امسح الباركود أو ابحث عن منتج...',
+                  hintText: AppLocalizations.of(context).barcodeScanHint,
                   hintStyle: TextStyle(color: AppColors.mutedColor),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,

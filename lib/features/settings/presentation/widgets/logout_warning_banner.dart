@@ -1,9 +1,10 @@
-// ignore_for_file: deprecated_member_use
 import 'package:bayaa_pos/core/functions/messege.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+
+import '../../../../l10n/app_localizations.dart';
 
 class LogoutWarningBanner extends StatelessWidget {
   const LogoutWarningBanner({
@@ -45,9 +46,9 @@ class LogoutWarningBanner extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'تسجيل الخروج',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context).logout,
+                    style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontWeight: FontWeight.w800,
                       fontSize: 13,
@@ -56,7 +57,7 @@ class LogoutWarningBanner extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'سيتم إنهاء يوم العمل الحالي والعودة لشاشة الدخول',
+                    AppLocalizations.of(context).logoutWarningMessage,
                     style: TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 11,
@@ -94,10 +95,13 @@ class LogoutWarningBanner extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(LucideIcons.logOut, size: 14, color: Colors.white),
+                      const Icon(LucideIcons.logOut,
+                          size: 14, color: Colors.white),
                       const SizedBox(width: 6),
                       Text(
-                        isMobile ? 'خروج' : 'تسجيل الخروج',
+                        isMobile
+                            ? AppLocalizations.of(context).logoutShort
+                            : AppLocalizations.of(context).logout,
                         style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w700,

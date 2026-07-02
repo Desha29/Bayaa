@@ -9,6 +9,7 @@ import '../../../core/components/empty_state.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/di/dependency_injection.dart';
 
+import '../../../l10n/app_localizations.dart';
 import 'widgets/filters_bar.dart';
 import 'widgets/notification_card.dart';
 import 'widgets/summary_row.dart';
@@ -18,8 +19,10 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection:
+          l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: SafeArea(

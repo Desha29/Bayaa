@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
+
 import '../../../../core/constants/app_colors.dart';
 import 'cart_item.dart';
 
@@ -18,12 +20,11 @@ class CartSection extends StatelessWidget {
     this.onEditPrice,
   });
 
- int _calculateRemainingQuantity(Map<String, dynamic> item) {
-  final quantityInStock = item['quantity'] ?? 0;      
-  final currentQuantityInCart = item['qty'] ?? 0;   
-  return quantityInStock - currentQuantityInCart;     
-}
-
+  int _calculateRemainingQuantity(Map<String, dynamic> item) {
+    final quantityInStock = item['quantity'] ?? 0;
+    final currentQuantityInCart = item['qty'] ?? 0;
+    return quantityInStock - currentQuantityInCart;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,7 @@ class CartSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'قائمة المنتجات',
+                    AppLocalizations.of(context).cartProductList,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.secondaryColor,
@@ -81,7 +82,8 @@ class CartSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.surfaceColor,
                       borderRadius: BorderRadius.circular(8),
@@ -100,7 +102,7 @@ class CartSection extends StatelessWidget {
             Divider(height: 1, color: AppColors.borderColor),
             Expanded(
               child: cartItems.isEmpty
-                  ? _buildEmptyState()
+                  ? _buildEmptyState(context)
                   : ListView.separated(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       itemCount: cartItems.length,
@@ -116,13 +118,14 @@ class CartSection extends StatelessWidget {
                           id: item['id'],
                           price: item['price'],
                           quantity: item['qty'],
-                          remainingQuantity: _calculateRemainingQuantity(item), 
+                          remainingQuantity: _calculateRemainingQuantity(item),
                           date: item['date'],
                           minPrice: item['minPrice'] ?? 0.0,
                           onRemove: () => onRemoveItem?.call(index),
                           onIncrease: () => onIncreaseQty?.call(index),
                           onDecrease: () => onDecreaseQty?.call(index),
-                          onEditPrice: (newPrice) => onEditPrice?.call(index, newPrice),
+                          onEditPrice: (newPrice) =>
+                              onEditPrice?.call(index, newPrice),
                         );
                       },
                     ),
@@ -133,7 +136,7 @@ class CartSection extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: SingleChildScrollView(
         child: Column(
@@ -153,7 +156,7 @@ class CartSection extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'السلة فارغة',
+              AppLocalizations.of(context).cartEmptyTitle,
               style: TextStyle(
                 color: AppColors.mutedColor,
                 fontSize: 16,
@@ -162,7 +165,7 @@ class CartSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'قم بمسح المنتجات لإضافتها',
+              AppLocalizations.of(context).cartEmptySubtitle,
               style: TextStyle(
                 color: AppColors.mutedColor.withOpacity(0.7),
                 fontSize: 14,
