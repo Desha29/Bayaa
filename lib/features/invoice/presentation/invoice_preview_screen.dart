@@ -8,6 +8,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../data/invoice_models.dart';
 import '../domain/invoice_pdf_service.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class InvoicePreviewScreen extends StatelessWidget {
   final InvoiceData data;
@@ -21,6 +22,7 @@ class InvoicePreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -31,7 +33,7 @@ class InvoicePreviewScreen extends StatelessWidget {
         ? (isMobile ? 200.0 : isTablet ? 240.0 : 280.0)
         : (isMobile ? 350.0 : isTablet ? 500.0 : 650.0);
 
-    final titleText = receiptMode ? 'إيصال دفع حراري (80mm)' : 'فاتورة مبيعات (A4)';
+    final titleText = receiptMode ? l10n.thermalReceiptTitle : l10n.a4InvoiceTitle;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -58,7 +60,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'رقم الفاتورة: #${data.invoiceId}',
+                l10n.invoiceNumberLabel(data.invoiceId),
                 style: const TextStyle(
                   fontFamily: 'Cairo',
                   color: AppColors.mutedColor,
@@ -72,14 +74,14 @@ class InvoicePreviewScreen extends StatelessWidget {
           actions: [
             _buildHeaderAction(
               icon: LucideIcons.printer,
-              tooltip: 'طباعة فورية',
+              tooltip: l10n.instantPrint,
               color: AppColors.primaryColor,
               onPressed: () => _handlePrint(context),
             ),
             const SizedBox(width: 8),
             _buildHeaderAction(
               icon: LucideIcons.share2,
-              tooltip: 'مشاركة PDF',
+              tooltip: l10n.sharePdf,
               color: AppColors.secondaryColor,
               onPressed: () => _handleShare(context),
             ),

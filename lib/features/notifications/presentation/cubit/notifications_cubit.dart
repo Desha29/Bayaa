@@ -3,6 +3,7 @@ import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 
+import '../../../../core/components/message_overlay.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/state/state_synchronizer.dart';
 import '../../../../core/logging/file_logger.dart';
@@ -95,8 +96,8 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
     // await Future.delayed(const Duration(seconds: 1));
     emit(NotificationsError(
       product.quantity == 0
-          ? 'المنتج نفد من المخزون'
-          : 'كمية المنتج في المخزون منخفضة (${product.quantity})',
+          ? GlobalMessage.l10n.productOutOfStock
+          : GlobalMessage.l10n.productLowStock(product.quantity),
     ));
     // Restore loaded state immediately so list view continues to work
     emit(NotificationsLoaded(_notifications));

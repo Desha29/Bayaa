@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 
+import 'package:bayaa_pos/l10n/app_localizations.dart';
+
 class PriorityChip extends StatelessWidget {
   final String priority;
 
@@ -8,19 +10,25 @@ class PriorityChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Color color;
+    String displayLabel;
     switch (priority) {
-      case "عاجل جداً":
+      case "very_urgent":
         color = AppColors.errorColor;
+        displayLabel = l10n.priorityVeryUrgent;
         break;
-      case "عاجل":
+      case "urgent":
         color = AppColors.warningColor;
+        displayLabel = l10n.priorityUrgent;
         break;
-      case "متوسط":
+      case "medium":
         color = AppColors.primaryColor;
+        displayLabel = l10n.priorityMedium;
         break;
       default:
         color = AppColors.successColor;
+        displayLabel = l10n.priorityMedium; // Fallback or could add low priority string
     }
 
     return Container(
@@ -34,7 +42,7 @@ class PriorityChip extends StatelessWidget {
         ),
       ),
       child: Text(
-        priority,
+        displayLabel,
         style: TextStyle(
           fontFamily: 'Cairo',
           fontSize: 10,

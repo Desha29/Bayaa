@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../cubit/invoice_state.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class InvoiceFilterSection extends StatelessWidget {
   final bool isDesktop;
@@ -41,6 +42,7 @@ class InvoiceFilterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -55,11 +57,11 @@ class InvoiceFilterSection extends StatelessWidget {
         ],
       ),
       padding: EdgeInsets.all(isDesktop ? 20 : 16),
-      child: isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
+      child: isDesktop ? _buildDesktopLayout(l10n) : _buildMobileLayout(l10n),
     );
   }
 
-  Widget _buildDesktopLayout() {
+  Widget _buildDesktopLayout(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -67,11 +69,11 @@ class InvoiceFilterSection extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _buildSearchField(),
+              child: _buildSearchField(l10n),
             ),
             if (searchQuery.isNotEmpty) ...[
               const SizedBox(width: 12),
-              _buildSearchBadge(),
+              _buildSearchBadge(l10n),
             ],
           ],
         ),
@@ -79,7 +81,7 @@ class InvoiceFilterSection extends StatelessWidget {
         // Filter + Date + Actions Row
         Row(
           children: [
-            _buildFilterTypeSelector(),
+            _buildFilterTypeSelector(l10n),
             const SizedBox(width: 20),
             Container(
               width: 1.2,
@@ -90,17 +92,17 @@ class InvoiceFilterSection extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  Flexible(child: _buildDateButton('من تاريخ', startDate, true)),
+                  Flexible(child: _buildDateButton(l10n.fromDate, startDate, true, l10n: l10n)),
                   const SizedBox(width: 12),
-                  Flexible(child: _buildDateButton('إلى تاريخ', endDate, false)),
+                  Flexible(child: _buildDateButton(l10n.toDate, endDate, false, l10n: l10n)),
                 ],
               ),
             ),
             const SizedBox(width: 16),
-            _buildClearButton(),
+            _buildClearButton(l10n),
             if (isManager) ...[
               const SizedBox(width: 8),
-              _buildDeleteButton(),
+              _buildDeleteButton(l10n),
             ],
           ],
         ),
@@ -108,28 +110,28 @@ class InvoiceFilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildMobileLayout() {
+  Widget _buildMobileLayout(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSearchField(),
+        _buildSearchField(l10n),
         if (searchQuery.isNotEmpty) ...[
           const SizedBox(height: 10),
-          _buildSearchBadge(),
+          _buildSearchBadge(l10n),
         ],
         const SizedBox(height: 14),
-        _buildFilterTypeSelector(),
+        _buildFilterTypeSelector(l10n),
         const SizedBox(height: 14),
-        _buildDateButton('من تاريخ', startDate, true),
+        _buildDateButton(l10n.fromDate, startDate, true, l10n: l10n),
         const SizedBox(height: 10),
-        _buildDateButton('إلى تاريخ', endDate, false),
+        _buildDateButton(l10n.toDate, endDate, false, l10n: l10n),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildClearButton()),
+            Expanded(child: _buildClearButton(l10n)),
             if (isManager) ...[
               const SizedBox(width: 8),
-              Expanded(child: _buildDeleteButton()),
+              Expanded(child: _buildDeleteButton(l10n)),
             ],
           ],
         ),
@@ -137,7 +139,7 @@ class InvoiceFilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchField() {
+  Widget _buildSearchField(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.backgroundColor,
@@ -149,7 +151,7 @@ class InvoiceFilterSection extends StatelessWidget {
         controller: barcodeSearchController,
         style: const TextStyle(fontFamily: 'Cairo', fontSize: 14, color: AppColors.textPrimary),
         decoration: InputDecoration(
-          hintText: 'امسح الباركود أو اكتب رقم الفاتورة...',
+          hintText: l10n.searchInvoiceHint,
           hintStyle: TextStyle(color: AppColors.mutedColor.withOpacity(0.6), fontSize: 13, fontFamily: 'Cairo'),
           prefixIcon: Icon(LucideIcons.search, color: AppColors.primaryColor.withOpacity(0.6), size: 18),
           border: InputBorder.none,
@@ -164,7 +166,7 @@ class InvoiceFilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBadge() {
+  Widget _buildSearchBadge(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -178,7 +180,7 @@ class InvoiceFilterSection extends StatelessWidget {
           const Icon(LucideIcons.search, color: AppColors.primaryColor, size: 13),
           const SizedBox(width: 6),
           Text(
-            'بحث: $searchQuery',
+            l10n.searchLabel(searchQuery),
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -196,15 +198,15 @@ class InvoiceFilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterTypeSelector() {
+  Widget _buildFilterTypeSelector(AppLocalizations l10n) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildFilterChip('الكل', InvoiceFilterType.all),
+        _buildFilterChip(l10n.all, InvoiceFilterType.all),
         const SizedBox(width: 6),
-        _buildFilterChip('مبيعات', InvoiceFilterType.sales),
+        _buildFilterChip(l10n.salesFilter, InvoiceFilterType.sales),
         const SizedBox(width: 6),
-        _buildFilterChip('مرتجعات', InvoiceFilterType.refunded),
+        _buildFilterChip(l10n.refundsFilter, InvoiceFilterType.refunded),
       ],
     );
   }
@@ -242,7 +244,7 @@ class InvoiceFilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDateButton(String label, DateTime? date, bool isStart) {
+  Widget _buildDateButton(String label, DateTime? date, bool isStart, {required AppLocalizations l10n}) {
     return InkWell(
       onTap: () => onSelectDate(isStart),
       borderRadius: BorderRadius.circular(12),
@@ -279,7 +281,7 @@ class InvoiceFilterSection extends StatelessWidget {
                   Text(
                     date != null
                         ? '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'
-                        : 'اختر التاريخ',
+                        : l10n.selectDate,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -296,7 +298,7 @@ class InvoiceFilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildClearButton() {
+  Widget _buildClearButton(AppLocalizations l10n) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -309,15 +311,15 @@ class InvoiceFilterSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: AppColors.borderColor.withOpacity(0.6)),
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(LucideIcons.rotateCcw, size: 16, color: AppColors.textSecondary),
+              const Icon(LucideIcons.rotateCcw, size: 16, color: AppColors.textSecondary),
               const SizedBox(width: 8),
               Text(
-                'مسح الفلاتر',
-                style: TextStyle(
+                l10n.clearFilters,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Cairo',
@@ -331,10 +333,10 @@ class InvoiceFilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDeleteButton() {
+  Widget _buildDeleteButton(AppLocalizations l10n) {
     final enabled = startDate != null && endDate != null;
     return Tooltip(
-      message: !enabled ? 'يجب تحديد نطاق التاريخ أولاً' : 'حذف الفواتير',
+      message: !enabled ? l10n.selectDateRangeFirst : l10n.deleteInvoices,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -354,7 +356,7 @@ class InvoiceFilterSection extends StatelessWidget {
                 Icon(LucideIcons.trash2, size: 16, color: enabled ? Colors.white : AppColors.mutedColor),
                 const SizedBox(width: 8),
                 Text(
-                  'مسح الفواتير',
+                  l10n.clearInvoices,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,

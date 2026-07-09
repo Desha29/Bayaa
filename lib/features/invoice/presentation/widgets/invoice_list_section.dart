@@ -3,6 +3,7 @@ import '../../../sales/data/models/sale_model.dart';
 import 'invoice_card.dart';
 
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class InvoiceListSection extends StatelessWidget {
   final bool loading;
@@ -32,6 +33,7 @@ class InvoiceListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (loading) {
       return Center(
         child: Column(
@@ -40,7 +42,7 @@ class InvoiceListSection extends StatelessWidget {
             const CircularProgressIndicator(color: AppColors.primaryColor),
             const SizedBox(height: 16),
             Text(
-              'جاري تحميل الفواتير...',
+              l10n.loadingInvoices,
               style: TextStyle(color: AppColors.mutedColor, fontSize: 13),
             ),
           ],
@@ -69,8 +71,8 @@ class InvoiceListSection extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 startDate != null || endDate != null
-                    ? 'لا توجد فواتير في الفترة المحددة'
-                    : 'لا توجد فواتير حديثة',
+                    ? l10n.noInvoicesInPeriod
+                    : l10n.noRecentInvoices,
                 style: const TextStyle(
                   fontSize: 16,
                   color: AppColors.mutedColor,
@@ -79,7 +81,7 @@ class InvoiceListSection extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'جرب تغيير معايير البحث أو الفلتر',
+                l10n.tryChangingFilter,
                 style: TextStyle(
                   fontSize: 12,
                   color: AppColors.mutedColor.withOpacity(0.6),

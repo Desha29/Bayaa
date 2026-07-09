@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../sales/data/models/sale_model.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class InvoiceCard extends StatefulWidget {
   final Sale sale;
@@ -31,8 +32,9 @@ class _InvoiceCardState extends State<InvoiceCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final df = DateFormat('yyyy-MM-dd  hh:mm a', 'en');
-    final cashierName = widget.sale.cashierName ?? 'الكاشير';
+    final cashierName = widget.sale.cashierName ?? l10n.cashier;
     final sale = widget.sale;
     final screenWidth = MediaQuery.of(context).size.width;
     final isCompact = screenWidth < 700;
@@ -84,9 +86,9 @@ class _InvoiceCardState extends State<InvoiceCard> {
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(isCompact ? 12 : 16),
-                        child: isCompact 
-                            ? _buildCompactLayout(sale, df, cashierName) 
-                            : _buildDesktopLayout(sale, df, cashierName),
+                        child: isCompact
+                            ? _buildCompactLayout(l10n, sale, df, cashierName)
+                            : _buildDesktopLayout(l10n, sale, df, cashierName),
                       ),
                     ),
                   ),
@@ -99,7 +101,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
     );
   }
 
-  Widget _buildDesktopLayout(Sale sale, DateFormat df, String cashierName) {
+  Widget _buildDesktopLayout(AppLocalizations l10n, Sale sale, DateFormat df, String cashierName) {
     return Row(
       children: [
         // Icon
@@ -125,7 +127,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
               Row(
                 children: [
                   Text(
-                    'فاتورة #${sale.id.length > 8 ? sale.id.substring(0, 8) : sale.id}',
+                    l10n.invoiceNumber(sale.id.length > 8 ? sale.id.substring(0, 8) : sale.id),
                     style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 15,
@@ -142,8 +144,8 @@ class _InvoiceCardState extends State<InvoiceCard> {
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: AppColors.errorColor.withOpacity(0.2)),
                       ),
-                      child: const Text(
-                        'مرتجع',
+                      child: Text(
+                        l10n.refunded,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 10,
@@ -160,7 +162,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
                 children: [
                   _buildInfoChip(LucideIcons.user, cashierName),
                   _buildDot(),
-                  _buildInfoChip(LucideIcons.package, '${sale.items} أصناف'),
+                  _buildInfoChip(LucideIcons.package, l10n.itemsCount(sale.items)),
                   _buildDot(),
                   _buildInfoChip(LucideIcons.clock, df.format(sale.date)),
                 ],
@@ -173,7 +175,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '${sale.total.toStringAsFixed(2)} ج.م',
+              '${sale.total.toStringAsFixed(2)} ${l10n.currencyEg}',
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 18,
@@ -184,7 +186,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
             const SizedBox(height: 8),
             Row(
               mainAxisSize: MainAxisSize.min,
-              children: _buildActions(),
+              children: _buildActions(l10n),
             ),
           ],
         ),
@@ -192,7 +194,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
     );
   }
 
-  Widget _buildCompactLayout(Sale sale, DateFormat df, String cashierName) {
+  Widget _buildCompactLayout(AppLocalizations l10n, Sale sale, DateFormat df, String cashierName) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -219,7 +221,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
                   Row(
                     children: [
                       Text(
-                        'فاتورة #${sale.id.length > 8 ? sale.id.substring(0, 8) : sale.id}',
+                        l10n.invoiceNumber(sale.id.length > 8 ? sale.id.substring(0, 8) : sale.id),
                         style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 13,
@@ -235,8 +237,8 @@ class _InvoiceCardState extends State<InvoiceCard> {
                             color: AppColors.errorColor.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text(
-                            'مرتجع',
+                          child: Text(
+                            l10n.refunded,
                             style: TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 9,
@@ -257,7 +259,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
               ),
             ),
             Text(
-              '${sale.total.toStringAsFixed(2)} ج.م',
+              '${sale.total.toStringAsFixed(2)} ${l10n.currencyEg}',
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 15,
@@ -272,10 +274,10 @@ class _InvoiceCardState extends State<InvoiceCard> {
           children: [
             _buildInfoChip(LucideIcons.user, cashierName),
             _buildDot(),
-            _buildInfoChip(LucideIcons.package, '${sale.items} أصناف'),
+            _buildInfoChip(LucideIcons.package, l10n.itemsCount(sale.items)),
             const Spacer(),
-            ...List.generate(_buildActions().length, (i) {
-              final actions = _buildActions();
+            ...List.generate(_buildActions(l10n).length, (i) {
+              final actions = _buildActions(l10n);
               if (i > 0) return Padding(padding: const EdgeInsets.only(right: 6), child: actions[i]);
               return actions[i];
             }),
@@ -311,12 +313,12 @@ class _InvoiceCardState extends State<InvoiceCard> {
     );
   }
 
-  List<Widget> _buildActions() {
+  List<Widget> _buildActions(AppLocalizations l10n) {
     return [
       if (widget.onReturn != null)
         _buildActionButton(
           LucideIcons.undo2,
-          'مرتجع',
+          l10n.refunded,
           AppColors.warningColor,
           widget.onReturn!,
         ),
@@ -324,7 +326,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
         const SizedBox(width: 6),
         _buildActionButton(
           LucideIcons.trash2,
-          'حذف',
+          l10n.delete,
           AppColors.errorColor,
           widget.onDelete!,
         ),
@@ -332,7 +334,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
       const SizedBox(width: 6),
       _buildActionButton(
         LucideIcons.printer,
-        'طباعة',
+        l10n.print,
         AppColors.primaryColor,
         widget.onPrint,
       ),

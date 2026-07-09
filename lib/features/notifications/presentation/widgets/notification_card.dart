@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
@@ -48,6 +49,7 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
@@ -107,7 +109,7 @@ class NotificationCard extends StatelessWidget {
                     const Spacer(),
                     // Mark as read/unread
                     Tooltip(
-                      message: item.read ? 'وضع كغير مقروء' : 'وضع كمقروء',
+                      message: item.read ? l10n.markAsReadUnread : l10n.markAsRead,
                       child: IconButton(
                         onPressed: onMarkReadToggle,
                         icon: Icon(
@@ -125,7 +127,7 @@ class NotificationCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     // Trash Delete Button
                     Tooltip(
-                      message: 'حذف التنبيه',
+                      message: l10n.deleteNotification,
                       child: IconButton(
                         onPressed: onDelete,
                         icon: const Icon(
@@ -293,7 +295,7 @@ class NotificationCard extends StatelessWidget {
                               children: [
                                 _MetaChip(
                                   icon: LucideIcons.hash,
-                                  text: 'كود المنتج: ${item.sku}',
+                                  text: l10n.productCode(item.sku),
                                 ),
                                 if (item.quantityHint != null) ...[
                                   const SizedBox(width: 8),

@@ -1,9 +1,11 @@
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../cubit/product_cubit.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 
 class EnhancedAddEditProductDialog extends StatefulWidget {
@@ -48,11 +50,11 @@ class _EnhancedAddEditProductDialogState
     wholesalePriceCtrl =
         TextEditingController(text: p?.wholesalePrice.toString() ?? '');
     
-    // Filter out "الكل" from valid categories
-    final validCategories = widget.categories.where((c) => c != 'الكل').toList();
+    // Filter out "All" from valid categories
+    final validCategories = widget.categories.where((c) => c != GlobalMessage.l10n.all).toList();
     
-    // Set initial category, ensuring it's not "الكل"
-    if (p?.category != null && p!.category != 'الكل' && validCategories.contains(p.category)) {
+    // Set initial category, ensuring it's not "All"
+    if (p?.category != null && p!.category != GlobalMessage.l10n.all && validCategories.contains(p.category)) {
       selectedCategory = p.category;
     } else {
       selectedCategory = validCategories.isNotEmpty ? validCategories.first : '';
@@ -72,32 +74,33 @@ class _EnhancedAddEditProductDialogState
   }
 
   Future<void> _submit() async {
-    // ✅ تحقق من جميع الحقول قبل الحفظ
+    // ✅ Validate all fields before saving
     if (!_formKey.currentState!.validate()) return;
 
     final barcode = barcodeCtrl.text.trim();
-    
+    final l10n = AppLocalizations.of(context);
+
     // Check for duplicates if adding new product
     if (widget.productToEdit == null) {
       if (!mounted) return;
       final exists = await getIt<ProductCubit>().checkProductExists(barcode);
       if (!mounted) return;
-      
+
       if (exists) {
-         
+
          showDialog(
            context: context,
            builder: (ctx) => AlertDialog(
-             title: const Row(children: [
-               Icon(Icons.error_outline, color: AppColors.errorColor),
-               SizedBox(width: 8),
-               Text('خطأ في الباركود'),
+             title: Row(children: [
+               const Icon(Icons.error_outline, color: AppColors.errorColor),
+               const SizedBox(width: 8),
+               Text(l10n.barcodeError),
              ]),
-             content: Text('المنتج ذو الباركود "$barcode" موجود بالفعل.\nالرجاء استخدام باركود مختلف أو تعديل المنتج الموجود.'),
+             content: Text(l10n.barcodeExistsMessage(barcode)),
              actions: [
                TextButton(
-                 onPressed: () => Navigator.pop(ctx), 
-                 child: const Text('حسناً')
+                 onPressed: () => Navigator.pop(ctx),
+                 child: Text(l10n.ok)
                )
              ],
            )
@@ -126,6 +129,7 @@ class _EnhancedAddEditProductDialogState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
@@ -166,8 +170,8 @@ class _EnhancedAddEditProductDialogState
                       alignment: Alignment.centerRight,
                       child: Text(
                         widget.productToEdit == null
-                            ? 'إضافة منتج جديد'
-                            : 'تعديل المنتج',
+                            ? l10n.addNewProduct
+                            : l10n.editProduct,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -189,16 +193,17 @@ class _EnhancedAddEditProductDialogState
                     builder: (context, constraints) {
                       final isWide = constraints.maxWidth > 500;
                       return Form(
-                        key: _formKey, // ✅ مفتاح التحقق
+                        key: _formKey, // ✅ Validation key
                         child: Column(
                           children: [
                             if (isWide) ...[
                               _buildTwoColumnRow([
+                                _buildTextField(l10n,
+                                    nameCtrl, l10n.productName, Icons.inventory_2),
                                 _buildTextField(
-                                    nameCtrl, 'اسم المنتج', Icons.inventory_2),
-                                _buildTextField(
+                                  l10n,
                                   barcodeCtrl,
-                                  'رقم الباركود',
+                                  l10n.barcodeNumber,
                                   readOnly: (widget.productToEdit == null)
                                       ? false
                                       : true,
@@ -206,49 +211,49 @@ class _EnhancedAddEditProductDialogState
                                 )
                               ]),
                               const SizedBox(height: 16),
-                              _buildTextField(wholesalePriceCtrl, 'سعرالجملة',
+                              _buildTextField(l10n, wholesalePriceCtrl, l10n.wholesalePriceLabel,
                                   Icons.price_change,
                                   keyboardType: TextInputType.number),
                               const SizedBox(height: 16),
                               _buildTwoColumnRow([
-                                _buildTextField(minPriceCtrl, 'الحدالأدنى للسعر',
+                                _buildTextField(l10n, minPriceCtrl, l10n.minPriceLabel2,
                                     Icons.price_change,
                                     keyboardType: TextInputType.number),
-                                _buildTextField(priceCtrl, 'سعر البيع',
+                                _buildTextField(l10n, priceCtrl, l10n.sellingPrice,
                                     Icons.attach_money,
                                     keyboardType: TextInputType.number),
                               ]),
                               const SizedBox(height: 16),
                               _buildTwoColumnRow([
-                                _buildTextField(qtyCtrl, 'الكميةالمتوفرة',
+                                _buildTextField(l10n, qtyCtrl, l10n.availableQty,
                                     Icons.inventory,
                                     keyboardType: TextInputType.number),
-                                _buildTextField(minQtyCtrl, 'الحدالأدنى للمخزون',
+                                _buildTextField(l10n, minQtyCtrl, l10n.minStockLevel,
                                     Icons.trending_down,
                                     keyboardType: TextInputType.number),
                               ]),
                             ] else ...[
                               const SizedBox(height: 16),
                               _buildTextField(
-                                  nameCtrl, 'اسم المنتج', Icons.inventory_2),
+                                  l10n, nameCtrl, l10n.productName, Icons.inventory_2),
                               const SizedBox(height: 16),
-                              _buildTextField(barcodeCtrl, 'رقم الباركود',
+                              _buildTextField(l10n, barcodeCtrl, l10n.barcodeNumber,
                                   Icons.qr_code_scanner),
                               const SizedBox(height: 16),
-                              _buildTextField(priceCtrl, 'سعر البيع',
+                              _buildTextField(l10n, priceCtrl, l10n.sellingPrice,
                                   Icons.attach_money,
                                   keyboardType: TextInputType.number),
                               const SizedBox(height: 16),
-                              _buildTextField(qtyCtrl, 'الكميةالمتوفرة',
+                              _buildTextField(l10n, qtyCtrl, l10n.availableQty,
                                   Icons.inventory,
                                   keyboardType: TextInputType.number),
                               const SizedBox(height: 16),
-                              _buildTextField(minQtyCtrl, 'الحدالأدنى للمخزون',
+                              _buildTextField(l10n, minQtyCtrl, l10n.minStockLevel,
                                   Icons.trending_down,
                                   keyboardType: TextInputType.number),
                             ],
                             const SizedBox(height: 16),
-                            _buildCategoryDropdown(),
+                            _buildCategoryDropdown(l10n),
                           ],
                         ),
                       );
@@ -269,7 +274,7 @@ class _EnhancedAddEditProductDialogState
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('إلغاء'),
+                      child: Text(l10n.cancel),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -288,8 +293,8 @@ class _EnhancedAddEditProductDialogState
                         fit: BoxFit.scaleDown,
                         child: Text(
                           widget.productToEdit == null
-                              ? 'إضافة المنتج'
-                              : 'حفظ التعديلات',
+                              ? l10n.addProduct
+                              : l10n.saveChanges,
                         ),
                       ),
                     ),
@@ -303,12 +308,12 @@ class _EnhancedAddEditProductDialogState
     );
   }
 
-  Widget _buildCategoryDropdown() {
-    // Filter out "الكل" (All) - it's only a UI filter, not a real category
-    final validCategories = widget.categories.where((c) => c != 'الكل').toList();
+  Widget _buildCategoryDropdown(AppLocalizations l10n) {
+    // Filter out "All" - it's only a UI filter, not a real category
+    final validCategories = widget.categories.where((c) => c != GlobalMessage.l10n.all).toList();
     
     // Ensure selected category is valid
-    if (selectedCategory == 'الكل' && validCategories.isNotEmpty) {
+    if (selectedCategory == GlobalMessage.l10n.all && validCategories.isNotEmpty) {
       selectedCategory = validCategories.first;
     }
     
@@ -337,7 +342,7 @@ class _EnhancedAddEditProductDialogState
             setState(() => selectedCategory = v ?? selectedCategory),
         decoration: InputDecoration(
           border: InputBorder.none,
-          labelText: 'الفئة',
+          labelText: l10n.categoryLabel,
           prefixIcon: Icon(Icons.category, color: AppColors.primaryColor),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -345,8 +350,8 @@ class _EnhancedAddEditProductDialogState
           ),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty || value == 'الكل') {
-            return 'يجب اختيار فئة صالحة';
+          if (value == null || value.isEmpty || value == GlobalMessage.l10n.all) {
+            return l10n.selectValidCategory;
           }
           return null;
         },
@@ -358,10 +363,11 @@ class _EnhancedAddEditProductDialogState
 class AddCategories extends StatelessWidget {
   AddCategories({super.key});
   final TextEditingController nameCtrl = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // ✅ للتحقق
+  final _formKey = GlobalKey<FormState>(); // ✅ For validation
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
@@ -398,9 +404,9 @@ class AddCategories extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerRight,
-                      child: const Text(
-                        'إضافة صنف جديد',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.addNewCategory,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -418,14 +424,14 @@ class AddCategories extends StatelessWidget {
               Flexible(
                 child: SingleChildScrollView(
                   child: Form(
-                    key: _formKey, // ✅ للتحقق
+                    key: _formKey, // ✅ For validation
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final isWide = constraints.maxWidth > 500;
                         return Column(children: [
                           if (isWide) ...[
                             _buildTextField(
-                                nameCtrl, 'اسم الصنف', Icons.inventory_2),
+                                l10n, nameCtrl, l10n.categoryName, Icons.inventory_2),
                           ],
                         ]);
                       },
@@ -446,7 +452,7 @@ class AddCategories extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('إلغاء'),
+                      child: Text(l10n.cancel),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -465,9 +471,9 @@ class AddCategories extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const FittedBox(
+                      child: FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text('إضافة صنف'),
+                        child: Text(l10n.addCategory),
                       ),
                     ),
                   ),
@@ -493,6 +499,7 @@ Widget _buildTwoColumnRow(List<Widget> children) {
 
 
 Widget _buildTextField(
+  AppLocalizations l10n,
   TextEditingController controller,
   String label,
   IconData icon, {
@@ -514,11 +521,11 @@ Widget _buildTextField(
     ),
     validator: (value) {
       if (value == null || value.trim().isEmpty) {
-        return 'هذا الحقل مطلوب';
+        return l10n.fieldRequired;
       }
       if (keyboardType == TextInputType.number &&
           double.tryParse(value.trim()) == null) {
-        return 'يجب إدخال رقم صالح';
+        return l10n.mustEnterValidNumber;
       }
       return null;
     },

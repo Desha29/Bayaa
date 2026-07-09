@@ -19,6 +19,7 @@ import '../widgets/analytics_extra_charts.dart';
 import '../widgets/analytics_monthly_sales_chart.dart';
 import '../widgets/analytics_yearly_summary.dart';
 import '../widgets/analytics_monthly_products_section.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 /// The available time period presets for analytics filtering.
 enum AnalyticsPeriod {
@@ -48,6 +49,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   List<Session> availableSessions = [];
   AnalyticsPeriod _selectedPeriod = AnalyticsPeriod.today;
   int _selectedTabIndex = 0;
+  late AppLocalizations l10n;
 
   bool get _hasAnyFilter => selectedSessionId != null;
 
@@ -189,6 +191,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -226,7 +229,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                 if (selectedSessionId != null)
                                   _buildFilterChip(
                                     icon: Icons.event_note_rounded,
-                                    label: 'جلسة: ${selectedSessionId!.length > 8 ? selectedSessionId!.substring(0, 8) : selectedSessionId}',
+                                    label: l10n.sessionFilterLabel(selectedSessionId!.length > 8 ? selectedSessionId!.substring(0, 8) : selectedSessionId!),
                                     onRemove: () {
                                       setState(() => selectedSessionId = null);
                                       context.read<AnalyticsCubit>().loadAnalytics(
@@ -439,7 +442,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             onPressed: () =>
                                 context.read<AnalyticsCubit>().refreshData(),
                             icon: const Icon(Icons.refresh),
-                            label: const Text('إعادة المحاولة'),
+                            label: Text(l10n.retry),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryColor,
                               foregroundColor: Colors.white,
@@ -560,12 +563,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                               ],
                             ],
                             if (state.monthlySales.isEmpty && state.yearlySales.isEmpty && state.hourlySales.isEmpty)
-                              const Center(
+                              Center(
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 64),
+                                  padding: const EdgeInsets.symmetric(vertical: 64),
                                   child: Text(
-                                    'لا توجد بيانات كافية لتحليل المبيعات',
-                                    style: TextStyle(color: AppColors.mutedColor, fontSize: 16),
+                                    l10n.insufficientSalesData,
+                                    style: const TextStyle(color: AppColors.mutedColor, fontSize: 16),
                                   ),
                                 ),
                               ),
@@ -623,11 +626,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   ),
 
                 if (state is AnalyticsInitial)
-                  const SliverFillRemaining(
+                  SliverFillRemaining(
                     child: Center(
                       child: Text(
-                        'لا توجد بيانات للعرض',
-                        style: TextStyle(
+                        l10n.noDataToShow,
+                        style: const TextStyle(
                             fontSize: 16, color: AppColors.mutedColor),
                       ),
                     ),
@@ -657,7 +660,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Widget _buildHeaderRow(bool isDesktop) {
     return ScreenHeader(
-      title: 'التحليلات والإحصائيات',
+      title: l10n.analyticsTitle,
       subtitle: _getDateRangeText(),
       icon: LucideIcons.barChart2,
       iconColor: AppColors.primaryColor,
@@ -674,15 +677,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   /// Builds the horizontal scrollable period chip selector bar.
   Widget _buildPeriodSelector() {
     final presets = <_PeriodOption>[
-      _PeriodOption(AnalyticsPeriod.today, 'اليوم', Icons.today_rounded),
-      _PeriodOption(AnalyticsPeriod.yesterday, 'أمس', Icons.event_rounded),
-      _PeriodOption(AnalyticsPeriod.last7Days, 'آخر 7 أيام', Icons.date_range_rounded),
-      _PeriodOption(AnalyticsPeriod.thisWeek, 'هذا الأسبوع', Icons.view_week_rounded),
-      _PeriodOption(AnalyticsPeriod.last30Days, 'آخر 30 يوم', Icons.calendar_month_rounded),
-      _PeriodOption(AnalyticsPeriod.thisMonth, 'هذا الشهر', Icons.calendar_today_rounded),
-      _PeriodOption(AnalyticsPeriod.thisYear, 'هذه السنة', Icons.calendar_view_month_rounded),
-      _PeriodOption(AnalyticsPeriod.customDate, 'يوم محدد', Icons.event_note_rounded),
-      _PeriodOption(AnalyticsPeriod.customRange, 'فترة مخصصة', Icons.edit_calendar_rounded),
+      _PeriodOption(AnalyticsPeriod.today, l10n.today, Icons.today_rounded),
+      _PeriodOption(AnalyticsPeriod.yesterday, l10n.periodYesterday, Icons.event_rounded),
+      _PeriodOption(AnalyticsPeriod.last7Days, l10n.periodLast7Days, Icons.date_range_rounded),
+      _PeriodOption(AnalyticsPeriod.thisWeek, l10n.periodThisWeek, Icons.view_week_rounded),
+      _PeriodOption(AnalyticsPeriod.last30Days, l10n.periodLast30Days, Icons.calendar_month_rounded),
+      _PeriodOption(AnalyticsPeriod.thisMonth, l10n.periodThisMonth, Icons.calendar_today_rounded),
+      _PeriodOption(AnalyticsPeriod.thisYear, l10n.periodThisYear, Icons.calendar_view_month_rounded),
+      _PeriodOption(AnalyticsPeriod.customDate, l10n.periodCustomDate, Icons.event_note_rounded),
+      _PeriodOption(AnalyticsPeriod.customRange, l10n.periodCustomRange, Icons.edit_calendar_rounded),
     ];
 
     return SizedBox(
@@ -773,9 +776,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   /// Builds a professional, modern segmented tab selector.
   Widget _buildTabSelector() {
     final tabs = [
-      _TabOption(0, 'نظرة عامة', Icons.dashboard_outlined),
-      _TabOption(1, 'تحليل المبيعات', Icons.bar_chart_rounded),
-      _TabOption(2, 'تحليل المنتجات', Icons.shopping_bag_outlined),
+      _TabOption(0, l10n.tabOverview, Icons.dashboard_outlined),
+      _TabOption(1, l10n.tabSalesAnalysis, Icons.bar_chart_rounded),
+      _TabOption(2, l10n.tabProductAnalysis, Icons.shopping_bag_outlined),
     ];
 
     return Container(
@@ -927,7 +930,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   String _getDateRangeText() {
     if (startDate == null || endDate == null) {
-      return 'آخر 30 يوم';
+      return l10n.periodLast30Days;
     }
 
     final df = DateFormat('d/M/yyyy');
@@ -938,12 +941,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       return df.format(startDate!);
     }
 
-    return 'من ${df.format(startDate!)} إلى ${df.format(endDate!)}';
+    return l10n.dateRangeFromTo(df.format(startDate!), df.format(endDate!));
   }
 
   Widget _buildSessionFilter() {
     return PopupMenuButton<String>(
-      tooltip: 'تصفية حسب الجلسة',
+      tooltip: l10n.filterBySessionTooltip,
       icon: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -982,7 +985,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'كل الجلسات',
+                  l10n.allSessions,
                   style: TextStyle(
                     fontWeight: selectedSessionId == null
                         ? FontWeight.bold
@@ -1011,7 +1014,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'جلسة #${session.id}',
+                          l10n.sessionHashLabel(session.id),
                           style: TextStyle(
                             fontWeight: isSelected
                                 ? FontWeight.bold

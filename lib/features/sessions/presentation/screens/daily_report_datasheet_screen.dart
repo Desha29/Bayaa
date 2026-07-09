@@ -4,6 +4,7 @@ import 'package:intl/intl.dart' as intl;
 import '../../../../core/constants/app_colors.dart';
 import '../../data/models/daily_report_model.dart';
 import '../../../sales/data/models/sale_model.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class DailyReportDatasheetScreen extends StatefulWidget {
   final DailyReport report;
@@ -36,18 +37,19 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        appBar: _buildGradientAppBar(),
+        appBar: _buildGradientAppBar(l10n),
         body: Column(
           children: [
-            _buildSummaryHeader(),
+            _buildSummaryHeader(l10n),
             Expanded(
               child: widget.report.transactions.isEmpty
-                  ? _buildEmptyState()
-                  : _buildTransactionsList(),
+                  ? _buildEmptyState(l10n)
+                  : _buildTransactionsList(l10n),
             ),
           ],
         ),
@@ -55,7 +57,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
     );
   }
 
-  PreferredSizeWidget _buildGradientAppBar() {
+  PreferredSizeWidget _buildGradientAppBar(AppLocalizations l10n) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: Container(
@@ -80,7 +82,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
               children: [
                 IconButton(
                   icon: const Icon(Icons.close_rounded, color: Colors.white),
-                  tooltip: 'إغلاق',
+                  tooltip: l10n.close,
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 const SizedBox(width: 4),
@@ -88,9 +90,9 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'تفاصيل المعاملات',
-                        style: TextStyle(
+                      Text(
+                        l10n.transactionDetails,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -99,7 +101,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${widget.report.totalTransactions} معاملة',
+                        l10n.transactionCount(widget.report.totalTransactions),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 12,
@@ -118,7 +120,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
     );
   }
 
-  Widget _buildSummaryHeader() {
+  Widget _buildSummaryHeader(AppLocalizations l10n) {
     final report = widget.report;
     return FadeTransition(
       opacity: _animationController,
@@ -145,27 +147,27 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
           child: Row(
             children: [
               _buildSummaryCard(
-                'صافي المبيعات',
+                l10n.netSales,
                 report.netRevenue.toStringAsFixed(2),
-                'ج.م',
+                l10n.currencyEg,
                 const Color(0xFF059669),
                 Icons.trending_up_rounded,
                 const Color(0xFFD1FAE5),
               ),
               const SizedBox(width: 14),
               _buildSummaryCard(
-                'عدد المعاملات',
+                l10n.numberOfTransactions,
                 '${report.totalTransactions}',
-                'معاملة',
+                l10n.transactionUnit,
                 AppColors.secondaryColor,
                 Icons.receipt_long_rounded,
                 const Color(0xFFDBEAFE),
               ),
               const SizedBox(width: 14),
               _buildSummaryCard(
-                'المرتجعات',
+                l10n.refunds,
                 report.totalRefunds.toStringAsFixed(2),
-                'ج.م',
+                l10n.currencyEg,
                 AppColors.errorColor,
                 Icons.rotate_left_rounded,
                 const Color(0xFFFEE2E2),
@@ -244,7 +246,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppLocalizations l10n) {
     return Center(
       child: FadeTransition(
         opacity: _animationController,
@@ -264,9 +266,9 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'لا توجد معاملات في هذا التقرير',
-              style: TextStyle(
+            Text(
+              l10n.noTransactionsInReport,
+              style: const TextStyle(
                 color: AppColors.mutedColor,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -274,7 +276,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              'سيتم عرض المعاملات هنا عند توفرها',
+              l10n.transactionsWillShowHere,
               style: TextStyle(
                 color: AppColors.mutedColor.withOpacity(0.6),
                 fontSize: 13,
@@ -286,7 +288,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
     );
   }
 
-  Widget _buildTransactionsList() {
+  Widget _buildTransactionsList(AppLocalizations l10n) {
     final transactions = List<Sale>.from(widget.report.transactions)
       ..sort((a, b) => b.date.compareTo(a.date));
 
@@ -314,7 +316,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'سجل الحركات التفصيلي',
+                  l10n.detailedTransactionsLog,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -329,7 +331,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '${transactions.length} عملية',
+                    l10n.operationsCount(transactions.length),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -348,14 +350,14 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
               color: AppColors.primaryColor.withOpacity(0.06),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                SizedBox(width: 90, child: Text('رقم المعاملة', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
-                SizedBox(width: 80, child: Text('الوقت', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
-                SizedBox(width: 70, child: Text('النوع', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
-                SizedBox(width: 80, child: Text('بواسطة', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
-                Expanded(child: Text('المنتجات', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
-                SizedBox(width: 90, child: Text('القيمة', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12), textAlign: TextAlign.left)),
+                SizedBox(width: 90, child: Text(l10n.transactionNumber, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
+                SizedBox(width: 80, child: Text(l10n.timeColumn, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
+                SizedBox(width: 70, child: Text(l10n.typeColumn, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
+                SizedBox(width: 80, child: Text(l10n.byColumn, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
+                Expanded(child: Text(l10n.productsColumn, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12))),
+                SizedBox(width: 90, child: Text(l10n.valueColumn, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor, fontSize: 12), textAlign: TextAlign.left)),
               ],
             ),
           ),
@@ -377,7 +379,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
                 ),
                 itemBuilder: (context, index) {
                   final sale = transactions[index];
-                  return _buildTransactionRow(sale, index);
+                  return _buildTransactionRow(l10n, sale, index);
                 },
               ),
             ),
@@ -388,7 +390,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
     );
   }
 
-  Widget _buildTransactionRow(Sale sale, int index) {
+  Widget _buildTransactionRow(AppLocalizations l10n, Sale sale, int index) {
     final isRefund = sale.isRefund;
     final itemsText = sale.saleItems
         .map((i) => '${i.name} (${i.quantity})')
@@ -437,7 +439,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
                 ),
               ),
               child: Text(
-                isRefund ? 'مرتجع' : 'بيع',
+                isRefund ? l10n.refunded : l10n.actSale,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: isRefund ? AppColors.errorColor : AppColors.successColor,
@@ -469,7 +471,7 @@ class _DailyReportDatasheetScreenState extends State<DailyReportDatasheetScreen>
           SizedBox(
             width: 90,
             child: Text(
-              '${isRefund ? '-' : ''}${sale.total.toStringAsFixed(2)} ج.م',
+              '${isRefund ? '-' : ''}${sale.total.toStringAsFixed(2)} ${l10n.currencyEg}',
               textAlign: TextAlign.left,
               style: TextStyle(
                 fontWeight: FontWeight.bold,

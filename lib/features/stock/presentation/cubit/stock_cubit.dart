@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:bayaa_pos/features/products/domain/product_repository_int.dart';
 import 'package:bayaa_pos/features/stock/presentation/cubit/stock_states.dart'
@@ -84,7 +85,7 @@ class StockCubit extends Cubit<StockStates> {
     );
     await getIt<ActivityLogger>().logActivity(
       type: ActivityType.productQuantityUpdate,
-      description: 'تحديث مخزون: ${product.name} (+$quantity)',
+      description: GlobalMessage.l10n.activityUpdateStock(product.name, quantity.toString()),
       userName: getIt<UserCubit>().currentUser.name,
       sessionId: sid,
       details: {'barcode': product.barcode, 'quantityAdded': quantity, 'newTotal': product.quantity},

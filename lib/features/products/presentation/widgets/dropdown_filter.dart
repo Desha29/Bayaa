@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../cubit/product_cubit.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 
 class DropDownFilter extends StatefulWidget {
@@ -105,6 +106,7 @@ class _DropDownFilterState extends State<DropDownFilter> {
 
   Future<bool?> showDeleteCategoryConfirmation(
       BuildContext context, String category) {
+    final l10n = AppLocalizations.of(context);
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -121,16 +123,16 @@ class _DropDownFilterState extends State<DropDownFilter> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                LucideIcons.trash2, // أيقونة الحذف
+                LucideIcons.trash2, // Delete icon
                 color: AppColors.errorColor,
                 size: 28,
               ),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Text(
-                'تأكيد حذف الفئة',
-                style: TextStyle(
+                l10n.confirmDeleteCategoryTitle,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -138,15 +140,15 @@ class _DropDownFilterState extends State<DropDownFilter> {
             ),
           ],
         ),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'هل أنت متأكد من حذف هذه الفئة؟',
-              style: TextStyle(fontSize: 16),
+              l10n.confirmDeleteCategoryMessage,
+              style: const TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
           ],
         ),
         actionsAlignment: MainAxisAlignment.spaceEvenly,
@@ -154,7 +156,7 @@ class _DropDownFilterState extends State<DropDownFilter> {
           OutlinedButton.icon(
             onPressed: () => Navigator.pop(context, false),
             icon: const Icon(LucideIcons.x),
-            label: const Text('إلغاء'),
+            label: Text(l10n.cancel),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               textStyle:
@@ -169,7 +171,7 @@ class _DropDownFilterState extends State<DropDownFilter> {
               Navigator.pop(context, true);
             },
             icon: const Icon(LucideIcons.trash2),
-            label: const Text('حذف'),
+            label: Text(l10n.delete),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.errorColor,
               foregroundColor: Colors.white,

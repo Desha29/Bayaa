@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dartz/dartz.dart';
 
+import '../../../../core/components/message_overlay.dart';
 import '../../../../core/error/failure.dart';
 import '../../../sessions/data/models/daily_report_model.dart';
 import '../../../sessions/data/models/product_performance_model.dart';
@@ -49,7 +50,7 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
     } catch (error, stackTrace) {
       print('Error loading analytics: $error\n$stackTrace');
       if (!isClosed) {
-        emit(AnalyticsError('حدث خطأ غير متوقع أثناء تحميل البيانات: ${error.toString()}'));
+        emit(AnalyticsError(GlobalMessage.l10n.analyticsLoadError(error.toString())));
       }
     }
   }
@@ -78,7 +79,7 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
 
       final report = reportRes.getOrElse(() => null);
       if (report == null) {
-        emit(AnalyticsError('لم يتم العثور على بيانات لهذا اليوم'));
+        emit(AnalyticsError(GlobalMessage.l10n.noDataForDay));
         return;
       }
 
@@ -102,14 +103,14 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
       emit(AnalyticsLoaded(
         summary: summary,
         topProducts: topProductsRes.getOrElse(() => []),
-        dailySales: {'اليوم': report.netRevenue},
+        dailySales: {GlobalMessage.l10n.today: report.netRevenue},
         hourlySales: hourlyRes.getOrElse(() => {}),
         categorySales: categoryRes.getOrElse(() => {}),
         dailyTimeSeries: const {},
       ));
     } catch (error) {
       if (!isClosed) {
-        emit(AnalyticsError('فشل تحميل بيانات الجلسة: ${error.toString()}'));
+        emit(AnalyticsError(GlobalMessage.l10n.sessionAnalyticsLoadError(error.toString())));
       }
     }
   }
@@ -159,9 +160,9 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
 
       // Derive dailySales from summary directly — avoids duplicate getSummary call
       final dailySales = <String, double>{
-        'اجمالي المبيعات': summary.totalRevenue,
-        'التكلفة الكلية': summary.totalCost,
-        'صافي الربح': summary.totalProfit,
+        GlobalMessage.l10n.totalSales: summary.totalRevenue,
+        GlobalMessage.l10n.totalCost: summary.totalCost,
+        GlobalMessage.l10n.netProfit: summary.totalProfit,
       };
 
       emit(AnalyticsLoaded(
@@ -176,7 +177,7 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
       ));
     } catch (error) {
       if (!isClosed) {
-        emit(AnalyticsError('فشل تحميل الإحصائيات العامة: ${error.toString()}'));
+        emit(AnalyticsError(GlobalMessage.l10n.aggregateAnalyticsLoadError(error.toString())));
       }
     }
   }

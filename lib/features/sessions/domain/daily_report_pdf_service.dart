@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../data/models/daily_report_model.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 
 
 class PdfAppColors {
@@ -21,7 +22,7 @@ class DailyReportPdfService {
   }) async {
     final pdf = pw.Document();
 
-    // تحميل الخطوط العربية (Regular + Bold)
+    // Load Arabic fonts (Regular + Bold)
     final arabicRegularFontData =
         await rootBundle.load('assets/fonts/Amiri-Regular.ttf');
     final arabicBoldFontData =
@@ -30,11 +31,11 @@ class DailyReportPdfService {
     final arabicRegularFont = pw.Font.ttf(arabicRegularFontData);
     final arabicBoldFont = pw.Font.ttf(arabicBoldFontData);
 
-    // تحميل اللوجو
+    // Load logo
     final logoData = await rootBundle.load('assets/images/logo.png');
     final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
 
-    // إعداد الصفحة (A4 عمودي أو أفقي)
+    // Page setup (A4 portrait or landscape)
     final pageFormat =
         landscape ? PdfPageFormat.a4.landscape : PdfPageFormat.a4;
 
@@ -74,7 +75,7 @@ class DailyReportPdfService {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-              'تقرير المبيعات اليومية',
+              GlobalMessage.l10n.pdfDailySalesReport,
               style: pw.TextStyle(
                 font: boldFont,
                 fontWeight: pw.FontWeight.bold,
@@ -84,7 +85,7 @@ class DailyReportPdfService {
             ),
             pw.SizedBox(height: 6),
             pw.Text(
-              'نظام نقاط البيع المتطور - Bayaa',
+              GlobalMessage.l10n.pdfPosSystemBayaa,
               style: pw.TextStyle(
                 font: boldFont,
                 fontSize: 13,
@@ -117,10 +118,10 @@ class DailyReportPdfService {
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
-          _infoItem('تاريخ التقرير:', _formatDate(report.date), boldFont),
-          _infoItem('عدد الحركات:', '${report.totalTransactions}', boldFont),
-          _infoItem('صافي الإيرادات:',
-              '${report.netRevenue.toStringAsFixed(2)} ج.م', boldFont),
+          _infoItem(GlobalMessage.l10n.pdfReportDate, _formatDate(report.date), boldFont),
+          _infoItem(GlobalMessage.l10n.pdfTransactionsCount, '${report.totalTransactions}', boldFont),
+          _infoItem(GlobalMessage.l10n.pdfNetRevenue,
+              '${report.netRevenue.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', boldFont),
         ],
       ),
     );
@@ -155,21 +156,21 @@ class DailyReportPdfService {
   /// ------------------------- SUMMARY SECTION -------------------------
   static pw.Widget _buildSummarySection(DailyReport report, pw.Font boldFont) {
     final summaries = [
-      _summaryBox('المبيعات الكلية',
-          '${report.totalSales.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('المرتجعات الكلية',
-          '${report.totalRefunds.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('صافي الربح',
-          '${report.netRevenue.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('عدد المعاملات', '${report.totalTransactions}', boldFont),
-      _summaryBox('تم الإغلاق بواسطة', report.closedByUserName, boldFont),
+      _summaryBox(GlobalMessage.l10n.pdfTotalSales,
+          '${report.totalSales.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', boldFont),
+      _summaryBox(GlobalMessage.l10n.pdfTotalRefunds,
+          '${report.totalRefunds.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', boldFont),
+      _summaryBox(GlobalMessage.l10n.pdfNetProfit,
+          '${report.netRevenue.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', boldFont),
+      _summaryBox(GlobalMessage.l10n.pdfTotalTransactions, '${report.totalTransactions}', boldFont),
+      _summaryBox(GlobalMessage.l10n.pdfClosedBy, report.closedByUserName, boldFont),
     ];
 
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'ملخص الأداء اليومي',
+          GlobalMessage.l10n.pdfDailyPerformanceSummary,
           style: pw.TextStyle(
             font: boldFont,
             fontSize: 17,
@@ -222,12 +223,12 @@ class DailyReportPdfService {
   static pw.Widget _buildProductTable(
       DailyReport report, pw.Font font, pw.Font boldFont) {
     final headers = [
-      'المنتج',
-      'الكمية',
-      'الإيرادات',
-      'التكلفة',
-      'الأرباح',
-      'هامش الربح'
+      GlobalMessage.l10n.pdfProduct,
+      GlobalMessage.l10n.pdfQtyLong,
+      GlobalMessage.l10n.pdfRevenue,
+      GlobalMessage.l10n.pdfCost,
+      GlobalMessage.l10n.pdfProfits,
+      GlobalMessage.l10n.pdfProfitMargin
     ];
 
     final data = report.topProducts.map((p) {
@@ -245,7 +246,7 @@ class DailyReportPdfService {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'أداء المنتجات الأكثر مبيعاً',
+          GlobalMessage.l10n.pdfTopSellingProducts,
           style: pw.TextStyle(
             font: boldFont,
             fontSize: 17,
@@ -287,12 +288,12 @@ class DailyReportPdfService {
       ),
       child: pw.Column(children: [
         pw.Text(
-          'تم إنشاء التقرير في: ${_formatDateTime(DateTime.now())}',
+          '${GlobalMessage.l10n.pdfReportGeneratedAt} ${_formatDateTime(DateTime.now())}',
           style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
         pw.SizedBox(height: 3),
         pw.Text(
-          '© 2026 Bayaa POS - جميع الحقوق محفوظة',
+          GlobalMessage.l10n.pdfCopyright,
           style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
       ]),

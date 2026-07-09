@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:bayaa_pos/features/sales/data/models/sale_model.dart';
 import 'package:bayaa_pos/features/settings/data/models/store_info_model.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 
 class ReceiptPdfGenerator {
   static Future<Uint8List> generateReceipt({
@@ -49,21 +50,21 @@ class ReceiptPdfGenerator {
                 ),
               pw.Text(storeInfo.name, style: pw.TextStyle(font: bold, fontSize: isThermal ? 16 : 24)),
               pw.Text(storeInfo.address, style: const pw.TextStyle(fontSize: 10)),
-              pw.Text('هاتف: ${storeInfo.phone}', style: const pw.TextStyle(fontSize: 10)),
+              pw.Text('${GlobalMessage.l10n.pdfPhone} ${storeInfo.phone}', style: const pw.TextStyle(fontSize: 10)),
               pw.Divider(),
-              pw.Text(sale.isRefund ? 'فاتورة مرتجع' : 'فاتورة مبيعات', style: pw.TextStyle(font: bold, fontSize: 14)),
+              pw.Text(sale.isRefund ? GlobalMessage.l10n.pdfRefundInvoice : GlobalMessage.l10n.pdfSalesInvoice, style: pw.TextStyle(font: bold, fontSize: 14)),
               pw.SizedBox(height: 5),
-              _buildRow('رقم الفاتورة:', sale.id, regular),
-              _buildRow('التاريخ:', _formatDate(sale.date), regular),
-              _buildRow('الكاشير:', sale.cashierName ?? 'غير معروف', regular),
+              _buildRow(GlobalMessage.l10n.pdfInvoiceNumber, sale.id, regular),
+              _buildRow(GlobalMessage.l10n.pdfDate, _formatDate(sale.date), regular),
+              _buildRow(GlobalMessage.l10n.pdfCashierShort, sale.cashierName ?? GlobalMessage.l10n.pdfUnknownCashier, regular),
               pw.Divider(),
               _buildItemsTable(sale.saleItems, bold, regular, isThermal),
               pw.Divider(),
-              _buildRow('الإجمالي:', '${sale.total.toStringAsFixed(2)} ج.م', bold, fontSize: 14),
+              _buildRow(GlobalMessage.l10n.pdfTotalCol, '${sale.total.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', bold, fontSize: 14),
               pw.SizedBox(height: 10),
-              pw.Text('شكراً لزيارتكم!', style: pw.TextStyle(font: regular, fontSize: 10)),
+              pw.Text(GlobalMessage.l10n.pdfThanksVisiting, style: pw.TextStyle(font: regular, fontSize: 10)),
               if (storeInfo.vat.isNotEmpty)
-                pw.Text('الرقم الضريبي: ${storeInfo.vat}', style: const pw.TextStyle(fontSize: 8)),
+                pw.Text('${GlobalMessage.l10n.pdfVatNumber} ${storeInfo.vat}', style: const pw.TextStyle(fontSize: 8)),
             ],
           );
         },
@@ -86,7 +87,7 @@ class ReceiptPdfGenerator {
   static pw.Widget _buildItemsTable(List<SaleItem> items, pw.Font bold, pw.Font regular, bool isThermal) {
     return pw.TableHelper.fromTextArray(
       context: null,
-      headers: ['المنتج', 'ق', 'س', 'ج'],
+      headers: [GlobalMessage.l10n.pdfProduct, GlobalMessage.l10n.pdfQtyShort, GlobalMessage.l10n.pdfPrice, GlobalMessage.l10n.pdfTotal],
       data: items.map((i) => [
         i.name,
         i.quantity.toString(),

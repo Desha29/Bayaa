@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../components/message_overlay.dart';
 import '../../features/sessions/data/models/session_model.dart';
 import '../../features/sessions/data/models/daily_report_model.dart';
 import '../../features/sessions/data/repositories/session_repository_impl.dart';
@@ -72,7 +73,7 @@ class SessionManager {
       final autoUser = User(
         username: userName ?? 'system',
         password: '',
-        name: userName ?? 'النظام',
+        name: userName ?? GlobalMessage.l10n.systemUserName,
         userType: UserType.cashier,
         phone: '',
       );
@@ -84,7 +85,7 @@ class SessionManager {
         final logger = getIt<ActivityLogger>();
         await logger.logActivity(
           type: ActivityType.sessionOpen,
-          description: 'فتح يوم جديد — ${autoUser.name}',
+          description: GlobalMessage.l10n.activityOpenDay(autoUser.name),
           userName: autoUser.name,
           sessionId: newSession.id,
         );

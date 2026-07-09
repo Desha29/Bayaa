@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/analytics_summary_model.dart';
 
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class AnalyticsSummaryCards extends StatelessWidget {
   final AnalyticsSummaryModel summary;
@@ -11,6 +12,7 @@ class AnalyticsSummaryCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
 
     final isDesktop = screenWidth >= 1024;
@@ -34,32 +36,32 @@ class AnalyticsSummaryCards extends StatelessWidget {
             childAspectRatio: childAspectRatio,
             children: [
               _buildSummaryCard(
-                title: 'إجمالي المبيعات',
-                value: '${summary.totalRevenue.toStringAsFixed(2)} ج.م',
+                title: l10n.totalSales,
+                value: '${summary.totalRevenue.toStringAsFixed(2)} ${l10n.currencyEg}',
                 icon: Icons.trending_up,
                 color: const Color(0xFF10B981),
-                subtitle: '${summary.totalSales} عملية بيع',
+                subtitle: l10n.salesCount(summary.totalSales),
               ),
               _buildSummaryCard(
-                title: 'التكلفة الكلية',
-                value: '${summary.totalCost.toStringAsFixed(2)} ج.م',
+                title: l10n.totalCost,
+                value: '${summary.totalCost.toStringAsFixed(2)} ${l10n.currencyEg}',
                 icon: Icons.shopping_cart_outlined,
                 color: const Color(0xFFF59E0B),
-                subtitle: 'تكلفة المنتجات',
+                subtitle: l10n.productsCost,
               ),
               _buildSummaryCard(
-                title: summary.isProfitable ? 'صافي الربح' : 'الخسارة',
-                value: '${summary.totalProfit.abs().toStringAsFixed(2)} ج.م',
+                title: summary.isProfitable ? l10n.netProfit : l10n.loss,
+                value: '${summary.totalProfit.abs().toStringAsFixed(2)} ${l10n.currencyEg}',
                 icon: summary.isProfitable ? Icons.attach_money : Icons.money_off,
                 color: summary.isProfitable ? const Color(0xFF6366F1) : const Color(0xFFEF4444),
-                subtitle: '${summary.profitMargin.toStringAsFixed(1)}% هامش',
+                subtitle: l10n.margin(summary.profitMargin.toStringAsFixed(1)),
               ),
               _buildSummaryCard(
-                title: 'متوسط البيعة',
-                value: '${summary.averageSaleValue.toStringAsFixed(2)} ج.م',
+                title: l10n.averageSale,
+                value: '${summary.averageSaleValue.toStringAsFixed(2)} ${l10n.currencyEg}',
                 icon: Icons.calculate_outlined,
                 color: const Color(0xFF8B5CF6),
-                subtitle: 'لكل عملية بيع',
+                subtitle: l10n.perSale,
               ),
             ],
           );

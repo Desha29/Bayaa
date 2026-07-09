@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class AnalyticsMonthlySalesChart extends StatefulWidget {
   final Map<String, double> monthlySales;
@@ -15,18 +16,24 @@ class AnalyticsMonthlySalesChart extends StatefulWidget {
 
 class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart> {
   int _touchedIndex = -1;
+  late AppLocalizations l10n;
 
-  static const _arabicMonths = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
-  ];
+  List<String> get _months => [
+        l10n.monthJan, l10n.monthFeb, l10n.monthMar, l10n.monthApr, l10n.monthMay, l10n.monthJun,
+        l10n.monthJul, l10n.monthAug, l10n.monthSep, l10n.monthOct, l10n.monthNov, l10n.monthDec,
+      ];
+
+  List<String> get _shortMonths => [
+        l10n.monthJanShort, l10n.monthFebShort, l10n.monthMarShort, l10n.monthAprShort, l10n.monthMayShort, l10n.monthJunShort,
+        l10n.monthJulShort, l10n.monthAugShort, l10n.monthSepShort, l10n.monthOctShort, l10n.monthNovShort, l10n.monthDecShort,
+      ];
 
   String _monthLabel(String key) {
     final parts = key.split('-');
     if (parts.length == 2) {
       final m = int.tryParse(parts[1]);
       if (m != null && m >= 1 && m <= 12) {
-        return _arabicMonths[m - 1];
+        return _months[m - 1];
       }
     }
     return key;
@@ -37,12 +44,7 @@ class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart>
     if (parts.length == 2) {
       final m = int.tryParse(parts[1]);
       if (m != null && m >= 1 && m <= 12) {
-        // Arabic short month names
-        const shortMonths = [
-          'ينا', 'فبر', 'مار', 'أبر', 'ماي', 'يون',
-          'يول', 'أغس', 'سبت', 'أكت', 'نوف', 'ديس',
-        ];
-        return shortMonths[m - 1];
+        return _shortMonths[m - 1];
       }
     }
     return key;
@@ -59,6 +61,7 @@ class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart>
 
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -113,8 +116,8 @@ class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart>
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'المبيعات الشهرية',
+                  Text(
+                    l10n.monthlySales,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -142,8 +145,8 @@ class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart>
                       Expanded(
                         child: _buildStatItem(
                           icon: Icons.monetization_on_rounded,
-                          label: 'الإجمالي',
-                          value: '${_formatAmount(totalSales)} ج.م',
+                          label: l10n.totalColumn,
+                          value: '${_formatAmount(totalSales)} ${l10n.currencyEg}',
                           color: AppColors.primaryColor,
                         ),
                       ),
@@ -155,8 +158,8 @@ class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart>
                       Expanded(
                         child: _buildStatItem(
                           icon: Icons.trending_up_rounded,
-                          label: 'المتوسط/شهر',
-                          value: '${_formatAmount(avgMonthly)} ج.م',
+                          label: l10n.monthlyAverage,
+                          value: '${_formatAmount(avgMonthly)} ${l10n.currencyEg}',
                           color: AppColors.secondaryColor,
                         ),
                       ),
@@ -168,7 +171,7 @@ class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart>
                       Expanded(
                         child: _buildStatItem(
                           icon: Icons.date_range_rounded,
-                          label: 'الأشهر',
+                          label: l10n.months,
                           value: '${entries.length}',
                           color: const Color(0xFF6366F1),
                         ),
@@ -191,9 +194,9 @@ class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart>
                               color: AppColors.mutedColor.withOpacity(0.3),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              'لا توجد بيانات للعرض',
-                              style: TextStyle(color: AppColors.mutedColor),
+                            Text(
+                              l10n.noDataToShow,
+                              style: const TextStyle(color: AppColors.mutedColor),
                             ),
                           ],
                         ),
@@ -223,7 +226,7 @@ class _AnalyticsMonthlySalesChartState extends State<AnalyticsMonthlySalesChart>
                                 final label = _monthLabel(entries[group.x.toInt()].key);
                                 final value = rod.toY;
                                 return BarTooltipItem(
-                                  '$label\n${_formatAmount(value)} ج.م',
+                                  '$label\n${_formatAmount(value)} ${l10n.currencyEg}',
                                   const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,

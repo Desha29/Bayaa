@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ));
           } else if (state is UserSuccess) {
             MotionSnackBarSuccess(context, state.message);
-            if (state.message == "تم تسجيل الدخول بنجاح") {
+            if (state.message == AppLocalizations.of(context).msgLoginSuccess) {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -224,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
               icon: const Icon(Icons.language,
                   size: 18, color: Color(0xFFD77E46)),
               label: Text(
-                l10n.localeName == 'ar' ? 'English' : 'العربية',
+                l10n.localeName == 'ar' ? 'English' : l10n.switchLanguageLabel,
                 style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.bold,

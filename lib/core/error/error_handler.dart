@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:either_dart/either.dart' as either_dart;
+import '../components/message_overlay.dart';
 import '../logging/file_logger.dart';
 import 'failure.dart';
 
@@ -44,7 +45,7 @@ class ErrorHandler {
       );
     } on DatabaseException catch (e, stack) {
       // SQLite/Database specific errors
-      final message = userFriendlyMessage ?? 'حدث خطأ في قاعدة البيانات';
+      final message = userFriendlyMessage ?? GlobalMessage.l10n.dbError;
       FileLogger.error(
         'Database error in $operationName',
         error: e,
@@ -54,7 +55,7 @@ class ErrorHandler {
       return Left(CacheFailure(message));
     } on FileSystemException catch (e, stack) {
       // File system errors (e.g., permissions, disk full)
-      final message = userFriendlyMessage ?? 'حدث خطأ في نظام الملفات';
+      final message = userFriendlyMessage ?? GlobalMessage.l10n.fileSystemError;
       FileLogger.error(
         'FileSystem error in $operationName',
         error: e,
@@ -64,7 +65,7 @@ class ErrorHandler {
       return Left(CacheFailure(message));
     } catch (e, stack) {
       // Catch-all for any other unexpected errors
-      final message = userFriendlyMessage ?? 'حدث خطأ غير متوقع';
+      final message = userFriendlyMessage ?? GlobalMessage.l10n.unexpectedErrorGeneric;
       FileLogger.critical(
         'Unexpected error in $operationName',
         error: e,
@@ -99,7 +100,7 @@ class ErrorHandler {
       
       return result;
     } on DatabaseException catch (e, stack) {
-      final message = userFriendlyMessage ?? 'حدث خطأ في قاعدة البيانات';
+      final message = userFriendlyMessage ?? GlobalMessage.l10n.dbError;
       FileLogger.error(
         'Database error in $operationName',
         error: e,
@@ -108,7 +109,7 @@ class ErrorHandler {
       );
       return either_dart.Left(CacheFailure(message));
     } on FileSystemException catch (e, stack) {
-      final message = userFriendlyMessage ?? 'حدث خطأ في نظام الملفات';
+      final message = userFriendlyMessage ?? GlobalMessage.l10n.fileSystemError;
       FileLogger.error(
         'FileSystem error in $operationName',
         error: e,
@@ -117,7 +118,7 @@ class ErrorHandler {
       );
       return either_dart.Left(CacheFailure(message));
     } catch (e, stack) {
-      final message = userFriendlyMessage ?? 'حدث خطأ غير متوقع';
+      final message = userFriendlyMessage ?? GlobalMessage.l10n.unexpectedErrorGeneric;
       FileLogger.critical(
         'Unexpected error in $operationName',
         error: e,

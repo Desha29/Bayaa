@@ -7,6 +7,7 @@ import '../data/invoice_models.dart';
 import '../../settings/data/models/store_info_model.dart';
 import 'package:bayaa_pos/core/di/dependency_injection.dart';
 import '../../settings/data/repository/settings_repository_imp.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 
 class InvoicePdfService {
   static pw.Font? _cachedArabicFont;
@@ -77,8 +78,8 @@ class InvoicePdfService {
     final storeRepo = getIt<StoreInfoRepository>();
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
-          name: 'بياع POS',
-          address: 'القاهرة، مصر',
+          name: GlobalMessage.l10n.pdfFallbackStoreName,
+          address: GlobalMessage.l10n.pdfFallbackStoreAddressShort,
           phone: '0100000000',
           vat: '', email: '',
         ));
@@ -119,12 +120,12 @@ class InvoicePdfService {
                 ),
               if (storeInfo.phone.isNotEmpty)
                 pw.Text(
-                  'هاتف: ${storeInfo.phone}', 
+                  '${GlobalMessage.l10n.pdfPhone} ${storeInfo.phone}', 
                   style: pw.TextStyle(font: arabicFont, fontSize: 8, color: PdfColors.grey700),
                 ),
               if (storeInfo.vat.isNotEmpty)
                 pw.Text(
-                  'الرقم الضريبي: ${storeInfo.vat}', 
+                  '${GlobalMessage.l10n.pdfVatNumber} ${storeInfo.vat}', 
                   style: pw.TextStyle(font: arabicFont, fontSize: 7.5, color: PdfColors.grey600),
                 ),
               
@@ -135,15 +136,15 @@ class InvoicePdfService {
 
               // Invoice Type Title
               pw.Text(
-                'إيصال مبيعات ضريبي', 
+                GlobalMessage.l10n.pdfSalesReceipt, 
                 style: pw.TextStyle(font: boldFont, fontSize: 10, color: brandBlue),
               ),
               pw.SizedBox(height: 6),
 
               // Metadata Row
-              _receiptMetaRow('رقم الفاتورة:', data.invoiceId, arabicFont, boldFont),
-              _receiptMetaRow('التاريخ والوقت:', _fmt(data.date), arabicFont, boldFont),
-              _receiptMetaRow('الكاشير المسؤول:', data.cashierName, arabicFont, boldFont),
+              _receiptMetaRow(GlobalMessage.l10n.pdfInvoiceNumber, data.invoiceId, arabicFont, boldFont),
+              _receiptMetaRow(GlobalMessage.l10n.pdfDateTime, _fmt(data.date), arabicFont, boldFont),
+              _receiptMetaRow(GlobalMessage.l10n.pdfCashier, data.cashierName, arabicFont, boldFont),
               
               pw.Padding(
                 padding: const pw.EdgeInsets.symmetric(vertical: 6),
@@ -153,7 +154,7 @@ class InvoicePdfService {
               // Items Table
               pw.TableHelper.fromTextArray(
                 context: null,
-                headers: ['المنتج', 'ك', 'سعر', 'إجمالي'],
+                headers: [GlobalMessage.l10n.pdfProduct, GlobalMessage.l10n.pdfQtyShort, GlobalMessage.l10n.pdfPrice, GlobalMessage.l10n.pdfTotal],
                 data: data.lines.map((l) => [
                   l.name,
                   l.qty.toString(),
@@ -179,11 +180,11 @@ class InvoicePdfService {
               ),
 
               // Totals
-              _receiptMetaRow('إجمالي السلع:', '${data.subtotal.toStringAsFixed(2)} ج.م', arabicFont, boldFont, fontSize: 8.5),
+              _receiptMetaRow(GlobalMessage.l10n.pdfSubtotalItems, '${data.subtotal.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', arabicFont, boldFont, fontSize: 8.5),
               if (data.discount > 0)
-                _receiptMetaRow('الخصم المطبق:', '- ${data.discount.toStringAsFixed(2)} ج.م', arabicFont, boldFont, fontSize: 8.5, color: brandOrange),
+                _receiptMetaRow(GlobalMessage.l10n.pdfDiscountApplied, '- ${data.discount.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', arabicFont, boldFont, fontSize: 8.5, color: brandOrange),
               if (data.tax > 0)
-                _receiptMetaRow('ضريبة القيمة المضافة:', '${data.tax.toStringAsFixed(2)} ج.م', arabicFont, boldFont, fontSize: 8.5),
+                _receiptMetaRow(GlobalMessage.l10n.pdfVatTax, '${data.tax.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', arabicFont, boldFont, fontSize: 8.5),
               
               pw.Padding(
                 padding: const pw.EdgeInsets.symmetric(vertical: 4),
@@ -191,8 +192,8 @@ class InvoicePdfService {
               ),
 
               _receiptMetaRow(
-                'الصافي الكلي:', 
-                '${data.grandTotal.toStringAsFixed(2)} ج.م', 
+                GlobalMessage.l10n.pdfNetTotal, 
+                '${data.grandTotal.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', 
                 boldFont, 
                 boldFont, 
                 fontSize: 11, 
@@ -200,8 +201,8 @@ class InvoicePdfService {
               ),
               
               pw.SizedBox(height: 12),
-              pw.Text('شكراً لتسوقكم معنا!', style: pw.TextStyle(font: boldFont, fontSize: 8.5, color: textDark), textAlign: pw.TextAlign.center),
-              pw.Text('نظام بياع لإدارة المبيعات POS', style: pw.TextStyle(font: arabicFont, fontSize: 6.5, color: PdfColors.grey600)), 
+              pw.Text(GlobalMessage.l10n.pdfThanksShopping, style: pw.TextStyle(font: boldFont, fontSize: 8.5, color: textDark), textAlign: pw.TextAlign.center),
+              pw.Text(GlobalMessage.l10n.pdfSystemName, style: pw.TextStyle(font: arabicFont, fontSize: 6.5, color: PdfColors.grey600)),
               
               pw.SizedBox(height: 8),
               pw.BarcodeWidget(
@@ -250,8 +251,8 @@ class InvoicePdfService {
     final storeRepo = getIt<StoreInfoRepository>();
     final storeInfoResult = await storeRepo.getStoreInfo();
     final storeInfo = storeInfoResult.getOrElse(() => StoreInfo(
-          name: 'بياع POS',
-          address: 'القاهرة، جمهورية مصر العربية',
+          name: GlobalMessage.l10n.pdfFallbackStoreName,
+          address: GlobalMessage.l10n.pdfFallbackStoreAddressLong,
           phone: '0100000000',
           vat: '', email: '',
         ));
@@ -322,9 +323,9 @@ class InvoicePdfService {
             if (store.address.isNotEmpty) 
               pw.Text(store.address, style: pw.TextStyle(font: regular, fontSize: 9.5, color: textMuted)),
             if (store.phone.isNotEmpty) 
-              pw.Text('هاتف: ${store.phone}', style: pw.TextStyle(font: regular, fontSize: 9.5, color: textMuted)),
+              pw.Text('${GlobalMessage.l10n.pdfPhone} ${store.phone}', style: pw.TextStyle(font: regular, fontSize: 9.5, color: textMuted)),
             if (store.vat.isNotEmpty) 
-              pw.Text('الرقم الضريبي للمنشأة: ${store.vat}', style: pw.TextStyle(font: regular, fontSize: 9.5, color: textMuted)),
+              pw.Text('${GlobalMessage.l10n.pdfVatNumberFacility} ${store.vat}', style: pw.TextStyle(font: regular, fontSize: 9.5, color: textMuted)),
           ],
         ),
         
@@ -332,7 +333,7 @@ class InvoicePdfService {
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [
-            pw.Text('فاتورة مبيعات ضريبية', style: pw.TextStyle(font: bold, fontSize: 22, color: brandColor)),
+            pw.Text(GlobalMessage.l10n.pdfSalesInvoice, style: pw.TextStyle(font: bold, fontSize: 22, color: brandColor)),
             pw.Text('TAX INVOICE', style: pw.TextStyle(font: bold, fontSize: 13, color: accentColor)),
             pw.SizedBox(height: 12),
             pw.Container(
@@ -369,14 +370,14 @@ class InvoicePdfService {
             children: [
               pw.Row(
                 children: [
-                  pw.Text('رقم الفاتورة: ', style: pw.TextStyle(font: bold, fontSize: 11, color: brandColor)),
+                  pw.Text('${GlobalMessage.l10n.pdfInvoiceNumber} ', style: pw.TextStyle(font: bold, fontSize: 11, color: brandColor)),
                   pw.Text(data.invoiceId, style: pw.TextStyle(font: bold, fontSize: 11)),
                 ],
               ),
               pw.SizedBox(height: 6),
               pw.Row(
                 children: [
-                  pw.Text('تاريخ الإصدار: ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
+                  pw.Text('${GlobalMessage.l10n.pdfIssueDate} ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
                   pw.Text(_fmt(data.date), style: const pw.TextStyle(fontSize: 10)),
                 ],
               ),
@@ -387,15 +388,15 @@ class InvoicePdfService {
             children: [
               pw.Row(
                 children: [
-                  pw.Text('الكاشير المسؤول: ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
+                  pw.Text('${GlobalMessage.l10n.pdfCashier} ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
                   pw.Text(data.cashierName, style: pw.TextStyle(font: bold, fontSize: 10)),
                 ],
               ),
               pw.SizedBox(height: 6),
               pw.Row(
                 children: [
-                  pw.Text('حالة الفاتورة: ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
-                  pw.Text('مدفوعة بالكامل', style: pw.TextStyle(font: bold, fontSize: 10, color: PdfColor.fromInt(0xFF22C55E))),
+                  pw.Text('${GlobalMessage.l10n.pdfInvoiceStatus} ', style: pw.TextStyle(font: regular, fontSize: 10, color: brandColor)),
+                  pw.Text(GlobalMessage.l10n.pdfPaidInFull, style: pw.TextStyle(font: bold, fontSize: 10, color: PdfColor.fromInt(0xFF22C55E))),
                 ],
               ),
             ],
@@ -434,10 +435,10 @@ class InvoicePdfService {
             borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
           ),
           children: [
-            _tableHeaderCell('المنتج / السلعة', bold),
-            _tableHeaderCell('الكمية', bold),
-            _tableHeaderCell('سعر الوحدة', bold),
-            _tableHeaderCell('الإجمالي الكلي', bold),
+            _tableHeaderCell(GlobalMessage.l10n.pdfProductItem, bold),
+            _tableHeaderCell(GlobalMessage.l10n.pdfQtyLong, bold),
+            _tableHeaderCell(GlobalMessage.l10n.pdfUnitPrice, bold),
+            _tableHeaderCell(GlobalMessage.l10n.pdfGrandTotalCol, bold),
           ],
         ),
         
@@ -452,8 +453,8 @@ class InvoicePdfService {
             children: [
               _tableCell(line.name, regular, align: pw.TextAlign.right, textDark: textDark),
               _tableCell(line.qty.toString(), regular, textDark: textDark),
-              _tableCell('${line.price.toStringAsFixed(2)} ج.م', regular, textDark: textDark),
-              _tableCell('${line.total.toStringAsFixed(2)} ج.م', bold, textDark: textDark),
+              _tableCell('${line.price.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', regular, textDark: textDark),
+              _tableCell('${line.total.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', bold, textDark: textDark),
             ],
           );
         }),
@@ -502,10 +503,10 @@ class InvoicePdfService {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('الشروط والأحكام:', style: pw.TextStyle(font: bold, fontSize: 9.5, color: brandColor)),
+              pw.Text(GlobalMessage.l10n.pdfTermsConditions, style: pw.TextStyle(font: bold, fontSize: 9.5, color: brandColor)),
               pw.SizedBox(height: 4),
-              pw.Text('1. البضاعة المباعة لا ترد ولا تستبدل بعد 14 يوماً من تاريخ الفاتورة.', style: pw.TextStyle(font: regular, fontSize: 8, color: PdfColors.grey700)),
-              pw.Text('2. يجب إحضار الفاتورة الأصلية عند طلب الاسترجاع أو الصيانة.', style: pw.TextStyle(font: regular, fontSize: 8, color: PdfColors.grey700)),
+              pw.Text(GlobalMessage.l10n.pdfTerm1, style: pw.TextStyle(font: regular, fontSize: 8, color: PdfColors.grey700)),
+              pw.Text(GlobalMessage.l10n.pdfTerm2, style: pw.TextStyle(font: regular, fontSize: 8, color: PdfColors.grey700)),
             ],
           ),
         ),
@@ -520,11 +521,11 @@ class InvoicePdfService {
           ),
           child: pw.Column(
             children: [
-              _summaryRow('الإجمالي الفرعي:', '${data.subtotal.toStringAsFixed(2)} ج.م', regular, regular, textDark),
+              _summaryRow(GlobalMessage.l10n.pdfSubtotal, '${data.subtotal.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', regular, regular, textDark),
               if (data.discount > 0)
-                _summaryRow('خصومات الفاتورة:', '- ${data.discount.toStringAsFixed(2)} ج.م', regular, regular, accentColor),
+                _summaryRow(GlobalMessage.l10n.pdfInvoiceDiscounts, '- ${data.discount.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', regular, regular, accentColor),
               if (data.tax > 0)
-                _summaryRow('ضريبة القيمة المضافة:', '${data.tax.toStringAsFixed(2)} ج.م', regular, regular, textDark),
+                _summaryRow(GlobalMessage.l10n.pdfVatTax, '${data.tax.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', regular, regular, textDark),
               
               pw.Container(
                 decoration: pw.BoxDecoration(
@@ -536,11 +537,11 @@ class InvoicePdfService {
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
                     pw.Text(
-                      'الإجمالي النهائي:', 
+                      GlobalMessage.l10n.pdfFinalTotal, 
                       style: pw.TextStyle(font: bold, fontSize: 11, color: PdfColors.white),
                     ),
                     pw.Text(
-                      '${data.grandTotal.toStringAsFixed(2)} ج.م', 
+                      '${data.grandTotal.toStringAsFixed(2)} ${GlobalMessage.l10n.currencyEg}', 
                       style: pw.TextStyle(font: bold, fontSize: 12, color: PdfColors.white),
                     ),
                   ],
@@ -575,7 +576,7 @@ class InvoicePdfService {
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
             pw.Text(
-              'شكراً لتعاملكم معنا ودمتم سالمين!', 
+              GlobalMessage.l10n.pdfThanksDealing, 
               style: pw.TextStyle(font: bold, fontSize: 9.5, color: PdfColor.fromInt(0xFF1E3A8A)),
             ),
             pw.BarcodeWidget(

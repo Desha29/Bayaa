@@ -3,6 +3,7 @@ import 'package:bayaa_pos/core/data/services/persistence_initializer.dart';
 import '../../data/models/stock_summary_category_model.dart';
 import '../../data/models/product_sales_detail.dart';
 import 'stock_summary_state.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 
 class StockSummaryCubit extends Cubit<StockSummaryState> {
   StockSummaryCubit() : super(StockSummaryInitial());
@@ -61,7 +62,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
 
       // Process Stock Data
       for (var row in stockResults) {
-        final categoryId = row['category_id'] as String? ?? 'عام';
+        final categoryId = row['category_id'] as String? ?? GlobalMessage.l10n.generalCategory;
         
         categoryMap[categoryId] = StockSummaryCategoryModel(
           categoryName: categoryId, // We use ID as name based on schema
@@ -81,7 +82,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
       // Process Sales Data
       for (var row in salesResults) {
         var categoryId = row['category_id'] as String?;
-        categoryId ??= 'المحذوفة';
+        categoryId ??= GlobalMessage.l10n.deletedCategory;
         
         if (!categoryMap.containsKey(categoryId)) {
            // Category exists in sales but not in current active products (maybe deleted category or no active products)
@@ -94,7 +95,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
              totalDefaultSellValue: 0,
              totalSoldQuantity: 0,
              totalHistoricValue: 0,
-             isDeletedCategory: categoryId == 'المحذوفة',
+             isDeletedCategory: categoryId == GlobalMessage.l10n.deletedCategory,
              productDetails: [],
            );
         }
@@ -112,7 +113,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
       
       for (var row in salesResults) {
         var categoryId = row['category_id'] as String?;
-        categoryId ??= 'المحذوفة';
+        categoryId ??= GlobalMessage.l10n.deletedCategory;
         
         final soldQty = (row['sold_qty'] as num).toInt();
         final refundedQty = (row['refunded_qty'] as num).toInt();
@@ -141,7 +142,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
   
       final stockDataMap = {
         for (var r in stockResults) 
-          (r['category_id'] as String? ?? 'عام') : r
+          (r['category_id'] as String? ?? GlobalMessage.l10n.generalCategory) : r
       };
 
       for (var cat in allCats) {
@@ -164,7 +165,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
           totalCurrentWholesaleValue: currentWholesale,
           totalMinSellValue: minSell,
           totalDefaultSellValue: defaultSell,
-          isDeletedCategory: cat == 'المحذوفة',
+          isDeletedCategory: cat == GlobalMessage.l10n.deletedCategory,
           productDetails: catDetails[cat] ?? [],
         ));
       }
@@ -195,7 +196,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
 
     } catch (e) {
       print('  ❌ Stock summary failed: $e');
-      if (!isClosed) emit(StockSummaryError("فشل في حساب الملخص: $e"));
+      if (!isClosed) emit(StockSummaryError(GlobalMessage.l10n.stockSummaryCalcFailed(e.toString())));
     }
   }
 }

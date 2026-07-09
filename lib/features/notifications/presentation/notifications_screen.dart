@@ -50,8 +50,8 @@ class NotificationsScreen extends StatelessWidget {
                         children: [
                           // Header
                           ScreenHeader(
-                            title: 'التنبيهات',
-                            subtitle: 'إدارة التنبيهات والإشعارات',
+                            title: l10n.notifications,
+                            subtitle: l10n.notificationsScreenSubtitle,
                             icon: LucideIcons.bell,
                             titleColor: AppColors.textPrimary,
                             iconColor: AppColors.primaryColor,
@@ -157,7 +157,7 @@ class NotificationsScreen extends StatelessWidget {
                   } else {
                     return Center(
                       child: Text(
-                        'حدث خطأ غير متوقع',
+                        l10n.unexpectedError,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           color: AppColors.textPrimary,

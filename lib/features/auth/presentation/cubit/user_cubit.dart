@@ -1,3 +1,4 @@
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import 'package:bayaa_pos/features/auth/domain/repository/user_repository_int.dart';
 import 'package:bayaa_pos/features/auth/presentation/cubit/user_states.dart';
@@ -45,7 +46,7 @@ class UserCubit extends Cubit<UserStates> {
           final defaultAdmin = User(
             username: 'admin',
             password: 'admin',
-            name: 'مدير النظام',
+            name: GlobalMessage.l10n.roleManager,
             userType: UserType.manager,
             phone: '000',
           );
@@ -74,7 +75,7 @@ class UserCubit extends Cubit<UserStates> {
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
       (_) async {
-        emit(UserSuccess("تم حذف المستخدم بنجاح"));
+        emit(UserSuccess(GlobalMessage.l10n.msgUserDeleted));
 
         // Log activity with session (auto-creates session if closed)
         final sid = await getIt<SessionManager>().ensureSessionId(
@@ -82,7 +83,7 @@ class UserCubit extends Cubit<UserStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: ActivityType.userDelete,
-          description: 'حذف مستخدم: $username',
+          description: GlobalMessage.l10n.activityDeleteUser(username),
           userName: currentUser.name,
           sessionId: sid,
         );
@@ -98,7 +99,7 @@ class UserCubit extends Cubit<UserStates> {
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
       (_) async {
-        emit(UserSuccess("تم إضافة المستخدم بنجاح"));
+        emit(UserSuccess(GlobalMessage.l10n.msgUserCreated));
 
         // Check if update (simple check if username exists in list, though list might be empty if not loaded)
         // Since we just saved successfully, we can't check _users easily if username is same vs new?
@@ -112,8 +113,8 @@ class UserCubit extends Cubit<UserStates> {
         await getIt<ActivityLogger>().logActivity(
           type: isUpdate ? ActivityType.userUpdate : ActivityType.userAdd,
           description: isUpdate
-              ? 'تحديث مستخدم: ${user.name}'
-              : 'إضافة مستخدم: ${user.name}',
+              ? GlobalMessage.l10n.activityUpdateUser(user.name)
+              : GlobalMessage.l10n.activityAddUser(user.name),
           userName: currentUser.name,
           sessionId: sid,
         );
@@ -132,7 +133,7 @@ class UserCubit extends Cubit<UserStates> {
         if (currentUser.username == user.username) {
           currentUser = user;
         }
-        emit(UserSuccess("تم تحديث المستخدم بنجاح"));
+        emit(UserSuccess(GlobalMessage.l10n.msgUserUpdated));
 
         // Log activity with session (auto-creates session if closed)
         final sid = await getIt<SessionManager>().ensureSessionId(
@@ -140,7 +141,7 @@ class UserCubit extends Cubit<UserStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: ActivityType.userUpdate,
-          description: 'تحديث مستخدم: ${user.name}',
+          description: GlobalMessage.l10n.activityUpdateUser(user.name),
           userName: currentUser.name,
           sessionId: sid,
         );
@@ -188,7 +189,7 @@ class UserCubit extends Cubit<UserStates> {
             // Log activity
             await getIt<ActivityLogger>().logActivity(
               type: ActivityType.login,
-              description: 'تسجيل دخول',
+              description: GlobalMessage.l10n.activityLogin,
               userName: user.name,
               sessionId: session.id,
             );
@@ -199,18 +200,18 @@ class UserCubit extends Cubit<UserStates> {
 
             if (hadOpenSession) {
               emit(LoginSuccess(
-                  "تم تسجيل الدخول. سستم المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.",
+                  GlobalMessage.l10n.loginSuccessExistingSession,
                   isExistingSession: true));
             } else {
-              emit(LoginSuccess("تم تسجيل الدخول وفتح يومية جديدة بنجاح",
+              emit(LoginSuccess(GlobalMessage.l10n.loginSuccessNewSession,
                   isExistingSession: false));
             }
           } catch (e) {
-            emit(UserFailure("فشل فتح اليوم: $e"));
+            emit(UserFailure(GlobalMessage.l10n.failedToOpenDay(e)));
           }
         } else {
           print("   ❌ Password Mismatch!");
-          emit(UserFailure("كلمة المرور غير صحيحة"));
+          emit(UserFailure(GlobalMessage.l10n.wrongPassword));
         }
       },
     );
@@ -237,17 +238,13 @@ class UserCubit extends Cubit<UserStates> {
         if (sessionManager.currentSession == null) {
           print(
               'DEBUG_SESSION: Still no session after load. Emitting failure.');
-          emit(UserFailure("لا يوجد يوم مفتوح لإغلاقه."));
+          emit(UserFailure(GlobalMessage.l10n.noOpenSessionToClose));
           return;
         }
       }
 
       final currentSessionToClose = sessionManager.currentSession!;
 
-      // if (currentSessionToClose.id == null) {
-      //     emit(UserFailure("خطأ في معرف اليوم"));
-      //     return;
-      // }
 
       // Robust Session Capture: Time-Based + ID-Based
       // We explicitly scan recent sales to ensure nothing is missed
@@ -372,7 +369,7 @@ class UserCubit extends Cubit<UserStates> {
       // Log activity with session
       await getIt<ActivityLogger>().logActivity(
         type: ActivityType.sessionClose,
-        description: 'إغلاق يوم: ${totalSales.toStringAsFixed(2)} ج.م',
+        description: GlobalMessage.l10n.activityCloseDay(totalSales.toStringAsFixed(2)),
         userName: currentUser.name,
         sessionId: currentSessionToClose.id,
       );
@@ -395,9 +392,9 @@ class UserCubit extends Cubit<UserStates> {
       );
 
       emit(UserSuccessWithReport(
-          "تم إغلاق اليومية بنجاح.", report, closedSession));
+          GlobalMessage.l10n.sessionCloseSuccess, report, closedSession));
     } catch (e) {
-      emit(UserFailure("فشل إغلاق اليومية: $e"));
+      emit(UserFailure(GlobalMessage.l10n.failedToCloseSession(e)));
     }
   }
 
