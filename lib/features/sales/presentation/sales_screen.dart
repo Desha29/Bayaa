@@ -140,7 +140,7 @@ class _SalesScreenState extends State<SalesScreen>
       }
 
       if (product.quantity <= 0) {
-        MotionSnackBarError(context, AppLocalizations.of(context).outOfStock);
+        MotionSnackBarError(context, AppLocalizations.of(context).cartProductOutOfStock);
         _barcodeController.clear();
         setState(() {});
         _barcodeFocusNode.requestFocus();

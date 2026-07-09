@@ -40,11 +40,11 @@ class Product {
   }
 
   String get priority {
-    if (quantity == 0) return 'عاجل جداً';
+    if (quantity == 0) return 'very_urgent';
     final diff = minQuantity - quantity;
-    if (diff >= 3) return 'عاجل';
-    if (diff == 1 || diff == 2) return 'متوسط';
-    return 'منخفض';
+    if (diff >= 3) return 'urgent';
+    if (diff == 1 || diff == 2) return 'medium';
+    return 'low';
   }
 
   Product copyWith({

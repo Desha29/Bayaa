@@ -10,6 +10,7 @@ import 'package:bayaa_pos/core/functions/messege.dart';
 import '../../../core/di/dependency_injection.dart';
 
 import '../../../l10n/app_localizations.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 import '../../auth/data/models/user_model.dart';
 import '../../auth/presentation/cubit/user_states.dart';
 
@@ -55,7 +56,8 @@ class _SettingsScreenContent extends StatelessWidget {
               builder: (c) => const Center(child: CircularProgressIndicator()),
             );
           } else if (state is UserFailure) {
-            if (state.error.contains("إغلاق") ||
+            if (state.error.contains(GlobalMessage.l10n.noOpenSessionToClose) ||
+                state.error.contains("close") ||
                 state.error.contains("Close") ||
                 state.error.contains("closeSession")) {
               Navigator.of(context, rootNavigator: true)

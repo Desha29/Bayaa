@@ -438,7 +438,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get outOfStock => 'نفذ';
+  String get cartProductOutOfStock => 'الكمية نفذت من المخزن لهذا المنتج';
 
   @override
   String maxQtyReached(Object qty) {
@@ -750,6 +750,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get all => 'الكل';
+
+  @override
+  String get outOfStock => 'نفذ';
 
   @override
   String get lowStock => 'منخفض';
@@ -1661,4 +1664,1092 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get dataManagementSub =>
       'عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة';
+
+  @override
+  String get msgConnectionTimeout => 'انتهت مهلة الاتصال';
+
+  @override
+  String get msgInvalidCredentials => 'بيانات الدخول غير صحيحة';
+
+  @override
+  String get warnLowStock => 'الكمية قليلة - يرجى إعادة التموين';
+
+  @override
+  String get warnUnsavedChanges => 'يوجد تغييرات غير محفوظة';
+
+  @override
+  String get warnConfirmDelete => 'هل أنت متأكد من الحذف؟';
+
+  @override
+  String get warnSessionExpired => 'انتهى يوم العمل';
+
+  @override
+  String get warnDataLoss => 'قد تفقد البيانات غير المحفوظة';
+
+  @override
+  String get warnBackupRequired => 'يُفضل عمل نسخة احتياطية';
+
+  @override
+  String get warnSystemMaintenance => 'سيتم إغلاق النظام للصيانة';
+
+  @override
+  String get infoLoadingData => 'جاري تحميل البيانات...';
+
+  @override
+  String get infoProcessingRequest => 'جاري معالجة الطلب...';
+
+  @override
+  String get infoGeneratingReport => 'جاري إنشاء التقرير...';
+
+  @override
+  String get infoSavingData => 'جاري حفظ البيانات...';
+
+  @override
+  String get infoUpdatingData => 'جاري تحديث البيانات...';
+
+  @override
+  String get infoDeletingData => 'جاري حذف البيانات...';
+
+  @override
+  String get infoExportingData => 'جاري تصدير البيانات...';
+
+  @override
+  String get infoImportingData => 'جاري استيراد البيانات...';
+
+  @override
+  String get infoSynchronizingData => 'جاري مزامنة البيانات...';
+
+  @override
+  String get infoSystemReady => 'النظام جاهز للاستخدام';
+
+  @override
+  String get infoNewUpdateAvailable => 'يوجد تحديث جديد متاح';
+
+  @override
+  String get infoMaintenanceScheduled => 'مجدولة صيانة النظام';
+
+  @override
+  String get systemUserName => 'النظام';
+
+  @override
+  String get activationTitle => '🔒 النسخة غير مفعّلة';
+
+  @override
+  String get activationMessage =>
+      'يبدو أنك تستخدم نسخة غير مفعّلة من النظام.\nيرجى التواصل مع المطور لتفعيل نسختك.';
+
+  @override
+  String get activationCallMe => 'اتصل بي';
+
+  @override
+  String get activationEmailSubject => 'طلب تفعيل التطبيق';
+
+  @override
+  String get activationEmailBody => 'مرحبًا، أود شراء نسخة من التطبيق.';
+
+  @override
+  String get activationEmailMe => 'راسلني عبر البريد';
+
+  @override
+  String get activationWhatsapp => 'تواصل عبر واتساب';
+
+  @override
+  String get activationCopyright => '© 2025 Amr Store. جميع الحقوق محفوظة';
+
+  @override
+  String analyticsLoadError(Object error) {
+    return 'حدث خطأ غير متوقع أثناء تحميل البيانات: $error';
+  }
+
+  @override
+  String get noDataForDay => 'لم يتم العثور على بيانات لهذا اليوم';
+
+  @override
+  String sessionAnalyticsLoadError(Object error) {
+    return 'فشل تحميل بيانات الجلسة: $error';
+  }
+
+  @override
+  String aggregateAnalyticsLoadError(Object error) {
+    return 'فشل تحميل الإحصائيات العامة: $error';
+  }
+
+  @override
+  String get amPeriod => 'ص';
+
+  @override
+  String get pmPeriod => 'م';
+
+  @override
+  String get salesByDepartment => 'المبيعات حسب القسم';
+
+  @override
+  String get refundRatio => 'نسبة المرتجعات';
+
+  @override
+  String netSalesLabel(Object amount) {
+    return 'مبيعات صافية ($amount)';
+  }
+
+  @override
+  String refundsLabel(Object amount) {
+    return 'مرتجعات ($amount)';
+  }
+
+  @override
+  String get analyticsTitle => 'التحليلات والإحصائيات';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get insufficientSalesData => 'لا توجد بيانات كافية لتحليل المبيعات';
+
+  @override
+  String sessionFilterLabel(Object id) {
+    return 'جلسة: $id';
+  }
+
+  @override
+  String get periodYesterday => 'أمس';
+
+  @override
+  String get periodLast7Days => 'آخر 7 أيام';
+
+  @override
+  String get periodThisWeek => 'هذا الأسبوع';
+
+  @override
+  String get periodLast30Days => 'آخر 30 يوم';
+
+  @override
+  String get periodThisMonth => 'هذا الشهر';
+
+  @override
+  String get periodThisYear => 'هذه السنة';
+
+  @override
+  String get periodCustomDate => 'يوم محدد';
+
+  @override
+  String get periodCustomRange => 'فترة مخصصة';
+
+  @override
+  String get tabOverview => 'نظرة عامة';
+
+  @override
+  String get tabSalesAnalysis => 'تحليل المبيعات';
+
+  @override
+  String get tabProductAnalysis => 'تحليل المنتجات';
+
+  @override
+  String dateRangeFromTo(Object end, Object start) {
+    return 'من $start إلى $end';
+  }
+
+  @override
+  String get filterBySessionTooltip => 'تصفية حسب الجلسة';
+
+  @override
+  String get allSessions => 'كل الجلسات';
+
+  @override
+  String sessionHashLabel(Object id) {
+    return 'جلسة #$id';
+  }
+
+  @override
+  String get wrongPassword => 'كلمة المرور غير صحيحة';
+
+  @override
+  String get noOpenSessionToClose => 'لا يوجد يوم مفتوح لإغلاقه.';
+
+  @override
+  String get loginSuccessExistingSession =>
+      'تم تسجيل الدخول. سستم المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.';
+
+  @override
+  String get loginSuccessNewSession => 'تم تسجيل الدخول وفتح يومية جديدة بنجاح';
+
+  @override
+  String failedToOpenDay(Object error) {
+    return 'فشل فتح اليوم: $error';
+  }
+
+  @override
+  String get sessionCloseSuccess => 'تم إغلاق اليومية بنجاح.';
+
+  @override
+  String failedToCloseSession(Object error) {
+    return 'فشل إغلاق اليومية: $error';
+  }
+
+  @override
+  String get sharePdf => 'مشاركة PDF';
+
+  @override
+  String get confirmDeleteInvoiceTitle => 'تأكيد حذف الفاتورة';
+
+  @override
+  String confirmDeleteInvoiceMessage(Object id) {
+    return 'هل أنت متأكد من حذف الفاتورة (#$id) نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه.';
+  }
+
+  @override
+  String get confirmDeleteAction => 'تأكيد الحذف';
+
+  @override
+  String get invoiceDeletedSuccess => 'تم حذف الفاتورة بنجاح';
+
+  @override
+  String invoiceDeleteFailed(Object error) {
+    return 'فشل حذف الفاتورة: $error';
+  }
+
+  @override
+  String get refundSuccess => 'تم المرتجع بنجاح';
+
+  @override
+  String get selectDateRangeToDelete => 'يجب تحديد نطاق التاريخ لحذف الفواتير';
+
+  @override
+  String get confirmDeleteInvoicesTitle => 'تأكيد حذف الفواتير';
+
+  @override
+  String confirmDeleteInvoicesMessage(Object end, Object start) {
+    return 'هل أنت متأكد من حذف جميع الفواتير من $start إلى $end؟\n\nهذا الإجراء لا يمكن التراجع عنه.';
+  }
+
+  @override
+  String get invoicesDeletedSuccess => 'تم حذف الفواتير بنجاح';
+
+  @override
+  String invoicesDeleteFailed(Object error) {
+    return 'فشل حذف الفواتير: $error';
+  }
+
+  @override
+  String get invoicesScreenSubtitle => 'عرض وطباعة الفواتير الصادرة';
+
+  @override
+  String get notificationsScreenSubtitle => 'إدارة التنبيهات والإشعارات';
+
+  @override
+  String get productsScreenSubtitle => 'إدارة المنتجات وعرض التفاصيل';
+
+  @override
+  String get selectCategoryBeforeAction => 'تحديد الفئة قبل تنفيذ الإجراء';
+
+  @override
+  String get chooseCategory => 'اختر الفئة';
+
+  @override
+  String get noOtherCategoriesToMove =>
+      'لا توجد فئات أخرى لنقل المنتجات إليها.';
+
+  @override
+  String get mustChooseCategoryToContinue => 'يجب اختيار فئة قبل المتابعة';
+
+  @override
+  String get moveProducts => 'نقل المنتجات';
+
+  @override
+  String get permanentDelete => 'حذف نهائي';
+
+  @override
+  String get msgProductSaved => 'تم حفظ المنتج بنجاح';
+
+  @override
+  String get categoryAddedSuccess => 'تمت الإضافة بنجاح';
+
+  @override
+  String get categoryDeletedSuccess => 'تم الحذف بنجاح';
+
+  @override
+  String get searchProductHint =>
+      'ابحث عن منتج بالاسم، الكود، الباركود أو السعر...';
+
+  @override
+  String get byAvailability => 'حسب التوفر';
+
+  @override
+  String get chooseAvailability => 'اختر التوفر';
+
+  @override
+  String get byCategory => 'حسب الفئة';
+
+  @override
+  String get gridView => 'عرض الشبكة';
+
+  @override
+  String get tableView => 'عرض الجدول';
+
+  @override
+  String get confirmDeleteCategoryTitle => 'تأكيد حذف الفئة';
+
+  @override
+  String get confirmDeleteCategoryMessage => 'هل أنت متأكد من حذف هذه الفئة؟';
+
+  @override
+  String get fieldRequired => 'هذا الحقل مطلوب';
+
+  @override
+  String get mustEnterValidNumber => 'يجب إدخال رقم صالح';
+
+  @override
+  String get actionsColumn => 'إجراءات';
+
+  @override
+  String get close => 'إغلاق';
+
+  @override
+  String get transactionDetails => 'تفاصيل المعاملات';
+
+  @override
+  String transactionCount(Object count) {
+    return '$count معاملة';
+  }
+
+  @override
+  String get numberOfTransactions => 'عدد المعاملات';
+
+  @override
+  String get transactionUnit => 'معاملة';
+
+  @override
+  String get noTransactionsInReport => 'لا توجد معاملات في هذا التقرير';
+
+  @override
+  String get transactionsWillShowHere => 'سيتم عرض المعاملات هنا عند توفرها';
+
+  @override
+  String get detailedTransactionsLog => 'سجل الحركات التفصيلي';
+
+  @override
+  String get transactionNumber => 'رقم المعاملة';
+
+  @override
+  String get timeColumn => 'الوقت';
+
+  @override
+  String get typeColumn => 'النوع';
+
+  @override
+  String get byColumn => 'بواسطة';
+
+  @override
+  String get valueColumn => 'القيمة';
+
+  @override
+  String get reportPreview => 'معاينة التقرير';
+
+  @override
+  String get share => 'مشاركة';
+
+  @override
+  String get openTimeLabel => 'وقت الفتح';
+
+  @override
+  String get closeTimeLabel => 'وقت الإغلاق';
+
+  @override
+  String get openStatus => 'مفتوح';
+
+  @override
+  String errorLoadingReport(Object error) {
+    return 'خطأ في تحميل التقرير: $error';
+  }
+
+  @override
+  String get reportLoadedSuccess => 'تم تحميل التقرير بنجاح';
+
+  @override
+  String get preparingReportForPrint => 'جاري إعداد التقرير للطباعة...';
+
+  @override
+  String get reportSentToPrintSuccess => 'تم إرسال التقرير للطباعة بنجاح';
+
+  @override
+  String printErrorMsg(Object error) {
+    return 'خطأ في الطباعة: $error';
+  }
+
+  @override
+  String get preparingReportForShare => 'جاري إعداد التقرير للمشاركة...';
+
+  @override
+  String get reportSharedSuccess => 'تم مشاركة التقرير بنجاح';
+
+  @override
+  String shareErrorMsg(Object error) {
+    return 'خطأ في مشاركة التقرير: $error';
+  }
+
+  @override
+  String get dailyReportsTitle => 'التقارير اليومية';
+
+  @override
+  String get todayRevenueAndSales => 'إيرادات ومبيعات اليوم';
+
+  @override
+  String get dailyReportScreenSubtitle =>
+      'مراجعة المؤشرات المالية، المبيعات، المرتجعات، وقائمة المنتجات الأكثر طلباً';
+
+  @override
+  String get noDataAvailableForDate => 'لا توجد بيانات متاحة لهذا التاريخ';
+
+  @override
+  String get checkDateOrCompleteSales =>
+      'يرجى التأكد من تحديد تاريخ صحيح أو إتمام عمليات بيع أولاً';
+
+  @override
+  String get filterReportByDate => 'تصفية التقرير حسب التاريخ';
+
+  @override
+  String get currentlySelectedDay => 'اليوم المحدد حالياً';
+
+  @override
+  String get generatedReportDate => 'تاريخ التقرير المولد';
+
+  @override
+  String closedByLabel(Object name) {
+    return 'المغلق: $name';
+  }
+
+  @override
+  String get todayTotalSalesLabel => 'إجمالي مبيعات اليوم';
+
+  @override
+  String get dailyNetProfitLabel => 'صافي الأرباح اليومية';
+
+  @override
+  String get previewSalesReport => 'معاينة تقرير المبيعات';
+
+  @override
+  String get viewDetailedSalesTable => 'عرض جدول المبيعات التفصيلي';
+
+  @override
+  String get instantPrintReport => 'طباعة فورية للتقرير';
+
+  @override
+  String get sharePdfReport => 'مشاركة التقرير PDF';
+
+  @override
+  String get viewTable => 'عرض الجدول';
+
+  @override
+  String get noProductsSoldForDate => 'لا توجد منتجات مباعة لهذا التاريخ';
+
+  @override
+  String dailyProductPerformanceCount(Object count) {
+    return 'أداء وحركة المنتجات اليومية ($count)';
+  }
+
+  @override
+  String soldUnitsLabel(Object qty) {
+    return 'مبيعات: $qty وحدات';
+  }
+
+  @override
+  String profitAmountLabel(Object profit) {
+    return 'ربح: $profit ج.م';
+  }
+
+  @override
+  String get refundedProductsDetails => 'تفاصيل المنتجات المرتجعة';
+
+  @override
+  String get refundedQuantityColumn => 'الكمية المرتجعة';
+
+  @override
+  String get refundValueColumn => 'قيمة المرتجع';
+
+  @override
+  String get dailyFinancialTransactionsLog => 'سجل عمليات اليوم المالية';
+
+  @override
+  String get invoiceNumberColumn => 'رقم الفاتورة';
+
+  @override
+  String get transactionTimeColumn => 'وقت العملية';
+
+  @override
+  String get transactionTypeColumn => 'نوع العملية';
+
+  @override
+  String get managerLabel => 'المدير';
+
+  @override
+  String get activityUserUpdate => 'تعديل صلاحيات';
+
+  @override
+  String get activitySessionOpen => 'فتح وردية';
+
+  @override
+  String get activitySessionClose => 'إغلاق وردية';
+
+  @override
+  String get sessionsLogTitle => 'سجل الجلسات';
+
+  @override
+  String get sessionsLogSubtitle => 'عرض وإدارة جلسات النظام والتقارير اليومية';
+
+  @override
+  String get storeInfoSavedSuccess => 'تم حفظ معلومات المتجر بنجاح';
+
+  @override
+  String dmFailedLoadData(Object error) {
+    return 'فشل تحميل البيانات: $error';
+  }
+
+  @override
+  String get dmBackupCreatedSuccess => 'تم إنشاء النسخة الاحتياطية بنجاح';
+
+  @override
+  String get dmBackupCreateFailed => 'فشل إنشاء النسخة الاحتياطية';
+
+  @override
+  String dmGenericError(Object error) {
+    return 'خطأ: $error';
+  }
+
+  @override
+  String get dmConfirmRestoreTitle => 'تأكيد الاستعادة';
+
+  @override
+  String get dmConfirmRestoreMessage =>
+      'سيتم استبدال البيانات الحالية بالبيانات الموجودة في النسخة المختارة.\n\nسيتم إعادة تشغيل التطبيق بعد الاستعادة.';
+
+  @override
+  String get dmRestoreSuccessRestarting =>
+      'تمت الاستعادة بنجاح. جارٍ إعادة التشغيل...';
+
+  @override
+  String get dmRestoreBackupFailed => 'فشل استعادة النسخة الاحتياطية';
+
+  @override
+  String dmRestoreErrorMsg(Object error) {
+    return 'خطأ أثناء الاستعادة: $error';
+  }
+
+  @override
+  String get dmConfirmRestoreCheckpointTitle => 'تأكيد استعادة نقطة الحفظ';
+
+  @override
+  String get dmConfirmRestoreCheckpointMessage =>
+      'سيتم الرجوع إلى نقطة الحفظ هذه وفقدان أي بيانات مسجلة بعدها.\n\nسيتم إعادة تشغيل التطبيق.';
+
+  @override
+  String get dmCheckpointRestoreSuccess =>
+      'تمت استعادة نقطة الحفظ بنجاح. جارٍ إعادة التشغيل...';
+
+  @override
+  String get dmCheckpointRestoreFailed => 'فشل استعادة نقطة الحفظ';
+
+  @override
+  String get dmDeleteBackupTitle => 'حذف النسخة';
+
+  @override
+  String get dmDeleteBackupMessage =>
+      'هل أنت متأكد من حذف هذه النسخة الاحتياطية؟\n\nلا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get dmBackupDeletedSuccess => 'تم حذف النسخة بنجاح';
+
+  @override
+  String dmDeleteFailedMsg(Object error) {
+    return 'فشل الحذف: $error';
+  }
+
+  @override
+  String get dmProtectionDisabledTitle => 'نظام الحماية غير مُفعّل';
+
+  @override
+  String get dmProtectionDisabledSubtitle =>
+      'يجب تفعيل نظام الحماية أولاً من الإعدادات';
+
+  @override
+  String get back => 'رجوع';
+
+  @override
+  String get dataManagementTitle => 'إدارة البيانات';
+
+  @override
+  String get dataManagementHeaderSubtitle =>
+      'النسخ الاحتياطي ونقاط الحفظ التلقائي';
+
+  @override
+  String get backupUnitLabel => 'نسخة';
+
+  @override
+  String get checkpointUnitLabel => 'نقطة';
+
+  @override
+  String get backupsTabLabel => 'النسخ الاحتياطي';
+
+  @override
+  String get checkpointsTabLabel => 'نقاط الحفظ التلقائي';
+
+  @override
+  String get systemModeTabLabel => 'وضع النظام';
+
+  @override
+  String get createNewBackup => 'إنشاء نسخة احتياطية جديدة';
+
+  @override
+  String get noBackupsTitle => 'لا توجد نسخ احتياطية';
+
+  @override
+  String get noBackupsSubtitle => 'أنشئ نسخة احتياطية للحفاظ على بياناتك';
+
+  @override
+  String get noCheckpointsTitle => 'لا توجد نقاط حفظ تلقائية';
+
+  @override
+  String get noCheckpointsSubtitle =>
+      'يتم إنشاء نقاط الحفظ تلقائياً عند إجراء عمليات مهمة';
+
+  @override
+  String get autoCheckpointReason => 'نقطة حفظ تلقائية';
+
+  @override
+  String get latestBadge => 'الأحدث';
+
+  @override
+  String get restore => 'استعادة';
+
+  @override
+  String get currentSystemModeTitle => 'وضع تشغيل النظام الحالي';
+
+  @override
+  String get debugModeActiveDesc =>
+      'التطبيق يعمل حالياً في وضع التطوير (بيانات تجريبية مُفعّلة)';
+
+  @override
+  String get releaseModeActiveDesc =>
+      'التطبيق يعمل حالياً في وضع الإنتاج الفعلي';
+
+  @override
+  String get chooseOperatingMode => 'اختر وضع التشغيل:';
+
+  @override
+  String get releaseModeTitle => 'وضع الإنتاج الفعلي (Release)';
+
+  @override
+  String get releaseModeDesc =>
+      'استخدام قاعدة البيانات الحقيقية فقط بدون أي بيانات تجريبية.';
+
+  @override
+  String get debugModeTitle => 'وضع التطوير والتحقق (Debug)';
+
+  @override
+  String get debugModeDesc =>
+      'توليد بيانات تجريبية تلقائياً للمنتجات والمبيعات لاختبار النظام.';
+
+  @override
+  String get debugDangerZoneTitle => 'منطقة خطر البيانات التجريبية';
+
+  @override
+  String get debugDangerZoneDesc =>
+      'أدوات التحكم بقاعدة البيانات وتوليد البيانات التجريبية.';
+
+  @override
+  String get debugSeedExplanation =>
+      'يتيح لك هذا الزر مسح جميع المدخلات وتوليد مبيعات تجريبية كاملة لفترة الـ 7 أيام الماضية، بالإضافة إلى 7 منتجات ذات كميات وتصنيفات مختلفة ومستخدمين تجريبيين لتمكينك من فحص لوحة التحكم والرسوم البيانية.';
+
+  @override
+  String get resetAndSeedButton =>
+      'تهيئة قاعدة البيانات وتوليد البيانات التجريبية';
+
+  @override
+  String modeChangedSuccess(Object mode) {
+    return 'تم تغيير وضع النظام إلى: $mode';
+  }
+
+  @override
+  String get debugModeShortLabel => 'وضع التطوير';
+
+  @override
+  String get releaseModeShortLabel => 'وضع الإنتاج';
+
+  @override
+  String dmSaveSettingsFailed(Object error) {
+    return 'فشل حفظ الإعدادات: $error';
+  }
+
+  @override
+  String get dmConfirmResetTitle => 'تأكيد إعادة تهيئة البيانات';
+
+  @override
+  String get dmConfirmResetMessage =>
+      'سيتم مسح جميع البيانات الحالية (المستخدمين، المنتجات، الفواتير، اليوميات، وسجلات النشاط) بشكل كامل وتوليد بيانات تجريبية جديدة.\n\nلا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get dmResetSeedSuccess =>
+      'تمت إعادة تهيئة البيانات وتوليد البيانات التجريبية بنجاح';
+
+  @override
+  String dmResetSeedError(Object error) {
+    return 'خطأ أثناء تهيئة البيانات: $error';
+  }
+
+  @override
+  String get protectionEnabledSuccess => 'تم تفعيل نظام الحماية بنجاح';
+
+  @override
+  String get restartAppTitle => 'إعادة تشغيل التطبيق';
+
+  @override
+  String get protectionEnabledRestartMessage =>
+      'تم تفعيل نظام الحماية بنجاح!\n\nللاستفادة الكاملة من النظام، يُفضل إعادة تشغيل التطبيق.';
+
+  @override
+  String get dataMovedSuccess => 'تم نقل البيانات بنجاح';
+
+  @override
+  String get dataMovedSuccessTitle => 'تم النقل بنجاح';
+
+  @override
+  String dataMovedToMessage(Object path) {
+    return 'تم نقل البيانات إلى:\n$path\n\nيُفضل إعادة تشغيل التطبيق.';
+  }
+
+  @override
+  String get dataMoveFailedOrCancelled => 'فشل نقل البيانات أو تم الإلغاء';
+
+  @override
+  String get dataProtectionSystemTitle => 'نظام الحماية من فقدان البيانات';
+
+  @override
+  String get enabledStatus => 'مُفعّل';
+
+  @override
+  String get notEnabledStatus => 'غير مُفعّل';
+
+  @override
+  String get systemEnabledLabel => 'النظام مُفعّل';
+
+  @override
+  String get dataProtectedFromLabel => 'بياناتك محمية من:';
+
+  @override
+  String get protectionFeatureAccidentalDelete => 'الحذف الغير مقصود';
+
+  @override
+  String get protectionFeatureCrashes => 'الأعطال والانهيارات';
+
+  @override
+  String get protectionFeaturePowerOutage => 'انقطاع الكهرباء';
+
+  @override
+  String get protectionFeatureWindowsReinstall => 'إعادة تثبيت Windows';
+
+  @override
+  String dataLocationLabel(Object path) {
+    return 'موقع البيانات:\n$path';
+  }
+
+  @override
+  String get changeStorageLocation => 'تغيير مكان الحفظ';
+
+  @override
+  String get systemNotEnabledLabel => 'النظام غير مُفعّل';
+
+  @override
+  String get dataAtRiskMessage => 'حالياً، بياناتك معرضة للفقدان في حالة:';
+
+  @override
+  String get riskProgramDelete => 'حذف البرنامج';
+
+  @override
+  String get riskAntivirusScan => 'فحص الفيروسات';
+
+  @override
+  String get riskSystemCrash => 'انهيار النظام';
+
+  @override
+  String get enableProtectionNow => 'تفعيل نظام الحماية الآن';
+
+  @override
+  String stockSummaryCalcFailed(Object error) {
+    return 'فشل في حساب الملخص: $error';
+  }
+
+  @override
+  String get pieceUnit => 'قطعة';
+
+  @override
+  String get switchLanguageLabel => 'العربية';
+
+  @override
+  String profitMarginLabel(Object percent) {
+    return 'هامش: $percent%';
+  }
+
+  @override
+  String revenueAmountLabel(Object amount) {
+    return '$amount ج.م';
+  }
+
+  @override
+  String get accessDeniedMessage =>
+      'تم رفض الوصول: ليس لديك صلاحية لتنفيذ هذا الإجراء.';
+
+  @override
+  String activityDeleteUser(Object name) {
+    return 'حذف مستخدم: $name';
+  }
+
+  @override
+  String activityUpdateUser(Object name) {
+    return 'تحديث مستخدم: $name';
+  }
+
+  @override
+  String activityAddUser(Object name) {
+    return 'إضافة مستخدم: $name';
+  }
+
+  @override
+  String get activityLogin => 'تسجيل دخول';
+
+  @override
+  String activityCloseDay(Object total) {
+    return 'إغلاق يوم: $total ج.م';
+  }
+
+  @override
+  String activityUpdateProduct(Object name) {
+    return 'تحديث منتج: $name';
+  }
+
+  @override
+  String activityAddProduct(Object name) {
+    return 'إضافة منتج: $name';
+  }
+
+  @override
+  String activityDeleteProduct(Object name) {
+    return 'حذف منتج: $name';
+  }
+
+  @override
+  String activityDeleteInvoice(Object total) {
+    return 'حذف فاتورة: $total ج.م';
+  }
+
+  @override
+  String activityRefund(Object total) {
+    return 'استرجاع: $total ج.م';
+  }
+
+  @override
+  String get activityBulkDeleteInvoices => 'حذف فواتير جماعي';
+
+  @override
+  String activitySale(Object total) {
+    return 'عملية بيع: $total ج.م';
+  }
+
+  @override
+  String get activityUpdateStoreInfo => 'تحديث معلومات المتجر';
+
+  @override
+  String activityUpdateStock(Object name, Object qty) {
+    return 'تحديث مخزون: $name (+$qty)';
+  }
+
+  @override
+  String activityOpenDay(Object name) {
+    return 'فتح يوم جديد — $name';
+  }
+
+  @override
+  String get priorityVeryUrgent => 'عاجل جداً';
+
+  @override
+  String get priorityUrgent => 'عاجل';
+
+  @override
+  String get priorityMedium => 'متوسط';
+
+  @override
+  String get pdfPhone => 'هاتف:';
+
+  @override
+  String get pdfVatNumber => 'الرقم الضريبي:';
+
+  @override
+  String get pdfVatNumberFacility => 'الرقم الضريبي للمنشأة:';
+
+  @override
+  String get pdfSalesReceipt => 'إيصال مبيعات ضريبي';
+
+  @override
+  String get pdfSalesInvoice => 'فاتورة مبيعات ضريبية';
+
+  @override
+  String get pdfInvoiceNumber => 'رقم الفاتورة:';
+
+  @override
+  String get pdfDateTime => 'التاريخ والوقت:';
+
+  @override
+  String get pdfIssueDate => 'تاريخ الإصدار:';
+
+  @override
+  String get pdfCashier => 'الكاشير المسؤول:';
+
+  @override
+  String get pdfInvoiceStatus => 'حالة الفاتورة:';
+
+  @override
+  String get pdfPaidInFull => 'مدفوعة بالكامل';
+
+  @override
+  String get pdfProduct => 'المنتج';
+
+  @override
+  String get pdfProductItem => 'المنتج / السلعة';
+
+  @override
+  String get pdfQtyShort => 'ك';
+
+  @override
+  String get pdfQtyLong => 'الكمية';
+
+  @override
+  String get pdfPrice => 'سعر';
+
+  @override
+  String get pdfUnitPrice => 'سعر الوحدة';
+
+  @override
+  String get pdfTotal => 'إجمالي';
+
+  @override
+  String get pdfGrandTotalCol => 'الإجمالي الكلي';
+
+  @override
+  String get pdfSubtotalItems => 'إجمالي السلع:';
+
+  @override
+  String get pdfSubtotal => 'الإجمالي الفرعي:';
+
+  @override
+  String get pdfDiscountApplied => 'الخصم المطبق:';
+
+  @override
+  String get pdfInvoiceDiscounts => 'خصومات الفاتورة:';
+
+  @override
+  String get pdfVatTax => 'ضريبة القيمة المضافة:';
+
+  @override
+  String get pdfNetTotal => 'الصافي الكلي:';
+
+  @override
+  String get pdfFinalTotal => 'الإجمالي النهائي:';
+
+  @override
+  String get pdfThanksShopping => 'شكراً لتسوقكم معنا!';
+
+  @override
+  String get pdfThanksDealing => 'شكراً لتعاملكم معنا ودمتم سالمين!';
+
+  @override
+  String get pdfSystemName => 'نظام بياع لإدارة المبيعات POS';
+
+  @override
+  String get pdfTermsConditions => 'الشروط والأحكام:';
+
+  @override
+  String get pdfTerm1 =>
+      '1. البضاعة المباعة لا ترد ولا تستبدل بعد 14 يوماً من تاريخ الفاتورة.';
+
+  @override
+  String get pdfTerm2 =>
+      '2. يجب إحضار الفاتورة الأصلية عند طلب الاسترجاع أو الصيانة.';
+
+  @override
+  String get pdfRefundInvoice => 'فاتورة مرتجع';
+
+  @override
+  String get pdfDate => 'التاريخ:';
+
+  @override
+  String get pdfCashierShort => 'الكاشير:';
+
+  @override
+  String get pdfThanksVisiting => 'شكراً لزيارتكم!';
+
+  @override
+  String get pdfTotalCol => 'الإجمالي:';
+
+  @override
+  String get pdfDailySalesReport => 'تقرير المبيعات اليومية';
+
+  @override
+  String get pdfPosSystemBayaa => 'نظام نقاط البيع المتطور - Bayaa';
+
+  @override
+  String get pdfReportDate => 'تاريخ التقرير:';
+
+  @override
+  String get pdfTransactionsCount => 'عدد الحركات:';
+
+  @override
+  String get pdfNetRevenue => 'صافي الإيرادات:';
+
+  @override
+  String get pdfTotalSales => 'المبيعات الكلية';
+
+  @override
+  String get pdfTotalRefunds => 'المرتجعات الكلية';
+
+  @override
+  String get pdfNetProfit => 'صافي الربح';
+
+  @override
+  String get pdfTotalTransactions => 'عدد المعاملات';
+
+  @override
+  String get pdfClosedBy => 'تم الإغلاق بواسطة';
+
+  @override
+  String get pdfDailyPerformanceSummary => 'ملخص الأداء اليومي';
+
+  @override
+  String get pdfRevenue => 'الإيرادات';
+
+  @override
+  String get pdfCost => 'التكلفة';
+
+  @override
+  String get pdfProfits => 'الأرباح';
+
+  @override
+  String get pdfProfitMargin => 'هامش الربح';
+
+  @override
+  String get pdfTopSellingProducts => 'أداء المنتجات الأكثر مبيعاً';
+
+  @override
+  String get pdfReportGeneratedAt => 'تم إنشاء التقرير في:';
+
+  @override
+  String get pdfCopyright => '© 2026 Bayaa POS - جميع الحقوق محفوظة';
+
+  @override
+  String get pdfFallbackStoreName => 'بياع POS';
+
+  @override
+  String get pdfFallbackStoreAddressShort => 'القاهرة، مصر';
+
+  @override
+  String get pdfFallbackStoreAddressLong => 'القاهرة، جمهورية مصر العربية';
+
+  @override
+  String get pdfUnknownCashier => 'غير معروف';
 }

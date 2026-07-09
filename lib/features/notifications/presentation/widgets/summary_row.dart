@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class SummaryRow extends StatelessWidget {
   const SummaryRow({
@@ -18,6 +19,7 @@ class SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
@@ -26,7 +28,7 @@ class SummaryRow extends StatelessWidget {
 
         final children = [
           SummaryCard(
-            label: 'مقروءة',
+            label: l10n.readNotifications,
             value: opened,
             icon: LucideIcons.eye,
             bg: const Color(0xFFECFDF5), // Soft green
@@ -34,7 +36,7 @@ class SummaryRow extends StatelessWidget {
             isMobile: isMobile,
           ),
           SummaryCard(
-            label: 'عاجلة',
+            label: l10n.urgentNotifications,
             value: urgent,
             icon: LucideIcons.alertTriangle,
             bg: const Color(0xFFFEF2F2), // Soft red
@@ -42,7 +44,7 @@ class SummaryRow extends StatelessWidget {
             isMobile: isMobile,
           ),
           SummaryCard(
-            label: 'غير مقروءة',
+            label: l10n.unreadLabel,
             value: unread,
             icon: LucideIcons.eyeOff,
             bg: const Color(0xFFFFFBEB), // Soft yellow

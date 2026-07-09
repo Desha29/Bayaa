@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class EmptyState extends StatelessWidget {
   const EmptyState({
@@ -30,9 +31,10 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     // Defaults per variant
-    final defaults = _defaultsFor(variant, theme);
+    final defaults = _defaultsFor(variant, theme, l10n);
 
     final iconColor = defaults.iconColor;
     final bgColor = background ?? defaults.bgColor;
@@ -97,13 +99,14 @@ class EmptyState extends StatelessWidget {
     );
   }
 
-  _EmptyDefaults _defaultsFor(EmptyStateVariant v, ThemeData theme) {
+  _EmptyDefaults _defaultsFor(
+      EmptyStateVariant v, ThemeData theme, AppLocalizations l10n) {
     switch (v) {
       case EmptyStateVariant.products:
         return _EmptyDefaults(
           icon: Icons.inventory_2_outlined,
-          title: 'لا توجد منتجات',
-          message: 'لم يتم العثور على منتجات تطابق البحث',
+          title: l10n.noProductsEmpty,
+          message: l10n.noProductsSearchMatch,
           bgColor: Colors.grey.shade100,
           iconColor: Colors.grey[400]!,
           titleStyle: const TextStyle(
@@ -120,8 +123,8 @@ class EmptyState extends StatelessWidget {
       case EmptyStateVariant.notifications:
         return _EmptyDefaults(
           icon: LucideIcons.bell,
-          title: 'لا توجد تنبيهات',
-          message: 'سيتم عرض التنبيهات هنا عند توفرها',
+          title: l10n.noAlertsEmpty,
+          message: l10n.alertsWillShowHere,
           bgColor: Colors.transparent,
           iconColor: theme.colorScheme.onSurface.withOpacity(0.25),
           titleStyle: theme.textTheme.titleLarge?.copyWith(

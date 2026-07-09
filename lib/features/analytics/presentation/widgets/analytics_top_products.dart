@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 import '../../../sessions/data/models/product_performance_model.dart';
 
@@ -15,6 +16,7 @@ class AnalyticsTopProducts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -61,9 +63,9 @@ class AnalyticsTopProducts extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'المنتجات الأكثر مبيعاً',
-                    style: TextStyle(
+                  Text(
+                    l10n.topSellingProducts,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.kDarkChip,
@@ -75,10 +77,10 @@ class AnalyticsTopProducts extends StatelessWidget {
               SizedBox(
                 height: isDesktop ? 200 : isTablet ? 160 : null,
                 child: products.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
-                          'لا توجد منتجات',
-                          style: TextStyle(color: AppColors.mutedColor),
+                          l10n.noProducts,
+                          style: const TextStyle(color: AppColors.mutedColor),
                         ),
                       )
                     : Builder(
@@ -93,7 +95,7 @@ class AnalyticsTopProducts extends StatelessWidget {
                             separatorBuilder: (context, index) => const Divider(height: 24),
                             itemBuilder: (context, index) {
                               final product = products[index];
-                              return _buildProductItem(product, index + 1, maxRev); 
+                              return _buildProductItem(l10n, product, index + 1, maxRev);
                             },
                           );
                         }
@@ -106,7 +108,7 @@ class AnalyticsTopProducts extends StatelessWidget {
     );
   }
 
-  Widget _buildProductItem(ProductPerformanceModel product, int rank, double maxRevenue) {
+  Widget _buildProductItem(AppLocalizations l10n, ProductPerformanceModel product, int rank, double maxRevenue) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -148,14 +150,14 @@ class AnalyticsTopProducts extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${product.revenue.toStringAsFixed(0)} ج.م',
+                        '${product.revenue.toStringAsFixed(0)} ${l10n.currencyEg}',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor),
                       ),
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'بيع: ${product.quantitySold} قطعة',
+                    l10n.soldCount(product.quantitySold),
                     style: const TextStyle(fontSize: 11, color: AppColors.mutedColor),
                   ),
                 ],

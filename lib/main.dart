@@ -206,7 +206,7 @@ class MyApp extends StatelessWidget {
           child: MessageOverlay(
             child: MaterialApp(
               navigatorKey: navigatorKey,
-              title: localeProvider.isArabic ? 'بياع' : 'Bayaa POS',
+              onGenerateTitle: (context) => AppLocalizations.of(context).appName,
               debugShowCheckedModeBanner: false,
               theme: AppTheme.lightTheme,
               home: const LoginScreen(),

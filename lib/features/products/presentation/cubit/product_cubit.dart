@@ -4,6 +4,7 @@ import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:bayaa_pos/features/products/domain/product_repository_int.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/components/message_overlay.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
@@ -45,8 +46,13 @@ class ProductCubit extends Cubit<ProductStates> {
   List<Product> products = [];
   List<Product> get allProducts => products;
   List<String> categories = [];
-  String selectedCategory = 'الكل';
-  String selectedAvailability = 'الكل';
+  String? _selectedCategory;
+  String get selectedCategory => _selectedCategory ??= GlobalMessage.l10n.all;
+  set selectedCategory(String value) => _selectedCategory = value;
+
+  String? _selectedAvailability;
+  String get selectedAvailability => _selectedAvailability ??= GlobalMessage.l10n.all;
+  set selectedAvailability(String value) => _selectedAvailability = value;
   
   String currentSearchQuery = '';
 
@@ -61,8 +67,8 @@ class ProductCubit extends Cubit<ProductStates> {
     currentPage = 0;
     hasMoreProducts = true;
     currentSearchQuery = '';
-    selectedCategory = 'الكل';
-    selectedAvailability = 'الكل';
+    selectedCategory = GlobalMessage.l10n.all;
+    selectedAvailability = GlobalMessage.l10n.all;
     emit(ProductLoadedState([]));
   }
 
@@ -128,7 +134,7 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) async {
-        emit(ProductSuccessState("تم حفظ المنتج بنجاح"));
+        emit(ProductSuccessState(GlobalMessage.l10n.msgProductSaved));
         
         // Determine activity type
         final isUpdate = products.any((p) => p.barcode == product.barcode);
@@ -139,7 +145,7 @@ class ProductCubit extends Cubit<ProductStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: isUpdate ? ActivityType.productUpdate : ActivityType.productAdd,
-          description: isUpdate ? 'تحديث منتج: ${product.name}' : 'إضافة منتج: ${product.name}',
+          description: isUpdate ? GlobalMessage.l10n.activityUpdateProduct(product.name) : GlobalMessage.l10n.activityAddProduct(product.name),
           userName: getIt<UserCubit>().currentUser.name,
           sessionId: sid,
           details: {'barcode': product.barcode, 'price': product.price},
@@ -158,7 +164,7 @@ class ProductCubit extends Cubit<ProductStates> {
       (_) async {
         final deletedProduct = products.firstWhere((p) => p.barcode == barcode);
         
-        emit(ProductSuccessState("تم حذف المنتج بنجاح"));
+        emit(ProductSuccessState(GlobalMessage.l10n.msgProductDeleted));
         
         // Log activity with session (auto-creates session if closed)
         final sid = await getIt<SessionManager>().ensureSessionId(
@@ -166,7 +172,7 @@ class ProductCubit extends Cubit<ProductStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: ActivityType.productDelete,
-          description: 'حذف منتج: ${deletedProduct.name}',
+          description: GlobalMessage.l10n.activityDeleteProduct(deletedProduct.name),
           userName: getIt<UserCubit>().currentUser.name,
           sessionId: sid,
           details: {'barcode': barcode},
@@ -210,7 +216,7 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(CategoryErrorState(failure.message)),
       (_) {
-        emit(CategorySuccessState("تمت الإضافة بنجاح"));
+        emit(CategorySuccessState(GlobalMessage.l10n.categoryAddedSuccess));
         getAllCategories();
       },
     );
@@ -232,7 +238,7 @@ class ProductCubit extends Cubit<ProductStates> {
         }
       },
       (_) {
-        emit(CategorySuccessState("تم الحذف  بنجاح"));
+        emit(CategorySuccessState(GlobalMessage.l10n.categoryDeletedSuccess));
         getAllCategories();
         getAllProducts();
       },

@@ -302,7 +302,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
                         const SizedBox(width: 14),
                         Expanded(
                           child: Text(
-                            AppLocalizations.of(context).localeName == 'ar' ? 'English' : 'العربية',
+                            AppLocalizations.of(context).localeName == 'ar' ? 'English' : AppLocalizations.of(context).switchLanguageLabel,
                             style: const TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 14,

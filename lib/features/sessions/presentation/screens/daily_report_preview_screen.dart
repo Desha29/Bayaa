@@ -6,6 +6,7 @@ import 'package:printing/printing.dart';
 import '../../data/models/daily_report_model.dart';
 import '../../data/models/session_model.dart';
 import '../../domain/daily_report_pdf_service.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class DailyReportPreviewScreen extends StatelessWidget {
   final DailyReport report;
@@ -138,6 +139,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _buildGradientAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: Container(
@@ -169,9 +171,9 @@ class DailyReportPreviewScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'معاينة التقرير',
-                        style: TextStyle(
+                      Text(
+                        l10n.reportPreview,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -192,13 +194,13 @@ class DailyReportPreviewScreen extends StatelessWidget {
                 ),
                 _buildAppBarAction(
                   icon: Icons.print_rounded,
-                  label: 'طباعة',
+                  label: l10n.print,
                   onPressed: _handlePrint,
                 ),
                 const SizedBox(width: 4),
                 _buildAppBarAction(
                   icon: Icons.share_rounded,
-                  label: 'مشاركة',
+                  label: l10n.share,
                   onPressed: _handleShare,
                 ),
                 const SizedBox(width: 4),
@@ -248,6 +250,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
   }
 
   Widget _buildSessionDetailsCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -275,23 +278,23 @@ class DailyReportPreviewScreen extends StatelessWidget {
         children: [
           _buildDetailChip(
             icon: Icons.login_rounded,
-            label: 'وقت الفتح',
+            label: l10n.openTimeLabel,
             value: DateFormat('hh:mm a').format(session!.openTime),
             color: AppColors.successColor,
           ),
           _buildDetailDivider(),
           _buildDetailChip(
             icon: Icons.logout_rounded,
-            label: 'وقت الإغلاق',
+            label: l10n.closeTimeLabel,
             value: session!.closeTime != null
                 ? DateFormat('hh:mm a').format(session!.closeTime!)
-                : 'مفتوح',
+                : l10n.openStatus,
             color: AppColors.warningColor,
           ),
           _buildDetailDivider(),
           _buildDetailChip(
             icon: Icons.person_rounded,
-            label: 'بواسطة',
+            label: l10n.byColumn,
             value: report.closedByUserName,
             color: AppColors.secondaryColor,
           ),

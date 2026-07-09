@@ -8,6 +8,7 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/session/session_manager.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 
 class SettingsCubit extends Cubit<SettingsStates> {
   SettingsCubit({
@@ -59,12 +60,12 @@ class SettingsCubit extends Cubit<SettingsStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: ActivityType.userUpdate,
-          description: 'تحديث معلومات المتجر',
+          description: GlobalMessage.l10n.activityUpdateStoreInfo,
           userName: userCubit.currentUser.name,
           sessionId: sid,
         );
         
-        emit(StoreInfoUpdateSuccess("تم حفظ معلومات المتجر بنجاح"));
+        emit(StoreInfoUpdateSuccess(GlobalMessage.l10n.storeInfoSavedSuccess));
         emit(StoreInfoLoaded(newStoreInfo));
       },
     );
@@ -74,7 +75,7 @@ class SettingsCubit extends Cubit<SettingsStates> {
     try {
       return userCubit.currentUser.name;
     } catch (e) {
-      return 'غير معروف';
+      return GlobalMessage.l10n.unknown;
     }
   }
 

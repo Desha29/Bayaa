@@ -439,7 +439,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get outOfStock => 'Out of Stock';
+  String get cartProductOutOfStock => 'This product is out of stock';
 
   @override
   String maxQtyReached(Object qty) {
@@ -751,6 +751,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get all => 'All';
+
+  @override
+  String get outOfStock => 'Out of Stock';
 
   @override
   String get lowStock => 'Low Stock';
@@ -1670,4 +1673,1103 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dataManagementSub =>
       'View system logs, backups, and restore points';
+
+  @override
+  String get msgConnectionTimeout => 'Connection timed out';
+
+  @override
+  String get msgInvalidCredentials => 'Invalid login credentials';
+
+  @override
+  String get warnLowStock => 'Low quantity - please restock';
+
+  @override
+  String get warnUnsavedChanges => 'You have unsaved changes';
+
+  @override
+  String get warnConfirmDelete => 'Are you sure you want to delete?';
+
+  @override
+  String get warnSessionExpired => 'The work day has ended';
+
+  @override
+  String get warnDataLoss => 'You may lose unsaved data';
+
+  @override
+  String get warnBackupRequired => 'A backup is recommended';
+
+  @override
+  String get warnSystemMaintenance =>
+      'The system will shut down for maintenance';
+
+  @override
+  String get infoLoadingData => 'Loading data...';
+
+  @override
+  String get infoProcessingRequest => 'Processing request...';
+
+  @override
+  String get infoGeneratingReport => 'Generating report...';
+
+  @override
+  String get infoSavingData => 'Saving data...';
+
+  @override
+  String get infoUpdatingData => 'Updating data...';
+
+  @override
+  String get infoDeletingData => 'Deleting data...';
+
+  @override
+  String get infoExportingData => 'Exporting data...';
+
+  @override
+  String get infoImportingData => 'Importing data...';
+
+  @override
+  String get infoSynchronizingData => 'Synchronizing data...';
+
+  @override
+  String get infoSystemReady => 'System ready to use';
+
+  @override
+  String get infoNewUpdateAvailable => 'A new update is available';
+
+  @override
+  String get infoMaintenanceScheduled => 'System maintenance scheduled';
+
+  @override
+  String get systemUserName => 'System';
+
+  @override
+  String get activationTitle => '🔒 Version not activated';
+
+  @override
+  String get activationMessage =>
+      'It looks like you\'re using an unactivated version of the system.\nPlease contact the developer to activate your copy.';
+
+  @override
+  String get activationCallMe => 'Call me';
+
+  @override
+  String get activationEmailSubject => 'App activation request';
+
+  @override
+  String get activationEmailBody =>
+      'Hello, I would like to purchase a copy of the app.';
+
+  @override
+  String get activationEmailMe => 'Email me';
+
+  @override
+  String get activationWhatsapp => 'Contact via WhatsApp';
+
+  @override
+  String get activationCopyright => '© 2025 Amr Store. All rights reserved';
+
+  @override
+  String analyticsLoadError(Object error) {
+    return 'An unexpected error occurred while loading data: $error';
+  }
+
+  @override
+  String get noDataForDay => 'No data found for this day';
+
+  @override
+  String sessionAnalyticsLoadError(Object error) {
+    return 'Failed to load session data: $error';
+  }
+
+  @override
+  String aggregateAnalyticsLoadError(Object error) {
+    return 'Failed to load overall statistics: $error';
+  }
+
+  @override
+  String get amPeriod => 'AM';
+
+  @override
+  String get pmPeriod => 'PM';
+
+  @override
+  String get salesByDepartment => 'Sales by Department';
+
+  @override
+  String get refundRatio => 'Refund Ratio';
+
+  @override
+  String netSalesLabel(Object amount) {
+    return 'Net Sales ($amount)';
+  }
+
+  @override
+  String refundsLabel(Object amount) {
+    return 'Refunds ($amount)';
+  }
+
+  @override
+  String get analyticsTitle => 'Analytics & Statistics';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get insufficientSalesData => 'Not enough data to analyze sales';
+
+  @override
+  String sessionFilterLabel(Object id) {
+    return 'Session: $id';
+  }
+
+  @override
+  String get periodYesterday => 'Yesterday';
+
+  @override
+  String get periodLast7Days => 'Last 7 days';
+
+  @override
+  String get periodThisWeek => 'This week';
+
+  @override
+  String get periodLast30Days => 'Last 30 days';
+
+  @override
+  String get periodThisMonth => 'This month';
+
+  @override
+  String get periodThisYear => 'This year';
+
+  @override
+  String get periodCustomDate => 'Specific day';
+
+  @override
+  String get periodCustomRange => 'Custom range';
+
+  @override
+  String get tabOverview => 'Overview';
+
+  @override
+  String get tabSalesAnalysis => 'Sales Analysis';
+
+  @override
+  String get tabProductAnalysis => 'Product Analysis';
+
+  @override
+  String dateRangeFromTo(Object end, Object start) {
+    return 'From $start to $end';
+  }
+
+  @override
+  String get filterBySessionTooltip => 'Filter by session';
+
+  @override
+  String get allSessions => 'All Sessions';
+
+  @override
+  String sessionHashLabel(Object id) {
+    return 'Session #$id';
+  }
+
+  @override
+  String get wrongPassword => 'Incorrect password';
+
+  @override
+  String get noOpenSessionToClose => 'There is no open day to close.';
+
+  @override
+  String get loginSuccessExistingSession =>
+      'Logged in. You will continue on the previously open day until it is closed.';
+
+  @override
+  String get loginSuccessNewSession =>
+      'Logged in and opened a new day successfully';
+
+  @override
+  String failedToOpenDay(Object error) {
+    return 'Failed to open the day: $error';
+  }
+
+  @override
+  String get sessionCloseSuccess => 'The day was closed successfully.';
+
+  @override
+  String failedToCloseSession(Object error) {
+    return 'Failed to close the day: $error';
+  }
+
+  @override
+  String get sharePdf => 'Share PDF';
+
+  @override
+  String get confirmDeleteInvoiceTitle => 'Confirm invoice deletion';
+
+  @override
+  String confirmDeleteInvoiceMessage(Object id) {
+    return 'Are you sure you want to permanently delete invoice (#$id)?\n\nThis action cannot be undone.';
+  }
+
+  @override
+  String get confirmDeleteAction => 'Confirm delete';
+
+  @override
+  String get invoiceDeletedSuccess => 'Invoice deleted successfully';
+
+  @override
+  String invoiceDeleteFailed(Object error) {
+    return 'Failed to delete invoice: $error';
+  }
+
+  @override
+  String get refundSuccess => 'Refund completed successfully';
+
+  @override
+  String get selectDateRangeToDelete =>
+      'You must select a date range to delete invoices';
+
+  @override
+  String get confirmDeleteInvoicesTitle => 'Confirm invoices deletion';
+
+  @override
+  String confirmDeleteInvoicesMessage(Object end, Object start) {
+    return 'Are you sure you want to delete all invoices from $start to $end?\n\nThis action cannot be undone.';
+  }
+
+  @override
+  String get invoicesDeletedSuccess => 'Invoices deleted successfully';
+
+  @override
+  String invoicesDeleteFailed(Object error) {
+    return 'Failed to delete invoices: $error';
+  }
+
+  @override
+  String get invoicesScreenSubtitle => 'View and print issued invoices';
+
+  @override
+  String get notificationsScreenSubtitle => 'Manage alerts and notifications';
+
+  @override
+  String get productsScreenSubtitle => 'Manage products and view details';
+
+  @override
+  String get selectCategoryBeforeAction =>
+      'Select a category before performing this action';
+
+  @override
+  String get chooseCategory => 'Choose category';
+
+  @override
+  String get noOtherCategoriesToMove =>
+      'There are no other categories to move products to.';
+
+  @override
+  String get mustChooseCategoryToContinue =>
+      'You must choose a category to continue';
+
+  @override
+  String get moveProducts => 'Move Products';
+
+  @override
+  String get permanentDelete => 'Permanently Delete';
+
+  @override
+  String get msgProductSaved => 'Product saved successfully';
+
+  @override
+  String get categoryAddedSuccess => 'Added successfully';
+
+  @override
+  String get categoryDeletedSuccess => 'Deleted successfully';
+
+  @override
+  String get searchProductHint => 'Search by name, code, barcode or price...';
+
+  @override
+  String get byAvailability => 'By Availability';
+
+  @override
+  String get chooseAvailability => 'Choose availability';
+
+  @override
+  String get byCategory => 'By Category';
+
+  @override
+  String get gridView => 'Grid View';
+
+  @override
+  String get tableView => 'Table View';
+
+  @override
+  String get confirmDeleteCategoryTitle => 'Confirm category deletion';
+
+  @override
+  String get confirmDeleteCategoryMessage =>
+      'Are you sure you want to delete this category?';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get mustEnterValidNumber => 'You must enter a valid number';
+
+  @override
+  String get actionsColumn => 'Actions';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get transactionDetails => 'Transaction Details';
+
+  @override
+  String transactionCount(Object count) {
+    return '$count transaction';
+  }
+
+  @override
+  String get numberOfTransactions => 'Number of Transactions';
+
+  @override
+  String get transactionUnit => 'transaction';
+
+  @override
+  String get noTransactionsInReport => 'No transactions in this report';
+
+  @override
+  String get transactionsWillShowHere =>
+      'Transactions will appear here once available';
+
+  @override
+  String get detailedTransactionsLog => 'Detailed Transactions Log';
+
+  @override
+  String get transactionNumber => 'Transaction #';
+
+  @override
+  String get timeColumn => 'Time';
+
+  @override
+  String get typeColumn => 'Type';
+
+  @override
+  String get byColumn => 'By';
+
+  @override
+  String get valueColumn => 'Value';
+
+  @override
+  String get reportPreview => 'Report Preview';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get openTimeLabel => 'Open Time';
+
+  @override
+  String get closeTimeLabel => 'Close Time';
+
+  @override
+  String get openStatus => 'Open';
+
+  @override
+  String errorLoadingReport(Object error) {
+    return 'Error loading report: $error';
+  }
+
+  @override
+  String get reportLoadedSuccess => 'Report loaded successfully';
+
+  @override
+  String get preparingReportForPrint => 'Preparing report for printing...';
+
+  @override
+  String get reportSentToPrintSuccess => 'Report sent to print successfully';
+
+  @override
+  String printErrorMsg(Object error) {
+    return 'Print error: $error';
+  }
+
+  @override
+  String get preparingReportForShare => 'Preparing report for sharing...';
+
+  @override
+  String get reportSharedSuccess => 'Report shared successfully';
+
+  @override
+  String shareErrorMsg(Object error) {
+    return 'Error sharing report: $error';
+  }
+
+  @override
+  String get dailyReportsTitle => 'Daily Reports';
+
+  @override
+  String get todayRevenueAndSales => 'Today\'s Revenue & Sales';
+
+  @override
+  String get dailyReportScreenSubtitle =>
+      'Review financial indicators, sales, refunds, and the top-selling products list';
+
+  @override
+  String get noDataAvailableForDate => 'No data available for this date';
+
+  @override
+  String get checkDateOrCompleteSales =>
+      'Please make sure the date is correct or complete some sales first';
+
+  @override
+  String get filterReportByDate => 'Filter report by date';
+
+  @override
+  String get currentlySelectedDay => 'Currently selected day';
+
+  @override
+  String get generatedReportDate => 'Generated report date';
+
+  @override
+  String closedByLabel(Object name) {
+    return 'Closed by: $name';
+  }
+
+  @override
+  String get todayTotalSalesLabel => 'Today\'s Total Sales';
+
+  @override
+  String get dailyNetProfitLabel => 'Daily Net Profit';
+
+  @override
+  String get previewSalesReport => 'Preview Sales Report';
+
+  @override
+  String get viewDetailedSalesTable => 'View Detailed Sales Table';
+
+  @override
+  String get instantPrintReport => 'Instant Print Report';
+
+  @override
+  String get sharePdfReport => 'Share PDF Report';
+
+  @override
+  String get viewTable => 'View Table';
+
+  @override
+  String get noProductsSoldForDate => 'No products sold for this date';
+
+  @override
+  String dailyProductPerformanceCount(Object count) {
+    return 'Daily Product Performance ($count)';
+  }
+
+  @override
+  String soldUnitsLabel(Object qty) {
+    return 'Sold: $qty units';
+  }
+
+  @override
+  String profitAmountLabel(Object profit) {
+    return 'Profit: $profit EGP';
+  }
+
+  @override
+  String get refundedProductsDetails => 'Refunded Products Details';
+
+  @override
+  String get refundedQuantityColumn => 'Refunded Quantity';
+
+  @override
+  String get refundValueColumn => 'Refund Value';
+
+  @override
+  String get dailyFinancialTransactionsLog =>
+      'Daily Financial Transactions Log';
+
+  @override
+  String get invoiceNumberColumn => 'Invoice Number';
+
+  @override
+  String get transactionTimeColumn => 'Transaction Time';
+
+  @override
+  String get transactionTypeColumn => 'Transaction Type';
+
+  @override
+  String get managerLabel => 'Manager';
+
+  @override
+  String get activityUserUpdate => 'Update permissions';
+
+  @override
+  String get activitySessionOpen => 'Open shift';
+
+  @override
+  String get activitySessionClose => 'Close shift';
+
+  @override
+  String get sessionsLogTitle => 'Sessions Log';
+
+  @override
+  String get sessionsLogSubtitle =>
+      'View and manage system sessions and daily reports';
+
+  @override
+  String get storeInfoSavedSuccess => 'Store information saved successfully';
+
+  @override
+  String dmFailedLoadData(Object error) {
+    return 'Failed to load data: $error';
+  }
+
+  @override
+  String get dmBackupCreatedSuccess => 'Backup created successfully';
+
+  @override
+  String get dmBackupCreateFailed => 'Failed to create backup';
+
+  @override
+  String dmGenericError(Object error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get dmConfirmRestoreTitle => 'Confirm Restore';
+
+  @override
+  String get dmConfirmRestoreMessage =>
+      'The current data will be replaced with the data in the selected backup.\n\nThe app will restart after the restore.';
+
+  @override
+  String get dmRestoreSuccessRestarting =>
+      'Restored successfully. Restarting...';
+
+  @override
+  String get dmRestoreBackupFailed => 'Failed to restore backup';
+
+  @override
+  String dmRestoreErrorMsg(Object error) {
+    return 'Error while restoring: $error';
+  }
+
+  @override
+  String get dmConfirmRestoreCheckpointTitle => 'Confirm Checkpoint Restore';
+
+  @override
+  String get dmConfirmRestoreCheckpointMessage =>
+      'You will revert to this checkpoint and lose any data recorded after it.\n\nThe app will restart.';
+
+  @override
+  String get dmCheckpointRestoreSuccess =>
+      'Checkpoint restored successfully. Restarting...';
+
+  @override
+  String get dmCheckpointRestoreFailed => 'Failed to restore checkpoint';
+
+  @override
+  String get dmDeleteBackupTitle => 'Delete Backup';
+
+  @override
+  String get dmDeleteBackupMessage =>
+      'Are you sure you want to delete this backup?\n\nThis action cannot be undone.';
+
+  @override
+  String get dmBackupDeletedSuccess => 'Backup deleted successfully';
+
+  @override
+  String dmDeleteFailedMsg(Object error) {
+    return 'Delete failed: $error';
+  }
+
+  @override
+  String get dmProtectionDisabledTitle => 'Protection system is not enabled';
+
+  @override
+  String get dmProtectionDisabledSubtitle =>
+      'You must enable the protection system from Settings first';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get dataManagementTitle => 'Data Management';
+
+  @override
+  String get dataManagementHeaderSubtitle =>
+      'Backups and automatic checkpoints';
+
+  @override
+  String get backupUnitLabel => 'backup';
+
+  @override
+  String get checkpointUnitLabel => 'checkpoint';
+
+  @override
+  String get backupsTabLabel => 'Backups';
+
+  @override
+  String get checkpointsTabLabel => 'Auto Checkpoints';
+
+  @override
+  String get systemModeTabLabel => 'System Mode';
+
+  @override
+  String get createNewBackup => 'Create New Backup';
+
+  @override
+  String get noBackupsTitle => 'No backups found';
+
+  @override
+  String get noBackupsSubtitle => 'Create a backup to keep your data safe';
+
+  @override
+  String get noCheckpointsTitle => 'No automatic checkpoints found';
+
+  @override
+  String get noCheckpointsSubtitle =>
+      'Checkpoints are created automatically when important operations occur';
+
+  @override
+  String get autoCheckpointReason => 'Automatic checkpoint';
+
+  @override
+  String get latestBadge => 'Latest';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get currentSystemModeTitle => 'Current System Mode';
+
+  @override
+  String get debugModeActiveDesc =>
+      'The app is currently running in development mode (sample data enabled)';
+
+  @override
+  String get releaseModeActiveDesc =>
+      'The app is currently running in real production mode';
+
+  @override
+  String get chooseOperatingMode => 'Choose operating mode:';
+
+  @override
+  String get releaseModeTitle => 'Production Mode (Release)';
+
+  @override
+  String get releaseModeDesc =>
+      'Use only the real database without any sample data.';
+
+  @override
+  String get debugModeTitle => 'Development & Testing Mode (Debug)';
+
+  @override
+  String get debugModeDesc =>
+      'Automatically generate sample data for products and sales to test the system.';
+
+  @override
+  String get debugDangerZoneTitle => 'Sample Data Danger Zone';
+
+  @override
+  String get debugDangerZoneDesc =>
+      'Tools to control the database and generate sample data.';
+
+  @override
+  String get debugSeedExplanation =>
+      'This button lets you clear all entries and generate a full set of sample sales for the past 7 days, plus 7 products with different quantities and categories and sample users, so you can inspect the dashboard and charts.';
+
+  @override
+  String get resetAndSeedButton => 'Reset Database & Generate Sample Data';
+
+  @override
+  String modeChangedSuccess(Object mode) {
+    return 'System mode changed to: $mode';
+  }
+
+  @override
+  String get debugModeShortLabel => 'Development Mode';
+
+  @override
+  String get releaseModeShortLabel => 'Production Mode';
+
+  @override
+  String dmSaveSettingsFailed(Object error) {
+    return 'Failed to save settings: $error';
+  }
+
+  @override
+  String get dmConfirmResetTitle => 'Confirm Data Reset';
+
+  @override
+  String get dmConfirmResetMessage =>
+      'All current data (users, products, invoices, daily reports, and activity logs) will be completely cleared and new sample data generated.\n\nThis action cannot be undone.';
+
+  @override
+  String get dmResetSeedSuccess =>
+      'Data reset and sample data generated successfully';
+
+  @override
+  String dmResetSeedError(Object error) {
+    return 'Error while resetting data: $error';
+  }
+
+  @override
+  String get protectionEnabledSuccess =>
+      'Protection system enabled successfully';
+
+  @override
+  String get restartAppTitle => 'Restart App';
+
+  @override
+  String get protectionEnabledRestartMessage =>
+      'Protection system enabled successfully!\n\nTo fully benefit from the system, it is recommended to restart the app.';
+
+  @override
+  String get dataMovedSuccess => 'Data moved successfully';
+
+  @override
+  String get dataMovedSuccessTitle => 'Move Successful';
+
+  @override
+  String dataMovedToMessage(Object path) {
+    return 'Data has been moved to:\n$path\n\nIt is recommended to restart the app.';
+  }
+
+  @override
+  String get dataMoveFailedOrCancelled =>
+      'Failed to move data or operation was cancelled';
+
+  @override
+  String get dataProtectionSystemTitle => 'Data Loss Protection System';
+
+  @override
+  String get enabledStatus => 'Enabled';
+
+  @override
+  String get notEnabledStatus => 'Not enabled';
+
+  @override
+  String get systemEnabledLabel => 'System enabled';
+
+  @override
+  String get dataProtectedFromLabel => 'Your data is protected from:';
+
+  @override
+  String get protectionFeatureAccidentalDelete => 'Accidental deletion';
+
+  @override
+  String get protectionFeatureCrashes => 'Crashes and failures';
+
+  @override
+  String get protectionFeaturePowerOutage => 'Power outages';
+
+  @override
+  String get protectionFeatureWindowsReinstall => 'Windows reinstall';
+
+  @override
+  String dataLocationLabel(Object path) {
+    return 'Data location:\n$path';
+  }
+
+  @override
+  String get changeStorageLocation => 'Change Storage Location';
+
+  @override
+  String get systemNotEnabledLabel => 'System not enabled';
+
+  @override
+  String get dataAtRiskMessage =>
+      'Currently, your data is at risk of loss in case of:';
+
+  @override
+  String get riskProgramDelete => 'Uninstalling the program';
+
+  @override
+  String get riskAntivirusScan => 'Antivirus scan';
+
+  @override
+  String get riskSystemCrash => 'System crash';
+
+  @override
+  String get enableProtectionNow => 'Enable Protection Now';
+
+  @override
+  String stockSummaryCalcFailed(Object error) {
+    return 'Failed to calculate summary: $error';
+  }
+
+  @override
+  String get pieceUnit => 'pcs';
+
+  @override
+  String get switchLanguageLabel => 'English';
+
+  @override
+  String profitMarginLabel(Object percent) {
+    return 'Margin: $percent%';
+  }
+
+  @override
+  String revenueAmountLabel(Object amount) {
+    return '$amount EGP';
+  }
+
+  @override
+  String get accessDeniedMessage =>
+      'Access denied: You do not have permission to perform this action.';
+
+  @override
+  String activityDeleteUser(Object name) {
+    return 'Delete user: $name';
+  }
+
+  @override
+  String activityUpdateUser(Object name) {
+    return 'Update user: $name';
+  }
+
+  @override
+  String activityAddUser(Object name) {
+    return 'Add user: $name';
+  }
+
+  @override
+  String get activityLogin => 'Login';
+
+  @override
+  String activityCloseDay(Object total) {
+    return 'Close day: $total EGP';
+  }
+
+  @override
+  String activityUpdateProduct(Object name) {
+    return 'Update product: $name';
+  }
+
+  @override
+  String activityAddProduct(Object name) {
+    return 'Add product: $name';
+  }
+
+  @override
+  String activityDeleteProduct(Object name) {
+    return 'Delete product: $name';
+  }
+
+  @override
+  String activityDeleteInvoice(Object total) {
+    return 'Delete invoice: $total EGP';
+  }
+
+  @override
+  String activityRefund(Object total) {
+    return 'Refund: $total EGP';
+  }
+
+  @override
+  String get activityBulkDeleteInvoices => 'Bulk delete invoices';
+
+  @override
+  String activitySale(Object total) {
+    return 'Sale: $total EGP';
+  }
+
+  @override
+  String get activityUpdateStoreInfo => 'Update store information';
+
+  @override
+  String activityUpdateStock(Object name, Object qty) {
+    return 'Update stock: $name (+$qty)';
+  }
+
+  @override
+  String activityOpenDay(Object name) {
+    return 'Open new day — $name';
+  }
+
+  @override
+  String get priorityVeryUrgent => 'Very Urgent';
+
+  @override
+  String get priorityUrgent => 'Urgent';
+
+  @override
+  String get priorityMedium => 'Medium';
+
+  @override
+  String get pdfPhone => 'Phone:';
+
+  @override
+  String get pdfVatNumber => 'VAT Number:';
+
+  @override
+  String get pdfVatNumberFacility => 'Facility VAT Number:';
+
+  @override
+  String get pdfSalesReceipt => 'Tax Sales Receipt';
+
+  @override
+  String get pdfSalesInvoice => 'Tax Sales Invoice';
+
+  @override
+  String get pdfInvoiceNumber => 'Invoice Number:';
+
+  @override
+  String get pdfDateTime => 'Date & Time:';
+
+  @override
+  String get pdfIssueDate => 'Issue Date:';
+
+  @override
+  String get pdfCashier => 'Cashier:';
+
+  @override
+  String get pdfInvoiceStatus => 'Invoice Status:';
+
+  @override
+  String get pdfPaidInFull => 'Paid in Full';
+
+  @override
+  String get pdfProduct => 'Product';
+
+  @override
+  String get pdfProductItem => 'Product / Item';
+
+  @override
+  String get pdfQtyShort => 'Qty';
+
+  @override
+  String get pdfQtyLong => 'Quantity';
+
+  @override
+  String get pdfPrice => 'Price';
+
+  @override
+  String get pdfUnitPrice => 'Unit Price';
+
+  @override
+  String get pdfTotal => 'Total';
+
+  @override
+  String get pdfGrandTotalCol => 'Grand Total';
+
+  @override
+  String get pdfSubtotalItems => 'Items Subtotal:';
+
+  @override
+  String get pdfSubtotal => 'Subtotal:';
+
+  @override
+  String get pdfDiscountApplied => 'Discount Applied:';
+
+  @override
+  String get pdfInvoiceDiscounts => 'Invoice Discounts:';
+
+  @override
+  String get pdfVatTax => 'VAT:';
+
+  @override
+  String get pdfNetTotal => 'Net Total:';
+
+  @override
+  String get pdfFinalTotal => 'Final Total:';
+
+  @override
+  String get pdfThanksShopping => 'Thank you for shopping with us!';
+
+  @override
+  String get pdfThanksDealing => 'Thank you for dealing with us, stay safe!';
+
+  @override
+  String get pdfSystemName => 'Bayaa POS Sales Management System';
+
+  @override
+  String get pdfTermsConditions => 'Terms & Conditions:';
+
+  @override
+  String get pdfTerm1 =>
+      '1. Goods sold cannot be returned or exchanged after 14 days from the invoice date.';
+
+  @override
+  String get pdfTerm2 =>
+      '2. Original invoice must be presented for returns or maintenance.';
+
+  @override
+  String get pdfRefundInvoice => 'Refund Invoice';
+
+  @override
+  String get pdfDate => 'Date:';
+
+  @override
+  String get pdfCashierShort => 'Cashier:';
+
+  @override
+  String get pdfThanksVisiting => 'Thank you for visiting!';
+
+  @override
+  String get pdfTotalCol => 'Total:';
+
+  @override
+  String get pdfDailySalesReport => 'Daily Sales Report';
+
+  @override
+  String get pdfPosSystemBayaa => 'Advanced POS System - Bayaa';
+
+  @override
+  String get pdfReportDate => 'Report Date:';
+
+  @override
+  String get pdfTransactionsCount => 'Transactions Count:';
+
+  @override
+  String get pdfNetRevenue => 'Net Revenue:';
+
+  @override
+  String get pdfTotalSales => 'Total Sales';
+
+  @override
+  String get pdfTotalRefunds => 'Total Refunds';
+
+  @override
+  String get pdfNetProfit => 'Net Profit';
+
+  @override
+  String get pdfTotalTransactions => 'Total Transactions';
+
+  @override
+  String get pdfClosedBy => 'Closed By';
+
+  @override
+  String get pdfDailyPerformanceSummary => 'Daily Performance Summary';
+
+  @override
+  String get pdfRevenue => 'Revenue';
+
+  @override
+  String get pdfCost => 'Cost';
+
+  @override
+  String get pdfProfits => 'Profits';
+
+  @override
+  String get pdfProfitMargin => 'Profit Margin';
+
+  @override
+  String get pdfTopSellingProducts => 'Top Selling Products Performance';
+
+  @override
+  String get pdfReportGeneratedAt => 'Report generated at:';
+
+  @override
+  String get pdfCopyright => '© 2026 Bayaa POS - All rights reserved';
+
+  @override
+  String get pdfFallbackStoreName => 'Bayaa POS';
+
+  @override
+  String get pdfFallbackStoreAddressShort => 'Cairo, Egypt';
+
+  @override
+  String get pdfFallbackStoreAddressLong => 'Cairo, Arab Republic of Egypt';
+
+  @override
+  String get pdfUnknownCashier => 'Unknown';
 }

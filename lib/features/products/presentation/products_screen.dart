@@ -6,6 +6,7 @@ import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:bayaa_pos/features/products/presentation/cubit/product_cubit.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 import 'package:bayaa_pos/features/products/presentation/cubit/product_states.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class ProductsScreenState extends State<ProductsScreen> {
   String? categoryFilter;
   String? availabilityFilter;
   List<String> categories = []; // Start empty, will load from cubit
-  final List<String> availabilities = ['الكل', 'متوفر', 'منخفض', 'غير متوفر'];
+  List<String> get availabilities => [AppLocalizations.of(context).all, AppLocalizations.of(context).available, AppLocalizations.of(context).lowStock, AppLocalizations.of(context).outOfStock];
 
   List<Product> products = [];
 
@@ -49,9 +50,10 @@ class ProductsScreenState extends State<ProductsScreen> {
   }
 
   String statusText(int qty, int min) {
-    if (qty == 0) return 'غير متوفر';
-    if (qty <= min) return 'منخفض';
-    return 'متوفر';
+    final l10n = AppLocalizations.of(context);
+    if (qty == 0) return l10n.outOfStock;
+    if (qty <= min) return l10n.lowStock;
+    return l10n.available;
   }
 
   Future<void> showAddEditDialog([Product? product]) async {
@@ -124,9 +126,9 @@ class ProductsScreenState extends State<ProductsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const ScreenHeader(
-                        title: 'المنتجات',
-                        subtitle: 'إدارة المنتجات وعرض التفاصيل',
+                      ScreenHeader(
+                        title: l10n.products,
+                        subtitle: l10n.productsScreenSubtitle,
                         icon: Icons.inventory_2_outlined,
                         iconColor: AppColors.primaryColor,
                         titleColor: AppColors.kDarkChip,
@@ -162,9 +164,9 @@ class ProductsScreenState extends State<ProductsScreen> {
                               final cubit = context.read<ProductCubit>();
                               if (categoryFilter != cubit.selectedCategory) {
                                 if (products.isNotEmpty ||
-                                    cubit.selectedCategory != 'الكل') {
+                                    cubit.selectedCategory != GlobalMessage.l10n.all) {
                                   categoryFilter = cubit.selectedCategory;
-                                } else if (cubit.selectedCategory == 'الكل' &&
+                                } else if (cubit.selectedCategory == GlobalMessage.l10n.all &&
                                     products.isEmpty) {
                                   categoryFilter = null;
                                 }
@@ -174,11 +176,11 @@ class ProductsScreenState extends State<ProductsScreen> {
                               if (availabilityFilter !=
                                   cubit.selectedAvailability) {
                                 if (products.isNotEmpty ||
-                                    cubit.selectedAvailability != 'الكل') {
+                                    cubit.selectedAvailability != GlobalMessage.l10n.all) {
                                   availabilityFilter =
                                       cubit.selectedAvailability;
                                 } else if (cubit.selectedAvailability ==
-                                        'الكل' &&
+                                        GlobalMessage.l10n.all &&
                                     products.isEmpty) {
                                   availabilityFilter = null;
                                 }
@@ -191,7 +193,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                               current is ProductLoadedState,
                           builder: (context, state) {
                             if (state is CategoryLoadedState) {
-                              categories = ['الكل', ...state.categories];
+                              categories = [GlobalMessage.l10n.all, ...state.categories];
                             }
 
                             // Use products list directly as it's filtered by server
@@ -314,10 +316,11 @@ Future<Map<String, String>?> showCategoryActionDialog({
   required String? categoryFilter,
   required List<String> categorie,
 }) {
+  final l10n = AppLocalizations.of(context);
   List<String> categories =
-      categorie.where((c) => (c != category && c != "الكل")).toList();
+      categorie.where((c) => (c != category && c != GlobalMessage.l10n.all)).toList();
   if (categories.isEmpty) {
-    MotionSnackBarInfo(context, "لا توجد فئات أخرى لنقل المنتجات إليها.");
+    MotionSnackBarInfo(context, l10n.noOtherCategoriesToMove);
     return Future.value(null);
   }
   categoryFilter = categories[0];
@@ -350,10 +353,10 @@ Future<Map<String, String>?> showCategoryActionDialog({
                   ),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'تحديد الفئة قبل تنفيذ الإجراء',
-                    style: TextStyle(
+                    l10n.selectCategoryBeforeAction,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -366,13 +369,13 @@ Future<Map<String, String>?> showCategoryActionDialog({
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DropDownFilter(
-                  label: 'اختر الفئة',
+                  label: l10n.chooseCategory,
                   value: selectedCategory,
                   items: categories,
                   onChanged: (v) {
                     setState(() {
                       selectedCategory = v;
-                      errorText = null; // إزالة رسالة الخطأ عند الاختيار
+                      errorText = null; // Clear error on selection
                     });
                   },
                   icon: Icons.category_outlined,
@@ -393,12 +396,12 @@ Future<Map<String, String>?> showCategoryActionDialog({
             ),
             actionsAlignment: MainAxisAlignment.spaceEvenly,
             actions: [
-              // ❌ زر الإلغاء
+              // Cancel button
               OutlinedButton.icon(
                 onPressed: () => Navigator.pop(context,
                     {'action': 'cancel', 'category': selectedCategory}),
                 icon: const Icon(LucideIcons.x),
-                label: const Text('إلغاء'),
+                label: Text(l10n.cancel),
                 style: OutlinedButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -409,12 +412,12 @@ Future<Map<String, String>?> showCategoryActionDialog({
                 ),
               ),
 
-              // 🔄 زر نقل المنتجات
+              // Move products button
               ElevatedButton.icon(
                 onPressed: () {
                   if (selectedCategory.isEmpty) {
                     setState(() {
-                      errorText = 'يجب اختيار فئة قبل المتابعة';
+                      errorText = l10n.mustChooseCategoryToContinue;
                     });
                     return;
                   }
@@ -428,7 +431,7 @@ Future<Map<String, String>?> showCategoryActionDialog({
                   });
                 },
                 icon: const Icon(LucideIcons.arrowRightLeft),
-                label: const Text('نقل المنتجات'),
+                label: Text(l10n.moveProducts),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.warningColor,
                   foregroundColor: Colors.white,
@@ -441,12 +444,12 @@ Future<Map<String, String>?> showCategoryActionDialog({
                 ),
               ),
 
-              // 🗑️ زر الحذف النهائي
+              // Permanent delete button
               ElevatedButton.icon(
                 onPressed: () {
                   if (selectedCategory.isEmpty) {
                     setState(() {
-                      errorText = 'يجب اختيار فئة قبل المتابعة';
+                      errorText = l10n.mustChooseCategoryToContinue;
                     });
                     return;
                   }
@@ -458,7 +461,7 @@ Future<Map<String, String>?> showCategoryActionDialog({
                   });
                 },
                 icon: const Icon(LucideIcons.trash2),
-                label: const Text('حذف نهائي'),
+                label: Text(l10n.permanentDelete),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.errorColor,
                   foregroundColor: Colors.white,

@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class ActivationScreen extends StatelessWidget {
   const ActivationScreen({super.key});
@@ -46,7 +48,16 @@ class ActivationScreen extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      home: Builder(builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
         body: Center(
           child: SingleChildScrollView(
@@ -90,7 +101,7 @@ class ActivationScreen extends StatelessWidget {
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            '🔒 النسخة غير مفعّلة',
+                            l10n.activationTitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
@@ -105,7 +116,7 @@ class ActivationScreen extends StatelessWidget {
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            'يبدو أنك تستخدم نسخة غير مفعّلة من النظام.\nيرجى التواصل مع المطور لتفعيل نسختك.',
+                            l10n.activationMessage,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -120,7 +131,7 @@ class ActivationScreen extends StatelessWidget {
                         ElevatedButton.icon(
                           onPressed: () => _launch("tel:$phone"),
                           icon: const Icon(LucideIcons.phone),
-                          label: const Text("اتصل بي"),
+                          label: Text(l10n.activationCallMe),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -134,12 +145,12 @@ class ActivationScreen extends StatelessWidget {
                           onPressed: () {
                             openGmail(
                               "mstfo23mr5@gmail.com",
-                              subject: "طلب تفعيل التطبيق",
-                              body: "مرحبًا، أود شراء نسخة من التطبيق.",
+                              subject: l10n.activationEmailSubject,
+                              body: l10n.activationEmailBody,
                             );
                           },
                           icon: const Icon(LucideIcons.mail),
-                          label: const Text("راسلني عبر البريد"),
+                          label: Text(l10n.activationEmailMe),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.successColor,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -152,7 +163,7 @@ class ActivationScreen extends StatelessWidget {
                         ElevatedButton.icon(
                           onPressed: () => _launch(whatsapp),
                           icon: const Icon(LucideIcons.messageCircle),
-                          label: const Text("تواصل عبر واتساب"),
+                          label: Text(l10n.activationWhatsapp),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.accentGold,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -168,7 +179,7 @@ class ActivationScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   Text(
-                    '© 2025 Amr Store. جميع الحقوق محفوظة',
+                    l10n.activationCopyright,
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
@@ -180,7 +191,8 @@ class ActivationScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
+        );
+      }),
     );
   }
 }

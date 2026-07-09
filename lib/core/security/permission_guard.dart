@@ -1,9 +1,10 @@
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 
 class PermissionDeniedException implements Exception {
   final String message;
   PermissionDeniedException(
-      [this.message = "تم رفض الوصول: ليس لديك صلاحية لتنفيذ هذا الإجراء."]);
+      [this.message = ""]); // TODO: Use GlobalMessage.l10n.accessDeniedMessage when context available
 
   @override
   String toString() => message;
@@ -13,9 +14,6 @@ class PermissionGuard {
   /// Refund permission — both managers and cashiers can process refunds.
   static void checkRefundPermission(User user) {
     // Cashiers are now allowed to process partial refunds.
-    //     if (user.userType == UserType.cashier) {
-    //   throw PermissionDeniedException("لا يمكن للكاشير تنفيذ عمليات المرتجع على الفواتير.");
-    // }
     return;
   }
 

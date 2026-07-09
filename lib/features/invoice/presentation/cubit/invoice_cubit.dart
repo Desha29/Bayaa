@@ -1,10 +1,9 @@
-
-
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bayaa_pos/core/di/dependency_injection.dart';
 import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 import 'package:bayaa_pos/features/sessions/data/models/session_model.dart';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 
 import '../../../sales/data/models/sale_model.dart';
 import '../../../sales/domain/sales_repository.dart';
@@ -151,7 +150,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
       );
       await getIt<ActivityLogger>().logActivity(
         type: ActivityType.invoiceDelete,
-        description: 'حذف فاتورة: ${sale.total.toStringAsFixed(2)} ج.م',
+        description: GlobalMessage.l10n.activityDeleteInvoice(sale.total.toStringAsFixed(2)),
         userName: getIt<UserCubit>().currentUser.name,
         sessionId: sid,
         details: {'saleId': saleId, 'items': sale.items},
@@ -249,7 +248,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     // 8. Log refund activity
     await getIt<ActivityLogger>().logActivity(
       type: ActivityType.refund,
-      description: 'استرجاع: ${refundTotal.toStringAsFixed(2)} ج.م',
+      description: GlobalMessage.l10n.activityRefund(refundTotal.toStringAsFixed(2)),
       userName: getIt<UserCubit>().currentUser.name,
       sessionId: session.id,
       details: {
@@ -278,7 +277,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
       );
       await getIt<ActivityLogger>().logActivity(
         type: ActivityType.invoiceDelete,
-        description: 'حذف فواتير جماعي',
+        description: GlobalMessage.l10n.activityBulkDeleteInvoices,
         userName: getIt<UserCubit>().currentUser.name,
         sessionId: sid,
         details: {

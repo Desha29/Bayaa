@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bayaa_pos/core/components/message_overlay.dart';
 import 'package:bayaa_pos/core/di/dependency_injection.dart';
 import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
 
@@ -110,12 +111,12 @@ class SalesCubit extends Cubit<SalesState> {
       },
       (product) async {
         if (product == null) {
-          emit(const SalesError(message: 'المنتج غير موجود'));
+          emit(SalesError(message: GlobalMessage.l10n.productNotFoundCubit));
           _emitLoaded();
           return;
         }
         if (product.quantity <= 0) {
-          emit(const SalesError(message: 'المنتج غير متوفر في المخزون'));
+          emit(SalesError(message: GlobalMessage.l10n.productUnavailable));
           _emitLoaded();
           return;
         }
@@ -183,8 +184,7 @@ class SalesCubit extends Cubit<SalesState> {
     final item = _cartItems[index];
     if (newPrice < item.minPrice) {
       emit(PriceValidationError(
-        message:
-            'السعر أقل من الحد الأدنى (${item.minPrice.toStringAsFixed(2)} ج.م)',
+        message: GlobalMessage.l10n.priceBelowMin(item.minPrice.toStringAsFixed(2)),
         minPrice: item.minPrice,
         attemptedPrice: newPrice,
       ));
@@ -197,7 +197,7 @@ class SalesCubit extends Cubit<SalesState> {
 
   Future<void> checkout() async {
     if (_cartItems.isEmpty) {
-      emit(const SalesError(message: 'السلة فارغة'));
+      emit(SalesError(message: GlobalMessage.l10n.cartIsEmpty));
       _emitLoaded();
       return;
     }
@@ -219,7 +219,7 @@ class SalesCubit extends Cubit<SalesState> {
       );
     } catch (e) {
       print('DEBUG_CHECKOUT: Failed to get session: $e');
-      emit(SalesError(message: 'فشل فتح يوم جديد: $e'));
+      emit(SalesError(message: GlobalMessage.l10n.failedOpenSession(e)));
       _emitLoaded();
       return;
     }
@@ -280,7 +280,7 @@ class SalesCubit extends Cubit<SalesState> {
       print('DEBUG_CHECKOUT: Logging activity type=sale total=$total');
       await getIt<ActivityLogger>().logActivity(
         type: ActivityType.sale,
-        description: 'عملية بيع: ${total.toStringAsFixed(2)} ج.م',
+        description: GlobalMessage.l10n.activitySale(total.toStringAsFixed(2)),
         userName: userName,
         sessionId: sessionId,
         details: {
@@ -298,7 +298,7 @@ class SalesCubit extends Cubit<SalesState> {
 
     // Emit with sale data to open invoice immediately
     emit(CheckoutSuccessWithSale(
-      message: 'تمت عملية البيع بنجاح',
+      message: GlobalMessage.l10n.saleSuccess,
       total: total,
       sale: sale,
     ));
