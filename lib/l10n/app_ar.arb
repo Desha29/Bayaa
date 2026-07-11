@@ -501,5 +501,102 @@
   "userType": "نوع المستخدم",
   "addUserButton": "إضافة المستخدم",
   "dataManagement": "إدارة البيانات والنسخ الاحتياطي",
-  "dataManagementSub": "عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة"
+  "dataManagementSub": "عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة",
+  "activitySessionOpened": "فتح {user} يومية عمل جديدة",
+  "@activitySessionOpened": {
+    "placeholders": {
+      "user": {}
+    }
+  },
+  "activitySessionClosed": "أغلق {user} اليومية",
+  "@activitySessionClosed": {
+    "placeholders": {
+      "user": {}
+    }
+  },
+  "activityLogin": "قام {user} بتسجيل الدخول",
+  "@activityLogin": {
+    "placeholders": {
+      "user": {}
+    }
+  },
+  "activityProductAdded": "قام {user} بإضافة المنتج {product}",
+  "@activityProductAdded": {
+    "placeholders": {
+      "user": {},
+      "product": {}
+    }
+  },
+  "activityProductUpdated": "قام {user} بتحديث المنتج {product}",
+  "@activityProductUpdated": {
+    "placeholders": {
+      "user": {},
+      "product": {}
+    }
+  },
+  "activityProductDeleted": "قام {user} بحذف المنتج {product}",
+  "@activityProductDeleted": {
+    "placeholders": {
+      "user": {},
+      "product": {}
+    }
+  },
+  "activityProductQtyUpdated": "تحديث مخزون {product} بواسطة {user} ({qty})",
+  "@activityProductQtyUpdated": {
+    "placeholders": {
+      "user": {},
+      "product": {},
+      "qty": {}
+    }
+  },
+  "activityRestock": "إعادة تخزين {product} بواسطة {user} بـ {qty} وحدات",
+  "@activityRestock": {
+    "placeholders": {
+      "user": {},
+      "product": {},
+      "qty": {}
+    }
+  },
+  "activitySaleCompleted": "عملية بيع بواسطة {user} بقيمة {total}",
+  "@activitySaleCompleted": {
+    "placeholders": {
+      "user": {},
+      "total": {}
+    }
+  },
+  "activityRefundCompleted": "عملية مرتجع بواسطة {user} بقيمة {total}",
+  "@activityRefundCompleted": {
+    "placeholders": {
+      "user": {},
+      "total": {}
+    }
+  },
+  "activityUserAdded": "إنشاء مستخدم {targetUser} بواسطة {user}",
+  "@activityUserAdded": {
+    "placeholders": {
+      "user": {},
+      "targetUser": {}
+    }
+  },
+  "activityUserUpdated": "تعديل مستخدم {targetUser} بواسطة {user}",
+  "@activityUserUpdated": {
+    "placeholders": {
+      "user": {},
+      "targetUser": {}
+    }
+  },
+  "activityUserDeleted": "حذف مستخدم {targetUser} بواسطة {user}",
+  "@activityUserDeleted": {
+    "placeholders": {
+      "user": {},
+      "targetUser": {}
+    }
+  },
+  "activityInvoiceDeleted": "حذف فاتورة #{id} بواسطة {user}",
+  "@activityInvoiceDeleted": {
+    "placeholders": {
+      "user": {},
+      "id": {}
+    }
+  }
 }

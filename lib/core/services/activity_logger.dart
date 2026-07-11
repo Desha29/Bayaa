@@ -41,6 +41,10 @@ class ActivityLogger {
           details: row['details'] != null 
               ? jsonDecode(row['details'] as String) 
               : null,
+          eventKey: row['event_key'] as String?,
+          parameters: row['parameters'] != null 
+              ? jsonDecode(row['parameters'] as String) as Map<String, dynamic>
+              : null,
         ));
       }
       _controller.add(_activities);
@@ -55,6 +59,8 @@ class ActivityLogger {
     required String userName,
     String sessionId = '',
     Map<String, dynamic>? details,
+    String? eventKey,
+    Map<String, dynamic>? parameters,
   }) async {
     final activity = ActivityLog(
       id: _uuid.v4(),
@@ -64,6 +70,8 @@ class ActivityLogger {
       description: description,
       userName: userName,
       details: details,
+      eventKey: eventKey,
+      parameters: parameters,
     );
 
     // Persist to DB FIRST
@@ -77,6 +85,8 @@ class ActivityLogger {
         'description': activity.description,
         'user_name': activity.userName,
         'details': activity.details != null ? jsonEncode(activity.details) : null,
+        'event_key': activity.eventKey,
+        'parameters': activity.parameters != null ? jsonEncode(activity.parameters) : null,
       });
     } catch (e) {
       print('Failed to persist activity log: $e');
@@ -118,6 +128,10 @@ class ActivityLogger {
         details: row['details'] != null 
             ? jsonDecode(row['details'] as String) 
             : null,
+        eventKey: row['event_key'] as String?,
+        parameters: row['parameters'] != null 
+            ? jsonDecode(row['parameters'] as String) as Map<String, dynamic>
+            : null,
       )).toList();
     } catch (e) {
       print('Failed to load session activities: $e');
@@ -149,6 +163,10 @@ class ActivityLogger {
         userName: row['user_name'] as String,
         details: row['details'] != null 
             ? jsonDecode(row['details'] as String) 
+            : null,
+        eventKey: row['event_key'] as String?,
+        parameters: row['parameters'] != null 
+            ? jsonDecode(row['parameters'] as String) as Map<String, dynamic>
             : null,
       )).toList();
     } catch (e) {
@@ -211,6 +229,10 @@ class ActivityLogger {
           userName: row['user_name'] as String,
           details: row['details'] != null
               ? jsonDecode(row['details'] as String)
+              : null,
+          eventKey: row['event_key'] as String?,
+          parameters: row['parameters'] != null 
+              ? jsonDecode(row['parameters'] as String) as Map<String, dynamic>
               : null,
         )).toList();
 
@@ -397,6 +419,54 @@ class ActivityLogger {
       return parts.join(' • ');
     } catch (e) {
       return details.toString();
+    }
+  }
+
+  static String formatActivity(BuildContext context, ActivityLog activity) {
+    if (activity.eventKey == null || activity.eventKey!.isEmpty) {
+      return activity.description; // Support old records
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final params = activity.parameters ?? {};
+    final user = params['user']?.toString() ?? '';
+    final product = params['product']?.toString() ?? '';
+    final qty = params['qty']?.toString() ?? '';
+    final total = params['total']?.toString() ?? '';
+    final targetUser = params['targetUser']?.toString() ?? '';
+    final id = params['id']?.toString() ?? '';
+
+    switch (activity.eventKey) {
+      case 'sessionOpened':
+        return l10n.activitySessionOpened(user);
+      case 'sessionClosed':
+        return l10n.activitySessionClosed(user);
+      case 'login':
+        return l10n.activityLogin(user);
+      case 'productAdded':
+        return l10n.activityProductAdded(user, product);
+      case 'productUpdated':
+        return l10n.activityProductUpdated(user, product);
+      case 'productDeleted':
+        return l10n.activityProductDeleted(user, product);
+      case 'productQtyUpdated':
+        return l10n.activityProductQtyUpdated(user, product, qty);
+      case 'restock':
+        return l10n.activityRestock(user, product, qty);
+      case 'saleCompleted':
+        return l10n.activitySaleCompleted(user, total);
+      case 'refundCompleted':
+        return l10n.activityRefundCompleted(user, total);
+      case 'userAdded':
+        return l10n.activityUserAdded(user, targetUser);
+      case 'userUpdated':
+        return l10n.activityUserUpdated(user, targetUser);
+      case 'userDeleted':
+        return l10n.activityUserDeleted(user, targetUser);
+      case 'invoiceDeleted':
+        return l10n.activityInvoiceDeleted(user, id);
+      default:
+        return activity.description;
     }
   }
 

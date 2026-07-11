@@ -1661,4 +1661,74 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get dataManagementSub =>
       'عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة';
+
+  @override
+  String activitySessionOpened(Object user) {
+    return 'فتح $user يومية عمل جديدة';
+  }
+
+  @override
+  String activitySessionClosed(Object user) {
+    return 'أغلق $user اليومية';
+  }
+
+  @override
+  String activityLogin(Object user) {
+    return 'قام $user بتسجيل الدخول';
+  }
+
+  @override
+  String activityProductAdded(Object user, Object product) {
+    return 'قام $user بإضافة المنتج $product';
+  }
+
+  @override
+  String activityProductUpdated(Object user, Object product) {
+    return 'قام $user بتحديث المنتج $product';
+  }
+
+  @override
+  String activityProductDeleted(Object user, Object product) {
+    return 'قام $user بحذف المنتج $product';
+  }
+
+  @override
+  String activityProductQtyUpdated(Object user, Object product, Object qty) {
+    return 'تحديث مخزون $product بواسطة $user ($qty)';
+  }
+
+  @override
+  String activityRestock(Object user, Object product, Object qty) {
+    return 'إعادة تخزين $product بواسطة $user بـ $qty وحدات';
+  }
+
+  @override
+  String activitySaleCompleted(Object user, Object total) {
+    return 'عملية بيع بواسطة $user بقيمة $total';
+  }
+
+  @override
+  String activityRefundCompleted(Object user, Object total) {
+    return 'عملية مرتجع بواسطة $user بقيمة $total';
+  }
+
+  @override
+  String activityUserAdded(Object user, Object targetUser) {
+    return 'إنشاء مستخدم $targetUser بواسطة $user';
+  }
+
+  @override
+  String activityUserUpdated(Object user, Object targetUser) {
+    return 'تعديل مستخدم $targetUser بواسطة $user';
+  }
+
+  @override
+  String activityUserDeleted(Object user, Object targetUser) {
+    return 'حذف مستخدم $targetUser بواسطة $user';
+  }
+
+  @override
+  String activityInvoiceDeleted(Object user, Object id) {
+    return 'حذف فاتورة #$id بواسطة $user';
+  }
 }

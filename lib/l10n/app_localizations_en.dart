@@ -1670,4 +1670,74 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dataManagementSub =>
       'View system logs, backups, and restore points';
+
+  @override
+  String activitySessionOpened(Object user) {
+    return '$user opened a new work day';
+  }
+
+  @override
+  String activitySessionClosed(Object user) {
+    return '$user closed the session';
+  }
+
+  @override
+  String activityLogin(Object user) {
+    return '$user logged in';
+  }
+
+  @override
+  String activityProductAdded(Object user, Object product) {
+    return '$user added product $product';
+  }
+
+  @override
+  String activityProductUpdated(Object user, Object product) {
+    return '$user updated product $product';
+  }
+
+  @override
+  String activityProductDeleted(Object user, Object product) {
+    return '$user deleted product $product';
+  }
+
+  @override
+  String activityProductQtyUpdated(Object user, Object product, Object qty) {
+    return '$user updated stock of $product ($qty)';
+  }
+
+  @override
+  String activityRestock(Object user, Object product, Object qty) {
+    return '$user restocked $product with $qty units';
+  }
+
+  @override
+  String activitySaleCompleted(Object user, Object total) {
+    return '$user completed a sale of $total';
+  }
+
+  @override
+  String activityRefundCompleted(Object user, Object total) {
+    return '$user processed a refund of $total';
+  }
+
+  @override
+  String activityUserAdded(Object user, Object targetUser) {
+    return '$user created user $targetUser';
+  }
+
+  @override
+  String activityUserUpdated(Object user, Object targetUser) {
+    return '$user updated user $targetUser';
+  }
+
+  @override
+  String activityUserDeleted(Object user, Object targetUser) {
+    return '$user deleted user $targetUser';
+  }
+
+  @override
+  String activityInvoiceDeleted(Object user, Object id) {
+    return '$user deleted invoice #$id';
+  }
 }

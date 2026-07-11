@@ -3109,6 +3109,90 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة'**
   String get dataManagementSub;
+
+  /// No description provided for @activitySessionOpened.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح {user} يومية عمل جديدة'**
+  String activitySessionOpened(Object user);
+
+  /// No description provided for @activitySessionClosed.
+  ///
+  /// In ar, this message translates to:
+  /// **'أغلق {user} اليومية'**
+  String activitySessionClosed(Object user);
+
+  /// No description provided for @activityLogin.
+  ///
+  /// In ar, this message translates to:
+  /// **'قام {user} بتسجيل الدخول'**
+  String activityLogin(Object user);
+
+  /// No description provided for @activityProductAdded.
+  ///
+  /// In ar, this message translates to:
+  /// **'قام {user} بإضافة المنتج {product}'**
+  String activityProductAdded(Object user, Object product);
+
+  /// No description provided for @activityProductUpdated.
+  ///
+  /// In ar, this message translates to:
+  /// **'قام {user} بتحديث المنتج {product}'**
+  String activityProductUpdated(Object user, Object product);
+
+  /// No description provided for @activityProductDeleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'قام {user} بحذف المنتج {product}'**
+  String activityProductDeleted(Object user, Object product);
+
+  /// No description provided for @activityProductQtyUpdated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديث مخزون {product} بواسطة {user} ({qty})'**
+  String activityProductQtyUpdated(Object user, Object product, Object qty);
+
+  /// No description provided for @activityRestock.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة تخزين {product} بواسطة {user} بـ {qty} وحدات'**
+  String activityRestock(Object user, Object product, Object qty);
+
+  /// No description provided for @activitySaleCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'عملية بيع بواسطة {user} بقيمة {total}'**
+  String activitySaleCompleted(Object user, Object total);
+
+  /// No description provided for @activityRefundCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'عملية مرتجع بواسطة {user} بقيمة {total}'**
+  String activityRefundCompleted(Object user, Object total);
+
+  /// No description provided for @activityUserAdded.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء مستخدم {targetUser} بواسطة {user}'**
+  String activityUserAdded(Object user, Object targetUser);
+
+  /// No description provided for @activityUserUpdated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل مستخدم {targetUser} بواسطة {user}'**
+  String activityUserUpdated(Object user, Object targetUser);
+
+  /// No description provided for @activityUserDeleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف مستخدم {targetUser} بواسطة {user}'**
+  String activityUserDeleted(Object user, Object targetUser);
+
+  /// No description provided for @activityInvoiceDeleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف فاتورة #{id} بواسطة {user}'**
+  String activityInvoiceDeleted(Object user, Object id);
 }
 
 class _AppLocalizationsDelegate

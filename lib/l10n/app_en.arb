@@ -501,5 +501,102 @@
   "userType": "User Type",
   "addUserButton": "Add User",
   "dataManagement": "Data Management & Backups",
-  "dataManagementSub": "View system logs, backups, and restore points"
+  "dataManagementSub": "View system logs, backups, and restore points",
+  "activitySessionOpened": "{user} opened a new work day",
+  "@activitySessionOpened": {
+    "placeholders": {
+      "user": {}
+    }
+  },
+  "activitySessionClosed": "{user} closed the session",
+  "@activitySessionClosed": {
+    "placeholders": {
+      "user": {}
+    }
+  },
+  "activityLogin": "{user} logged in",
+  "@activityLogin": {
+    "placeholders": {
+      "user": {}
+    }
+  },
+  "activityProductAdded": "{user} added product {product}",
+  "@activityProductAdded": {
+    "placeholders": {
+      "user": {},
+      "product": {}
+    }
+  },
+  "activityProductUpdated": "{user} updated product {product}",
+  "@activityProductUpdated": {
+    "placeholders": {
+      "user": {},
+      "product": {}
+    }
+  },
+  "activityProductDeleted": "{user} deleted product {product}",
+  "@activityProductDeleted": {
+    "placeholders": {
+      "user": {},
+      "product": {}
+    }
+  },
+  "activityProductQtyUpdated": "{user} updated stock of {product} ({qty})",
+  "@activityProductQtyUpdated": {
+    "placeholders": {
+      "user": {},
+      "product": {},
+      "qty": {}
+    }
+  },
+  "activityRestock": "{user} restocked {product} with {qty} units",
+  "@activityRestock": {
+    "placeholders": {
+      "user": {},
+      "product": {},
+      "qty": {}
+    }
+  },
+  "activitySaleCompleted": "{user} completed a sale of {total}",
+  "@activitySaleCompleted": {
+    "placeholders": {
+      "user": {},
+      "total": {}
+    }
+  },
+  "activityRefundCompleted": "{user} processed a refund of {total}",
+  "@activityRefundCompleted": {
+    "placeholders": {
+      "user": {},
+      "total": {}
+    }
+  },
+  "activityUserAdded": "{user} created user {targetUser}",
+  "@activityUserAdded": {
+    "placeholders": {
+      "user": {},
+      "targetUser": {}
+    }
+  },
+  "activityUserUpdated": "{user} updated user {targetUser}",
+  "@activityUserUpdated": {
+    "placeholders": {
+      "user": {},
+      "targetUser": {}
+    }
+  },
+  "activityUserDeleted": "{user} deleted user {targetUser}",
+  "@activityUserDeleted": {
+    "placeholders": {
+      "user": {},
+      "targetUser": {}
+    }
+  },
+  "activityInvoiceDeleted": "{user} deleted invoice #{id}",
+  "@activityInvoiceDeleted": {
+    "placeholders": {
+      "user": {},
+      "id": {}
+    }
+  }
 }
