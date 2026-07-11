@@ -86,17 +86,17 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
       String whereClause = 'is_active = 1';
       List<Object?> whereArgs = [];
       
-      if (category != null && category != 'الكل') {
+      if (category != null && category != '*') {
         whereClause += ' AND category_id = ?';
         whereArgs.add(category);
       }
       
-      if (availability != null && availability != 'الكل') {
-        if (availability == 'غير متوفر') {
+      if (availability != null && availability != '*') {
+        if (availability == 'outOfStock') {
           whereClause += ' AND stock = 0';
-        } else if (availability == 'منخفض') {
+        } else if (availability == 'lowStock') {
           whereClause += ' AND stock > 0 AND stock <= min_stock';
-        } else if (availability == 'متوفر') {
+        } else if (availability == 'available') {
           whereClause += ' AND stock > min_stock';
         }
       }

@@ -424,7 +424,7 @@ class ActivityLogger {
 
   static String formatActivity(BuildContext context, ActivityLog activity) {
     if (activity.eventKey == null || activity.eventKey!.isEmpty) {
-      return activity.description; // Support old records
+      return _translateLegacyDescription(context, activity);
     }
 
     final l10n = AppLocalizations.of(context);
@@ -468,6 +468,56 @@ class ActivityLogger {
       default:
         return activity.description;
     }
+  }
+
+  static String _translateLegacyDescription(BuildContext context, ActivityLog activity) {
+    final l10n = AppLocalizations.of(context);
+    final desc = activity.description;
+    final user = activity.userName;
+
+    if (desc.startsWith('فتح يوم')) return l10n.activitySessionOpened(user);
+    if (desc.startsWith('إغلاق يوم') || desc.contains('إغلاق يوم')) return l10n.activitySessionClosed(user);
+    if (desc == 'تسجيل دخول' || desc.startsWith('تسجيل دخول')) return l10n.activityLogin(user);
+    if (desc.startsWith('إضافة منتج')) {
+      final name = desc.replaceFirst('إضافة منتج: ', '');
+      return l10n.activityProductAdded(user, name);
+    }
+    if (desc.startsWith('تحديث منتج')) {
+      final name = desc.replaceFirst('تحديث منتج: ', '');
+      return l10n.activityProductUpdated(user, name);
+    }
+    if (desc.startsWith('حذف منتج')) {
+      final name = desc.replaceFirst('حذف منتج: ', '');
+      return l10n.activityProductDeleted(user, name);
+    }
+    if (desc.startsWith('عملية بيع')) {
+      final total = RegExp(r'[\d.]+').firstMatch(desc)?.group(0) ?? '';
+      return l10n.activitySaleCompleted(user, total);
+    }
+    if (desc.startsWith('استرجاع')) {
+      final total = RegExp(r'[\d.]+').firstMatch(desc)?.group(0) ?? '';
+      return l10n.activityRefundCompleted(user, total);
+    }
+    if (desc.startsWith('إضافة مستخدم')) {
+      final name = desc.replaceFirst('إضافة مستخدم: ', '');
+      return l10n.activityUserAdded(user, name);
+    }
+    if (desc.startsWith('تحديث مستخدم')) {
+      final name = desc.replaceFirst('تحديث مستخدم: ', '');
+      return l10n.activityUserUpdated(user, name);
+    }
+    if (desc.startsWith('حذف مستخدم')) {
+      final name = desc.replaceFirst('حذف مستخدم: ', '');
+      return l10n.activityUserDeleted(user, name);
+    }
+    if (desc.startsWith('حذف فاتورة')) return l10n.activityInvoiceDeleted(user, '');
+    if (desc.startsWith('تحديث مخزون')) {
+      final name = desc.replaceFirst('تحديث مخزون: ', '').split(' ').first;
+      return l10n.activityProductQtyUpdated(user, name, '');
+    }
+    if (desc.startsWith('تحديث معلومات المتجر')) return l10n.activityUserUpdated(user, 'store info');
+
+    return desc;
   }
 
   void dispose() {

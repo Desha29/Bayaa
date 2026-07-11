@@ -1740,4 +1740,110 @@ class AppLocalizationsEn extends AppLocalizations {
   String activityInvoiceDeleted(Object user, Object id) {
     return '$user deleted invoice #$id';
   }
+
+  @override
+  String get confirmDeleteInvoiceTitle => 'Confirm Delete Invoice';
+
+  @override
+  String confirmDeleteInvoiceMessage(Object id) {
+    return 'Are you sure you want to permanently delete invoice (#$id)?\n\nThis action cannot be undone.';
+  }
+
+  @override
+  String get confirmDeleteBtn => 'Confirm Delete';
+
+  @override
+  String get invoiceDeletedSuccess => 'Invoice deleted successfully';
+
+  @override
+  String invoiceDeleteFailed(Object error) {
+    return 'Failed to delete invoice: $error';
+  }
+
+  @override
+  String get refundSuccess => 'Refund processed successfully';
+
+  @override
+  String get confirmDeleteInvoicesTitle => 'Confirm Delete Invoices';
+
+  @override
+  String confirmDeleteInvoicesMessage(
+      Object y1, Object m1, Object d1, Object y2, Object m2, Object d2) {
+    return 'Are you sure you want to delete all invoices from $y1-$m1-$d1 to $y2-$m2-$d2?\n\nThis action cannot be undone.';
+  }
+
+  @override
+  String get invoicesDeletedSuccess => 'Invoices deleted successfully';
+
+  @override
+  String invoicesDeleteFailed(Object error) {
+    return 'Failed to delete invoices: $error';
+  }
+
+  @override
+  String get productsManagement => 'Manage products and view details';
+
+  @override
+  String get noOtherCategoriesToMove =>
+      'No other categories to move products to.';
+
+  @override
+  String get selectCategoryBeforeAction => 'Select category before action';
+
+  @override
+  String get chooseCategory => 'Choose category';
+
+  @override
+  String get moveProducts => 'Move Products';
+
+  @override
+  String get permanentDelete => 'Permanent Delete';
+
+  @override
+  String get mustSelectCategoryFirst => 'You must select a category first';
+
+  @override
+  String get categoryActionNoCategories =>
+      'No other categories to move products to.';
+
+  @override
+  String get productSavedSuccess => 'Product saved successfully';
+
+  @override
+  String get categoryAddedSuccess => 'Category added successfully';
+
+  @override
+  String get categoryDeletedSuccess => 'Category deleted successfully';
+
+  @override
+  String get loginExistingSession =>
+      'Logged in. The system will continue with the previously open session until it is closed.';
+
+  @override
+  String get loginNewSession => 'Logged in and new session opened successfully';
+
+  @override
+  String failedOpenDay(Object error) {
+    return 'Failed to open day: $error';
+  }
+
+  @override
+  String get wrongPassword => 'Incorrect password';
+
+  @override
+  String get noOpenSession => 'No open session to close.';
+
+  @override
+  String failedCloseDay(Object error) {
+    return 'Failed to close session: $error';
+  }
+
+  @override
+  String get storeInfoSaved => 'Store information saved successfully';
+
+  @override
+  String get unknownUser => 'Unknown';
+
+  @override
+  String get trialCashier => 'Trial Cashier';
 }

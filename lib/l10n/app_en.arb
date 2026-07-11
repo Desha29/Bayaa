@@ -598,5 +598,70 @@
       "user": {},
       "id": {}
     }
-  }
+  },
+  "confirmDeleteInvoiceTitle": "Confirm Delete Invoice",
+  "confirmDeleteInvoiceMessage": "Are you sure you want to permanently delete invoice (#{id})?\n\nThis action cannot be undone.",
+  "@confirmDeleteInvoiceMessage": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "confirmDeleteBtn": "Confirm Delete",
+  "invoiceDeletedSuccess": "Invoice deleted successfully",
+  "invoiceDeleteFailed": "Failed to delete invoice: {error}",
+  "@invoiceDeleteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "refundSuccess": "Refund processed successfully",
+  "confirmDeleteInvoicesTitle": "Confirm Delete Invoices",
+  "confirmDeleteInvoicesMessage": "Are you sure you want to delete all invoices from {y1}-{m1}-{d1} to {y2}-{m2}-{d2}?\n\nThis action cannot be undone.",
+  "@confirmDeleteInvoicesMessage": {
+    "placeholders": {
+      "y1": {},
+      "m1": {},
+      "d1": {},
+      "y2": {},
+      "m2": {},
+      "d2": {}
+    }
+  },
+  "invoicesDeletedSuccess": "Invoices deleted successfully",
+  "invoicesDeleteFailed": "Failed to delete invoices: {error}",
+  "@invoicesDeleteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "productsManagement": "Manage products and view details",
+  "noOtherCategoriesToMove": "No other categories to move products to.",
+  "selectCategoryBeforeAction": "Select category before action",
+  "chooseCategory": "Choose category",
+  "moveProducts": "Move Products",
+  "permanentDelete": "Permanent Delete",
+  "mustSelectCategoryFirst": "You must select a category first",
+  "categoryActionNoCategories": "No other categories to move products to.",
+  "productSavedSuccess": "Product saved successfully",
+  "categoryAddedSuccess": "Category added successfully",
+  "categoryDeletedSuccess": "Category deleted successfully",
+  "loginExistingSession": "Logged in. The system will continue with the previously open session until it is closed.",
+  "loginNewSession": "Logged in and new session opened successfully",
+  "failedOpenDay": "Failed to open day: {error}",
+  "@failedOpenDay": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "wrongPassword": "Incorrect password",
+  "noOpenSession": "No open session to close.",
+  "failedCloseDay": "Failed to close session: {error}",
+  "@failedCloseDay": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "storeInfoSaved": "Store information saved successfully",
+  "unknownUser": "Unknown",
+  "trialCashier": "Trial Cashier"
 }

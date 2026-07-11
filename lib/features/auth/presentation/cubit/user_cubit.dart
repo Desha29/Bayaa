@@ -74,7 +74,7 @@ class UserCubit extends Cubit<UserStates> {
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
       (_) async {
-        emit(UserSuccess("تم حذف المستخدم بنجاح"));
+        emit(UserSuccess("msgUserDeleted"));
 
         // Log activity with session (auto-creates session if closed)
         final sid = await getIt<SessionManager>().ensureSessionId(
@@ -85,6 +85,8 @@ class UserCubit extends Cubit<UserStates> {
           description: 'حذف مستخدم: $username',
           userName: currentUser.name,
           sessionId: sid,
+          eventKey: 'userDeleted',
+          parameters: {'user': currentUser.name, 'targetUser': username},
         );
 
         getAllUsers();
@@ -98,7 +100,7 @@ class UserCubit extends Cubit<UserStates> {
     result.fold(
       (failure) => emit(UserFailure(failure.message)),
       (_) async {
-        emit(UserSuccess("تم إضافة المستخدم بنجاح"));
+        emit(UserSuccess("msgUserCreated"));
 
         // Check if update (simple check if username exists in list, though list might be empty if not loaded)
         // Since we just saved successfully, we can't check _users easily if username is same vs new?
@@ -116,6 +118,8 @@ class UserCubit extends Cubit<UserStates> {
               : 'إضافة مستخدم: ${user.name}',
           userName: currentUser.name,
           sessionId: sid,
+          eventKey: isUpdate ? 'userUpdated' : 'userAdded',
+          parameters: {'user': currentUser.name, 'targetUser': user.name},
         );
 
         getAllUsers();
@@ -132,7 +136,7 @@ class UserCubit extends Cubit<UserStates> {
         if (currentUser.username == user.username) {
           currentUser = user;
         }
-        emit(UserSuccess("تم تحديث المستخدم بنجاح"));
+        emit(UserSuccess("msgUserUpdated"));
 
         // Log activity with session (auto-creates session if closed)
         final sid = await getIt<SessionManager>().ensureSessionId(
@@ -143,6 +147,8 @@ class UserCubit extends Cubit<UserStates> {
           description: 'تحديث مستخدم: ${user.name}',
           userName: currentUser.name,
           sessionId: sid,
+          eventKey: 'userUpdated',
+          parameters: {'user': currentUser.name, 'targetUser': user.name},
         );
 
         getAllUsers();
@@ -191,6 +197,8 @@ class UserCubit extends Cubit<UserStates> {
               description: 'تسجيل دخول',
               userName: user.name,
               sessionId: session.id,
+              eventKey: 'login',
+              parameters: {'user': user.name},
             );
 
             // Create checkpoint on login
@@ -199,18 +207,18 @@ class UserCubit extends Cubit<UserStates> {
 
             if (hadOpenSession) {
               emit(LoginSuccess(
-                  "تم تسجيل الدخول. سستم المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.",
+                  "loginExistingSession",
                   isExistingSession: true));
             } else {
-              emit(LoginSuccess("تم تسجيل الدخول وفتح يومية جديدة بنجاح",
+              emit(LoginSuccess("loginNewSession",
                   isExistingSession: false));
             }
           } catch (e) {
-            emit(UserFailure("فشل فتح اليوم: $e"));
+            emit(UserFailure("failedOpenDay:$e"));
           }
         } else {
           print("   ❌ Password Mismatch!");
-          emit(UserFailure("كلمة المرور غير صحيحة"));
+          emit(UserFailure("wrongPassword"));
         }
       },
     );
@@ -237,7 +245,7 @@ class UserCubit extends Cubit<UserStates> {
         if (sessionManager.currentSession == null) {
           print(
               'DEBUG_SESSION: Still no session after load. Emitting failure.');
-          emit(UserFailure("لا يوجد يوم مفتوح لإغلاقه."));
+          emit(UserFailure("noOpenSession"));
           return;
         }
       }
@@ -375,6 +383,8 @@ class UserCubit extends Cubit<UserStates> {
         description: 'إغلاق يوم: ${totalSales.toStringAsFixed(2)} ج.م',
         userName: currentUser.name,
         sessionId: currentSessionToClose.id,
+        eventKey: 'sessionClosed',
+        parameters: {'user': currentUser.name},
       );
 
       // Create checkpoint on session close
@@ -395,9 +405,9 @@ class UserCubit extends Cubit<UserStates> {
       );
 
       emit(UserSuccessWithReport(
-          "تم إغلاق اليومية بنجاح.", report, closedSession));
+          "dayClosedSuccessReport", report, closedSession));
     } catch (e) {
-      emit(UserFailure("فشل إغلاق اليومية: $e"));
+      emit(UserFailure("failedCloseDay:$e"));
     }
   }
 

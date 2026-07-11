@@ -1731,4 +1731,110 @@ class AppLocalizationsAr extends AppLocalizations {
   String activityInvoiceDeleted(Object user, Object id) {
     return 'حذف فاتورة #$id بواسطة $user';
   }
+
+  @override
+  String get confirmDeleteInvoiceTitle => 'تأكيد حذف الفاتورة';
+
+  @override
+  String confirmDeleteInvoiceMessage(Object id) {
+    return 'هل أنت متأكد من حذف الفاتورة (#$id) نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه.';
+  }
+
+  @override
+  String get confirmDeleteBtn => 'تأكيد الحذف';
+
+  @override
+  String get invoiceDeletedSuccess => 'تم حذف الفاتورة بنجاح';
+
+  @override
+  String invoiceDeleteFailed(Object error) {
+    return 'فشل حذف الفاتورة: $error';
+  }
+
+  @override
+  String get refundSuccess => 'تم المرتجع بنجاح';
+
+  @override
+  String get confirmDeleteInvoicesTitle => 'تأكيد حذف الفواتير';
+
+  @override
+  String confirmDeleteInvoicesMessage(
+      Object y1, Object m1, Object d1, Object y2, Object m2, Object d2) {
+    return 'هل أنت متأكد من حذف جميع الفواتير من $y1-$m1-$d1 إلى $y2-$m2-$d2؟\n\nهذا الإجراء لا يمكن التراجع عنه.';
+  }
+
+  @override
+  String get invoicesDeletedSuccess => 'تم حذف الفواتير بنجاح';
+
+  @override
+  String invoicesDeleteFailed(Object error) {
+    return 'فشل حذف الفواتير: $error';
+  }
+
+  @override
+  String get productsManagement => 'إدارة المنتجات وعرض التفاصيل';
+
+  @override
+  String get noOtherCategoriesToMove =>
+      'لا توجد فئات أخرى لنقل المنتجات إليها.';
+
+  @override
+  String get selectCategoryBeforeAction => 'تحديد الفئة قبل تنفيذ الإجراء';
+
+  @override
+  String get chooseCategory => 'اختر الفئة';
+
+  @override
+  String get moveProducts => 'نقل المنتجات';
+
+  @override
+  String get permanentDelete => 'حذف نهائي';
+
+  @override
+  String get mustSelectCategoryFirst => 'يجب اختيار فئة قبل المتابعة';
+
+  @override
+  String get categoryActionNoCategories =>
+      'لا توجد فئات أخرى لنقل المنتجات إليها.';
+
+  @override
+  String get productSavedSuccess => 'تم حفظ المنتج بنجاح';
+
+  @override
+  String get categoryAddedSuccess => 'تمت الإضافة بنجاح';
+
+  @override
+  String get categoryDeletedSuccess => 'تم الحذف بنجاح';
+
+  @override
+  String get loginExistingSession =>
+      'تم تسجيل الدخول. ستمت المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.';
+
+  @override
+  String get loginNewSession => 'تم تسجيل الدخول وفتح يومية جديدة بنجاح';
+
+  @override
+  String failedOpenDay(Object error) {
+    return 'فشل فتح اليوم: $error';
+  }
+
+  @override
+  String get wrongPassword => 'كلمة المرور غير صحيحة';
+
+  @override
+  String get noOpenSession => 'لا يوجد يوم مفتوح لإغلاقه.';
+
+  @override
+  String failedCloseDay(Object error) {
+    return 'فشل إغلاق اليومية: $error';
+  }
+
+  @override
+  String get storeInfoSaved => 'تم حفظ معلومات المتجر بنجاح';
+
+  @override
+  String get unknownUser => 'غير معروف';
+
+  @override
+  String get trialCashier => 'كاشير تجريبي';
 }

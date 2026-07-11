@@ -87,6 +87,8 @@ class SessionManager {
           description: 'فتح يوم جديد — ${autoUser.name}',
           userName: autoUser.name,
           sessionId: newSession.id,
+          eventKey: 'sessionOpened',
+          parameters: {'user': autoUser.name},
         );
       } catch (e) {
         print('Warning: Failed to log auto-session creation: $e');

@@ -43,8 +43,7 @@ class ErrorHandler {
         },
       );
     } on DatabaseException catch (e, stack) {
-      // SQLite/Database specific errors
-      final message = userFriendlyMessage ?? 'حدث خطأ في قاعدة البيانات';
+      final message = userFriendlyMessage ?? 'dbError';
       FileLogger.error(
         'Database error in $operationName',
         error: e,
@@ -53,8 +52,7 @@ class ErrorHandler {
       );
       return Left(CacheFailure(message));
     } on FileSystemException catch (e, stack) {
-      // File system errors (e.g., permissions, disk full)
-      final message = userFriendlyMessage ?? 'حدث خطأ في نظام الملفات';
+      final message = userFriendlyMessage ?? 'fileSystemError';
       FileLogger.error(
         'FileSystem error in $operationName',
         error: e,
@@ -63,8 +61,7 @@ class ErrorHandler {
       );
       return Left(CacheFailure(message));
     } catch (e, stack) {
-      // Catch-all for any other unexpected errors
-      final message = userFriendlyMessage ?? 'حدث خطأ غير متوقع';
+      final message = userFriendlyMessage ?? 'unexpectedErrorGeneric';
       FileLogger.critical(
         'Unexpected error in $operationName',
         error: e,
@@ -99,7 +96,7 @@ class ErrorHandler {
       
       return result;
     } on DatabaseException catch (e, stack) {
-      final message = userFriendlyMessage ?? 'حدث خطأ في قاعدة البيانات';
+      final message = userFriendlyMessage ?? 'dbError';
       FileLogger.error(
         'Database error in $operationName',
         error: e,
@@ -108,7 +105,7 @@ class ErrorHandler {
       );
       return either_dart.Left(CacheFailure(message));
     } on FileSystemException catch (e, stack) {
-      final message = userFriendlyMessage ?? 'حدث خطأ في نظام الملفات';
+      final message = userFriendlyMessage ?? 'fileSystemError';
       FileLogger.error(
         'FileSystem error in $operationName',
         error: e,
@@ -117,7 +114,7 @@ class ErrorHandler {
       );
       return either_dart.Left(CacheFailure(message));
     } catch (e, stack) {
-      final message = userFriendlyMessage ?? 'حدث خطأ غير متوقع';
+      final message = userFriendlyMessage ?? 'unexpectedErrorGeneric';
       FileLogger.critical(
         'Unexpected error in $operationName',
         error: e,

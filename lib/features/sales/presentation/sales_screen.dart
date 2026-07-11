@@ -257,6 +257,8 @@ class _SalesScreenState extends State<SalesScreen>
                 'itemCount': itemCount,
                 'items': itemNames,
               },
+              eventKey: 'saleCompleted',
+              parameters: {'user': userName, 'total': total.toStringAsFixed(2)},
             );
             print('DEBUG_CHECKOUT: Sale activity logged ✓');
           } catch (e) {

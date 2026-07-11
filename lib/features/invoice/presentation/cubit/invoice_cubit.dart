@@ -155,6 +155,11 @@ class InvoiceCubit extends Cubit<InvoiceState> {
         userName: getIt<UserCubit>().currentUser.name,
         sessionId: sid,
         details: {'saleId': saleId, 'items': sale.items},
+        eventKey: 'invoiceDeleted',
+        parameters: {
+          'user': getIt<UserCubit>().currentUser.name,
+          'id': saleId,
+        },
       );
     }
     
@@ -258,6 +263,11 @@ class InvoiceCubit extends Cubit<InvoiceState> {
         'originalInvoiceId': originalSale.id,
         'refundedItems': itemsToRefund.map((i) => i.productName).toList(),
       },
+      eventKey: 'refundCompleted',
+      parameters: {
+        'user': getIt<UserCubit>().currentUser.name,
+        'total': refundTotal.toStringAsFixed(2),
+      },
     );
 
     loadSales();
@@ -285,6 +295,11 @@ class InvoiceCubit extends Cubit<InvoiceState> {
           'startDate': start?.toIso8601String(),
           'endDate': end?.toIso8601String(),
           'searchQuery': searchQuery,
+        },
+        eventKey: 'invoiceDeleted',
+        parameters: {
+          'user': getIt<UserCubit>().currentUser.name,
+          'id': 'bulk',
         },
       );
     } catch (_) {}

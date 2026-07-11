@@ -62,9 +62,14 @@ class SettingsCubit extends Cubit<SettingsStates> {
           description: 'تحديث معلومات المتجر',
           userName: userCubit.currentUser.name,
           sessionId: sid,
+          eventKey: 'userUpdated',
+          parameters: {
+            'user': userCubit.currentUser.name,
+            'targetUser': 'store info',
+          },
         );
         
-        emit(StoreInfoUpdateSuccess("تم حفظ معلومات المتجر بنجاح"));
+        emit(StoreInfoUpdateSuccess("storeInfoSaved"));
         emit(StoreInfoLoaded(newStoreInfo));
       },
     );
@@ -74,7 +79,7 @@ class SettingsCubit extends Cubit<SettingsStates> {
     try {
       return userCubit.currentUser.name;
     } catch (e) {
-      return 'غير معروف';
+      return 'unknownUser';
     }
   }
 

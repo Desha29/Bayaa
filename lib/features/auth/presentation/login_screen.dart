@@ -3,6 +3,7 @@
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 import 'package:bayaa_pos/core/di/dependency_injection.dart';
 import 'package:bayaa_pos/core/functions/messege.dart';
+import 'package:bayaa_pos/core/localization/translation_helper.dart';
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import 'package:bayaa_pos/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:bayaa_pos/core/components/app_logo.dart';
@@ -27,12 +28,19 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController();
+  bool _isPasswordVisible = false;
   final _passwordController = TextEditingController();
   final _passwordFocusNode = FocusNode();
-
-  bool _isPasswordVisible = false;
   bool _rememberMe = true;
+  final _usernameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -63,14 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    _passwordFocusNode.dispose();
-    super.dispose();
-  }
-
   void _onLoginPressed() {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
@@ -84,56 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     getIt<UserCubit>().login(username, password);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth >= 900;
-
-    return BlocProvider<UserCubit>.value(
-      value: getIt<UserCubit>(),
-      child: BlocListener<UserCubit, UserStates>(
-        listener: (context, state) {
-          if (state is UserFailure) {
-            MotionSnackBarError(context, state.error);
-          } else if (state is LoginSuccess) {
-            if (state.isExistingSession) {
-              MotionSnackBarInfo(context, state.message);
-            } else {
-              MotionSnackBarSuccess(context, state.message);
-            }
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DashboardScreen(),
-                ));
-          } else if (state is UserSuccess) {
-            MotionSnackBarSuccess(context, state.message);
-            if (state.message == "تم تسجيل الدخول بنجاح") {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DashboardScreen(),
-                  ));
-            } else {
-              MotionSnackBarInfo(context, state.message);
-            }
-          }
-        },
-        child: Scaffold(
-          backgroundColor: AppColors.backgroundColor,
-          body: Center(
-            child: isDesktop
-                ? _buildDesktopLayout(context)
-                : SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: _buildMobileLayout(context),
-                  ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildDesktopLayout(BuildContext context) {
@@ -394,37 +344,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           onFieldSubmitted: (_) => _onLoginPressed(),
         ),
-        const SizedBox(height: 16),
-
-        // Remember Me checkbox
-        Row(
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: Checkbox(
-                value: _rememberMe,
-                activeColor: const Color(0xFFD77E46),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4)),
-                onChanged: (val) {
-                  setState(() {
-                    _rememberMe = val ?? true;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              l10n.rememberMe,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
         // Login Button
         BlocBuilder<UserCubit, UserStates>(
@@ -520,9 +440,9 @@ class _LoginScreenState extends State<LoginScreen> {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 2.2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 3.0,
               ),
               itemCount: users.length,
               itemBuilder: (context, index) {
@@ -713,13 +633,64 @@ class _LoginScreenState extends State<LoginScreen> {
       ],
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 900;
+
+    return BlocProvider<UserCubit>.value(
+      value: getIt<UserCubit>(),
+      child: BlocListener<UserCubit, UserStates>(
+        listener: (context, state) {
+          if (state is UserFailure) {
+            MotionSnackBarError(
+                context, TranslationHelper.translate(context, state.error));
+          } else if (state is LoginSuccess) {
+            if (state.isExistingSession) {
+              MotionSnackBarInfo(
+                  context, TranslationHelper.translate(context, state.message));
+            } else {
+              MotionSnackBarSuccess(
+                  context, TranslationHelper.translate(context, state.message));
+            }
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DashboardScreen(),
+                ));
+          } else if (state is UserSuccess) {
+            MotionSnackBarSuccess(
+                context, TranslationHelper.translate(context, state.message));
+            if (state.message == "dayClosedSuccessReport") {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardScreen(),
+                  ));
+            } else {
+              MotionSnackBarInfo(
+                  context, TranslationHelper.translate(context, state.message));
+            }
+          }
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.backgroundColor,
+          body: Center(
+            child: isDesktop
+                ? _buildDesktopLayout(context)
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: _buildMobileLayout(context),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class HoverableUserCard extends StatefulWidget {
-  final User user;
-  final bool isSelected;
-  final VoidCallback onTap;
-
   const HoverableUserCard({
     super.key,
     required this.user,
@@ -727,12 +698,23 @@ class HoverableUserCard extends StatefulWidget {
     required this.onTap,
   });
 
+  final bool isSelected;
+  final VoidCallback onTap;
+  final User user;
+
   @override
   State<HoverableUserCard> createState() => _HoverableUserCardState();
 }
 
 class _HoverableUserCardState extends State<HoverableUserCard> {
   bool _isHovered = false;
+
+  String _displayName(BuildContext context) {
+    return TranslationHelper.translateUserName(
+      context, widget.user.name, username: widget.user.username);
+  }
+
+  String _displayRole(BuildContext context) => widget.user.username;
 
   @override
   Widget build(BuildContext context) {
@@ -751,10 +733,10 @@ class _HoverableUserCardState extends State<HoverableUserCard> {
         child: GestureDetector(
           onTap: widget.onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: widget.isSelected
                     ? logoColor
@@ -775,32 +757,37 @@ class _HoverableUserCardState extends State<HoverableUserCard> {
                 ),
               ],
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  widget.user.name,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _displayName(context),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  widget.user.username,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: AppColors.mutedColor,
+                  const SizedBox(height: 1),
+                  Text(
+                    _displayRole(context),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: AppColors.mutedColor,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

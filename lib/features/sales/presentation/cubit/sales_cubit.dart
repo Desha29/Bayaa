@@ -110,12 +110,12 @@ class SalesCubit extends Cubit<SalesState> {
       },
       (product) async {
         if (product == null) {
-          emit(const SalesError(message: 'المنتج غير موجود'));
+          emit(const SalesError(message: 'productNotFoundCubit'));
           _emitLoaded();
           return;
         }
         if (product.quantity <= 0) {
-          emit(const SalesError(message: 'المنتج غير متوفر في المخزون'));
+          emit(const SalesError(message: 'outOfStock'));
           _emitLoaded();
           return;
         }
@@ -184,7 +184,7 @@ class SalesCubit extends Cubit<SalesState> {
     if (newPrice < item.minPrice) {
       emit(PriceValidationError(
         message:
-            'السعر أقل من الحد الأدنى (${item.minPrice.toStringAsFixed(2)} ج.م)',
+            'priceBelowMin:${item.minPrice.toStringAsFixed(2)}',
         minPrice: item.minPrice,
         attemptedPrice: newPrice,
       ));
@@ -197,7 +197,7 @@ class SalesCubit extends Cubit<SalesState> {
 
   Future<void> checkout() async {
     if (_cartItems.isEmpty) {
-      emit(const SalesError(message: 'السلة فارغة'));
+      emit(const SalesError(message: 'cartIsEmpty'));
       _emitLoaded();
       return;
     }
@@ -219,7 +219,7 @@ class SalesCubit extends Cubit<SalesState> {
       );
     } catch (e) {
       print('DEBUG_CHECKOUT: Failed to get session: $e');
-      emit(SalesError(message: 'فشل فتح يوم جديد: $e'));
+      emit(SalesError(message: 'failedOpenSession'));
       _emitLoaded();
       return;
     }
@@ -288,6 +288,8 @@ class SalesCubit extends Cubit<SalesState> {
           'itemCount': itemCount,
           'items': itemNames,
         },
+        eventKey: 'saleCompleted',
+        parameters: {'user': userName, 'total': total.toStringAsFixed(2)},
       );
       print('DEBUG_CHECKOUT: Activity logged successfully ✓');
     } catch (e) {
@@ -298,7 +300,7 @@ class SalesCubit extends Cubit<SalesState> {
 
     // Emit with sale data to open invoice immediately
     emit(CheckoutSuccessWithSale(
-      message: 'تمت عملية البيع بنجاح',
+      message: 'saleSuccess',
       total: total,
       sale: sale,
     ));

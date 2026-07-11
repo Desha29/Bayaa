@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
+import 'package:bayaa_pos/core/localization/translation_helper.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/services/activity_logger.dart';
 import 'package:intl/intl.dart';
@@ -468,7 +469,6 @@ class _RecentOperationsState extends State<RecentOperations> {
   }
 
   Widget _buildActivityTile(ActivityLog activity) {
-    final l10n = AppLocalizations.of(context);
     final timeFormat = DateFormat('hh:mm a');
     final activityColor = _getColorForType(activity.type);
 
@@ -529,7 +529,7 @@ class _RecentOperationsState extends State<RecentOperations> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        activity.description,
+                        ActivityLogger.formatActivity(context, activity),
                         style: TextStyle(
                           fontWeight: isSessionEvent
                               ? FontWeight.w700
@@ -548,7 +548,7 @@ class _RecentOperationsState extends State<RecentOperations> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  activity.userName,
+                  TranslationHelper.translateUserName(context, activity.userName),
                   style: TextStyle(
                     fontSize: 11,
                     color: AppColors.primaryColor,

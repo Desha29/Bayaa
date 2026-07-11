@@ -61,8 +61,8 @@ class ProductCubit extends Cubit<ProductStates> {
     currentPage = 0;
     hasMoreProducts = true;
     currentSearchQuery = '';
-    selectedCategory = 'الكل';
-    selectedAvailability = 'الكل';
+    selectedCategory = '*';
+    selectedAvailability = '*';
     emit(ProductLoadedState([]));
   }
 
@@ -128,7 +128,7 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(ProductErrorState(failure.message)),
       (_) async {
-        emit(ProductSuccessState("تم حفظ المنتج بنجاح"));
+        emit(ProductSuccessState("productSavedSuccess"));
         
         // Determine activity type
         final isUpdate = products.any((p) => p.barcode == product.barcode);
@@ -143,6 +143,8 @@ class ProductCubit extends Cubit<ProductStates> {
           userName: getIt<UserCubit>().currentUser.name,
           sessionId: sid,
           details: {'barcode': product.barcode, 'price': product.price},
+          eventKey: isUpdate ? 'productUpdated' : 'productAdded',
+          parameters: {'user': getIt<UserCubit>().currentUser.name, 'product': product.name},
         );
         
         getAllProducts();
@@ -158,7 +160,7 @@ class ProductCubit extends Cubit<ProductStates> {
       (_) async {
         final deletedProduct = products.firstWhere((p) => p.barcode == barcode);
         
-        emit(ProductSuccessState("تم حذف المنتج بنجاح"));
+        emit(ProductSuccessState("msgProductDeleted"));
         
         // Log activity with session (auto-creates session if closed)
         final sid = await getIt<SessionManager>().ensureSessionId(
@@ -170,6 +172,8 @@ class ProductCubit extends Cubit<ProductStates> {
           userName: getIt<UserCubit>().currentUser.name,
           sessionId: sid,
           details: {'barcode': barcode},
+          eventKey: 'productDeleted',
+          parameters: {'user': getIt<UserCubit>().currentUser.name, 'product': deletedProduct.name},
         );
         
         getAllProducts();
@@ -210,7 +214,7 @@ class ProductCubit extends Cubit<ProductStates> {
     result.fold(
       (failure) => emit(CategoryErrorState(failure.message)),
       (_) {
-        emit(CategorySuccessState("تمت الإضافة بنجاح"));
+        emit(CategorySuccessState("categoryAddedSuccess"));
         getAllCategories();
       },
     );
@@ -232,7 +236,7 @@ class ProductCubit extends Cubit<ProductStates> {
         }
       },
       (_) {
-        emit(CategorySuccessState("تم الحذف  بنجاح"));
+        emit(CategorySuccessState("categoryDeletedSuccess"));
         getAllCategories();
         getAllProducts();
       },

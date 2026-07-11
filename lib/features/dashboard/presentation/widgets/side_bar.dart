@@ -3,6 +3,7 @@ import 'package:bayaa_pos/core/functions/messege.dart';
 import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_states.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
 import 'package:bayaa_pos/core/localization/locale_provider.dart';
+import 'package:bayaa_pos/core/localization/translation_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -88,7 +89,9 @@ class _CustomSidebarState extends State<CustomSidebar> {
   Widget _buildUserInfo(bool isNarrow) {
     final l10n = AppLocalizations.of(context);
     final user = getIt<UserCubit>().currentUser;
-    final firstLetter = user.name.isNotEmpty ? user.name.substring(0, 1) : '?';
+    final displayName = TranslationHelper.translateUserName(
+      context, user.name, username: user.username);
+    final firstLetter = displayName.isNotEmpty ? displayName.substring(0, 1) : '?';
     final roleName = user.userType == UserType.manager ? l10n.roleManager : l10n.roleCashier;
 
     return Container(
@@ -139,7 +142,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            user.name,
+                            displayName,
                             style: const TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 12,

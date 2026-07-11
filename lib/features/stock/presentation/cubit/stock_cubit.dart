@@ -88,6 +88,12 @@ class StockCubit extends Cubit<StockStates> {
       userName: getIt<UserCubit>().currentUser.name,
       sessionId: sid,
       details: {'barcode': product.barcode, 'quantityAdded': quantity, 'newTotal': product.quantity},
+      eventKey: 'productQtyUpdated',
+      parameters: {
+        'user': getIt<UserCubit>().currentUser.name,
+        'product': product.name,
+        'qty': quantity.toString(),
+      },
     );
   }
 

@@ -3193,6 +3193,187 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حذف فاتورة #{id} بواسطة {user}'**
   String activityInvoiceDeleted(Object user, Object id);
+
+  /// No description provided for @confirmDeleteInvoiceTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد حذف الفاتورة'**
+  String get confirmDeleteInvoiceTitle;
+
+  /// No description provided for @confirmDeleteInvoiceMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد من حذف الفاتورة (#{id}) نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه.'**
+  String confirmDeleteInvoiceMessage(Object id);
+
+  /// No description provided for @confirmDeleteBtn.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد الحذف'**
+  String get confirmDeleteBtn;
+
+  /// No description provided for @invoiceDeletedSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حذف الفاتورة بنجاح'**
+  String get invoiceDeletedSuccess;
+
+  /// No description provided for @invoiceDeleteFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل حذف الفاتورة: {error}'**
+  String invoiceDeleteFailed(Object error);
+
+  /// No description provided for @refundSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم المرتجع بنجاح'**
+  String get refundSuccess;
+
+  /// No description provided for @confirmDeleteInvoicesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد حذف الفواتير'**
+  String get confirmDeleteInvoicesTitle;
+
+  /// No description provided for @confirmDeleteInvoicesMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد من حذف جميع الفواتير من {y1}-{m1}-{d1} إلى {y2}-{m2}-{d2}؟\n\nهذا الإجراء لا يمكن التراجع عنه.'**
+  String confirmDeleteInvoicesMessage(
+      Object y1, Object m1, Object d1, Object y2, Object m2, Object d2);
+
+  /// No description provided for @invoicesDeletedSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حذف الفواتير بنجاح'**
+  String get invoicesDeletedSuccess;
+
+  /// No description provided for @invoicesDeleteFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل حذف الفواتير: {error}'**
+  String invoicesDeleteFailed(Object error);
+
+  /// No description provided for @productsManagement.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدارة المنتجات وعرض التفاصيل'**
+  String get productsManagement;
+
+  /// No description provided for @noOtherCategoriesToMove.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد فئات أخرى لنقل المنتجات إليها.'**
+  String get noOtherCategoriesToMove;
+
+  /// No description provided for @selectCategoryBeforeAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد الفئة قبل تنفيذ الإجراء'**
+  String get selectCategoryBeforeAction;
+
+  /// No description provided for @chooseCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر الفئة'**
+  String get chooseCategory;
+
+  /// No description provided for @moveProducts.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقل المنتجات'**
+  String get moveProducts;
+
+  /// No description provided for @permanentDelete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف نهائي'**
+  String get permanentDelete;
+
+  /// No description provided for @mustSelectCategoryFirst.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب اختيار فئة قبل المتابعة'**
+  String get mustSelectCategoryFirst;
+
+  /// No description provided for @categoryActionNoCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد فئات أخرى لنقل المنتجات إليها.'**
+  String get categoryActionNoCategories;
+
+  /// No description provided for @productSavedSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ المنتج بنجاح'**
+  String get productSavedSuccess;
+
+  /// No description provided for @categoryAddedSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت الإضافة بنجاح'**
+  String get categoryAddedSuccess;
+
+  /// No description provided for @categoryDeletedSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الحذف بنجاح'**
+  String get categoryDeletedSuccess;
+
+  /// No description provided for @loginExistingSession.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تسجيل الدخول. ستمت المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.'**
+  String get loginExistingSession;
+
+  /// No description provided for @loginNewSession.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تسجيل الدخول وفتح يومية جديدة بنجاح'**
+  String get loginNewSession;
+
+  /// No description provided for @failedOpenDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل فتح اليوم: {error}'**
+  String failedOpenDay(Object error);
+
+  /// No description provided for @wrongPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور غير صحيحة'**
+  String get wrongPassword;
+
+  /// No description provided for @noOpenSession.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد يوم مفتوح لإغلاقه.'**
+  String get noOpenSession;
+
+  /// No description provided for @failedCloseDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل إغلاق اليومية: {error}'**
+  String failedCloseDay(Object error);
+
+  /// No description provided for @storeInfoSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ معلومات المتجر بنجاح'**
+  String get storeInfoSaved;
+
+  /// No description provided for @unknownUser.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير معروف'**
+  String get unknownUser;
+
+  /// No description provided for @trialCashier.
+  ///
+  /// In ar, this message translates to:
+  /// **'كاشير تجريبي'**
+  String get trialCashier;
 }
 
 class _AppLocalizationsDelegate

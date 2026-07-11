@@ -16,6 +16,8 @@ import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../../auth/data/models/user_model.dart';
 import 'daily_report_preview_screen.dart';
 import 'daily_report_datasheet_screen.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../core/localization/translation_helper.dart';
 
 class SessionHistoryScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -150,13 +152,14 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
   }
 
   Future<void> _deleteSession(Session session) async {
+    final l10n = AppLocalizations.of(context);
     final currentUser = getIt<UserCubit>().currentUser;
     if (currentUser.userType != UserType.manager) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            'فقط المدير يمكنه حذف الورديات.',
+          content: Text(
+            l10n.managerOnlyDelete,
             style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
           ),
           backgroundColor: AppColors.errorColor,
@@ -172,8 +175,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            'لا يمكن حذف الوردية الحالية وهي مفتوحة.',
+          content: Text(
+            l10n.cannotDeleteOpenSession,
             style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
           ),
           backgroundColor: AppColors.warningColor,
@@ -205,10 +208,10 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     color: AppColors.errorColor, size: 22),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'تأكيد حذف الوردية',
-                  style: TextStyle(
+                  l10n.confirmDeleteSession,
+                  style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontWeight: FontWeight.bold,
                       fontSize: 17),
@@ -216,9 +219,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
               ),
             ],
           ),
-          content: const Text(
-            'هل أنت متأكد من حذف هذه الوردية؟ سيتم حذف تقرير الإغلاق المرتبط بها نهائياً ولا يمكن التراجع.',
-            style: TextStyle(
+          content: Text(
+            l10n.confirmDeleteSessionMessage,
+            style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 13.5,
                 color: AppColors.textSecondary),
@@ -235,9 +238,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                           borderRadius: BorderRadius.circular(10)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text(
-                      'إلغاء',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.cancel,
+                      style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.bold,
                           color: AppColors.textSecondary),
@@ -256,9 +259,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'حذف',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.delete,
+                      style: const TextStyle(
                           fontFamily: 'Cairo', fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -293,8 +296,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              'تم حذف الوردية بنجاح.',
+            content: Text(
+              l10n.sessionDeletedSuccess,
               style:
                   TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
             ),
@@ -310,7 +313,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'فشل حذف الوردية: ${e.toString()}',
+              l10n.sessionDeleteFailed(e.toString()),
               style: const TextStyle(
                   fontFamily: 'Cairo', fontWeight: FontWeight.w700),
             ),
@@ -325,12 +328,13 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
   }
 
   String _formatDuration(Session session) {
-    if (session.closeTime == null) return 'نشطة الآن';
+    final l10n = AppLocalizations.of(context);
+    if (session.closeTime == null) return l10n.activeNow;
     final duration = session.closeTime!.difference(session.openTime);
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
-    if (hours > 0) return '${hours}س ${minutes}د';
-    return '${minutes}د';
+    if (hours > 0) return l10n.hoursMinutes(hours, minutes);
+    return l10n.minutesOnly(minutes);
   }
 
   @override
@@ -372,6 +376,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
 
   // ─── AppBar ────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar() {
+    final l10n = AppLocalizations.of(context);
     return PreferredSize(
       preferredSize: const Size.fromHeight(60),
       child: Container(
@@ -425,9 +430,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'سجل الورديات',
-                        style: TextStyle(
+                      Text(
+                        l10n.sessionsHistory,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontFamily: 'Cairo',
@@ -436,7 +441,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                         ),
                       ),
                       Text(
-                        '${_sessions.length} وردية مسجلة',
+                        l10n.sessionsCount(_sessions.length),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.75),
                           fontFamily: 'Cairo',
@@ -470,6 +475,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
 
   // ─── Shift List Panel ──────────────────────────────────────
   Widget _buildShiftList() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         // Panel header
@@ -494,9 +500,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     size: 15, color: AppColors.primaryColor),
               ),
               const SizedBox(width: 10),
-              const Text(
-                'قائمة الورديات',
-                style: TextStyle(
+              Text(
+                l10n.sessionsList,
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                   fontFamily: 'Cairo',
@@ -544,6 +550,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
   }
 
   Widget _buildListLoader() {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -558,7 +565,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
           ),
           const SizedBox(height: 14),
           Text(
-            'جاري تحميل الورديات...',
+            l10n.loadingSessions,
             style: TextStyle(
                 color: AppColors.mutedColor,
                 fontSize: 12,
@@ -570,6 +577,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
   }
 
   Widget _buildEmptyShifts() {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -586,9 +594,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                   size: 36, color: AppColors.mutedColor.withOpacity(0.4)),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'لا توجد ورديات مسجلة',
-              style: TextStyle(
+            Text(
+              l10n.noSessions,
+              style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Cairo',
@@ -596,7 +604,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
             ),
             const SizedBox(height: 6),
             Text(
-              'ستُضاف الورديات تلقائياً فور فتحها وإغلاقها',
+              l10n.sessionsAutoAdd,
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: AppColors.mutedColor.withOpacity(0.8),
@@ -610,6 +618,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
   }
 
   Widget _buildShiftCard(Session session) {
+    final l10n = AppLocalizations.of(context);
     final isSelected = _selectedSession?.id == session.id;
     final dateFormat = DateFormat('dd/MM/yyyy');
     final timeFormat = DateFormat('hh:mm a');
@@ -680,7 +689,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                         ),
                       ),
                       child: Text(
-                        session.isOpen ? 'نشطة' : 'مغلقة',
+                        session.isOpen ? l10n.sessionActive : l10n.sessionClosed,
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Cairo',
@@ -725,8 +734,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                 const SizedBox(height: 10),
 
                 // Shift ID
-                Text(
-                  'وردية #${(session.id.length > 8 ? session.id.substring(0, 8) : session.id).toUpperCase()}',
+                  Text(
+                    l10n.sessionId((session.id.length > 8 ? session.id.substring(0, 8) : session.id).toUpperCase()),
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.w800,
@@ -823,6 +832,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
 
   // ─── Detail Panel ──────────────────────────────────────────
   Widget _buildDetailPanel() {
+    final l10n = AppLocalizations.of(context);
     if (_selectedSession == null) {
       return Center(
         child: Column(
@@ -838,9 +848,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                   size: 40, color: AppColors.mutedColor.withOpacity(0.3)),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'اختر وردية لعرض تفاصيلها',
-              style: TextStyle(
+            Text(
+              l10n.selectSessionForDetails,
+              style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -848,7 +858,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
             ),
             const SizedBox(height: 6),
             Text(
-              'اختر إحدى الورديات من القائمة لعرض سجل العمليات والتقرير المالي',
+              l10n.selectSessionHint,
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: AppColors.mutedColor, fontSize: 12, fontFamily: 'Cairo'),
@@ -884,20 +894,20 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
               Tab(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(LucideIcons.list, size: 15),
-                    SizedBox(width: 7),
-                    Text('سجل العمليات'),
+                  children: [
+                    const Icon(LucideIcons.list, size: 15),
+                    const SizedBox(width: 7),
+                    Text(l10n.operationsLog),
                   ],
                 ),
               ),
               Tab(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(LucideIcons.fileText, size: 15),
-                    SizedBox(width: 7),
-                    Text('التقرير المالي'),
+                  children: [
+                    const Icon(LucideIcons.fileText, size: 15),
+                    const SizedBox(width: 7),
+                    Text(l10n.financialReport),
                   ],
                 ),
               ),
@@ -922,6 +932,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
 
   // ─── Detail Header ─────────────────────────────────────────
   Widget _buildDetailHeader(Session session) {
+    final l10n = AppLocalizations.of(context);
     final timeFormat = DateFormat('hh:mm a');
     final dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -965,7 +976,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'وردية #${(session.id.length > 12 ? session.id.substring(0, 12) : session.id).toUpperCase()}',
+                      l10n.sessionId((session.id.length > 12 ? session.id.substring(0, 12) : session.id).toUpperCase()),
                       style: const TextStyle(
                         fontSize: 15,
                         fontFamily: 'Cairo',
@@ -1007,8 +1018,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                               const SizedBox(width: 5),
                               Text(
                                 session.isOpen
-                                    ? 'وردية نشطة'
-                                    : 'وردية مغلقة',
+                                    ? l10n.activeSession
+                                    : l10n.closedSession,
                                 style: TextStyle(
                                   color: session.isOpen
                                       ? AppColors.successColor
@@ -1042,7 +1053,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
               if (!session.isOpen) ...[
                 _buildActionBtn(
                   icon: LucideIcons.printer,
-                  tooltip: 'طباعة التقرير',
+                  tooltip: l10n.printReport,
                   color: AppColors.primaryColor,
                   onPressed: () => _handlePrintReport(session),
                 ),
@@ -1050,7 +1061,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
               ],
               _buildActionBtn(
                 icon: LucideIcons.trash2,
-                tooltip: 'حذف الوردية',
+                tooltip: l10n.deleteSession,
                 color: AppColors.errorColor,
                 onPressed: () => _deleteSession(session),
               ),
@@ -1065,20 +1076,20 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
             children: [
               _buildStatChip(
                 LucideIcons.logIn,
-                'بدء الوردية',
+                l10n.sessionStart,
                 '${dateFormat.format(session.openTime)}  ${timeFormat.format(session.openTime)}',
                 AppColors.successColor,
               ),
               if (session.closeTime != null) ...[
                 _buildStatChip(
                   LucideIcons.logOut,
-                  'إغلاق الوردية',
+                  l10n.sessionEnd,
                   '${dateFormat.format(session.closeTime!)}  ${timeFormat.format(session.closeTime!)}',
                   AppColors.warningColor,
                 ),
                 _buildStatChip(
                   LucideIcons.clock,
-                  'إجمالي المدة',
+                  l10n.totalDuration,
                   _formatDuration(session),
                   AppColors.secondaryColor,
                 ),
@@ -1156,6 +1167,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
 
   // ─── Activity Log ──────────────────────────────────────────
   Widget _buildActivityLog() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         // Filter toolbar
@@ -1184,7 +1196,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     style: const TextStyle(
                         fontFamily: 'Cairo', fontSize: 12.5),
                     decoration: InputDecoration(
-                      hintText: 'بحث بالعملية أو اسم المستخدم...',
+                      hintText: l10n.searchOperationsHint,
                       hintStyle: TextStyle(
                           color: AppColors.mutedColor.withOpacity(0.55),
                           fontSize: 12,
@@ -1220,7 +1232,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                         fontFamily: 'Cairo',
                         color: AppColors.textPrimary,
                         fontSize: 12),
-                    hint: Text('كل العمليات',
+                    hint: Text(l10n.allOperations,
                         style: TextStyle(
                             fontSize: 12,
                             color: AppColors.mutedColor,
@@ -1229,10 +1241,10 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                         size: 14, color: AppColors.mutedColor),
                     isDense: true,
                     items: [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                           value: null,
-                          child: Text('كل العمليات',
-                              style: TextStyle(
+                          child: Text(l10n.allOperations,
+                              style: const TextStyle(
                                   fontSize: 12, fontFamily: 'Cairo'))),
                       ...ActivityType.values.map((type) =>
                           DropdownMenuItem(
@@ -1285,7 +1297,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                           ),
                           const SizedBox(height: 14),
                           const Text(
-                            'لا توجد عمليات تطابق البحث',
+                            'No matching operations',
                             style: TextStyle(
                                 color: AppColors.mutedColor,
                                 fontSize: 13,
@@ -1394,7 +1406,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     children: [
                       Expanded(
                         child: Text(
-                          activity.description,
+                          ActivityLogger.formatActivity(context, activity),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12.5,
@@ -1424,7 +1436,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                           color: AppColors.primaryColor.withOpacity(0.6)),
                       const SizedBox(width: 4),
                       Text(
-                        activity.userName,
+                        TranslationHelper.translateUserName(context, activity.userName),
                         style: const TextStyle(
                             fontSize: 10.5,
                             color: AppColors.primaryColor,
@@ -1437,8 +1449,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                       activity.details!.isNotEmpty) ...[
                     const SizedBox(height: 5),
                     Text(
-                      ActivityLogger.formatDetailsArabic(
-                          activity.type, activity.details),
+                      ActivityLogger.formatDetails(
+                          context, activity.type, activity.details),
                       style: TextStyle(
                           fontSize: 11,
                           color:
@@ -1459,6 +1471,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
 
   // ─── Report Preview ────────────────────────────────────────
   Widget _buildReportPreview() {
+    final l10n = AppLocalizations.of(context);
     if (_selectedSession == null || _selectedSession!.isOpen) {
       return Center(
         child: Column(
@@ -1474,9 +1487,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                   size: 42, color: AppColors.mutedColor.withOpacity(0.35)),
             ),
             const SizedBox(height: 18),
-            const Text(
-              'التقرير يتاح بعد إغلاق الوردية',
-              style: TextStyle(
+            Text(
+              l10n.reportAfterClose,
+              style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.bold,
@@ -1484,7 +1497,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
             ),
             const SizedBox(height: 6),
             Text(
-              'أغلق الوردية الحالية لإنشاء التقرير المالي وعرض الإحصائيات',
+              l10n.closeSessionForReport,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 11,
@@ -1521,8 +1534,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                       color: AppColors.errorColor.withOpacity(0.6)),
                 ),
                 const SizedBox(height: 14),
-                const Text('فشل تحميل التقرير المالي',
-                    style: TextStyle(
+                Text(l10n.failedLoadReport,
+                    style: const TextStyle(
                         color: AppColors.errorColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -1553,13 +1566,13 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                       color: AppColors.mutedColor.withOpacity(0.35)),
                 ),
                 const SizedBox(height: 14),
-                const Text('لم يتم العثور على تقرير مالي',
-                    style: TextStyle(
+                Text(l10n.noFinancialReport,
+                    style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Cairo')),
                 const SizedBox(height: 4),
-                Text('تأكد من إغلاق الوردية بنجاح',
+                Text(l10n.ensureSessionClosed,
                     style: TextStyle(
                         fontSize: 11,
                         color: AppColors.mutedColor,
@@ -1586,36 +1599,36 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
               child: Row(
                 children: [
                   _buildReportStat(
-                    'صافي المبيعات',
-                    '${report.netRevenue.toStringAsFixed(0)} ج.م',
+                    l10n.netSales,
+                    '${report.netRevenue.toStringAsFixed(0)} ${l10n.currencyEg}',
                     const Color(0xFF059669),
                     LucideIcons.trendingUp,
                   ),
                   _buildReportStatDivider(),
                   _buildReportStat(
-                    'عمليات البيع',
+                    l10n.salesOperations,
                     '${report.totalTransactions}',
                     AppColors.secondaryColor,
                     LucideIcons.receipt,
                   ),
                   _buildReportStatDivider(),
                   _buildReportStat(
-                    'المرتجعات',
-                    '${report.totalRefunds.toStringAsFixed(0)} ج.م',
+                    l10n.refunds,
+                    '${report.totalRefunds.toStringAsFixed(0)} ${l10n.currencyEg}',
                     AppColors.errorColor,
                     LucideIcons.cornerUpLeft,
                   ),
                   const Spacer(),
                   _buildReportActionBtn(
                     icon: LucideIcons.printer,
-                    label: 'طباعة',
+                    label: l10n.print,
                     color: AppColors.primaryColor,
                     onTap: () => _handlePrintReport(_selectedSession!),
                   ),
                   const SizedBox(width: 8),
                   _buildReportActionBtn(
                     icon: LucideIcons.table,
-                    label: 'الجدول',
+                    label: l10n.datasheet,
                     color: AppColors.secondaryColor,
                     onTap: () {
                       showDialog(
@@ -1741,6 +1754,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
 
   // ─── Print Report ──────────────────────────────────────────
   Future<void> _handlePrintReport(Session session) async {
+    final l10n = AppLocalizations.of(context);
     try {
       final repo = getIt<SessionRepositoryImpl>();
       final report = await repo.generateDailyReport(session.id);
@@ -1748,9 +1762,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
       if (report == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لا يوجد تقرير لهذه الوردية',
-                  style: TextStyle(fontFamily: 'Cairo')),
+            SnackBar(
+              content: Text(l10n.noReportForSession,
+                  style: const TextStyle(fontFamily: 'Cairo')),
             ),
           );
         }
@@ -1785,9 +1799,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'معاينة التقرير قبل الطباعة',
-                        style: TextStyle(
+                      Text(
+                        l10n.previewBeforePrint,
+                        style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
@@ -1822,7 +1836,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('فشل تحميل التقرير: $e',
+            content: Text(l10n.failedLoadReportError(e.toString()),
                 style: const TextStyle(fontFamily: 'Cairo')),
           ),
         );
@@ -1906,39 +1920,40 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
   }
 
   String _getTypeName(ActivityType type) {
+    final l10n = AppLocalizations.of(context);
     switch (type) {
       case ActivityType.sale:
-        return 'عملية بيع';
+        return l10n.actSale;
       case ActivityType.refund:
-        return 'مرتجع';
+        return l10n.actRefund;
       case ActivityType.productAdd:
-        return 'إضافة منتج';
+        return l10n.actProductAdd;
       case ActivityType.productUpdate:
-        return 'تعديل منتج';
+        return l10n.actProductUpdate;
       case ActivityType.productDelete:
-        return 'حذف منتج';
+        return l10n.actProductDelete;
       case ActivityType.productQuantityUpdate:
-        return 'تعديل كمية';
+        return l10n.actProductQtyUpdate;
       case ActivityType.userAdd:
-        return 'إضافة مستخدم';
+        return l10n.actUserAdd;
       case ActivityType.userUpdate:
-        return 'تعديل صلاحيات';
+        return l10n.actUserUpdate;
       case ActivityType.userDelete:
-        return 'حذف مستخدم';
+        return l10n.actUserDelete;
       case ActivityType.sessionOpen:
-        return 'فتح وردية';
+        return l10n.actSessionOpen;
       case ActivityType.sessionClose:
-        return 'إغلاق وردية';
+        return l10n.actSessionClose;
       case ActivityType.restock:
-        return 'شحنة جديدة';
+        return l10n.actRestock;
       case ActivityType.expense:
-        return 'مصروفات';
+        return l10n.actExpense;
       case ActivityType.invoiceDelete:
-        return 'حذف فاتورة';
+        return l10n.actInvoiceDelete;
       case ActivityType.printReport:
-        return 'طباعة تقرير';
+        return l10n.actPrintReport;
       case ActivityType.login:
-        return 'تسجيل دخول';
+        return l10n.actLogin;
     }
   }
 }

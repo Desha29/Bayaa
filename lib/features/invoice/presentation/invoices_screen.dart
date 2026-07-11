@@ -48,12 +48,10 @@ class _InvoiceScreenState extends State<InvoiceScreen>
   final StringBuffer _hidBuffer = StringBuffer();
   Timer? _hidTimer;
   Timer? _debounceTimer;
-  late AppLocalizations localizations;
 
   @override
   void initState() {
     super.initState();
-    localizations = AppLocalizations.of(context);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -165,22 +163,22 @@ class _InvoiceScreenState extends State<InvoiceScreen>
   }
 
   Future<void> _handleDeleteSale(Sale sale) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تأكيد حذف الفاتورة'),
-        content: Text(
-            'هل أنت متأكد من حذف الفاتورة (#${sale.id}) نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه.'),
+        title: Text(l10n.confirmDeleteInvoiceTitle),
+        content: Text(l10n.confirmDeleteInvoiceMessage(sale.id)),
         actions: [
           TextButton(
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.errorColor,
             ),
-            child: const Text('تأكيد الحذف'),
+            child: Text(l10n.confirmDeleteBtn),
             onPressed: () => Navigator.of(ctx).pop(true),
           ),
         ],
@@ -194,20 +192,20 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم حذف الفاتورة بنجاح')),
+          SnackBar(content: Text(l10n.invoiceDeletedSuccess)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل حذف الفاتورة: ${e.toString()}')),
+          SnackBar(content: Text(l10n.invoiceDeleteFailed(e.toString()))),
         );
       }
     }
   }
 
   Future<void> _handleReturnSale(Sale sale) async {
-    // Show partial refund dialog
+    final l10n = AppLocalizations.of(context);
     final refundService = RefundCalculationService(widget.repository);
 
     final selectedItems = await showDialog<List<RefundItem>>(
@@ -220,7 +218,6 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
     if (selectedItems == null || selectedItems.isEmpty) return;
 
-    // Create partial refund
     await context.read<InvoiceCubit>().createPartialRefund(
           originalSale: sale,
           itemsToRefund: selectedItems,
@@ -228,18 +225,18 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم المرتجع بنجاح')),
+        SnackBar(content: Text(l10n.refundSuccess)),
       );
     }
   }
 
   Future<void> _deleteInvoices(
       DateTime? startDate, DateTime? endDate, String searchQuery) async {
-    // Require date range for bulk deletion
+    final l10n = AppLocalizations.of(context);
     if (startDate == null || endDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('يجب تحديد نطاق التاريخ لحذف الفواتير'),
+        SnackBar(
+          content: Text(l10n.selectDateRangeFirst),
           backgroundColor: AppColors.errorColor,
         ),
       );
@@ -249,19 +246,20 @@ class _InvoiceScreenState extends State<InvoiceScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تأكيد حذف الفواتير'),
-        content: Text(
-            'هل أنت متأكد من حذف جميع الفواتير من ${startDate.year}-${startDate.month}-${startDate.day} إلى ${endDate.year}-${endDate.month}-${endDate.day}؟\n\nهذا الإجراء لا يمكن التراجع عنه.'),
+        title: Text(l10n.confirmDeleteInvoicesTitle),
+        content: Text(l10n.confirmDeleteInvoicesMessage(
+            startDate.year, startDate.month, startDate.day,
+            endDate.year, endDate.month, endDate.day)),
         actions: [
           TextButton(
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.errorColor,
             ),
-            child: const Text('تأكيد الحذف'),
+            child: Text(l10n.confirmDeleteBtn),
             onPressed: () => Navigator.of(ctx).pop(true),
           ),
         ],
@@ -277,21 +275,22 @@ class _InvoiceScreenState extends State<InvoiceScreen>
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم حذف الفواتير بنجاح')),
+          SnackBar(content: Text(l10n.invoicesDeletedSuccess)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل حذف الفواتير: ${e.toString()}')),
+          SnackBar(content: Text(l10n.invoicesDeleteFailed(e.toString()))),
         );
       }
     }
   }
 
   Future<void> _openInvoice(Sale sale) async {
+    final l10n = AppLocalizations.of(context);
     final subtotal = sale.saleItems.fold<double>(0, (s, it) => s + it.total);
-    final cashierName = sale.cashierName ?? 'الكاشير';
+    final cashierName = sale.cashierName ?? l10n.cashier;
 
     final data = InvoiceData(
       invoiceId: sale.id,
@@ -332,8 +331,9 @@ class _InvoiceScreenState extends State<InvoiceScreen>
   }
 
   Future<void> _handlePrintInvoice(Sale sale) async {
+    final l10n = AppLocalizations.of(context);
     final subtotal = sale.saleItems.fold<double>(0, (s, it) => s + it.total);
-    final cashierName = sale.cashierName ?? 'الكاشير';
+    final cashierName = sale.cashierName ?? l10n.cashier;
 
     final data = InvoiceData(
       invoiceId: sale.id,
@@ -389,9 +389,9 @@ class _InvoiceScreenState extends State<InvoiceScreen>
                           curve: Curves.easeOut,
                         )),
                         child: ScreenHeader(
-                          title: 'الفواتير',
+                          title: l10n.invoices,
                           icon: LucideIcons.fileSpreadsheet,
-                          subtitle: 'عرض وطباعة الفواتير الصادرة',
+                          subtitle: l10n.invoicesSubtitle,
                           subtitleColor: AppColors.mutedColor,
                           iconColor: AppColors.primaryColor,
                         ),

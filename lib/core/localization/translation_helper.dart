@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 
 class TranslationHelper {
+  static const _defaultAdminNameAr = 'مدير النظام';
+  static const _defaultAdminUsername = 'admin';
+  static const _defaultCashierNameAr = 'كاشير تجريبي';
+  static const _defaultCashierUsername = 'cashier';
+
+  static String translateUserName(BuildContext context, String name, {String? username}) {
+    final l10n = AppLocalizations.of(context);
+    if (username == _defaultAdminUsername && name == _defaultAdminNameAr) {
+      return l10n.roleManager;
+    }
+    if (username == _defaultCashierUsername && name == _defaultCashierNameAr) {
+      return l10n.trialCashier;
+    }
+    return name;
+  }
+
   static String translate(BuildContext context, String key, {List<String>? args}) {
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return key;
@@ -91,7 +107,35 @@ class TranslationHelper {
       case 'sessionOpenWarning':
         return l10n.sessionOpenWarning;
       case 'sessionCloseSuccess':
-        return l10n.sessionDeletedSuccess; // or custom
+        return l10n.sessionDeletedSuccess;
+
+      // Cubit event keys
+      case 'productSavedSuccess':
+        return l10n.productSavedSuccess;
+      case 'msgProductDeleted':
+        return l10n.msgProductDeleted;
+      case 'categoryAddedSuccess':
+        return l10n.categoryAddedSuccess;
+      case 'categoryDeletedSuccess':
+        return l10n.categoryDeletedSuccess;
+      case 'loginExistingSession':
+        return l10n.loginExistingSession;
+      case 'loginNewSession':
+        return l10n.loginNewSession;
+      case 'failedOpenDay':
+        return l10n.failedOpenDay('');
+      case 'wrongPassword':
+        return l10n.wrongPassword;
+      case 'noOpenSession':
+        return l10n.noOpenSession;
+      case 'dayClosedSuccessReport':
+        return l10n.dayClosedSuccessReport;
+      case 'failedCloseDay':
+        return l10n.failedCloseDay('');
+      case 'storeInfoSaved':
+        return l10n.storeInfoSaved;
+      case 'unknownUser':
+        return l10n.unknownUser;
       
       default:
         // Try parsing prefix-based dynamic errors (e.g. Price below minimum check, or generic error message)
@@ -110,6 +154,22 @@ class TranslationHelper {
         if (key.startsWith('maxQtyReached:')) {
           final val = key.substring('maxQtyReached:'.length);
           return l10n.maxQtyReached(val);
+        }
+        if (key.startsWith('failedOpenDay:')) {
+          final val = key.substring('failedOpenDay:'.length);
+          return l10n.failedOpenDay(val);
+        }
+        if (key.startsWith('failedCloseDay:')) {
+          final val = key.substring('failedCloseDay:'.length);
+          return l10n.failedCloseDay(val);
+        }
+        if (key.startsWith('invoiceDeleteFailed:')) {
+          final val = key.substring('invoiceDeleteFailed:'.length);
+          return l10n.invoiceDeleteFailed(val);
+        }
+        if (key.startsWith('invoicesDeleteFailed:')) {
+          final val = key.substring('invoicesDeleteFailed:'.length);
+          return l10n.invoicesDeleteFailed(val);
         }
         
         return key;

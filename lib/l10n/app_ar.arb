@@ -598,5 +598,70 @@
       "user": {},
       "id": {}
     }
-  }
+  },
+  "confirmDeleteInvoiceTitle": "تأكيد حذف الفاتورة",
+  "confirmDeleteInvoiceMessage": "هل أنت متأكد من حذف الفاتورة (#{id}) نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه.",
+  "@confirmDeleteInvoiceMessage": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "confirmDeleteBtn": "تأكيد الحذف",
+  "invoiceDeletedSuccess": "تم حذف الفاتورة بنجاح",
+  "invoiceDeleteFailed": "فشل حذف الفاتورة: {error}",
+  "@invoiceDeleteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "refundSuccess": "تم المرتجع بنجاح",
+  "confirmDeleteInvoicesTitle": "تأكيد حذف الفواتير",
+  "confirmDeleteInvoicesMessage": "هل أنت متأكد من حذف جميع الفواتير من {y1}-{m1}-{d1} إلى {y2}-{m2}-{d2}؟\n\nهذا الإجراء لا يمكن التراجع عنه.",
+  "@confirmDeleteInvoicesMessage": {
+    "placeholders": {
+      "y1": {},
+      "m1": {},
+      "d1": {},
+      "y2": {},
+      "m2": {},
+      "d2": {}
+    }
+  },
+  "invoicesDeletedSuccess": "تم حذف الفواتير بنجاح",
+  "invoicesDeleteFailed": "فشل حذف الفواتير: {error}",
+  "@invoicesDeleteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "productsManagement": "إدارة المنتجات وعرض التفاصيل",
+  "noOtherCategoriesToMove": "لا توجد فئات أخرى لنقل المنتجات إليها.",
+  "selectCategoryBeforeAction": "تحديد الفئة قبل تنفيذ الإجراء",
+  "chooseCategory": "اختر الفئة",
+  "moveProducts": "نقل المنتجات",
+  "permanentDelete": "حذف نهائي",
+  "mustSelectCategoryFirst": "يجب اختيار فئة قبل المتابعة",
+  "categoryActionNoCategories": "لا توجد فئات أخرى لنقل المنتجات إليها.",
+  "productSavedSuccess": "تم حفظ المنتج بنجاح",
+  "categoryAddedSuccess": "تمت الإضافة بنجاح",
+  "categoryDeletedSuccess": "تم الحذف بنجاح",
+  "loginExistingSession": "تم تسجيل الدخول. ستمت المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.",
+  "loginNewSession": "تم تسجيل الدخول وفتح يومية جديدة بنجاح",
+  "failedOpenDay": "فشل فتح اليوم: {error}",
+  "@failedOpenDay": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "wrongPassword": "كلمة المرور غير صحيحة",
+  "noOpenSession": "لا يوجد يوم مفتوح لإغلاقه.",
+  "failedCloseDay": "فشل إغلاق اليومية: {error}",
+  "@failedCloseDay": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "storeInfoSaved": "تم حفظ معلومات المتجر بنجاح",
+  "unknownUser": "غير معروف",
+  "trialCashier": "كاشير تجريبي"
 }
