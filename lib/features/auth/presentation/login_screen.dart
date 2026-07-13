@@ -470,13 +470,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildBrandingBanner(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final configuredStoreName = getIt<SettingsCubit>().currentStoreInfo?.name;
-    final isDefaultBrand =
-        configuredStoreName == null ||
+    final isDefaultBrand = configuredStoreName == null ||
         configuredStoreName.isEmpty ||
         configuredStoreName == 'Bayaa POS' ||
         configuredStoreName == 'Bayaa Store';
     final storeName =
-        isDefaultBrand ? l10n.loginBrandName : configuredStoreName!;
+        isDefaultBrand ? l10n.loginBrandName : configuredStoreName;
 
     return Container(
       decoration: const BoxDecoration(

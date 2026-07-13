@@ -4,12 +4,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
-import 'package:bayaa_pos/l10n/app_localizations.dart';
+
 import 'package:bayaa_pos/core/localization/translation_helper.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/services/activity_logger.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 
@@ -32,7 +33,9 @@ class _RecentOperationsState extends State<RecentOperations> {
     super.initState();
     _loadGrouped();
     // Listen to stream for live updates
-    _activitySub = ActivityLogger().activitiesStream.listen((_) => _loadGrouped(silent: true));
+    _activitySub = ActivityLogger()
+        .activitiesStream
+        .listen((_) => _loadGrouped(silent: true));
   }
 
   @override
@@ -45,7 +48,8 @@ class _RecentOperationsState extends State<RecentOperations> {
     if (!silent && !mounted) return;
     if (!silent) setState(() => _loading = true);
     try {
-      final groups = await ActivityLogger().getActivitiesGroupedBySession(sessionLimit: _sessionLimit);
+      final groups = await ActivityLogger()
+          .getActivitiesGroupedBySession(sessionLimit: _sessionLimit);
       if (mounted) {
         setState(() {
           _groups = groups;
@@ -62,7 +66,8 @@ class _RecentOperationsState extends State<RecentOperations> {
     setState(() => _loadingMore = true);
     _sessionLimit += 5;
     try {
-      final groups = await ActivityLogger().getActivitiesGroupedBySession(sessionLimit: _sessionLimit);
+      final groups = await ActivityLogger()
+          .getActivitiesGroupedBySession(sessionLimit: _sessionLimit);
       if (mounted) {
         setState(() {
           _groups = groups;
@@ -422,8 +427,10 @@ class _RecentOperationsState extends State<RecentOperations> {
               children: [
                 Text(
                   group.isOpen
-                      ? l10n.activeDayUser(TranslationHelper.translateUserName(context, group.openedBy))
-                      : l10n.closedDayUser(TranslationHelper.translateUserName(context, group.openedBy)),
+                      ? l10n.activeDayUser(TranslationHelper.translateUserName(
+                          context, group.openedBy))
+                      : l10n.closedDayUser(TranslationHelper.translateUserName(
+                          context, group.openedBy)),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -548,7 +555,8 @@ class _RecentOperationsState extends State<RecentOperations> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  TranslationHelper.translateUserName(context, activity.userName),
+                  TranslationHelper.translateUserName(
+                      context, activity.userName),
                   style: TextStyle(
                     fontSize: 11,
                     color: AppColors.primaryColor,
@@ -592,7 +600,7 @@ class _RecentOperationsState extends State<RecentOperations> {
   Widget _buildLoadMoreButton() {
     final l10n = AppLocalizations.of(context);
     if (_groups.isEmpty) return const SizedBox.shrink();
-    
+
     if (_loadingMore) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 16),
@@ -609,7 +617,8 @@ class _RecentOperationsState extends State<RecentOperations> {
           style: TextButton.styleFrom(
             foregroundColor: AppColors.primaryColor,
             visualDensity: VisualDensity.compact,
-            textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+            textStyle:
+                const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
           ),
         ),
       ),

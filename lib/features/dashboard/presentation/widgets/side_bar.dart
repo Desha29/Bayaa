@@ -80,8 +80,10 @@ class _CustomSidebarState extends State<CustomSidebar> {
 
     addSection(l10n.homeSection, ['dashboard']);
     addSection(l10n.salesSection, ['sales', 'invoices']);
-    addSection(l10n.stockSection, ['products', 'stock_alerts', 'stock_summary']);
-    addSection(l10n.systemSection, ['reports', 'sessions', 'notifications', 'settings']);
+    addSection(
+        l10n.stockSection, ['products', 'stock_alerts', 'stock_summary']);
+    addSection(l10n.systemSection,
+        ['reports', 'sessions', 'notifications', 'settings']);
 
     return filtered;
   }
@@ -89,10 +91,12 @@ class _CustomSidebarState extends State<CustomSidebar> {
   Widget _buildUserInfo(bool isNarrow) {
     final l10n = AppLocalizations.of(context);
     final user = getIt<UserCubit>().currentUser;
-    final displayName = TranslationHelper.translateUserName(
-      context, user.name, username: user.username);
-    final firstLetter = displayName.isNotEmpty ? displayName.substring(0, 1) : '?';
-    final roleName = user.userType == UserType.manager ? l10n.roleManager : l10n.roleCashier;
+    final displayName = TranslationHelper.translateUserName(context, user.name,
+        username: user.username);
+    final firstLetter =
+        displayName.isNotEmpty ? displayName.substring(0, 1) : '?';
+    final roleName =
+        user.userType == UserType.manager ? l10n.roleManager : l10n.roleCashier;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -165,7 +169,9 @@ class _CustomSidebarState extends State<CustomSidebar> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               _buildConnectivityStatus(),
-                              if (PersistenceInitializer.persistenceManager?.config.appMode == 'debug') ...[
+                              if (PersistenceInitializer
+                                      .persistenceManager?.config.appMode ==
+                                  'debug') ...[
                                 const SizedBox(width: 4),
                                 _buildDebugBadge(),
                               ],
@@ -264,6 +270,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
       ),
     );
   }
+
   Widget _buildLanguageToggle(bool isNarrow) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -305,7 +312,9 @@ class _CustomSidebarState extends State<CustomSidebar> {
                         const SizedBox(width: 14),
                         Expanded(
                           child: Text(
-                            AppLocalizations.of(context).localeName == 'ar' ? 'English' : 'العربية',
+                            AppLocalizations.of(context).localeName == 'ar'
+                                ? 'English'
+                                : 'العربية',
                             style: const TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 14,
@@ -502,7 +511,8 @@ class _CustomSidebarState extends State<CustomSidebar> {
                       scrollDirection: Axis.horizontal,
                       physics: const NeverScrollableScrollPhysics(),
                       child: SizedBox(
-                        width: 184, // 240 width - 24 margin - 32 internal padding
+                        width:
+                            184, // 240 width - 24 margin - 32 internal padding
                         child: Row(
                           children: [
                             Icon(
@@ -607,14 +617,13 @@ class _CustomSidebarState extends State<CustomSidebar> {
                               final l10n = AppLocalizations.of(context);
                               final configuredName =
                                   getIt<SettingsCubit>().currentStoreInfo?.name;
-                              final isDefaultBrand =
-                                  configuredName == null ||
+                              final isDefaultBrand = configuredName == null ||
                                   configuredName.isEmpty ||
                                   configuredName == 'Bayaa POS' ||
                                   configuredName == 'Bayaa Store';
                               final name = isDefaultBrand
                                   ? l10n.loginBrandName
-                                  : configuredName!;
+                                  : configuredName;
                               return Text(
                                 name,
                                 style: const TextStyle(
@@ -647,7 +656,8 @@ class _CustomSidebarState extends State<CustomSidebar> {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           child: Transform.flip(
-                            flipX: AppLocalizations.of(context).localeName == 'ar',
+                            flipX:
+                                AppLocalizations.of(context).localeName == 'ar',
                             child: const Icon(
                               LucideIcons.chevronLeft,
                               color: AppColors.primaryColor,

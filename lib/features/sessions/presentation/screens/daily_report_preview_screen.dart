@@ -1,10 +1,11 @@
 import '../../../../core/constants/app_colors.dart';
-import '../../../../l10n/app_localizations.dart';
+
 import '../../../../core/localization/translation_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:printing/printing.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../data/models/daily_report_model.dart';
 import '../../data/models/session_model.dart';
 import '../../domain/daily_report_pdf_service.dart';
@@ -39,8 +40,9 @@ class DailyReportPreviewScreen extends StatelessWidget {
       builder: (context, constraints) {
         if (isEmbedded) {
           return PdfPreview(
-            build: (format) =>
-                DailyReportPdfService.generateDailyReportPDF(report, locale: Localizations.localeOf(context)),
+            build: (format) => DailyReportPdfService.generateDailyReportPDF(
+                report,
+                locale: Localizations.localeOf(context)),
             allowPrinting: true,
             allowSharing: true,
             canChangeOrientation: false,
@@ -59,11 +61,19 @@ class DailyReportPreviewScreen extends StatelessWidget {
 
         return Center(
           child: Container(
-            constraints: BoxConstraints(
-                maxWidth: maxPageWidth + (isDesktop ? 100 : 40)),
+            constraints:
+                BoxConstraints(maxWidth: maxPageWidth + (isDesktop ? 100 : 40)),
             padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 8 : isTablet ? 16 : 24,
-              vertical: isMobile ? 12 : isTablet ? 16 : 24,
+              horizontal: isMobile
+                  ? 8
+                  : isTablet
+                      ? 16
+                      : 24,
+              vertical: isMobile
+                  ? 12
+                  : isTablet
+                      ? 16
+                      : 24,
             ),
             child: Column(
               children: [
@@ -97,7 +107,8 @@ class DailyReportPreviewScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       child: PdfPreview(
                         build: (format) =>
-                            DailyReportPdfService.generateDailyReportPDF(report, locale: Localizations.localeOf(context)),
+                            DailyReportPdfService.generateDailyReportPDF(report,
+                                locale: Localizations.localeOf(context)),
                         allowPrinting: true,
                         allowSharing: true,
                         canChangeOrientation: false,
@@ -111,7 +122,11 @@ class DailyReportPreviewScreen extends StatelessWidget {
                         scrollViewDecoration: BoxDecoration(
                           color: AppColors.backgroundColor,
                         ),
-                        previewPageMargin: EdgeInsets.all(isMobile ? 4 : isTablet ? 8 : 12),
+                        previewPageMargin: EdgeInsets.all(isMobile
+                            ? 4
+                            : isTablet
+                                ? 8
+                                : 12),
                       ),
                     ),
                   ),
@@ -125,13 +140,15 @@ class DailyReportPreviewScreen extends StatelessWidget {
 
     if (isEmbedded) {
       return Directionality(
-        textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+        textDirection:
+            l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
         child: body,
       );
     }
 
     return Directionality(
-      textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+      textDirection:
+          l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: _buildGradientAppBar(context),
@@ -165,7 +182,8 @@ class DailyReportPreviewScreen extends StatelessWidget {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                  icon:
+                      const Icon(Icons.arrow_back_rounded, color: Colors.white),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 const SizedBox(width: 4),
@@ -184,7 +202,8 @@ class DailyReportPreviewScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        DateFormat('EEEE, d MMMM yyyy', 'ar').format(report.date),
+                        DateFormat('EEEE, d MMMM yyyy', 'ar')
+                            .format(report.date),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 12,
@@ -297,7 +316,8 @@ class DailyReportPreviewScreen extends StatelessWidget {
           _buildDetailChip(
             icon: Icons.person_rounded,
             label: l10n.byLabel,
-            value: TranslationHelper.translateUserName(context, report.closedByUserName),
+            value: TranslationHelper.translateUserName(
+                context, report.closedByUserName),
             color: AppColors.secondaryColor,
           ),
         ],
@@ -366,15 +386,16 @@ class DailyReportPreviewScreen extends StatelessWidget {
 
   Future<void> _handlePrint(BuildContext context) async {
     await Printing.layoutPdf(
-        onLayout: (format) =>
-            DailyReportPdfService.generateDailyReportPDF(report, locale: Localizations.localeOf(context)));
+        onLayout: (format) => DailyReportPdfService.generateDailyReportPDF(
+            report,
+            locale: Localizations.localeOf(context)));
   }
 
   Future<void> _handleShare(BuildContext context) async {
-    final bytes = await DailyReportPdfService.generateDailyReportPDF(report, locale: Localizations.localeOf(context));
+    final bytes = await DailyReportPdfService.generateDailyReportPDF(report,
+        locale: Localizations.localeOf(context));
     await Printing.sharePdf(
-        bytes: bytes,
-        filename: 'daily_report_${_formatDate(report.date)}.pdf');
+        bytes: bytes, filename: 'daily_report_${_formatDate(report.date)}.pdf');
   }
 
   String _formatDate(DateTime? date) {

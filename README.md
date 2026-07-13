@@ -21,6 +21,18 @@ Bayaa POS is a Flutter desktop application for retail businesses that need depen
 
 The application stores its data locally in SQLite, supports Arabic and English interfaces, and is designed for fast day-to-day work at the counter.
 
+## Contents
+
+- [Highlights](#highlights)
+- [Product workflow](#product-workflow)
+- [Core capabilities](#core-capabilities)
+- [Roles and permissions](#roles-and-permissions)
+- [Screenshots](#screenshots)
+- [Technology](#technology)
+- [Architecture](#architecture)
+- [Data and reliability](#data-and-reliability)
+- [Getting started](#getting-started)
+
 ## Highlights
 
 - **Offline-first** — sales and inventory data remain on the local machine.
@@ -29,6 +41,20 @@ The application stores its data locally in SQLite, supports Arabic and English i
 - **Role-based access** — separate Manager and Cashier capabilities.
 - **Invoices and refunds** — A4 invoices, 80 mm receipts, partial refunds, and stock restoration.
 - **Operational visibility** — sales, profit, inventory, notifications, sessions, and audit history.
+
+## Product workflow
+
+```mermaid
+flowchart LR
+    A[Sign in] --> B[Open sales session]
+    B --> C[Scan or search products]
+    C --> D[Review cart and checkout]
+    D --> E[Create invoice or receipt]
+    E --> F[Update stock and activity log]
+    F --> G[Review reports, alerts, and sessions]
+    E --> H[Process partial refund]
+    H --> I[Restore stock and link refund invoice]
+```
 
 ## Core capabilities
 
@@ -67,6 +93,10 @@ The application stores its data locally in SQLite, supports Arabic and English i
 | :---: | :---: |
 | ![Product management](Screenshots/Manger/manger_product.png) | ![Daily report](Screenshots/Manger/daliy_report1.png) |
 
+| Sales analytics | Stock summary |
+| :---: | :---: |
+| ![Sales analytics](Screenshots/Manger/Erp.png) | ![Stock summary](Screenshots/Manger/summary_stock1.png) |
+
 More application views are available in the [`Screenshots`](Screenshots) directory.
 
 ## Technology
@@ -86,26 +116,67 @@ More application views are available in the [`Screenshots`](Screenshots) directo
 
 The codebase uses a feature-first structure with shared infrastructure in `core` and business capabilities grouped by feature.
 
+```mermaid
+flowchart TB
+    UI[Flutter desktop UI] --> Features[Feature modules]
+    Features --> State[BLoC and Cubit state]
+    Features --> Core[Core services]
+    Features --> POS
+    Features --> Inventory
+    Features --> Operations
+    Features --> Admin
+    Core --> Data[SQLite and local files]
+    Core --> Documents[PDF and printing]
+    Core --> Localization[Arabic and English localization]
+
+    subgraph FeatureAreas[Feature modules]
+      POS[Sales and invoices]
+      Inventory[Products and stock]
+      Operations[Sessions, reports, and notifications]
+      Admin[Auth and settings]
+    end
+```
+
 ```text
 lib/
 ├── main.dart                 Application startup and desktop configuration
-├── core/                     Shared services, UI components, theme, security, and data helpers
+├── core/                     Shared infrastructure
+│   ├── components/           Reusable UI components
+│   ├── constants/            Colors, defaults, and shared constants
 │   ├── data/                 SQLite, persistence, backup, and shared models
 │   ├── di/                   Dependency injection configuration
+│   ├── error/                Failure and error-handling utilities
 │   ├── localization/         Locale selection and translation helpers
+│   │   └── l10n/             Arabic and English localization resources
 │   ├── logging/              Application and crash logging
-│   └── session/              Shift and active-session management
+│   ├── security/             Permission checks
+│   ├── services/             Shared operational services
+│   ├── session/              Shift and active-session management
+│   ├── state/                Cross-feature state synchronization
+│   ├── theme/                Application theme
+│   └── utils/                General utilities
 ├── features/
+│   ├── activation/           Application activation
 │   ├── auth/                 Login, users, and roles
 │   ├── dashboard/            Navigation shell and dashboard
 │   ├── invoice/              Invoice history, printing, and refunds
+│   ├── notifications/        Low-stock notifications
 │   ├── products/             Product and category management
 │   ├── sales/                Checkout, cart, and barcode workflows
 │   ├── sessions/             Shift history and daily reports
 │   ├── settings/             Store settings, users, and data management
-│   └── stock*/               Stock alerts and stock summary
-└── l10n/                     Arabic and English translations
+│   ├── stock/                Stock alerts and restocking
+│   ├── stock_summary/        Stock valuation and summaries
+│   └── analytics/            Sales analytics and visual reports
 ```
+
+### Design principles
+
+- **Feature-first organization** keeps each business capability easy to locate and evolve.
+- **Cubit and BLoC state management** keeps UI state predictable and reactive.
+- **Repository and service layers** isolate persistence, backup, printing, and operational logic.
+- **Local-first persistence** keeps checkout and inventory workflows available without a server.
+- **Localization and RTL** are treated as application-wide behavior, not a screen-specific add-on.
 
 ## Data and reliability
 
@@ -143,6 +214,15 @@ The Windows release is created under:
 ```text
 build/windows/x64/runner/Release/
 ```
+
+### Verify changes
+
+```bash
+flutter analyze
+flutter test
+```
+
+For UI changes, also run the Windows application and verify both English and Arabic layouts.
 
 ## Contributing
 

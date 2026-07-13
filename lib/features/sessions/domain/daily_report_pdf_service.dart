@@ -4,9 +4,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../../../l10n/app_localizations.dart';
 import '../data/models/daily_report_model.dart';
-import 'package:bayaa_pos/l10n/app_localizations.dart';
-
 
 class PdfAppColors {
   static const mutedColor = PdfColors.grey600;
@@ -46,7 +45,9 @@ class DailyReportPdfService {
       pw.MultiPage(
         pageFormat: pageFormat,
         margin: const pw.EdgeInsets.all(28),
-        textDirection: locale.languageCode == 'ar' ? pw.TextDirection.rtl : pw.TextDirection.ltr,
+        textDirection: locale.languageCode == 'ar'
+            ? pw.TextDirection.rtl
+            : pw.TextDirection.ltr,
         theme: pw.ThemeData.withFont(
           base: arabicRegularFont,
           bold: arabicBoldFont,
@@ -69,7 +70,8 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- HEADER -------------------------
-  static pw.Widget _buildHeader(pw.MemoryImage logo, pw.Font boldFont, AppLocalizations l10n) {
+  static pw.Widget _buildHeader(
+      pw.MemoryImage logo, pw.Font boldFont, AppLocalizations l10n) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -111,7 +113,8 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- REPORT INFO -------------------------
-  static pw.Widget _buildReportInfo(DailyReport report, pw.Font boldFont, AppLocalizations l10n) {
+  static pw.Widget _buildReportInfo(
+      DailyReport report, pw.Font boldFont, AppLocalizations l10n) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
@@ -122,9 +125,12 @@ class DailyReportPdfService {
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           _infoItem(l10n.reportDateLabel, _formatDate(report.date), boldFont),
-          _infoItem(l10n.transactionCountLabel, '${report.totalTransactions}', boldFont),
-          _infoItem(l10n.netRevenueLabel,
-              '${report.netRevenue.toStringAsFixed(2)} ${l10n.currencyEg}', boldFont),
+          _infoItem(l10n.transactionCountLabel, '${report.totalTransactions}',
+              boldFont),
+          _infoItem(
+              l10n.netRevenueLabel,
+              '${report.netRevenue.toStringAsFixed(2)} ${l10n.currencyEg}',
+              boldFont),
         ],
       ),
     );
@@ -157,16 +163,25 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- SUMMARY SECTION -------------------------
-  static pw.Widget _buildSummarySection(DailyReport report, pw.Font boldFont, AppLocalizations l10n) {
+  static pw.Widget _buildSummarySection(
+      DailyReport report, pw.Font boldFont, AppLocalizations l10n) {
     final summaries = [
-      _summaryBox(l10n.totalSalesLabel,
-          '${report.totalSales.toStringAsFixed(2)} ${l10n.currencyEg}', boldFont),
-      _summaryBox(l10n.totalRefundsLabel,
-          '${report.totalRefunds.toStringAsFixed(2)} ${l10n.currencyEg}', boldFont),
-      _summaryBox(l10n.netProfitLabel,
-          '${report.netRevenue.toStringAsFixed(2)} ${l10n.currencyEg}', boldFont),
-      _summaryBox(l10n.transactionCountLabel, '${report.totalTransactions}', boldFont),
-      _summaryBox(l10n.closedByLabel, _translateUserName(report.closedByUserName, l10n), boldFont),
+      _summaryBox(
+          l10n.totalSalesLabel,
+          '${report.totalSales.toStringAsFixed(2)} ${l10n.currencyEg}',
+          boldFont),
+      _summaryBox(
+          l10n.totalRefundsLabel,
+          '${report.totalRefunds.toStringAsFixed(2)} ${l10n.currencyEg}',
+          boldFont),
+      _summaryBox(
+          l10n.netProfitLabel,
+          '${report.netRevenue.toStringAsFixed(2)} ${l10n.currencyEg}',
+          boldFont),
+      _summaryBox(
+          l10n.transactionCountLabel, '${report.totalTransactions}', boldFont),
+      _summaryBox(l10n.closedByLabel,
+          _translateUserName(report.closedByUserName, l10n), boldFont),
     ];
 
     return pw.Column(
@@ -223,8 +238,8 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- PRODUCT TABLE -------------------------
-  static pw.Widget _buildProductTable(
-      DailyReport report, pw.Font font, pw.Font boldFont, AppLocalizations l10n) {
+  static pw.Widget _buildProductTable(DailyReport report, pw.Font font,
+      pw.Font boldFont, AppLocalizations l10n) {
     final headers = [
       l10n.productColumn,
       l10n.quantity,
@@ -265,14 +280,16 @@ class DailyReportPdfService {
             fontWeight: pw.FontWeight.bold,
             color: PdfColors.black,
           ),
-          headerDecoration: const pw.BoxDecoration(color: PdfAppColors.mutedColor200),
+          headerDecoration:
+              const pw.BoxDecoration(color: PdfAppColors.mutedColor200),
           cellStyle: pw.TextStyle(
             font: boldFont,
             fontSize: 11,
             color: PdfColors.black,
             fontWeight: pw.FontWeight.bold,
           ),
-          border: pw.TableBorder.all(color: PdfAppColors.mutedColor700, width: 0.5),
+          border:
+              pw.TableBorder.all(color: PdfAppColors.mutedColor700, width: 0.5),
           cellAlignment: pw.Alignment.center,
           headerAlignment: pw.Alignment.center,
           cellHeight: 26,
@@ -287,17 +304,20 @@ class DailyReportPdfService {
       alignment: pw.Alignment.center,
       padding: const pw.EdgeInsets.all(10),
       decoration: pw.BoxDecoration(
-        border: pw.Border(top: pw.BorderSide(color: PdfAppColors.mutedColor600, width: 0.5)),
+        border: pw.Border(
+            top: pw.BorderSide(color: PdfAppColors.mutedColor600, width: 0.5)),
       ),
       child: pw.Column(children: [
         pw.Text(
           l10n.reportCreatedAt(_formatDateTime(DateTime.now())),
-          style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
+          style: pw.TextStyle(
+              font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
         pw.SizedBox(height: 3),
         pw.Text(
           '© 2026 Bayaa POS - ${l10n.allRightsReserved}',
-          style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
+          style: pw.TextStyle(
+              font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
       ]),
     );
@@ -311,8 +331,10 @@ class DailyReportPdfService {
       '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year} - ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
 
   static String _translateUserName(String name, AppLocalizations l10n) {
-    if (name == 'System Administrator' || name == 'مدير النظام') return l10n.roleManager;
-    if (name == 'Trial Cashier' || name == 'كاشير تجريبي') return l10n.trialCashier;
+    if (name == 'System Administrator' || name == 'مدير النظام')
+      return l10n.roleManager;
+    if (name == 'Trial Cashier' || name == 'كاشير تجريبي')
+      return l10n.trialCashier;
     return name;
   }
 }

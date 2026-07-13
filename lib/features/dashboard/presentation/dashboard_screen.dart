@@ -196,14 +196,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           final l10n = AppLocalizations.of(context);
                           final configuredName =
                               getIt<SettingsCubit>().currentStoreInfo?.name;
-                          final isDefaultBrand =
-                              configuredName == null ||
+                          final isDefaultBrand = configuredName == null ||
                               configuredName.isEmpty ||
                               configuredName == 'Bayaa POS' ||
                               configuredName == 'Bayaa Store';
                           final name = isDefaultBrand
                               ? l10n.loginBrandName
-                              : configuredName!;
+                              : configuredName;
                           return Text(name);
                         }),
                     leading: Builder(

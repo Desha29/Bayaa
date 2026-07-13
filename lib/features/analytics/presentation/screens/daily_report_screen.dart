@@ -1,29 +1,22 @@
 import 'dart:async';
 import 'package:bayaa_pos/core/components/screen_header.dart';
-
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-
 import '../../../sessions/data/models/daily_report_model.dart';
 import '../../../sessions/data/models/product_performance_model.dart';
 import '../../domain/analytics_repository.dart';
 import '../../../sessions/domain/daily_report_pdf_service.dart';
 import '../../../sessions/presentation/screens/daily_report_datasheet_screen.dart';
 import '../../../sessions/presentation/screens/daily_report_preview_screen.dart';
-
 import '../../../../core/components/message_overlay.dart';
 import '../../../../core/di/dependency_injection.dart';
 
-
-
-
 class DailyReportScreen extends StatefulWidget {
   final DailyReport? initialReport;
-  
+
   const DailyReportScreen({Key? key, this.initialReport}) : super(key: key);
 
   @override
@@ -44,16 +37,16 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    
+
     // Use initialReport if provided (for session closure)
     if (widget.initialReport != null) {
       report = widget.initialReport;
       // Extract date from report if available
       selectedDate = report!.date;
-        } else {
+    } else {
       fetchReport();
     }
-    
+
     _animationController.forward();
   }
 
@@ -68,7 +61,6 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     setState(() {
       loading = true;
     });
-
 
     final repo = getIt<AnalyticsRepository>();
     final result = await repo.getDailyReport(selectedDate);
@@ -143,7 +135,9 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     if (report == null) return;
     GlobalMessage.showLoading(l10n.loadingReport);
     try {
-      final pdfBytes = await DailyReportPdfService.generateDailyReportPDF(report!, locale: Localizations.localeOf(context));
+      final pdfBytes = await DailyReportPdfService.generateDailyReportPDF(
+          report!,
+          locale: Localizations.localeOf(context));
       await Printing.layoutPdf(
         onLayout: (format) => pdfBytes,
       );
@@ -158,7 +152,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     if (report == null) return;
     GlobalMessage.showLoading(l10n.loadingShare);
     try {
-      final bytes = await DailyReportPdfService.generateDailyReportPDF(report!, locale: Localizations.localeOf(context));
+      final bytes = await DailyReportPdfService.generateDailyReportPDF(report!,
+          locale: Localizations.localeOf(context));
       await Printing.sharePdf(
         bytes: bytes,
         filename:
@@ -210,69 +205,70 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         centerTitle: true,
       ),
       body: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200),
-              child: Padding(
-                padding: EdgeInsets.all(isDesktop ? 32 : 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 24),
-                    if (widget.initialReport == null)
-                      FadeTransition(
-                        opacity: _animationController,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, -0.1),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: _animationController,
-                            curve: Curves.easeOut,
-                          )),
-                          child: _buildDateSelectionSection(),
-                        ),
-                      )
-                    else 
-                      FadeTransition(
-                        opacity: _animationController,
-                         child: _buildReadOnlyDateSection(),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: Padding(
+              padding: EdgeInsets.all(isDesktop ? 32 : 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  if (widget.initialReport == null)
+                    FadeTransition(
+                      opacity: _animationController,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, -0.1),
+                          end: Offset.zero,
+                        ).animate(CurvedAnimation(
+                          parent: _animationController,
+                          curve: Curves.easeOut,
+                        )),
+                        child: _buildDateSelectionSection(),
                       ),
-                    
-                    const SizedBox(height: 24),
-                    Expanded(
-                      child: loading
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                  color: AppColors.primaryColor))
-                          : report == null
-                              ? FadeTransition(
-                                  opacity: _animationController,
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.analytics_outlined,
-                                            size: 80, color: AppColors.mutedColor.withValues(alpha: 0.4)),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          l10n.noDataForDate,
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: AppColors.mutedColor,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : _buildReportContent(),
+                    )
+                  else
+                    FadeTransition(
+                      opacity: _animationController,
+                      child: _buildReadOnlyDateSection(),
                     ),
-                  ],
-                ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: loading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                                color: AppColors.primaryColor))
+                        : report == null
+                            ? FadeTransition(
+                                opacity: _animationController,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.analytics_outlined,
+                                          size: 80,
+                                          color: AppColors.mutedColor
+                                              .withValues(alpha: 0.4)),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        l10n.noDataForDate,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color: AppColors.mutedColor,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : _buildReportContent(),
+                  ),
+                ],
               ),
             ),
           ),
+        ),
       ),
     );
   }
@@ -315,7 +311,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.mutedColor.withValues(alpha: 0.4)),
+                border: Border.all(
+                    color: AppColors.mutedColor.withValues(alpha: 0.4)),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -387,7 +384,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               ),
               const SizedBox(height: 4),
               Text(
-                DateFormat('yyyy-MM-dd   hh:mm a', 'en').format(report?.date ?? DateTime.now()),
+                DateFormat('yyyy-MM-dd   hh:mm a', 'en')
+                    .format(report?.date ?? DateTime.now()),
                 style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -397,7 +395,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
           ),
           if (report?.closedByUserName != null) ...[
             const Spacer(),
-             Container(
+            Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: AppColors.secondaryColor.withValues(alpha: 0.1),
@@ -405,8 +403,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               ),
               child: Row(
                 children: [
-                  Icon(Icons.person,
-                      size: 16, color: AppColors.secondaryColor),
+                  Icon(Icons.person, size: 16, color: AppColors.secondaryColor),
                   const SizedBox(width: 8),
                   Text(
                     l10n.closedByLabel2(report!.closedByUserName),
@@ -454,7 +451,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
           const SizedBox(height: 24),
           if (report?.refundedProducts.isNotEmpty == true) ...[
             SizedBox(
-              height: 300, 
+              height: 300,
               child: FadeTransition(
                 opacity: _animationController,
                 child: _buildRefundedProductsList(),
@@ -578,102 +575,102 @@ class _DailyReportScreenState extends State<DailyReportScreen>
 
   Widget _buildActionButtons() {
     final l10n = AppLocalizations.of(context);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 600;
-        
-        if (isMobile) {
-          return Column(
-            children: [
-              _buildActionButton(
-                onPressed: _handlePreview,
-                icon: Icons.visibility,
-                label: l10n.previewReportBtn,
-                color: AppColors.primaryColor,
-              ),
-              const SizedBox(height: 12),
-              _buildActionButton(
-                onPressed: () {
-                   if (report == null) return;
-                   Navigator.of(context).push(MaterialPageRoute(
-                     builder: (context) => DailyReportDatasheetScreen(report: report!),
-                   ));
-                },
-                icon: Icons.table_chart,
-                label: l10n.viewAsTable,
-                color: AppColors.secondaryColor,
-              ),
-              const SizedBox(height: 12),
-              _buildActionButton(
-                onPressed: _handlePrint,
-                icon: Icons.print,
-                label: l10n.quickPrint,
-                color: Color(0xFF2E7D32),
-              ),
-              const SizedBox(height: 12),
-              _buildActionButton(
-                onPressed: _handleShare,
-                icon: Icons.share,
-                label: l10n.sharePdf,
-                 color: AppColors.mutedColor,
-                isOutlined: true,
-              ),
-            ],
-          );
-        }
+    return LayoutBuilder(builder: (context, constraints) {
+      final isMobile = constraints.maxWidth < 600;
 
+      if (isMobile) {
         return Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildActionButton(
-                    onPressed: _handlePreview,
-                    icon: Icons.visibility,
-                    label: l10n.previewReportBtn,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildActionButton(
-                    onPressed: () {
-                       if (report == null) return;
-                       Navigator.of(context).push(MaterialPageRoute(
-                         builder: (context) => DailyReportDatasheetScreen(report: report!),
-                       ));
-                    },
-                    icon: Icons.table_chart,
-                    label: l10n.viewAsTable,
-                    color: AppColors.secondaryColor,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildActionButton(
-                    onPressed: _handlePrint,
-                    icon: Icons.print,
-                    label: l10n.quickPrint,
-                    color: Color(0xFF2E7D32),
-                  ),
-                ),
-              ],
+            _buildActionButton(
+              onPressed: _handlePreview,
+              icon: Icons.visibility,
+              label: l10n.previewReportBtn,
+              color: AppColors.primaryColor,
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: _buildActionButton(
-                onPressed: _handleShare,
-                icon: Icons.share,
-                label: l10n.sharePdf,
-                color: AppColors.mutedColor,
-                isOutlined: true,
-              ),
+            _buildActionButton(
+              onPressed: () {
+                if (report == null) return;
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      DailyReportDatasheetScreen(report: report!),
+                ));
+              },
+              icon: Icons.table_chart,
+              label: l10n.viewAsTable,
+              color: AppColors.secondaryColor,
+            ),
+            const SizedBox(height: 12),
+            _buildActionButton(
+              onPressed: _handlePrint,
+              icon: Icons.print,
+              label: l10n.quickPrint,
+              color: Color(0xFF2E7D32),
+            ),
+            const SizedBox(height: 12),
+            _buildActionButton(
+              onPressed: _handleShare,
+              icon: Icons.share,
+              label: l10n.sharePdf,
+              color: AppColors.mutedColor,
+              isOutlined: true,
             ),
           ],
         );
       }
-    );
+
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionButton(
+                  onPressed: _handlePreview,
+                  icon: Icons.visibility,
+                  label: l10n.previewReportBtn,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionButton(
+                  onPressed: () {
+                    if (report == null) return;
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          DailyReportDatasheetScreen(report: report!),
+                    ));
+                  },
+                  icon: Icons.table_chart,
+                  label: l10n.viewAsTable,
+                  color: AppColors.secondaryColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionButton(
+                  onPressed: _handlePrint,
+                  icon: Icons.print,
+                  label: l10n.quickPrint,
+                  color: Color(0xFF2E7D32),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: _buildActionButton(
+              onPressed: _handleShare,
+              icon: Icons.share,
+              label: l10n.sharePdf,
+              color: AppColors.mutedColor,
+              isOutlined: true,
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildActionButton({
@@ -691,9 +688,9 @@ class _DailyReportScreenState extends State<DailyReportScreen>
         backgroundColor: isOutlined ? color.withValues(alpha: 0.15) : color,
         foregroundColor: isOutlined ? color : Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
-        minimumSize: const Size(double.infinity, 50), // Ensure consistent height
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        minimumSize:
+            const Size(double.infinity, 50), // Ensure consistent height
       ),
     );
   }
@@ -703,7 +700,9 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     if (report?.topProducts.isEmpty ?? true) {
       return Center(
           child: Text(l10n.noProductsSoldDate,
-              style: TextStyle(color: AppColors.mutedColor.withValues(alpha: 0.1), fontSize: 16)));
+              style: TextStyle(
+                  color: AppColors.mutedColor.withValues(alpha: 0.1),
+                  fontSize: 16)));
     }
     return Container(
       decoration: BoxDecoration(
@@ -782,7 +781,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
           decoration: BoxDecoration(
             color: AppColors.mutedColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.mutedColor.withValues(alpha: 0.3)),
+            border:
+                Border.all(color: AppColors.mutedColor.withValues(alpha: 0.3)),
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -826,7 +826,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('${product.revenue.toStringAsFixed(2)} ${l10n.currencyEg}',
+                  Text(
+                      '${product.revenue.toStringAsFixed(2)} ${l10n.currencyEg}',
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -835,7 +836,9 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                   Text(l10n.profitAmount(product.profit.toStringAsFixed(2)),
                       style:
                           TextStyle(fontSize: 12, color: AppColors.mutedColor)),
-                  Text(l10n.profitMarginAnalytics(product.profitMargin.toStringAsFixed(1)),
+                  Text(
+                      l10n.profitMarginAnalytics(
+                          product.profitMargin.toStringAsFixed(1)),
                       style:
                           TextStyle(fontSize: 12, color: AppColors.mutedColor)),
                 ],
@@ -911,7 +914,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: AppColors.errorColor.withValues(alpha: 0.1),
+                                  color: AppColors.errorColor
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: const Icon(Icons.inventory_2_outlined,
@@ -923,7 +927,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                           ),
                         ),
                         DataCell(Text('${product.quantitySold}')),
-                        DataCell(Text('${product.revenue.toStringAsFixed(2)} ${l10n.currencyEg}',
+                        DataCell(Text(
+                            '${product.revenue.toStringAsFixed(2)} ${l10n.currencyEg}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.errorColor))),
@@ -1000,26 +1005,37 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                     final isRefund = sale.isRefund;
                     return DataRow(
                       cells: [
-                        DataCell(Text(sale.id.length > 8 ? '#${sale.id.substring(0, 8)}' : '#${sale.id}')),
-                        DataCell(Text(sale.cashierName ?? 'Admin')), // Display User Name
+                        DataCell(Text(sale.id.length > 8
+                            ? '#${sale.id.substring(0, 8)}'
+                            : '#${sale.id}')),
+                        DataCell(Text(
+                            sale.cashierName ?? 'Admin')), // Display User Name
                         DataCell(Text(DateFormat('hh:mm a').format(sale.date))),
                         DataCell(Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: (isRefund ? AppColors.errorColor : AppColors.successColor).withValues(alpha: 0.1),
+                            color: (isRefund
+                                    ? AppColors.errorColor
+                                    : AppColors.successColor)
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             isRefund ? l10n.refundLabel : l10n.saleLabel,
                             style: TextStyle(
                               fontSize: 12,
-                              color: isRefund ? AppColors.errorColor : AppColors.successColor,
+                              color: isRefund
+                                  ? AppColors.errorColor
+                                  : AppColors.successColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         )),
-                        DataCell(Text('${sale.total.toStringAsFixed(2)} ${l10n.currencyEg}',
-                            style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Text(
+                            '${sale.total.toStringAsFixed(2)} ${l10n.currencyEg}',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold))),
                       ],
                     );
                   }).toList(),
@@ -1033,4 +1049,3 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     );
   }
 }
-

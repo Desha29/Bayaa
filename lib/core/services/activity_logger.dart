@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
-import 'package:bayaa_pos/l10n/app_localizations.dart';
+
+import '../../l10n/app_localizations.dart';
 import '../data/models/activity_log.dart';
 import '../data/services/persistence_initializer.dart';
+
 import '../localization/translation_helper.dart';
 
 class ActivityLogger {
@@ -39,11 +41,11 @@ class ActivityLogger {
           ),
           description: row['description'] as String,
           userName: row['user_name'] as String,
-          details: row['details'] != null 
-              ? jsonDecode(row['details'] as String) 
+          details: row['details'] != null
+              ? jsonDecode(row['details'] as String)
               : null,
           eventKey: row['event_key'] as String?,
-          parameters: row['parameters'] != null 
+          parameters: row['parameters'] != null
               ? jsonDecode(row['parameters'] as String) as Map<String, dynamic>
               : null,
         ));
@@ -85,14 +87,17 @@ class ActivityLogger {
         'type': activity.type.toString().split('.').last,
         'description': activity.description,
         'user_name': activity.userName,
-        'details': activity.details != null ? jsonEncode(activity.details) : null,
+        'details':
+            activity.details != null ? jsonEncode(activity.details) : null,
         'event_key': activity.eventKey,
-        'parameters': activity.parameters != null ? jsonEncode(activity.parameters) : null,
+        'parameters': activity.parameters != null
+            ? jsonEncode(activity.parameters)
+            : null,
       });
     } catch (e) {
       print('Failed to persist activity log: $e');
-      // Should we continue to update UI if DB failed? 
-      // Yes, generally better to show optimization even if persist failed, 
+      // Should we continue to update UI if DB failed?
+      // Yes, generally better to show optimization even if persist failed,
       // but here the issue was race condition where UI tried to read from DB too early.
       // So ensuring DB write happens first solves it.
     }
@@ -116,24 +121,27 @@ class ActivityLogger {
         orderBy: 'timestamp DESC',
       );
 
-      return results.map((row) => ActivityLog(
-        id: row['id'] as String,
-        sessionId: (row['session_id'] ?? '') as String,
-        timestamp: DateTime.parse(row['timestamp'] as String),
-        type: ActivityType.values.firstWhere(
-          (e) => e.toString() == 'ActivityType.${row['type']}',
-          orElse: () => ActivityType.sale,
-        ),
-        description: row['description'] as String,
-        userName: row['user_name'] as String,
-        details: row['details'] != null 
-            ? jsonDecode(row['details'] as String) 
-            : null,
-        eventKey: row['event_key'] as String?,
-        parameters: row['parameters'] != null 
-            ? jsonDecode(row['parameters'] as String) as Map<String, dynamic>
-            : null,
-      )).toList();
+      return results
+          .map((row) => ActivityLog(
+                id: row['id'] as String,
+                sessionId: (row['session_id'] ?? '') as String,
+                timestamp: DateTime.parse(row['timestamp'] as String),
+                type: ActivityType.values.firstWhere(
+                  (e) => e.toString() == 'ActivityType.${row['type']}',
+                  orElse: () => ActivityType.sale,
+                ),
+                description: row['description'] as String,
+                userName: row['user_name'] as String,
+                details: row['details'] != null
+                    ? jsonDecode(row['details'] as String)
+                    : null,
+                eventKey: row['event_key'] as String?,
+                parameters: row['parameters'] != null
+                    ? jsonDecode(row['parameters'] as String)
+                        as Map<String, dynamic>
+                    : null,
+              ))
+          .toList();
     } catch (e) {
       print('Failed to load session activities: $e');
       return [];
@@ -141,7 +149,8 @@ class ActivityLogger {
   }
 
   /// Get activities filtered by type.
-  Future<List<ActivityLog>> getActivitiesByType(ActivityType type, {int limit = 50}) async {
+  Future<List<ActivityLog>> getActivitiesByType(ActivityType type,
+      {int limit = 50}) async {
     try {
       final db = PersistenceInitializer.persistenceManager!.sqliteManager;
       final results = await db.query(
@@ -152,24 +161,27 @@ class ActivityLogger {
         limit: limit,
       );
 
-      return results.map((row) => ActivityLog(
-        id: row['id'] as String,
-        sessionId: (row['session_id'] ?? '') as String,
-        timestamp: DateTime.parse(row['timestamp'] as String),
-        type: ActivityType.values.firstWhere(
-          (e) => e.toString() == 'ActivityType.${row['type']}',
-          orElse: () => ActivityType.sale,
-        ),
-        description: row['description'] as String,
-        userName: row['user_name'] as String,
-        details: row['details'] != null 
-            ? jsonDecode(row['details'] as String) 
-            : null,
-        eventKey: row['event_key'] as String?,
-        parameters: row['parameters'] != null 
-            ? jsonDecode(row['parameters'] as String) as Map<String, dynamic>
-            : null,
-      )).toList();
+      return results
+          .map((row) => ActivityLog(
+                id: row['id'] as String,
+                sessionId: (row['session_id'] ?? '') as String,
+                timestamp: DateTime.parse(row['timestamp'] as String),
+                type: ActivityType.values.firstWhere(
+                  (e) => e.toString() == 'ActivityType.${row['type']}',
+                  orElse: () => ActivityType.sale,
+                ),
+                description: row['description'] as String,
+                userName: row['user_name'] as String,
+                details: row['details'] != null
+                    ? jsonDecode(row['details'] as String)
+                    : null,
+                eventKey: row['event_key'] as String?,
+                parameters: row['parameters'] != null
+                    ? jsonDecode(row['parameters'] as String)
+                        as Map<String, dynamic>
+                    : null,
+              ))
+          .toList();
     } catch (e) {
       print('Failed to load activities by type: $e');
       return [];
@@ -184,10 +196,11 @@ class ActivityLogger {
   /// - sessionOpen comes first (top)
   /// - operations in chronological order
   /// - sessionClose comes last (bottom)
-  Future<List<SessionActivityGroup>> getActivitiesGroupedBySession({int sessionLimit = 5}) async {
+  Future<List<SessionActivityGroup>> getActivitiesGroupedBySession(
+      {int sessionLimit = 5}) async {
     try {
       final db = PersistenceInitializer.persistenceManager!.sqliteManager;
-      
+
       // Get distinct session IDs from recent activities (most recent sessions first)
       final sessionRows = await db.query(
         'activity_logs',
@@ -218,24 +231,27 @@ class ActivityLogger {
           orderBy: 'timestamp ASC',
         );
 
-        final activities = activityRows.map((row) => ActivityLog(
-          id: row['id'] as String,
-          sessionId: (row['session_id'] ?? '') as String,
-          timestamp: DateTime.parse(row['timestamp'] as String),
-          type: ActivityType.values.firstWhere(
-            (e) => e.toString() == 'ActivityType.${row['type']}',
-            orElse: () => ActivityType.sale,
-          ),
-          description: row['description'] as String,
-          userName: row['user_name'] as String,
-          details: row['details'] != null
-              ? jsonDecode(row['details'] as String)
-              : null,
-          eventKey: row['event_key'] as String?,
-          parameters: row['parameters'] != null 
-              ? jsonDecode(row['parameters'] as String) as Map<String, dynamic>
-              : null,
-        )).toList();
+        final activities = activityRows
+            .map((row) => ActivityLog(
+                  id: row['id'] as String,
+                  sessionId: (row['session_id'] ?? '') as String,
+                  timestamp: DateTime.parse(row['timestamp'] as String),
+                  type: ActivityType.values.firstWhere(
+                    (e) => e.toString() == 'ActivityType.${row['type']}',
+                    orElse: () => ActivityType.sale,
+                  ),
+                  description: row['description'] as String,
+                  userName: row['user_name'] as String,
+                  details: row['details'] != null
+                      ? jsonDecode(row['details'] as String)
+                      : null,
+                  eventKey: row['event_key'] as String?,
+                  parameters: row['parameters'] != null
+                      ? jsonDecode(row['parameters'] as String)
+                          as Map<String, dynamic>
+                      : null,
+                ))
+            .toList();
 
         if (activities.isEmpty) continue;
 
@@ -295,7 +311,8 @@ class ActivityLogger {
   }
 
   /// Formats activity details into a human-readable localized string.
-  static String formatDetails(BuildContext context, ActivityType type, Map<String, dynamic>? details) {
+  static String formatDetails(
+      BuildContext context, ActivityType type, Map<String, dynamic>? details) {
     if (details == null || details.isEmpty) return '';
 
     try {
@@ -307,42 +324,54 @@ class ActivityLogger {
         case ActivityType.refund:
           if (details['items'] != null && details['items'] is List) {
             parts.add(l10n.detailsItems((details['items'] as List).join('، ')));
-          } else if (details['refundedItems'] != null && details['refundedItems'] is List) {
-            parts.add(l10n.detailsItems((details['refundedItems'] as List).join('، ')));
+          } else if (details['refundedItems'] != null &&
+              details['refundedItems'] is List) {
+            parts.add(l10n
+                .detailsItems((details['refundedItems'] as List).join('، ')));
           }
           if (details['total'] != null) {
-            parts.add(l10n.detailsTotal(details['total'].toString(), l10n.currencyEg));
+            parts.add(l10n.detailsTotal(
+                details['total'].toString(), l10n.currencyEg));
           }
           break;
 
         case ActivityType.productUpdate:
         case ActivityType.productQuantityUpdate:
-          if (details['name'] != null) parts.add(l10n.detailsProduct(details['name'].toString()));
+          if (details['name'] != null)
+            parts.add(l10n.detailsProduct(details['name'].toString()));
           if (details['oldQty'] != null && details['newQty'] != null) {
-            parts.add(l10n.detailsQty(details['oldQty'].toString(), details['newQty'].toString()));
+            parts.add(l10n.detailsQty(
+                details['oldQty'].toString(), details['newQty'].toString()));
           }
           if (details['oldPrice'] != null && details['newPrice'] != null) {
-            parts.add(l10n.detailsPrice(details['oldPrice'].toString(), details['newPrice'].toString()));
+            parts.add(l10n.detailsPrice(details['oldPrice'].toString(),
+                details['newPrice'].toString()));
           }
           break;
 
         case ActivityType.restock:
-          if (details['productName'] != null) parts.add(l10n.detailsProduct(details['productName'].toString()));
-          if (details['addedQty'] != null) parts.add(l10n.detailsAddedQty(details['addedQty'].toString()));
+          if (details['productName'] != null)
+            parts.add(l10n.detailsProduct(details['productName'].toString()));
+          if (details['addedQty'] != null)
+            parts.add(l10n.detailsAddedQty(details['addedQty'].toString()));
           break;
 
         case ActivityType.expense:
-          if (details['category'] != null) parts.add(l10n.detailsCategory(details['category'].toString()));
+          if (details['category'] != null)
+            parts.add(l10n.detailsCategory(details['category'].toString()));
           if (details['amount'] != null) {
-            parts.add(l10n.detailsAmount(details['amount'].toString(), l10n.currencyEg));
+            parts.add(l10n.detailsAmount(
+                details['amount'].toString(), l10n.currencyEg));
           }
           break;
 
         case ActivityType.userAdd:
         case ActivityType.userUpdate:
         case ActivityType.userDelete:
-          if (details['targetUser'] != null) parts.add(l10n.detailsUser(details['targetUser'].toString()));
-          if (details['role'] != null) parts.add(l10n.detailsRole(details['role'].toString()));
+          if (details['targetUser'] != null)
+            parts.add(l10n.detailsUser(details['targetUser'].toString()));
+          if (details['role'] != null)
+            parts.add(l10n.detailsRole(details['role'].toString()));
           break;
 
         default:
@@ -373,7 +402,8 @@ class ActivityLogger {
     final qty = params['qty']?.toString() ?? '';
     final total = params['total']?.toString() ?? '';
     final rawTargetUser = params['targetUser']?.toString() ?? '';
-    final targetUser = TranslationHelper.translateUserName(context, rawTargetUser);
+    final targetUser =
+        TranslationHelper.translateUserName(context, rawTargetUser);
     final id = params['id']?.toString() ?? '';
 
     switch (activity.eventKey) {
@@ -410,14 +440,18 @@ class ActivityLogger {
     }
   }
 
-  static String _translateLegacyDescription(BuildContext context, ActivityLog activity) {
+  static String _translateLegacyDescription(
+      BuildContext context, ActivityLog activity) {
     final l10n = AppLocalizations.of(context);
     final desc = activity.description;
-    final user = TranslationHelper.translateUserName(context, activity.userName);
+    final user =
+        TranslationHelper.translateUserName(context, activity.userName);
 
     if (desc.startsWith('فتح يوم')) return l10n.activitySessionOpened(user);
-    if (desc.startsWith('إغلاق يوم') || desc.contains('إغلاق يوم')) return l10n.activitySessionClosed(user);
-    if (desc == 'تسجيل دخول' || desc.startsWith('تسجيل دخول')) return l10n.activityLogin(user);
+    if (desc.startsWith('إغلاق يوم') || desc.contains('إغلاق يوم'))
+      return l10n.activitySessionClosed(user);
+    if (desc == 'تسجيل دخول' || desc.startsWith('تسجيل دخول'))
+      return l10n.activityLogin(user);
     if (desc.startsWith('إضافة منتج')) {
       final name = desc.replaceFirst('إضافة منتج: ', '');
       return l10n.activityProductAdded(user, name);
@@ -450,12 +484,14 @@ class ActivityLogger {
       final name = desc.replaceFirst('حذف مستخدم: ', '');
       return l10n.activityUserDeleted(user, name);
     }
-    if (desc.startsWith('حذف فاتورة')) return l10n.activityInvoiceDeleted(user, '');
+    if (desc.startsWith('حذف فاتورة'))
+      return l10n.activityInvoiceDeleted(user, '');
     if (desc.startsWith('تحديث مخزون')) {
       final name = desc.replaceFirst('تحديث مخزون: ', '').split(' ').first;
       return l10n.activityProductQtyUpdated(user, name, '');
     }
-    if (desc.startsWith('تحديث معلومات المتجر')) return l10n.activityUserUpdated(user, 'store info');
+    if (desc.startsWith('تحديث معلومات المتجر'))
+      return l10n.activityUserUpdated(user, 'store info');
 
     return desc;
   }

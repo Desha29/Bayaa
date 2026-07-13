@@ -8,6 +8,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/data/models/activity_log.dart';
 import '../../../../core/services/activity_logger.dart';
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/session_repository_impl.dart';
 import '../../data/models/session_model.dart';
 import '../../data/models/daily_report_model.dart';
@@ -16,7 +17,7 @@ import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../../auth/data/models/user_model.dart';
 import 'daily_report_preview_screen.dart';
 import 'daily_report_datasheet_screen.dart';
-import '../../../../l10n/app_localizations.dart';
+
 import '../../../../core/localization/translation_helper.dart';
 
 class SessionHistoryScreen extends StatefulWidget {

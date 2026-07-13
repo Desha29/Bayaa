@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
 import '../../../../core/constants/app_colors.dart';
+
 import '../../../../l10n/app_localizations.dart';
 import '../../data/models/daily_report_model.dart';
 import '../../../sales/data/models/sale_model.dart';
