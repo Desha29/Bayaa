@@ -130,4 +130,4 @@ app.*.map.json
 #folder database
 
 # End of .gitignore
-lib/secrets.dart
+#lib/secrets.dart

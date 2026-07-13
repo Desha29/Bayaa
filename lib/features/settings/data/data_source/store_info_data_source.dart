@@ -47,8 +47,19 @@ class StoreInfoDataSource {
       
       if (results.isNotEmpty) {
         final row = results.first;
+        final savedName = row['store_name'] as String;
+        // Upgrade installations that still use the retired product name.
+        final name = savedName == 'Bayaa Store' ? 'Bayaa POS' : savedName;
+        if (name != savedName) {
+          await db.update(
+            _table,
+            {'store_name': name},
+            where: 'id = ?',
+            whereArgs: [_id],
+          );
+        }
         return StoreInfo(
-          name: row['store_name'] as String ,
+          name: name,
           address: (row['store_address'] as String?) ?? 'Alkhanka',
           phone: (row['store_phone'] as String?) ?? '01000000000',
           email: (row['store_email'] as String?) ?? 'bayaa@bayaa',
@@ -75,7 +86,7 @@ class StoreInfoDataSource {
 
   StoreInfo getDefaultStoreInfo() {
     return StoreInfo(
-      name: 'Bayaa',
+      name: 'Bayaa POS',
       phone: '',
       email: '',
       address: "",

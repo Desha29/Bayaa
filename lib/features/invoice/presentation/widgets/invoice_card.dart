@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/localization/translation_helper.dart';
 import '../../../sales/data/models/sale_model.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
 
@@ -34,7 +35,10 @@ class _InvoiceCardState extends State<InvoiceCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final df = DateFormat('yyyy-MM-dd  hh:mm a', 'en');
-    final cashierName = widget.sale.cashierName ?? l10n.cashier;
+    final cashierName = TranslationHelper.translateUserName(
+      context,
+      widget.sale.cashierName ?? l10n.cashier,
+    );
     final sale = widget.sale;
     final screenWidth = MediaQuery.of(context).size.width;
     final isCompact = screenWidth < 700;
@@ -81,10 +85,16 @@ class _InvoiceCardState extends State<InvoiceCard> {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: widget.onOpen,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(14),
-                        bottomLeft: Radius.circular(14),
-                      ),
+                      borderRadius:
+                          l10n.localeName == 'ar'
+                              ? const BorderRadius.only(
+                                  topRight: Radius.circular(14),
+                                  bottomRight: Radius.circular(14),
+                                )
+                              : const BorderRadius.only(
+                                  topLeft: Radius.circular(14),
+                                  bottomLeft: Radius.circular(14),
+                                ),
                       child: Padding(
                         padding: EdgeInsets.all(isCompact ? 12 : 16),
                         child: isCompact

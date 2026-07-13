@@ -114,7 +114,7 @@ class InvoicePdfService {
               
               // Store Header
               pw.Text(
-                (storeInfo.name == 'Bayaa POS' || storeInfo.name == 'Bayaa Store' || storeInfo.name.isEmpty)
+                (storeInfo.name == 'Bayaa POS' || storeInfo.name.isEmpty)
                     ? l10n.appName
                     : storeInfo.name, 
                 style: pw.TextStyle(font: boldFont, fontSize: 13, color: brandBlue),
@@ -342,7 +342,7 @@ class InvoicePdfService {
                 child: pw.Image(logo),
               ),
             pw.Text(
-                (store.name == 'Bayaa POS' || store.name == 'Bayaa Store' || store.name.isEmpty)
+                (store.name == 'Bayaa POS' || store.name.isEmpty)
                     ? l10n.appName
                     : store.name,
                 style: pw.TextStyle(font: bold, fontSize: 20, color: brandColor)),

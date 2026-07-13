@@ -44,17 +44,11 @@ class NotificationCard extends StatelessWidget {
     }
   }
 
-  BorderDirectional _cardBorder() {
-    return BorderDirectional(
-      start: BorderSide(
-        color: item.read 
-            ? Colors.transparent 
-            : _priorityPrimary(), 
-        width: 4,
-      ),
-      top: BorderSide(color: _priorityBorder(), width: 1),
-      bottom: BorderSide(color: _priorityBorder(), width: 1),
-      end: BorderSide(color: _priorityBorder(), width: 1),
+  Border _cardBorder() {
+    // Rounded BoxDecorations require one uniform border color on every side.
+    return Border.all(
+      color: item.read ? _priorityBorder() : _priorityPrimary(),
+      width: item.read ? 1 : 2,
     );
   }
 

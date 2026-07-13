@@ -173,7 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
               icon: const Icon(Icons.language,
                   size: 18, color: Color(0xFFD77E46)),
               label: Text(
-                l10n.localeName == 'ar' ? 'English' : 'العربية',
+                l10n.localeName == 'ar'
+                    ? l10n.switchToEnglish
+                    : l10n.switchToArabic,
                 style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.bold,
@@ -467,10 +469,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildBrandingBanner(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final configuredStoreName = getIt<SettingsCubit>().currentStoreInfo?.name;
+    final isDefaultBrand =
+        configuredStoreName == null ||
+        configuredStoreName.isEmpty ||
+        configuredStoreName == 'Bayaa POS' ||
+        configuredStoreName == 'Bayaa Store';
     final storeName =
-        getIt<SettingsCubit>().currentStoreInfo?.name.isNotEmpty == true
-            ? getIt<SettingsCubit>().currentStoreInfo!.name
-            : l10n.appName;
+        isDefaultBrand ? l10n.loginBrandName : configuredStoreName!;
 
     return Container(
       decoration: const BoxDecoration(
@@ -492,27 +498,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // Logo & Name Row
           Row(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border:
-                      Border.all(color: const Color(0xFFD77E46), width: 2.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(8),
-                child: const AppLogo(
-                  width: 54,
-                  height: 54,
-                  fit: BoxFit.cover,
-                ),
-              ),
+              _buildLoginWordmark(context),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -543,7 +529,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
           // Main Call to Action Header
           Text(
-            l10n.appName,
+            l10n.loginBrandName,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 32,
@@ -601,6 +587,20 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildLoginWordmark(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD77E46), width: 2),
+      ),
+      padding: const EdgeInsets.all(8),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: const AppLogo(width: 80, height: 80, fit: BoxFit.cover)),
     );
   }
 

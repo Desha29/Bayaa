@@ -193,10 +193,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     title: BlocBuilder<SettingsCubit, SettingsStates>(
                         bloc: getIt<SettingsCubit>(),
                         builder: (context, state) {
-                          final name =
-                              getIt<SettingsCubit>().currentStoreInfo?.name ??
-                                  'Bayaa';
-                          return Text(name.isNotEmpty ? name : 'Bayaa');
+                          final l10n = AppLocalizations.of(context);
+                          final configuredName =
+                              getIt<SettingsCubit>().currentStoreInfo?.name;
+                          final isDefaultBrand =
+                              configuredName == null ||
+                              configuredName.isEmpty ||
+                              configuredName == 'Bayaa POS' ||
+                              configuredName == 'Bayaa Store';
+                          final name = isDefaultBrand
+                              ? l10n.loginBrandName
+                              : configuredName!;
+                          return Text(name);
                         }),
                     leading: Builder(
                       builder: (context) => IconButton(

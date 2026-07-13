@@ -801,9 +801,14 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     ),
                     if (session.closeTime != null) ...[
                       const SizedBox(width: 6),
-                      Icon(LucideIcons.arrowLeft,
+                      Transform.flip(
+                        flipX: AppLocalizations.of(context).localeName == 'ar',
+                        child: Icon(
+                          LucideIcons.arrowLeft,
                           size: 9,
-                          color: AppColors.mutedColor.withOpacity(0.3)),
+                          color: AppColors.mutedColor.withOpacity(0.3),
+                        ),
+                      ),
                       const SizedBox(width: 6),
                       _buildMiniTimeChip(
                         LucideIcons.logOut,

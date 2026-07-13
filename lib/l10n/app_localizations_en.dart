@@ -9,6 +9,15 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get switchToArabic => 'العربية';
+
+  @override
+  String get switchToEnglish => 'English';
+
+  @override
+  String get loginBrandName => 'Bayaa POS';
+
+  @override
   String get appName => 'Bayaa POS';
 
   @override

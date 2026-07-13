@@ -168,7 +168,7 @@ class ActivationScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   Text(
-                    '© 2025 Amr Store. All rights reserved',
+                    '© 2026 Bayaa POS. All rights reserved',
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall

@@ -89,10 +89,13 @@ class DataManagementCard extends StatelessWidget {
                     color: AppColors.mutedColor.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    LucideIcons.chevronLeft,
-                    size: 16,
-                    color: AppColors.mutedColor,
+                  child: Transform.flip(
+                    flipX: AppLocalizations.of(context).localeName == 'ar',
+                    child: Icon(
+                      LucideIcons.chevronLeft,
+                      size: 16,
+                      color: AppColors.mutedColor,
+                    ),
                   ),
                 ),
               ],

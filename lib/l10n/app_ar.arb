@@ -1,4 +1,7 @@
 {
+  "switchToArabic": "العربية",
+  "switchToEnglish": "English",
+  "loginBrandName": "بياع",
   "appName": "بياع",
   "systemSubtitle": "نظام نقاط البيع وإدارة مبيعات التجزئة",
   "loginWelcome": "أهلاً بك مجدداً!",

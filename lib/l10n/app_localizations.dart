@@ -98,6 +98,24 @@ abstract class AppLocalizations {
     Locale('en')
   ];
 
+  /// No description provided for @switchToArabic.
+  ///
+  /// In ar, this message translates to:
+  /// **'العربية'**
+  String get switchToArabic;
+
+  /// No description provided for @switchToEnglish.
+  ///
+  /// In ar, this message translates to:
+  /// **'English'**
+  String get switchToEnglish;
+
+  /// No description provided for @loginBrandName.
+  ///
+  /// In ar, this message translates to:
+  /// **'بياع'**
+  String get loginBrandName;
+
   /// No description provided for @appName.
   ///
   /// In ar, this message translates to:

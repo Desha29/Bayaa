@@ -9,6 +9,15 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get switchToArabic => 'العربية';
+
+  @override
+  String get switchToEnglish => 'English';
+
+  @override
+  String get loginBrandName => 'بياع';
+
+  @override
   String get appName => 'بياع';
 
   @override

@@ -67,9 +67,12 @@ class RecentSalesSection extends StatelessWidget {
               const Spacer(),
               if (onToggleCollapse != null)
                 IconButton(
-                  icon: const Icon(
-                    LucideIcons.chevronRight,
-                    color: AppColors.primaryColor,
+                  icon: Transform.flip(
+                    flipX: l10n.localeName == 'ar',
+                    child: const Icon(
+                      LucideIcons.chevronRight,
+                      color: AppColors.primaryColor,
+                    ),
                   ),
                   tooltip: l10n.hideRecentSales,
                   onPressed: onToggleCollapse,

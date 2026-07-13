@@ -53,8 +53,13 @@ class InvoicePreviewScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(LucideIcons.arrowRight,
-                color: AppColors.textPrimary),
+            icon: Transform.flip(
+              flipX: l10n.localeName == 'ar',
+              child: const Icon(
+                Icons.arrow_back,
+                color: AppColors.textPrimary,
+              ),
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Column(

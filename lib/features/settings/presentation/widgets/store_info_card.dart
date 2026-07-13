@@ -286,7 +286,7 @@ class StoreInfoCard extends StatelessWidget {
       _StoreInfoRow(
         icon: LucideIcons.store,
         label: l10n.storeName,
-        value: (store.name == 'Bayaa POS' || store.name == 'Bayaa Store' || store.name.isEmpty)
+        value: (store.name == 'Bayaa POS' || store.name.isEmpty)
             ? l10n.appName
             : store.name,
       ),
