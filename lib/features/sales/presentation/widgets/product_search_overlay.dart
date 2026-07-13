@@ -34,13 +34,17 @@ class ProductSearchOverlay extends StatelessWidget {
         border: Border.all(color: AppColors.borderColor, width: 1),
       ),
       constraints: const BoxConstraints(maxHeight: 300),
-      child: ListView.separated(
-        shrinkWrap: true,
-        padding: const EdgeInsets.all(8),
-        itemCount: products.length,
-        separatorBuilder: (context, index) =>
-            Divider(color: AppColors.borderColor, height: 1),
-        itemBuilder: (context, index) {
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: ListView.separated(
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(8),
+          itemCount: products.length,
+          separatorBuilder: (context, index) =>
+              Divider(color: AppColors.borderColor, height: 1),
+          itemBuilder: (context, index) {
           final product = products[index];
           // Compute similar products (category or name prefix) from allProducts when provided
           final List<Product> similar = [];
@@ -62,7 +66,7 @@ class ProductSearchOverlay extends StatelessWidget {
             }
           }
 
-          return Column(
+            return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ListTile(
@@ -135,8 +139,9 @@ class ProductSearchOverlay extends StatelessWidget {
                   ),
                 ),
             ],
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
