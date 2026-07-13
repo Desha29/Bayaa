@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../l10n/app_localizations.dart';
 
 class TranslationHelper {
@@ -8,7 +9,8 @@ class TranslationHelper {
   static const _defaultAdminNameEn = 'System Administrator';
   static const _defaultCashierNameEn = 'Trial Cashier';
 
-  static String translateUserName(BuildContext context, String name, {String? username}) {
+  static String translateUserName(BuildContext context, String name,
+      {String? username}) {
     final l10n = AppLocalizations.of(context);
     if (name == _defaultAdminNameAr || name == _defaultAdminNameEn) {
       return l10n.roleManager;
@@ -19,7 +21,8 @@ class TranslationHelper {
     return name;
   }
 
-  static String translate(BuildContext context, String key, {List<String>? args}) {
+  static String translate(BuildContext context, String key,
+      {List<String>? args}) {
     final l10n = AppLocalizations.of(context);
 
     switch (key) {
@@ -83,9 +86,13 @@ class TranslationHelper {
       case 'cartIsEmpty':
         return l10n.cartIsEmpty;
       case 'priceBelowMin':
-        return args != null && args.isNotEmpty ? l10n.priceBelowMin(args[0]) : l10n.priceBelowMin('0');
+        return args != null && args.isNotEmpty
+            ? l10n.priceBelowMin(args[0])
+            : l10n.priceBelowMin('0');
       case 'failedOpenSession':
-        return args != null && args.isNotEmpty ? l10n.failedOpenSession(args[0]) : l10n.failedOpenSession('');
+        return args != null && args.isNotEmpty
+            ? l10n.failedOpenSession(args[0])
+            : l10n.failedOpenSession('');
       case 'saleSuccess':
         return l10n.saleSuccess;
       case 'dbError':
@@ -95,14 +102,18 @@ class TranslationHelper {
       case 'unexpectedErrorGeneric':
         return l10n.unexpectedErrorGeneric;
       case 'cantAddMoreStock':
-        return args != null && args.isNotEmpty ? l10n.cantAddMoreStock(args[0]) : l10n.cantAddMoreStock('0');
+        return args != null && args.isNotEmpty
+            ? l10n.cantAddMoreStock(args[0])
+            : l10n.cantAddMoreStock('0');
       case 'outOfStock':
         return l10n.outOfStock;
       case 'maxQtyReached':
-        return args != null && args.isNotEmpty ? l10n.maxQtyReached(args[0]) : l10n.maxQtyReached('0');
+        return args != null && args.isNotEmpty
+            ? l10n.maxQtyReached(args[0])
+            : l10n.maxQtyReached('0');
       case 'cartEmpty':
         return l10n.cartEmpty;
-      
+
       // Session/Shift specific
       case 'sessionOpenWarning':
         return l10n.sessionOpenWarning;
@@ -134,7 +145,7 @@ class TranslationHelper {
         return l10n.storeInfoSaved;
       case 'unknownUser':
         return l10n.unknownUser;
-      
+
       default:
         // Try parsing prefix-based dynamic errors (e.g. Price below minimum check, or generic error message)
         if (key.startsWith('priceBelowMin:')) {
@@ -169,7 +180,7 @@ class TranslationHelper {
           final val = key.substring('invoicesDeleteFailed:'.length);
           return l10n.invoicesDeleteFailed(val);
         }
-        
+
         return key;
     }
   }

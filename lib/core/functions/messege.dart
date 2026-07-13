@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
-import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 /// Renders a premium, floating, custom-styled SnackBar
-void _showCustomSnackBar(BuildContext context, String message, IconData icon, Color color) {
+void _showCustomSnackBar(
+    BuildContext context, String message, IconData icon, Color color) {
   // Clear any existing snackbars to keep notifications instant and snappy
   ScaffoldMessenger.of(context).clearSnackBars();
-  
+
   final screenWidth = MediaQuery.of(context).size.width;
   final isDesktop = screenWidth > 600;
 
@@ -79,19 +80,23 @@ void _showCustomSnackBar(BuildContext context, String message, IconData icon, Co
 }
 
 void MotionSnackBarSuccess(BuildContext context, String message) {
-  _showCustomSnackBar(context, message, LucideIcons.checkCircle2, AppColors.successColor);
+  _showCustomSnackBar(
+      context, message, LucideIcons.checkCircle2, AppColors.successColor);
 }
 
 void MotionSnackBarError(BuildContext context, String message) {
-  _showCustomSnackBar(context, message, LucideIcons.xCircle, AppColors.errorColor);
+  _showCustomSnackBar(
+      context, message, LucideIcons.xCircle, AppColors.errorColor);
 }
 
 void MotionSnackBarInfo(BuildContext context, String message) {
-  _showCustomSnackBar(context, message, LucideIcons.info, AppColors.secondaryColor);
+  _showCustomSnackBar(
+      context, message, LucideIcons.info, AppColors.secondaryColor);
 }
 
 void MotionSnackBarWarning(BuildContext context, String message) {
-  _showCustomSnackBar(context, message, LucideIcons.alertTriangle, AppColors.warningColor);
+  _showCustomSnackBar(
+      context, message, LucideIcons.alertTriangle, AppColors.warningColor);
 }
 
 Future<void> handleLogout(BuildContext context) async {
@@ -198,7 +203,8 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
                 onPressed: () => Navigator.pop(context, false),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.borderColor),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 child: Text(
@@ -220,7 +226,8 @@ Future<bool?> _showLogoutConfirmation(BuildContext context) {
                   backgroundColor: AppColors.errorColor,
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 child: Text(
@@ -259,7 +266,8 @@ void _showLoadingDialog(BuildContext context) {
             mainAxisSize: MainAxisSize.min,
             children: [
               const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
               ),
               const SizedBox(height: 20),
               Text(
