@@ -87,15 +87,19 @@ flowchart LR
 
 | Dashboard | Invoice management |
 | :---: | :---: |
-| ![Manager dashboard](Screenshots/Manger/manger_dashboard.png) | ![Manager invoices](Screenshots/Manger/manger_invoices.png) |
+| ![Dashboard](Screenshots/dashboard.png) | ![Invoices](Screenshots/invoices.png) |
 
 | Inventory | Daily reporting |
 | :---: | :---: |
-| ![Product management](Screenshots/Manger/manger_product.png) | ![Daily report](Screenshots/Manger/daliy_report1.png) |
+| ![Product management](Screenshots/products1.png) | ![Sales analysis](Screenshots/analysis1.png) |
 
 | Sales analytics | Stock summary |
 | :---: | :---: |
-| ![Sales analytics](Screenshots/Manger/Erp.png) | ![Stock summary](Screenshots/Manger/summary_stock1.png) |
+| ![Sales analytics](Screenshots/analysis2.png) | ![Stock summary](Screenshots/summary_stock1.png) |
+
+| Sessions | Low-stock notifications |
+| :---: | :---: |
+| ![Sessions](Screenshots/sessions.png) | ![Notifications](Screenshots/notification.png) |
 
 More application views are available in the [`Screenshots`](Screenshots) directory.
 
