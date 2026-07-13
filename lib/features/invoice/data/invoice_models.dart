@@ -27,9 +27,10 @@ class InvoiceData {
   final double discount;
   final double tax;
   final double grandTotal;
-  final String? footerNote;
   final String? logoAsset;
   final Uint8List? logoBytes;
+  final String? footerNote;
+  final String paymentMethod;
 
   const InvoiceData({
     required this.invoiceId,
@@ -46,5 +47,6 @@ class InvoiceData {
     this.footerNote,
     this.logoAsset,
     this.logoBytes,
+    this.paymentMethod = 'cash',
   });
 }

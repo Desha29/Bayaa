@@ -84,7 +84,7 @@ class StockCubit extends Cubit<StockStates> {
     );
     await getIt<ActivityLogger>().logActivity(
       type: ActivityType.productQuantityUpdate,
-      description: 'تحديث مخزون: ${product.name} (+$quantity)',
+      description: 'Stock update: ${product.name} (+$quantity)',
       userName: getIt<UserCubit>().currentUser.name,
       sessionId: sid,
       details: {'barcode': product.barcode, 'quantityAdded': quantity, 'newTotal': product.quantity},

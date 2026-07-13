@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/components/empty_state.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ProductsTableView extends StatelessWidget {
   final List<Product> products;
@@ -32,11 +33,12 @@ class ProductsTableView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (products.isEmpty) {
       return EmptyState(
         variant: EmptyStateVariant.products,
-        title: emptyTitle ?? 'لا توجد منتجات',
-        message: emptyMessage ?? 'قم بإضافة منتجات جديدة لعرضها هنا',
+        title: emptyTitle ?? l10n.noProducts,
+        message: emptyMessage ?? l10n.addProductsHint,
         icon: Icons.search,
       );
     }
@@ -81,60 +83,60 @@ class ProductsTableView extends StatelessWidget {
                       ),
                     ),
                     columns: [
-                      const DataColumn(
-                          label: Text('اسم المنتج',
-                              style: TextStyle(
+                      DataColumn(
+                          label: Text(l10n.productName,
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                   color: AppColors.primaryColor))),
-                      const DataColumn(
-                          label: Text('الباركود',
-                              style: TextStyle(
+                      DataColumn(
+                          label: Text(l10n.barcode,
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                   color: AppColors.primaryColor))),
-                      const DataColumn(
-                          label: Text('الفئة',
-                              style: TextStyle(
+                      DataColumn(
+                          label: Text(l10n.category,
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                   color: AppColors.primaryColor))),
-                      const DataColumn(
-                          label: Text('السعر',
-                              style: TextStyle(
+                      DataColumn(
+                          label: Text(l10n.price,
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                   color: AppColors.primaryColor))),
                       if (isManager) ...[
-                        const DataColumn(
-                            label: Text('جملة',
-                                style: TextStyle(
+                        DataColumn(
+                            label: Text(l10n.wholesalePrice,
+                                style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
                                     color: AppColors.primaryColor))),
-                        const DataColumn(
-                            label: Text('أدنى سعر', // corrected name
-                                style: TextStyle(
+                        DataColumn(
+                            label: Text(l10n.minPriceColumn,
+                                style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
                                     color: AppColors.primaryColor))),
                       ],
-                      const DataColumn(
-                          label: Text('الكمية',
-                              style: TextStyle(
+                      DataColumn(
+                          label: Text(l10n.quantity,
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                   color: AppColors.primaryColor))),
-                      const DataColumn(
-                          label: Text('الحالة',
-                              style: TextStyle(
+                      DataColumn(
+                          label: Text(l10n.status,
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                   color: AppColors.primaryColor))),
                       if (isManager)
-                        const DataColumn(
-                            label: Text('إجراءات',
-                                style: TextStyle(
+                        DataColumn(
+                            label: Text(l10n.actions,
+                                style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
                                     color: AppColors.primaryColor))),
@@ -181,19 +183,19 @@ class ProductsTableView extends StatelessWidget {
                             ),
                           ),
                           DataCell(Text(
-                              '${product.price.toStringAsFixed(2)} ج.م',
+                              '${product.price.toStringAsFixed(2)} ${l10n.currencyEg}',
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13))),
                           if (isManager) ...[
                             DataCell(Text(
-                                '${product.wholesalePrice.toStringAsFixed(2)} ج.م',
+                                '${product.wholesalePrice.toStringAsFixed(2)} ${l10n.currencyEg}',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
                                     color: Colors.blueGrey))),
                             DataCell(Text(
-                                '${product.minPrice.toStringAsFixed(2)} ج.م',
+                                '${product.minPrice.toStringAsFixed(2)} ${l10n.currencyEg}',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
@@ -233,14 +235,14 @@ class ProductsTableView extends StatelessWidget {
                                         size: 18),
                                     color: AppColors.primaryColor,
                                     onPressed: () => onEdit(product),
-                                    tooltip: 'تعديل',
+                                    tooltip: l10n.edit,
                                   ),
                                   IconButton(
                                     icon: const Icon(LucideIcons.trash2,
                                         size: 18),
                                     color: AppColors.errorColor,
                                     onPressed: () => onDelete(product),
-                                    tooltip: 'حذف',
+                                    tooltip: l10n.delete,
                                   ),
                                 ],
                               ),

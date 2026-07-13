@@ -45,7 +45,7 @@ class UserCubit extends Cubit<UserStates> {
           final defaultAdmin = User(
             username: 'admin',
             password: 'admin',
-            name: 'مدير النظام',
+            name: 'System Administrator',
             userType: UserType.manager,
             phone: '000',
           );
@@ -82,7 +82,7 @@ class UserCubit extends Cubit<UserStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: ActivityType.userDelete,
-          description: 'حذف مستخدم: $username',
+          description: 'Deleted user: $username',
           userName: currentUser.name,
           sessionId: sid,
           eventKey: 'userDeleted',
@@ -114,8 +114,8 @@ class UserCubit extends Cubit<UserStates> {
         await getIt<ActivityLogger>().logActivity(
           type: isUpdate ? ActivityType.userUpdate : ActivityType.userAdd,
           description: isUpdate
-              ? 'تحديث مستخدم: ${user.name}'
-              : 'إضافة مستخدم: ${user.name}',
+              ? 'Updated user: ${user.name}'
+              : 'Added user: ${user.name}',
           userName: currentUser.name,
           sessionId: sid,
           eventKey: isUpdate ? 'userUpdated' : 'userAdded',
@@ -144,7 +144,7 @@ class UserCubit extends Cubit<UserStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: ActivityType.userUpdate,
-          description: 'تحديث مستخدم: ${user.name}',
+          description: 'Updated user: ${user.name}',
           userName: currentUser.name,
           sessionId: sid,
           eventKey: 'userUpdated',
@@ -194,7 +194,7 @@ class UserCubit extends Cubit<UserStates> {
             // Log activity
             await getIt<ActivityLogger>().logActivity(
               type: ActivityType.login,
-              description: 'تسجيل دخول',
+              description: 'Login',
               userName: user.name,
               sessionId: session.id,
               eventKey: 'login',
@@ -380,7 +380,7 @@ class UserCubit extends Cubit<UserStates> {
       // Log activity with session
       await getIt<ActivityLogger>().logActivity(
         type: ActivityType.sessionClose,
-        description: 'إغلاق يوم: ${totalSales.toStringAsFixed(2)} ج.م',
+        description: 'Closed day: ${totalSales.toStringAsFixed(2)} EGP',
         userName: currentUser.name,
         sessionId: currentSessionToClose.id,
         eventKey: 'sessionClosed',

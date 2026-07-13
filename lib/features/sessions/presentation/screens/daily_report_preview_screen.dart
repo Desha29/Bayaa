@@ -1,4 +1,6 @@
 import '../../../../core/constants/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../core/localization/translation_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:printing/printing.dart';
@@ -21,6 +23,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -37,7 +40,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
         if (isEmbedded) {
           return PdfPreview(
             build: (format) =>
-                DailyReportPdfService.generateDailyReportPDF(report),
+                DailyReportPdfService.generateDailyReportPDF(report, locale: Localizations.localeOf(context)),
             allowPrinting: true,
             allowSharing: true,
             canChangeOrientation: false,
@@ -94,7 +97,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       child: PdfPreview(
                         build: (format) =>
-                            DailyReportPdfService.generateDailyReportPDF(report),
+                            DailyReportPdfService.generateDailyReportPDF(report, locale: Localizations.localeOf(context)),
                         allowPrinting: true,
                         allowSharing: true,
                         canChangeOrientation: false,
@@ -122,13 +125,13 @@ class DailyReportPreviewScreen extends StatelessWidget {
 
     if (isEmbedded) {
       return Directionality(
-        textDirection: TextDirection.rtl,
+        textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
         child: body,
       );
     }
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: _buildGradientAppBar(context),
@@ -138,6 +141,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _buildGradientAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: Container(
@@ -169,8 +173,8 @@ class DailyReportPreviewScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'معاينة التقرير',
+                      Text(
+                        l10n.previewReportTitle,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -192,14 +196,14 @@ class DailyReportPreviewScreen extends StatelessWidget {
                 ),
                 _buildAppBarAction(
                   icon: Icons.print_rounded,
-                  label: 'طباعة',
-                  onPressed: _handlePrint,
+                  label: l10n.printBtn,
+                  onPressed: () => _handlePrint(context),
                 ),
                 const SizedBox(width: 4),
                 _buildAppBarAction(
                   icon: Icons.share_rounded,
-                  label: 'مشاركة',
-                  onPressed: _handleShare,
+                  label: l10n.shareBtn,
+                  onPressed: () => _handleShare(context),
                 ),
                 const SizedBox(width: 4),
               ],
@@ -248,6 +252,7 @@ class DailyReportPreviewScreen extends StatelessWidget {
   }
 
   Widget _buildSessionDetailsCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -275,24 +280,24 @@ class DailyReportPreviewScreen extends StatelessWidget {
         children: [
           _buildDetailChip(
             icon: Icons.login_rounded,
-            label: 'وقت الفتح',
+            label: l10n.openTimeLabel,
             value: DateFormat('hh:mm a').format(session!.openTime),
             color: AppColors.successColor,
           ),
           _buildDetailDivider(),
           _buildDetailChip(
             icon: Icons.logout_rounded,
-            label: 'وقت الإغلاق',
+            label: l10n.closeTimeLabel,
             value: session!.closeTime != null
                 ? DateFormat('hh:mm a').format(session!.closeTime!)
-                : 'مفتوح',
+                : l10n.openLabel,
             color: AppColors.warningColor,
           ),
           _buildDetailDivider(),
           _buildDetailChip(
             icon: Icons.person_rounded,
-            label: 'بواسطة',
-            value: report.closedByUserName,
+            label: l10n.byLabel,
+            value: TranslationHelper.translateUserName(context, report.closedByUserName),
             color: AppColors.secondaryColor,
           ),
         ],
@@ -359,14 +364,14 @@ class DailyReportPreviewScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _handlePrint() async {
+  Future<void> _handlePrint(BuildContext context) async {
     await Printing.layoutPdf(
         onLayout: (format) =>
-            DailyReportPdfService.generateDailyReportPDF(report));
+            DailyReportPdfService.generateDailyReportPDF(report, locale: Localizations.localeOf(context)));
   }
 
-  Future<void> _handleShare() async {
-    final bytes = await DailyReportPdfService.generateDailyReportPDF(report);
+  Future<void> _handleShare(BuildContext context) async {
+    final bytes = await DailyReportPdfService.generateDailyReportPDF(report, locale: Localizations.localeOf(context));
     await Printing.sharePdf(
         bytes: bytes,
         filename: 'daily_report_${_formatDate(report.date)}.pdf');

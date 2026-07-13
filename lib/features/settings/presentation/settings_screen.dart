@@ -55,7 +55,7 @@ class _SettingsScreenContent extends StatelessWidget {
               builder: (c) => const Center(child: CircularProgressIndicator()),
             );
           } else if (state is UserFailure) {
-            if (state.error.contains("إغلاق") ||
+            if (state.error.contains(AppLocalizations.of(context).settingsClose) ||
                 state.error.contains("Close") ||
                 state.error.contains("closeSession")) {
               Navigator.of(context, rootNavigator: true)

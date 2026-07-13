@@ -90,7 +90,7 @@ class ActivationScreen extends StatelessWidget {
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            '🔒 النسخة غير مفعّلة',
+                            '🔒 License Inactive',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
@@ -105,7 +105,7 @@ class ActivationScreen extends StatelessWidget {
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            'يبدو أنك تستخدم نسخة غير مفعّلة من النظام.\nيرجى التواصل مع المطور لتفعيل نسختك.',
+                            'You are using an unlicensed version.\nPlease contact the developer to activate your license.',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -120,7 +120,7 @@ class ActivationScreen extends StatelessWidget {
                         ElevatedButton.icon(
                           onPressed: () => _launch("tel:$phone"),
                           icon: const Icon(LucideIcons.phone),
-                          label: const Text("اتصل بي"),
+                          label: const Text("Call Me"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -134,12 +134,12 @@ class ActivationScreen extends StatelessWidget {
                           onPressed: () {
                             openGmail(
                               "mstfo23mr5@gmail.com",
-                              subject: "طلب تفعيل التطبيق",
-                              body: "مرحبًا، أود شراء نسخة من التطبيق.",
+                              subject: "App Activation Request",
+                              body: "Hello, I would like to purchase a copy of the app.",
                             );
                           },
                           icon: const Icon(LucideIcons.mail),
-                          label: const Text("راسلني عبر البريد"),
+                          label: const Text("Email Me"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.successColor,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -152,7 +152,7 @@ class ActivationScreen extends StatelessWidget {
                         ElevatedButton.icon(
                           onPressed: () => _launch(whatsapp),
                           icon: const Icon(LucideIcons.messageCircle),
-                          label: const Text("تواصل عبر واتساب"),
+                          label: const Text("Contact via WhatsApp"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.accentGold,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -168,7 +168,7 @@ class ActivationScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   Text(
-                    '© 2025 Amr Store. جميع الحقوق محفوظة',
+                    '© 2025 Amr Store. All rights reserved',
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall

@@ -21,7 +21,7 @@ class SQLiteManager {
 
     _database = await openDatabase(
       databasePath,
-      version: 6,
+      version: 7,
       onCreate: _onCreate,
       onConfigure: _onConfigure,
       onUpgrade: _onUpgrade,
@@ -178,6 +178,19 @@ class SQLiteManager {
         }
       }
       print('  ✅ Migration to v6 complete');
+    }
+
+    if (oldVersion < 7) {
+      print('  ➕ Adding payment_method to sales table...');
+      try {
+        await db.execute("ALTER TABLE sales ADD COLUMN payment_method TEXT DEFAULT 'cash'");
+        print('    ✅ Added payment_method column');
+      } catch (e) {
+        if (!e.toString().contains('duplicate column name')) {
+          print('    ⚠️ Error adding payment_method: $e');
+        }
+      }
+      print('  ✅ Migration to v7 complete');
     }
   }
 
@@ -364,7 +377,7 @@ class SQLiteManager {
         currency, invoice_prefix, last_invoice_number,
         created_at, updated_at
       ) VALUES (
-        'store_settings_singleton', 'Bayaa Store', '', '',
+        'store_settings_singleton', 'Bayaa POS', '', '',
         'EGP', 'INV', 0,
         '${DateTime.now().toIso8601String()}',
         '${DateTime.now().toIso8601String()}'

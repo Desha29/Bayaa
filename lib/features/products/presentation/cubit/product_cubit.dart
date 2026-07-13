@@ -45,8 +45,8 @@ class ProductCubit extends Cubit<ProductStates> {
   List<Product> products = [];
   List<Product> get allProducts => products;
   List<String> categories = [];
-  String selectedCategory = 'الكل';
-  String selectedAvailability = 'الكل';
+  String selectedCategory = 'All';
+  String selectedAvailability = 'All';
   
   String currentSearchQuery = '';
 
@@ -139,7 +139,7 @@ class ProductCubit extends Cubit<ProductStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: isUpdate ? ActivityType.productUpdate : ActivityType.productAdd,
-          description: isUpdate ? 'تحديث منتج: ${product.name}' : 'إضافة منتج: ${product.name}',
+          description: isUpdate ? 'Update product: ${product.name}' : 'Add product: ${product.name}',
           userName: getIt<UserCubit>().currentUser.name,
           sessionId: sid,
           details: {'barcode': product.barcode, 'price': product.price},
@@ -168,7 +168,7 @@ class ProductCubit extends Cubit<ProductStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: ActivityType.productDelete,
-          description: 'حذف منتج: ${deletedProduct.name}',
+          description: 'Delete product: ${deletedProduct.name}',
           userName: getIt<UserCubit>().currentUser.name,
           sessionId: sid,
           details: {'barcode': barcode},

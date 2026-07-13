@@ -8,6 +8,7 @@ import 'package:printing/printing.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/components/screen_header.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/models/daily_report_model.dart';
 import '../../data/models/product_performance_model.dart';
 import '../../domain/daily_report_pdf_service.dart';
@@ -16,11 +17,12 @@ import 'daily_report_datasheet_screen.dart';
 import '../../../../core/components/message_overlay.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../analytics/domain/analytics_repository.dart';
+import '../../../../core/localization/translation_helper.dart';
 
 class DailyReportScreen extends StatefulWidget {
   final DailyReport? initialReport;
-  
-  const DailyReportScreen({Key? key, this.initialReport}) : super(key: key);
+
+  const DailyReportScreen({super.key, this.initialReport});
 
   @override
   State<DailyReportScreen> createState() => _DailyReportScreenState();
@@ -40,14 +42,14 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    
+
     if (widget.initialReport != null) {
       report = widget.initialReport;
       selectedDate = report!.date;
     } else {
       fetchReport();
     }
-    
+
     _animationController.forward();
   }
 
@@ -66,13 +68,15 @@ class _DailyReportScreenState extends State<DailyReportScreen>
     final result = await repo.getDailyReport(selectedDate);
 
     result.fold((failure) {
-      GlobalMessage.showError("خطأ في تحميل التقرير: ${failure.toString()}");
+      GlobalMessage.showError(
+          AppLocalizations.of(context).loadReportError(failure.toString()));
       setState(() => report = null);
     }, (loadedReport) {
       setState(() {
         report = loadedReport;
       });
-      GlobalMessage.showSuccess("تم تحميل التقرير بنجاح");
+      GlobalMessage.showSuccess(
+          AppLocalizations.of(context).reportLoadedSuccess);
     });
 
     setState(() {
@@ -96,7 +100,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                textStyle: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                textStyle: const TextStyle(
+                    fontFamily: 'Cairo', fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -138,52 +143,62 @@ class _DailyReportScreenState extends State<DailyReportScreen>
 
   Future<void> _handlePrint() async {
     if (report == null) return;
-    GlobalMessage.showLoading("جاري إعداد التقرير للطباعة...");
+    GlobalMessage.showLoading(AppLocalizations.of(context).loadingReport);
     try {
-      final pdfBytes = await DailyReportPdfService.generateDailyReportPDF(report!);
+      final pdfBytes = await DailyReportPdfService.generateDailyReportPDF(
+          report!,
+          locale: Localizations.localeOf(context));
       await Printing.layoutPdf(
         onLayout: (format) => pdfBytes,
       );
-      GlobalMessage.showSuccess("تم إرسال التقرير للطباعة بنجاح");
+      GlobalMessage.showSuccess(
+          AppLocalizations.of(context).printReportSuccess);
     } catch (e) {
-      GlobalMessage.showError("خطأ في الطباعة: ${e.toString()}");
+      GlobalMessage.showError(
+          AppLocalizations.of(context).printReportError(e.toString()));
     }
   }
 
   Future<void> _handleShare() async {
     if (report == null) return;
-    GlobalMessage.showLoading("جاري إعداد التقرير للمشاركة...");
+    GlobalMessage.showLoading(AppLocalizations.of(context).loadingShare);
     try {
-      final bytes = await DailyReportPdfService.generateDailyReportPDF(report!);
+      final bytes = await DailyReportPdfService.generateDailyReportPDF(report!,
+          locale: Localizations.localeOf(context));
       await Printing.sharePdf(
         bytes: bytes,
         filename:
             'daily_report_${DateFormat('yyyy-MM-dd').format(selectedDate)}.pdf',
       );
-      GlobalMessage.showSuccess("تم مشاركة التقرير بنجاح");
+      GlobalMessage.showSuccess(
+          AppLocalizations.of(context).shareReportSuccess);
     } catch (e) {
-      GlobalMessage.showError("خطأ في مشاركة التقرير: ${e.toString()}");
+      GlobalMessage.showError(
+          AppLocalizations.of(context).shareReportError(e.toString()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 900;
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection:
+          l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
           backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(LucideIcons.arrowRight, color: AppColors.textPrimary),
+            icon: const Icon(LucideIcons.arrowRight,
+                color: AppColors.textPrimary),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: const Text(
-            'التقارير اليومية',
+          title: Text(
+            l10n.dailyReports,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
@@ -198,16 +213,17 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1200),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: isDesktop ? 32 : 16, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                    horizontal: isDesktop ? 32 : 16, vertical: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     FadeTransition(
                       opacity: _animationController,
-                      child: const ScreenHeader(
-                        title: 'إيرادات ومبيعات اليوم',
+                      child: ScreenHeader(
+                        title: l10n.todayRevenue,
                         icon: LucideIcons.trendingUp,
-                        subtitle: 'مراجعة المؤشرات المالية، المبيعات، المرتجعات، وقائمة المنتجات الأكثر طلباً',
+                        subtitle: l10n.dailyReportDesc,
                         subtitleColor: AppColors.mutedColor,
                         iconColor: AppColors.primaryColor,
                       ),
@@ -218,7 +234,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                         opacity: _animationController,
                         child: _buildDateSelectionSection(),
                       )
-                    else 
+                    else
                       FadeTransition(
                         opacity: _animationController,
                         child: _buildReadOnlyDateSection(),
@@ -234,20 +250,24 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                                   opacity: _animationController,
                                   child: Center(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Container(
                                           padding: const EdgeInsets.all(24),
                                           decoration: BoxDecoration(
-                                            color: AppColors.primaryColor.withOpacity(0.04),
+                                            color: AppColors.primaryColor
+                                                .withOpacity(0.04),
                                             shape: BoxShape.circle,
                                           ),
                                           child: Icon(LucideIcons.barChart2,
-                                              size: 60, color: AppColors.mutedColor.withOpacity(0.4)),
+                                              size: 60,
+                                              color: AppColors.mutedColor
+                                                  .withOpacity(0.4)),
                                         ),
                                         const SizedBox(height: 20),
-                                        const Text(
-                                          'لا توجد بيانات متاحة لهذا التاريخ',
+                                        Text(
+                                          l10n.noDataForDate,
                                           style: TextStyle(
                                               fontSize: 16,
                                               color: AppColors.textPrimary,
@@ -256,7 +276,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
-                                          'يرجى التأكد من تحديد تاريخ صحيح أو إتمام عمليات بيع أولاً',
+                                          l10n.ensureValidDate,
                                           style: TextStyle(
                                               fontSize: 12,
                                               color: AppColors.mutedColor,
@@ -279,6 +299,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildDateSelectionSection() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -295,13 +316,14 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(LucideIcons.calendar, color: AppColors.primaryColor, size: 20),
-              SizedBox(width: 10),
+              const Icon(LucideIcons.calendar,
+                  color: AppColors.primaryColor, size: 20),
+              const SizedBox(width: 10),
               Text(
-                'تصفية التقرير حسب التاريخ',
-                style: TextStyle(
+                l10n.filterReportByDate,
+                style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Cairo',
@@ -322,17 +344,23 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               ),
               child: Row(
                 children: [
-                  const Icon(LucideIcons.calendarDays, color: AppColors.secondaryColor, size: 18),
+                  const Icon(LucideIcons.calendarDays,
+                      color: AppColors.secondaryColor, size: 18),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('اليوم المحدد حالياً',
+                        Text(l10n.currentSelectedDay,
                             style: TextStyle(
-                                fontSize: 10, color: AppColors.mutedColor, fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+                                fontSize: 10,
+                                color: AppColors.mutedColor,
+                                fontFamily: 'Cairo',
+                                fontWeight: FontWeight.bold)),
                         const SizedBox(height: 2),
-                        Text(DateFormat('dd MMMM yyyy', 'ar').format(selectedDate),
+                        Text(
+                            DateFormat('dd MMMM yyyy', 'ar')
+                                .format(selectedDate),
                             style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -341,7 +369,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                       ],
                     ),
                   ),
-                  const Icon(LucideIcons.chevronDown, color: AppColors.mutedColor, size: 16),
+                  const Icon(LucideIcons.chevronDown,
+                      color: AppColors.mutedColor, size: 16),
                 ],
               ),
             ),
@@ -352,6 +381,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildReadOnlyDateSection() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -373,14 +403,15 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               color: AppColors.primaryColor.withOpacity(0.08),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(LucideIcons.calendar, color: AppColors.primaryColor, size: 22),
+            child: const Icon(LucideIcons.calendar,
+                color: AppColors.primaryColor, size: 22),
           ),
           const SizedBox(width: 14),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'تاريخ التقرير المولد',
+              Text(
+                l10n.reportGeneratedDate,
                 style: TextStyle(
                     fontSize: 11,
                     color: AppColors.mutedColor,
@@ -389,7 +420,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               ),
               const SizedBox(height: 4),
               Text(
-                DateFormat('dd/MM/yyyy   hh:mm a').format(report?.date ?? DateTime.now()),
+                DateFormat('dd/MM/yyyy   hh:mm a')
+                    .format(report?.date ?? DateTime.now()),
                 style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -405,14 +437,17 @@ class _DailyReportScreenState extends State<DailyReportScreen>
               decoration: BoxDecoration(
                 color: AppColors.secondaryColor.withOpacity(0.06),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.secondaryColor.withOpacity(0.12)),
+                border: Border.all(
+                    color: AppColors.secondaryColor.withOpacity(0.12)),
               ),
               child: Row(
                 children: [
-                  const Icon(LucideIcons.user, size: 13, color: AppColors.secondaryColor),
+                  const Icon(LucideIcons.user,
+                      size: 13, color: AppColors.secondaryColor),
                   const SizedBox(width: 8),
                   Text(
-                    'المغلق: ${report!.closedByUserName}',
+                    l10n.closedByUser(TranslationHelper.translateUserName(
+                        context, report!.closedByUserName)),
                     style: const TextStyle(
                         fontSize: 12,
                         fontFamily: 'Cairo',
@@ -469,19 +504,20 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   Widget _buildSummaryCards() {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final l10n = AppLocalizations.of(context);
         final isMobile = constraints.maxWidth < 600;
         if (isMobile) {
           return Column(
             children: [
               _buildSummaryCard(
-                  'إجمالي مبيعات اليوم',
-                  '${report!.totalSales.toStringAsFixed(2)} ج.م',
+                  l10n.todayTotalSales,
+                  '${report!.totalSales.toStringAsFixed(2)} ${l10n.currencyEg}',
                   LucideIcons.banknote,
                   AppColors.successColor),
               const SizedBox(height: 12),
               _buildSummaryCard(
-                  'صافي الأرباح اليومية',
-                  '${report!.netRevenue.toStringAsFixed(2)} ج.م',
+                  l10n.dailyNetProfit,
+                  '${report!.netRevenue.toStringAsFixed(2)} ${l10n.currencyEg}',
                   LucideIcons.trendingUp,
                   const Color(0xFF059669)),
             ],
@@ -491,16 +527,16 @@ class _DailyReportScreenState extends State<DailyReportScreen>
           children: [
             Expanded(
               child: _buildSummaryCard(
-                  'إجمالي مبيعات اليوم',
-                  '${report!.totalSales.toStringAsFixed(2)} ج.م',
+                  l10n.todayTotalSales,
+                  '${report!.totalSales.toStringAsFixed(2)} ${l10n.currencyEg}',
                   LucideIcons.banknote,
                   AppColors.successColor),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: _buildSummaryCard(
-                  'صافي الأرباح اليومية',
-                  '${report!.netRevenue.toStringAsFixed(2)} ج.م',
+                  l10n.dailyNetProfit,
+                  '${report!.netRevenue.toStringAsFixed(2)} ${l10n.currencyEg}',
                   LucideIcons.trendingUp,
                   const Color(0xFF059669)),
             ),
@@ -565,102 +601,103 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildActionButtons() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 600;
-        
-        if (isMobile) {
-          return Column(
-            children: [
-              _buildActionButton(
-                onPressed: _handlePreview,
-                icon: LucideIcons.eye,
-                label: 'معاينة تقرير المبيعات',
-                color: AppColors.primaryColor,
-              ),
-              const SizedBox(height: 10),
-              _buildActionButton(
-                onPressed: () {
-                  if (report == null) return;
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => DailyReportDatasheetScreen(report: report!),
-                  ));
-                },
-                icon: LucideIcons.table,
-                label: 'عرض جدول المبيعات التفصيلي',
-                color: AppColors.secondaryColor,
-              ),
-              const SizedBox(height: 10),
-              _buildActionButton(
-                onPressed: _handlePrint,
-                icon: LucideIcons.printer,
-                label: 'طباعة فورية للتقرير',
-                color: const Color(0xFF059669),
-              ),
-              const SizedBox(height: 10),
-              _buildActionButton(
-                onPressed: _handleShare,
-                icon: LucideIcons.share2,
-                label: 'مشاركة التقرير PDF',
-                color: AppColors.mutedColor,
-                isOutlined: true,
-              ),
-            ],
-          );
-        }
+    return LayoutBuilder(builder: (context, constraints) {
+      final l10n = AppLocalizations.of(context);
+      final isMobile = constraints.maxWidth < 600;
 
+      if (isMobile) {
         return Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildActionButton(
-                    onPressed: _handlePreview,
-                    icon: LucideIcons.eye,
-                    label: 'معاينة التقرير',
-                    color: AppColors.primaryColor,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildActionButton(
-                    onPressed: () {
-                      if (report == null) return;
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => DailyReportDatasheetScreen(report: report!),
-                      ));
-                    },
-                    icon: LucideIcons.table,
-                    label: 'عرض الجدول',
-                    color: AppColors.secondaryColor,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildActionButton(
-                    onPressed: _handlePrint,
-                    icon: LucideIcons.printer,
-                    label: 'طباعة فورية',
-                    color: const Color(0xFF059669),
-                  ),
-                ),
-              ],
+            _buildActionButton(
+              onPressed: _handlePreview,
+              icon: LucideIcons.eye,
+              label: l10n.salesReportPreview,
+              color: AppColors.primaryColor,
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: _buildActionButton(
-                onPressed: _handleShare,
-                icon: LucideIcons.share2,
-                label: 'مشاركة التقرير PDF',
-                color: AppColors.textSecondary,
-                isOutlined: true,
-              ),
+            const SizedBox(height: 10),
+            _buildActionButton(
+              onPressed: () {
+                if (report == null) return;
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      DailyReportDatasheetScreen(report: report!),
+                ));
+              },
+              icon: LucideIcons.table,
+              label: l10n.viewDetailedTable,
+              color: AppColors.secondaryColor,
+            ),
+            const SizedBox(height: 10),
+            _buildActionButton(
+              onPressed: _handlePrint,
+              icon: LucideIcons.printer,
+              label: l10n.instantPrintReport,
+              color: const Color(0xFF059669),
+            ),
+            const SizedBox(height: 10),
+            _buildActionButton(
+              onPressed: _handleShare,
+              icon: LucideIcons.share2,
+              label: l10n.sharePdfReport,
+              color: AppColors.mutedColor,
+              isOutlined: true,
             ),
           ],
         );
       }
-    );
+
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionButton(
+                  onPressed: _handlePreview,
+                  icon: LucideIcons.eye,
+                  label: l10n.previewReportTitle,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionButton(
+                  onPressed: () {
+                    if (report == null) return;
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          DailyReportDatasheetScreen(report: report!),
+                    ));
+                  },
+                  icon: LucideIcons.table,
+                  label: l10n.viewTableBtn,
+                  color: AppColors.secondaryColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionButton(
+                  onPressed: _handlePrint,
+                  icon: LucideIcons.printer,
+                  label: l10n.instantPrint,
+                  color: const Color(0xFF059669),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: _buildActionButton(
+              onPressed: _handleShare,
+              icon: LucideIcons.share2,
+              label: l10n.sharePdfReport,
+              color: AppColors.textSecondary,
+              isOutlined: true,
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildActionButton({
@@ -715,10 +752,14 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildTopProductsList() {
+    final l10n = AppLocalizations.of(context);
     if (report?.topProducts.isEmpty ?? true) {
       return Center(
-          child: Text('لا توجد منتجات مباعة لهذا التاريخ',
-              style: TextStyle(color: AppColors.mutedColor.withOpacity(0.5), fontSize: 14, fontFamily: 'Cairo')));
+          child: Text(l10n.noProductsSoldDate,
+              style: TextStyle(
+                  color: AppColors.mutedColor.withOpacity(0.5),
+                  fontSize: 14,
+                  fontFamily: 'Cairo')));
     }
     return Container(
       decoration: BoxDecoration(
@@ -739,10 +780,11 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                const Icon(LucideIcons.barChart2, color: AppColors.primaryColor, size: 20),
+                const Icon(LucideIcons.barChart2,
+                    color: AppColors.primaryColor, size: 20),
                 const SizedBox(width: 10),
                 Text(
-                  'أداء وحركة المنتجات اليومية (${report!.topProducts.length})',
+                  l10n.dailyProductsPerformance(report!.topProducts.length),
                   style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -768,6 +810,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildProductCard(ProductPerformanceModel product, int index) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -793,7 +836,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                 decoration: BoxDecoration(
                   color: AppColors.primaryColor.withOpacity(0.06),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.primaryColor.withOpacity(0.1)),
+                  border: Border.all(
+                      color: AppColors.primaryColor.withOpacity(0.1)),
                 ),
                 child: const Icon(LucideIcons.package,
                     color: AppColors.primaryColor, size: 18),
@@ -815,10 +859,11 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(LucideIcons.shoppingBag, size: 12, color: AppColors.mutedColor),
+                        const Icon(LucideIcons.shoppingBag,
+                            size: 12, color: AppColors.mutedColor),
                         const SizedBox(width: 4),
                         Text(
-                          'مبيعات: ${product.quantitySold} وحدات',
+                          l10n.salesUnits(product.quantitySold),
                           style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 11,
@@ -836,7 +881,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${product.revenue.toStringAsFixed(2)} ج.م',
+                    '${product.revenue.toStringAsFixed(2)} ${l10n.currencyEg}',
                     style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 13,
@@ -849,7 +894,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'ربح: ${product.profit.toStringAsFixed(2)} ج.م',
+                        l10n.profitAmount(product.profit.toStringAsFixed(2)),
                         style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 10.5,
@@ -878,7 +923,8 @@ class _DailyReportScreenState extends State<DailyReportScreen>
             child: LinearProgressIndicator(
               value: (10.0 - index.clamp(0, 9)) / 10.0,
               backgroundColor: AppColors.borderColor.withOpacity(0.5),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
               minHeight: 4,
             ),
           ),
@@ -888,6 +934,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildRefundedProductsList() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -904,15 +951,16 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
             child: Row(
               children: [
-                Icon(LucideIcons.packageX, color: AppColors.errorColor, size: 20),
-                SizedBox(width: 10),
+                const Icon(LucideIcons.packageX,
+                    color: AppColors.errorColor, size: 20),
+                const SizedBox(width: 10),
                 Text(
-                  'تفاصيل المنتجات المرتجعة',
-                  style: TextStyle(
+                  l10n.returnedProductsDetails,
+                  style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Cairo',
@@ -945,10 +993,10 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                     fontSize: 12,
                   ),
                   columnSpacing: 24,
-                  columns: const [
-                    DataColumn(label: Text('اسم المنتج')),
-                    DataColumn(label: Text('الكمية المرتجعة'), numeric: true),
-                    DataColumn(label: Text('قيمة المرتجع'), numeric: true),
+                  columns: [
+                    DataColumn(label: Text(l10n.productNameColumn)),
+                    DataColumn(label: Text(l10n.returnedQty), numeric: true),
+                    DataColumn(label: Text(l10n.returnedValue), numeric: true),
                   ],
                   rows: report!.refundedProducts.map((product) {
                     return DataRow(
@@ -974,7 +1022,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                         DataCell(Text('${product.quantitySold}')),
                         DataCell(
                           Text(
-                            '${product.revenue.toStringAsFixed(2)} ج.م',
+                            '${product.revenue.toStringAsFixed(2)} ${l10n.currencyEg}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.errorColor),
@@ -993,6 +1041,7 @@ class _DailyReportScreenState extends State<DailyReportScreen>
   }
 
   Widget _buildTransactionsLog() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1009,15 +1058,16 @@ class _DailyReportScreenState extends State<DailyReportScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
             child: Row(
               children: [
-                Icon(LucideIcons.fileSpreadsheet, color: AppColors.primaryColor, size: 20),
-                SizedBox(width: 10),
+                const Icon(LucideIcons.fileSpreadsheet,
+                    color: AppColors.primaryColor, size: 20),
+                const SizedBox(width: 10),
                 Text(
-                  'سجل عمليات اليوم المالية',
-                  style: TextStyle(
+                  l10n.dailyFinancialLog,
+                  style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Cairo',
@@ -1050,36 +1100,48 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                     fontSize: 12,
                   ),
                   columnSpacing: 24,
-                  columns: const [
-                    DataColumn(label: Text('رقم الفاتورة')),
-                    DataColumn(label: Text('الكاشير')),
-                    DataColumn(label: Text('وقت العملية')),
-                    DataColumn(label: Text('نوع العملية')),
-                    DataColumn(label: Text('المبلغ الإجمالي'), numeric: true),
+                  columns: [
+                    DataColumn(label: Text(l10n.invoiceNumberPdf)),
+                    DataColumn(label: Text(l10n.cashierPdf)),
+                    DataColumn(label: Text(l10n.operationTime)),
+                    DataColumn(label: Text(l10n.operationType)),
+                    DataColumn(
+                        label: Text(l10n.totalAmountLabel), numeric: true),
                   ],
                   rows: report!.transactions.map((sale) {
                     final isRefund = sale.isRefund;
                     return DataRow(
                       cells: [
-                        DataCell(Text(sale.id.length > 8 ? '#${sale.id.substring(0, 8).toUpperCase()}' : '#${sale.id.toUpperCase()}')),
-                        DataCell(Text(sale.cashierName ?? 'المدير')),
+                        DataCell(Text(sale.id.length > 8
+                            ? '#${sale.id.substring(0, 8).toUpperCase()}'
+                            : '#${sale.id.toUpperCase()}')),
+                        DataCell(Text(sale.cashierName ?? l10n.roleManager)),
                         DataCell(Text(DateFormat('hh:mm a').format(sale.date))),
                         DataCell(
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: (isRefund ? AppColors.errorColor : AppColors.successColor).withOpacity(0.08),
+                              color: (isRefund
+                                      ? AppColors.errorColor
+                                      : AppColors.successColor)
+                                  .withOpacity(0.08),
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                color: (isRefund ? AppColors.errorColor : AppColors.successColor).withOpacity(0.16),
+                                color: (isRefund
+                                        ? AppColors.errorColor
+                                        : AppColors.successColor)
+                                    .withOpacity(0.16),
                               ),
                             ),
                             child: Text(
-                              isRefund ? 'مرتجع' : 'عملية بيع',
+                              isRefund ? l10n.refundLabel : l10n.saleProcess,
                               style: TextStyle(
                                 fontSize: 11,
                                 fontFamily: 'Cairo',
-                                color: isRefund ? AppColors.errorColor : AppColors.successColor,
+                                color: isRefund
+                                    ? AppColors.errorColor
+                                    : AppColors.successColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -1087,10 +1149,12 @@ class _DailyReportScreenState extends State<DailyReportScreen>
                         ),
                         DataCell(
                           Text(
-                            '${sale.total.toStringAsFixed(2)} ج.م',
+                            '${sale.total.toStringAsFixed(2)} ${l10n.currencyEg}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: isRefund ? AppColors.errorColor : AppColors.textPrimary,
+                              color: isRefund
+                                  ? AppColors.errorColor
+                                  : AppColors.textPrimary,
                             ),
                           ),
                         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/cubit/user_cubit.dart';
 
@@ -23,6 +24,7 @@ class EnhancedProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final qty = product.quantity;
     final min = product.minQuantity;
     final isLowStock = qty > 0 && qty <= min;
@@ -112,12 +114,12 @@ class EnhancedProductCard extends StatelessWidget {
                   children: [
                     Icon(Icons.monetization_on_outlined, size: 14, color: AppColors.mutedColor),
                     const SizedBox(width: 4),
-                    Text("سعر البيع", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
+                    Text(l10n.sellingPrice, style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
                   ],
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  "${product.price.toStringAsFixed(2)} ج.م",
+                  "${product.price.toStringAsFixed(2)} ${l10n.currencyEg}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: value,
@@ -149,7 +151,7 @@ class EnhancedProductCard extends StatelessWidget {
                       children: [
                         Icon(Icons.inventory_2_outlined, size: 14, color: AppColors.mutedColor),
                         const SizedBox(width: 4),
-                        Text("الكمية", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
+                        Text(l10n.quantity, style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
                       ],
                     ),
                     const SizedBox(height: 2),
@@ -171,7 +173,7 @@ class EnhancedProductCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("جملة", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
+                      Text(l10n.wholesalePrice, style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
                       const SizedBox(height: 2),
                       Text(
                         "${product.wholesalePrice.toStringAsFixed(2)}",
@@ -184,7 +186,7 @@ class EnhancedProductCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("أدنى سعر", style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
+                      Text(l10n.minPriceColumn, style: TextStyle(fontSize: small, color: AppColors.mutedColor)),
                       const SizedBox(height: 2),
                       Text(
                         "${product.minPrice.toStringAsFixed(2)}",
@@ -207,12 +209,12 @@ class EnhancedProductCard extends StatelessWidget {
                 IconButton(
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit_rounded, color: AppColors.primaryColor),
-                  tooltip: 'تعديل',
+                  tooltip: l10n.edit,
                 ),
                 IconButton(
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_rounded, color: AppColors.errorColor),
-                  tooltip: 'حذف',
+                  tooltip: l10n.delete,
                 ),
               ],
             ),

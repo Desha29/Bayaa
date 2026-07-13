@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../functions/messege.dart';
 
 class MessageOverlay extends StatefulWidget {
   final Widget child;
 
   const MessageOverlay({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<MessageOverlay> createState() => _MessageOverlayState();
@@ -16,13 +17,14 @@ class MessageOverlay extends StatefulWidget {
 class _MessageOverlayState extends State<MessageOverlay> {
   @override
   Widget build(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations);
+    final isArabic = l10n != null && l10n.localeName == 'ar';
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: widget.child,
     );
   }
 }
-
 
 class GlobalMessage {
   static BuildContext? _context;

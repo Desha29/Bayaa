@@ -37,7 +37,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         return const Right(null);
       },
       operationName: 'deleteProduct',
-      userFriendlyMessage: 'فشل حذف المنتج',
+      userFriendlyMessage: 'Failed to delete product',
       source: 'ProductRepository',
     );
   }
@@ -59,13 +59,13 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         wholesalePrice: m['wholesale_price'] as double? ?? 0.0,
         quantity: (m['stock'] as num).toInt(),
         minQuantity: (m['min_stock'] as num).toInt(),
-        category: m['category_id'] as String? ?? 'عام',
+        category: m['category_id'] as String? ?? 'General',
       )).toList();
       
       return Right(products);
     } on Exception catch (e) {
       print('  ❌ Failed to load products: $e');
-      return Left(CacheFailure("خطأ في جلب المنتجات: ${e.toString()}"));
+      return Left(CacheFailure("Error fetching products: ${e.toString()}"));
     }
   }
 
@@ -126,13 +126,13 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         wholesalePrice: m['wholesale_price'] as double? ?? 0.0,
         quantity: (m['stock'] as num).toInt(),
         minQuantity: (m['min_stock'] as num).toInt(),
-        category: m['category_id'] as String? ?? 'עם',
+        category: m['category_id'] as String? ?? 'General',
       )).toList();
       
       return Right(products);
     } on Exception catch (e) {
       print('  ❌ Failed to load products page: $e');
-      return Left(CacheFailure("خطأ في جلب المنتجات: ${e.toString()}"));
+      return Left(CacheFailure("Error fetching products: ${e.toString()}"));
     }
   }
 
@@ -181,7 +181,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         return const Right(null);
       },
       operationName: 'saveProduct',
-      userFriendlyMessage: 'فشل حفظ المنتج',
+      userFriendlyMessage: 'Failed to save product',
       source: 'ProductRepository',
     );
   }
@@ -205,12 +205,12 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
     try {
       if (category == newCategory) {
         return Left(
-            NetworkFailure("لا يمكن إعادة تعيين المنتجات إلى نفس الفئة."));
+            NetworkFailure("Cannot move products to the same category."));
       }
       
       final productsResult = await getAllProduct();
       productsResult.fold(
-          (failure) => Left(NetworkFailure("خطأ في جلب المنتجات")),
+          (failure) => Left(NetworkFailure("Error fetching products")),
           (products) => productsList = products);
           
       var filteredProducts = productsList
@@ -235,7 +235,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         if (filteredProducts.isNotEmpty) {
           if (newCategory == null || newCategory.isEmpty) {
             return Left(CacheFailure(
-                "لا يمكنك حذف الفئة لأنها تحتوي على منتجات. الرجاء اختيار فئة جديدة لإعادة تعيين المنتجات أو استخدام الحذف القسري."));
+                "Cannot delete category because it contains products. Please choose a new category to move products to or use force delete."));
           }
           for (var product in filteredProducts) {
             var updatedProduct = Product(
@@ -271,7 +271,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
       );
       return const Right(null);
     } on Exception {
-      return Left(NetworkFailure("خطأ في حذف الفئة"));
+      return Left(NetworkFailure("Error deleting category"));
     }
   }
 
@@ -289,7 +289,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
       return Right(categories);
     } on Exception catch (e) {
       print('  ❌ Failed to load categories: $e');
-      return Left(CacheFailure("خطأ في جلب الفئات: ${e.toString()}"));
+      return Left(CacheFailure("Error fetching categories: ${e.toString()}"));
     }
   }
 
@@ -320,7 +320,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         return const Right(null);
       },
       operationName: 'saveCategory',
-      userFriendlyMessage: 'فشل حفظ الفئة',
+      userFriendlyMessage: 'Failed to save category',
       source: 'ProductRepository',
     );
   }
@@ -331,7 +331,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
       final exists = await _productExists(barcode);
       return Right(exists);
     } catch (e) {
-      return Left(CacheFailure("خطأ في التحقق من وجود المنتج: ${e.toString()}"));
+      return Left(CacheFailure("Error checking product existence: ${e.toString()}"));
     }
   }
 }

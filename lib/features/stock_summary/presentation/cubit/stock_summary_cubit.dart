@@ -61,7 +61,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
 
       // Process Stock Data
       for (var row in stockResults) {
-        final categoryId = row['category_id'] as String? ?? 'عام';
+        final categoryId = row['category_id'] as String? ?? 'General';
         
         categoryMap[categoryId] = StockSummaryCategoryModel(
           categoryName: categoryId, // We use ID as name based on schema
@@ -81,7 +81,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
       // Process Sales Data
       for (var row in salesResults) {
         var categoryId = row['category_id'] as String?;
-        categoryId ??= 'المحذوفة';
+        categoryId ??= 'Deleted';
         
         if (!categoryMap.containsKey(categoryId)) {
            // Category exists in sales but not in current active products (maybe deleted category or no active products)
@@ -94,7 +94,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
              totalDefaultSellValue: 0,
              totalSoldQuantity: 0,
              totalHistoricValue: 0,
-             isDeletedCategory: categoryId == 'المحذوفة',
+             isDeletedCategory: categoryId == 'Deleted',
              productDetails: [],
            );
         }
@@ -112,7 +112,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
       
       for (var row in salesResults) {
         var categoryId = row['category_id'] as String?;
-        categoryId ??= 'المحذوفة';
+        categoryId ??= 'Deleted';
         
         final soldQty = (row['sold_qty'] as num).toInt();
         final refundedQty = (row['refunded_qty'] as num).toInt();
@@ -141,7 +141,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
   
       final stockDataMap = {
         for (var r in stockResults) 
-          (r['category_id'] as String? ?? 'عام') : r
+          (r['category_id'] as String? ?? 'General') : r
       };
 
       for (var cat in allCats) {
@@ -164,7 +164,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
           totalCurrentWholesaleValue: currentWholesale,
           totalMinSellValue: minSell,
           totalDefaultSellValue: defaultSell,
-          isDeletedCategory: cat == 'المحذوفة',
+          isDeletedCategory: cat == 'Deleted',
           productDetails: catDetails[cat] ?? [],
         ));
       }
@@ -195,7 +195,7 @@ class StockSummaryCubit extends Cubit<StockSummaryState> {
 
     } catch (e) {
       print('  ❌ Stock summary failed: $e');
-      if (!isClosed) emit(StockSummaryError("فشل في حساب الملخص: $e"));
+      if (!isClosed) emit(StockSummaryError("Failed to calculate summary: $e"));
     }
   }
 }

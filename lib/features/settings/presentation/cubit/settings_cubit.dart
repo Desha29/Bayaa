@@ -59,7 +59,7 @@ class SettingsCubit extends Cubit<SettingsStates> {
         );
         await getIt<ActivityLogger>().logActivity(
           type: ActivityType.userUpdate,
-          description: 'تحديث معلومات المتجر',
+          description: 'Update store settings',
           userName: userCubit.currentUser.name,
           sessionId: sid,
           eventKey: 'userUpdated',

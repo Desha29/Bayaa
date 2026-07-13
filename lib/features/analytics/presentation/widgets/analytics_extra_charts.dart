@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class AnalyticsHourlyChart extends StatelessWidget {
   final Map<int, double> hourlySales;
@@ -11,6 +12,7 @@ class AnalyticsHourlyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -72,7 +74,7 @@ class AnalyticsHourlyChart extends StatelessWidget {
                    child: const Icon(Icons.access_time_filled, color: AppColors.secondaryColor, size: 20),
                  ),
                  const SizedBox(width: 12),
-                 const Text("نشاط المبيعات بالساعة", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.kDarkChip)),
+                 Text(l10n.salesByHourAnalytics, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.kDarkChip)),
               ],
             ),
             const SizedBox(height: 24),
@@ -90,10 +92,10 @@ class AnalyticsHourlyChart extends StatelessWidget {
                       tooltipMargin: 8,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final hour = group.x;
-                        final period = hour < 12 ? 'ص' : 'م';
+                        final period = hour < 12 ? l10n.amLabel : l10n.pmLabel;
                         final h12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
                         return BarTooltipItem(
-                          '$h12:00 $period\n${rod.toY.toInt()} ج.م',
+                          '$h12:00 $period\n${rod.toY.toInt()} ${l10n.currencyEg}',
                           const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -113,7 +115,7 @@ class AnalyticsHourlyChart extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           final hour = value.toInt();
                           if (hour % 4 != 0) return const SizedBox();
-                          final period = hour < 12 ? 'ص' : 'م';
+                          final period = hour < 12 ? l10n.amLabel : l10n.pmLabel;
                           final h12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
@@ -165,6 +167,7 @@ class _AnalyticsCategoryPieChartState extends State<AnalyticsCategoryPieChart> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -224,7 +227,7 @@ class _AnalyticsCategoryPieChartState extends State<AnalyticsCategoryPieChart> {
                    child: const Icon(Icons.category, color: Colors.purple, size: 20),
                  ),
                  const SizedBox(width: 12),
-                 const Text("المبيعات حسب القسم", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.kDarkChip)),
+                 Text(l10n.salesByCategoryAnalytics, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.kDarkChip)),
               ],
             ),
              const SizedBox(height: 24),
@@ -314,6 +317,7 @@ class _AnalyticsSalesVsRefundChartState extends State<AnalyticsSalesVsRefundChar
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -365,7 +369,7 @@ class _AnalyticsSalesVsRefundChartState extends State<AnalyticsSalesVsRefundChar
                    child: const Icon(Icons.compare_arrows, color: AppColors.errorColor, size: 20),
                  ),
                  const SizedBox(width: 12),
-                 const Text("نسبة المرتجعات", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.kDarkChip)),
+                 Text(l10n.returnRateLabel, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.kDarkChip)),
               ],
             ),
             const SizedBox(height: 24),
@@ -401,11 +405,11 @@ class _AnalyticsSalesVsRefundChartState extends State<AnalyticsSalesVsRefundChar
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                         _LegendItem(color: AppColors.successColor, text: "مبيعات صافية (${netSales.toStringAsFixed(0)})"),
-                         const SizedBox(height: 8),
-                         _LegendItem(color: AppColors.errorColor, text: "مرتجعات (${widget.refunds.toStringAsFixed(0)})"),
-                      ],
+                         children: [
+                          _LegendItem(color: AppColors.successColor, text: l10n.netSoldLabel(netSales.toStringAsFixed(0))),
+                          const SizedBox(height: 8),
+                          _LegendItem(color: AppColors.errorColor, text: l10n.refundCountLabel(widget.refunds.toStringAsFixed(0))),
+                       ],
                     ),
                   )
                 ],

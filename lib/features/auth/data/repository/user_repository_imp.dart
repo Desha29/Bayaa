@@ -25,7 +25,7 @@ class UserRepositoryImp extends UserRepositoryInt with RepositoryPersistenceMixi
       );
       return const Right(null);
     } on Exception catch (e) {
-      return Left(CacheFailure("فشل في حذف المستخدم: ${e.toString()}"));
+      return Left(CacheFailure("Failed to delete user: ${e.toString()}"));
     }
   }
 
@@ -53,7 +53,7 @@ class UserRepositoryImp extends UserRepositoryInt with RepositoryPersistenceMixi
       return Right(users);
     } on Exception catch (e) {
       print('  ❌ Failed to load users: $e');
-      return Left(CacheFailure("فشل في جلب المستخدمين: ${e.toString()}"));
+      return Left(CacheFailure("Failed to fetch users: ${e.toString()}"));
     }
   }
 
@@ -92,11 +92,11 @@ class UserRepositoryImp extends UserRepositoryInt with RepositoryPersistenceMixi
         return Right(user);
       } else {
         print('  ❌ User not found');
-        return Left(CacheFailure("المستخدم غير موجود"));
+        return Left(CacheFailure("User not found"));
       }
     } on Exception catch (e) {
       print('  ❌ Failed to get user: $e');
-      return Left(CacheFailure("فشل في جلب المستخدم: ${e.toString()}"));
+      return Left(CacheFailure("Failed to fetch user: ${e.toString()}"));
     }
   }
 
@@ -146,7 +146,7 @@ class UserRepositoryImp extends UserRepositoryInt with RepositoryPersistenceMixi
         return const Right(null);
       },
       operationName: 'saveUser',
-      userFriendlyMessage: 'فشل في حفظ المستخدم',
+      userFriendlyMessage: 'Failed to save user',
       source: 'UserRepository',
     );
   }

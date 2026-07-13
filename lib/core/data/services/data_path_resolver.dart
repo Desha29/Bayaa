@@ -86,7 +86,7 @@ class DataPathResolver {
     String? result;
     try {
       result = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'اختر مكان حفظ البيانات - Select Data Storage Location${defaultDataPath != null ? '\n\nالافتراضي: $defaultDataPath' : ''}',
+        dialogTitle: 'Select Data Storage Location${defaultDataPath != null ? '\n\nDefault: $defaultDataPath' : ''}',
         lockParentWindow: false,
       );
     } catch (e) {

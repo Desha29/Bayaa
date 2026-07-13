@@ -151,7 +151,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
       );
       await getIt<ActivityLogger>().logActivity(
         type: ActivityType.invoiceDelete,
-        description: 'حذف فاتورة: ${sale.total.toStringAsFixed(2)} ج.م',
+        description: 'Delete invoice: ${sale.total.toStringAsFixed(2)} EGP',
         userName: getIt<UserCubit>().currentUser.name,
         sessionId: sid,
         details: {'saleId': saleId, 'items': sale.items},
@@ -159,6 +159,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
         parameters: {
           'user': getIt<UserCubit>().currentUser.name,
           'id': saleId,
+          'total': sale.total.toStringAsFixed(2),
         },
       );
     }
@@ -254,7 +255,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     // 8. Log refund activity
     await getIt<ActivityLogger>().logActivity(
       type: ActivityType.refund,
-      description: 'استرجاع: ${refundTotal.toStringAsFixed(2)} ج.م',
+      description: 'Refund: ${refundTotal.toStringAsFixed(2)} EGP',
       userName: getIt<UserCubit>().currentUser.name,
       sessionId: session.id,
       details: {
@@ -267,6 +268,8 @@ class InvoiceCubit extends Cubit<InvoiceState> {
       parameters: {
         'user': getIt<UserCubit>().currentUser.name,
         'total': refundTotal.toStringAsFixed(2),
+        'originalInvoiceId': originalSale.id,
+        'itemCount': totalItems,
       },
     );
 
@@ -288,7 +291,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
       );
       await getIt<ActivityLogger>().logActivity(
         type: ActivityType.invoiceDelete,
-        description: 'حذف فواتير جماعي',
+        description: 'Bulk invoice deletion',
         userName: getIt<UserCubit>().currentUser.name,
         sessionId: sid,
         details: {

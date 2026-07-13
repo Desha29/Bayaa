@@ -3,16 +3,17 @@ import '../../l10n/app_localizations.dart';
 
 class TranslationHelper {
   static const _defaultAdminNameAr = 'مدير النظام';
-  static const _defaultAdminUsername = 'admin';
   static const _defaultCashierNameAr = 'كاشير تجريبي';
-  static const _defaultCashierUsername = 'cashier';
+
+  static const _defaultAdminNameEn = 'System Administrator';
+  static const _defaultCashierNameEn = 'Trial Cashier';
 
   static String translateUserName(BuildContext context, String name, {String? username}) {
     final l10n = AppLocalizations.of(context);
-    if (username == _defaultAdminUsername && name == _defaultAdminNameAr) {
+    if (name == _defaultAdminNameAr || name == _defaultAdminNameEn) {
       return l10n.roleManager;
     }
-    if (username == _defaultCashierUsername && name == _defaultCashierNameAr) {
+    if (name == _defaultCashierNameAr || name == _defaultCashierNameEn) {
       return l10n.trialCashier;
     }
     return name;
@@ -20,7 +21,6 @@ class TranslationHelper {
 
   static String translate(BuildContext context, String key, {List<String>? args}) {
     final l10n = AppLocalizations.of(context);
-    if (l10n == null) return key;
 
     switch (key) {
       // Success Messages
@@ -112,8 +112,6 @@ class TranslationHelper {
       // Cubit event keys
       case 'productSavedSuccess':
         return l10n.productSavedSuccess;
-      case 'msgProductDeleted':
-        return l10n.msgProductDeleted;
       case 'categoryAddedSuccess':
         return l10n.categoryAddedSuccess;
       case 'categoryDeletedSuccess':

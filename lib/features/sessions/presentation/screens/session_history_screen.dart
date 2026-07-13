@@ -71,9 +71,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
       if (current != null && current.isOpen) {
         all.add(current);
       }
-      closed.sort((a, b) =>
-          (b.closeTime ?? DateTime.now())
-              .compareTo(a.closeTime ?? DateTime.now()));
+      closed.sort((a, b) => (b.closeTime ?? DateTime.now())
+          .compareTo(a.closeTime ?? DateTime.now()));
       all.addAll(closed);
 
       setState(() {
@@ -141,9 +140,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
     setState(() {
       _filteredActivities = _allActivities.where((a) {
         final matchesSearch = _searchQuery.isEmpty ||
-            a.description
-                .toLowerCase()
-                .contains(_searchQuery.toLowerCase()) ||
+            a.description.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             a.userName.toLowerCase().contains(_searchQuery.toLowerCase());
         final matchesType = _filterType == null || a.type == _filterType;
         return matchesSearch && matchesType;
@@ -191,7 +188,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => Directionality(
-        textDirection: TextDirection.rtl,
+        textDirection: AppLocalizations.of(context).localeName == 'ar'
+            ? TextDirection.rtl
+            : TextDirection.ltr,
         child: AlertDialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -303,8 +302,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
             ),
             backgroundColor: AppColors.successColor,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -319,8 +318,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
             ),
             backgroundColor: AppColors.errorColor,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -364,13 +363,21 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
     );
 
     if (widget.isEmbedded) {
-      return Directionality(textDirection: TextDirection.rtl, child: content);
+      return Directionality(
+          textDirection: AppLocalizations.of(context).localeName == 'ar'
+              ? TextDirection.rtl
+              : TextDirection.ltr,
+          child: content);
     }
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: _buildAppBar(),
-      body: Directionality(textDirection: TextDirection.rtl, child: content),
+      body: Directionality(
+          textDirection: AppLocalizations.of(context).localeName == 'ar'
+              ? TextDirection.rtl
+              : TextDirection.ltr,
+          child: content),
     );
   }
 
@@ -396,8 +403,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
         ),
         child: SafeArea(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
             child: Row(
               children: [
                 // Back button
@@ -484,8 +490,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border(
-              bottom:
-                  BorderSide(color: AppColors.borderColor.withOpacity(0.5)),
+              bottom: BorderSide(color: AppColors.borderColor.withOpacity(0.5)),
             ),
           ),
           child: Row(
@@ -567,9 +572,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
           Text(
             l10n.loadingSessions,
             style: TextStyle(
-                color: AppColors.mutedColor,
-                fontSize: 12,
-                fontFamily: 'Cairo'),
+                color: AppColors.mutedColor, fontSize: 12, fontFamily: 'Cairo'),
           ),
         ],
       ),
@@ -689,7 +692,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                         ),
                       ),
                       child: Text(
-                        session.isOpen ? l10n.sessionActive : l10n.sessionClosed,
+                        session.isOpen
+                            ? l10n.sessionActive
+                            : l10n.sessionClosed,
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Cairo',
@@ -708,8 +713,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                         color: AppColors.secondaryColor.withOpacity(0.06),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                            color:
-                                AppColors.secondaryColor.withOpacity(0.12)),
+                            color: AppColors.secondaryColor.withOpacity(0.12)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -734,8 +738,11 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                 const SizedBox(height: 10),
 
                 // Shift ID
-                  Text(
-                    l10n.sessionId((session.id.length > 8 ? session.id.substring(0, 8) : session.id).toUpperCase()),
+                Text(
+                  l10n.sessionId((session.id.length > 8
+                          ? session.id.substring(0, 8)
+                          : session.id)
+                      .toUpperCase()),
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.w800,
@@ -769,7 +776,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        session.openedByUserId,
+                        TranslationHelper.translateUserName(
+                            context, session.openedByUserId),
                         style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 11,
@@ -861,7 +869,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
               l10n.selectSessionHint,
               textAlign: TextAlign.center,
               style: TextStyle(
-                  color: AppColors.mutedColor, fontSize: 12, fontFamily: 'Cairo'),
+                  color: AppColors.mutedColor,
+                  fontSize: 12,
+                  fontFamily: 'Cairo'),
             ),
           ],
         ),
@@ -886,9 +896,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
             labelStyle: const TextStyle(
                 fontWeight: FontWeight.bold, fontSize: 13, fontFamily: 'Cairo'),
             unselectedLabelStyle: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-                fontFamily: 'Cairo'),
+                fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Cairo'),
             dividerColor: AppColors.borderColor.withOpacity(0.5),
             tabs: [
               Tab(
@@ -976,7 +984,10 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.sessionId((session.id.length > 12 ? session.id.substring(0, 12) : session.id).toUpperCase()),
+                      l10n.sessionId((session.id.length > 12
+                              ? session.id.substring(0, 12)
+                              : session.id)
+                          .toUpperCase()),
                       style: const TextStyle(
                         fontSize: 15,
                         fontFamily: 'Cairo',
@@ -1037,7 +1048,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                             size: 12, color: AppColors.mutedColor),
                         const SizedBox(width: 4),
                         Text(
-                          session.openedByUserId,
+                          TranslationHelper.translateUserName(
+                              context, session.openedByUserId),
                           style: const TextStyle(
                               fontSize: 11.5,
                               color: AppColors.textSecondary,
@@ -1172,13 +1184,11 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
       children: [
         // Filter toolbar
         Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border(
-              bottom: BorderSide(
-                  color: AppColors.borderColor.withOpacity(0.4)),
+              bottom: BorderSide(color: AppColors.borderColor.withOpacity(0.4)),
             ),
           ),
           child: Row(
@@ -1193,8 +1203,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                         color: AppColors.borderColor.withOpacity(0.4)),
                   ),
                   child: TextField(
-                    style: const TextStyle(
-                        fontFamily: 'Cairo', fontSize: 12.5),
+                    style: const TextStyle(fontFamily: 'Cairo', fontSize: 12.5),
                     decoration: InputDecoration(
                       hintText: l10n.searchOperationsHint,
                       hintStyle: TextStyle(
@@ -1221,8 +1230,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   color: AppColors.backgroundColor,
-                  border: Border.all(
-                      color: AppColors.borderColor.withOpacity(0.4)),
+                  border:
+                      Border.all(color: AppColors.borderColor.withOpacity(0.4)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: DropdownButtonHideUnderline(
@@ -1246,14 +1255,12 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                           child: Text(l10n.allOperations,
                               style: const TextStyle(
                                   fontSize: 12, fontFamily: 'Cairo'))),
-                      ...ActivityType.values.map((type) =>
-                          DropdownMenuItem(
+                      ...ActivityType.values.map((type) => DropdownMenuItem(
                             value: type,
                             child: Row(
                               children: [
                                 Icon(_getIconForType(type),
-                                    size: 12,
-                                    color: _getColorForType(type)),
+                                    size: 12, color: _getColorForType(type)),
                                 const SizedBox(width: 6),
                                 Text(_getTypeName(type),
                                     style: const TextStyle(
@@ -1292,8 +1299,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                             ),
                             child: Icon(LucideIcons.filterX,
                                 size: 36,
-                                color:
-                                    AppColors.mutedColor.withOpacity(0.3)),
+                                color: AppColors.mutedColor.withOpacity(0.3)),
                           ),
                           const SizedBox(height: 14),
                           const Text(
@@ -1382,9 +1388,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
               decoration: BoxDecoration(
-                color: isSessionEvent
-                    ? color.withOpacity(0.04)
-                    : Colors.white,
+                color: isSessionEvent ? color.withOpacity(0.04) : Colors.white,
                 borderRadius: BorderRadius.circular(11),
                 border: Border.all(
                   color: isSessionEvent
@@ -1411,9 +1415,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                             fontWeight: FontWeight.bold,
                             fontSize: 12.5,
                             fontFamily: 'Cairo',
-                            color: isSessionEvent
-                                ? color
-                                : AppColors.textPrimary,
+                            color:
+                                isSessionEvent ? color : AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -1422,8 +1425,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                         style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color:
-                                AppColors.mutedColor.withOpacity(0.75),
+                            color: AppColors.mutedColor.withOpacity(0.75),
                             fontFamily: 'Cairo'),
                       ),
                     ],
@@ -1436,7 +1438,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                           color: AppColors.primaryColor.withOpacity(0.6)),
                       const SizedBox(width: 4),
                       Text(
-                        TranslationHelper.translateUserName(context, activity.userName),
+                        TranslationHelper.translateUserName(
+                            context, activity.userName),
                         style: const TextStyle(
                             fontSize: 10.5,
                             color: AppColors.primaryColor,
@@ -1453,8 +1456,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                           context, activity.type, activity.details),
                       style: TextStyle(
                           fontSize: 11,
-                          color:
-                              AppColors.textSecondary.withOpacity(0.8),
+                          color: AppColors.textSecondary.withOpacity(0.8),
                           fontFamily: 'Cairo'),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -1530,8 +1532,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     shape: BoxShape.circle,
                   ),
                   child: Icon(LucideIcons.alertTriangle,
-                      size: 38,
-                      color: AppColors.errorColor.withOpacity(0.6)),
+                      size: 38, color: AppColors.errorColor.withOpacity(0.6)),
                 ),
                 const SizedBox(height: 14),
                 Text(l10n.failedLoadReport,
@@ -1562,8 +1563,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                     shape: BoxShape.circle,
                   ),
                   child: Icon(LucideIcons.fileQuestion,
-                      size: 38,
-                      color: AppColors.mutedColor.withOpacity(0.35)),
+                      size: 38, color: AppColors.mutedColor.withOpacity(0.35)),
                 ),
                 const SizedBox(height: 14),
                 Text(l10n.noFinancialReport,
@@ -1588,8 +1588,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
           children: [
             // Report summary strip
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -1639,12 +1638,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                               borderRadius: BorderRadius.circular(16)),
                           clipBehavior: Clip.antiAlias,
                           child: SizedBox(
-                            width:
-                                MediaQuery.of(context).size.width * 0.85,
-                            height:
-                                MediaQuery.of(context).size.height * 0.85,
-                            child: DailyReportDatasheetScreen(
-                                report: report),
+                            width: MediaQuery.of(context).size.width * 0.85,
+                            height: MediaQuery.of(context).size.height * 0.85,
+                            child: DailyReportDatasheetScreen(report: report),
                           ),
                         ),
                       );
@@ -1727,8 +1723,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
         onTap: onTap,
         borderRadius: BorderRadius.circular(9),
         child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
             color: color.withOpacity(0.06),
             borderRadius: BorderRadius.circular(9),
@@ -1789,8 +1784,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   decoration: BoxDecoration(
                     border: Border(
                         bottom: BorderSide(
@@ -1818,8 +1813,8 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen>
                 ),
                 Expanded(
                   child: ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(bottom: Radius.circular(16)),
+                    borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(16)),
                     child: DailyReportPreviewScreen(
                       report: report,
                       session: session,

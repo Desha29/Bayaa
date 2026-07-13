@@ -41,7 +41,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
       }
       return Right(result);
     } catch (e) {
-      return Left(CacheFailure("فشل في جلب المبيعات بالساعة"));
+      return Left(CacheFailure("Failed to fetch hourly sales"));
     }
   }
 
@@ -93,7 +93,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
       }
       return Right(result);
     } catch (e) {
-      return Left(CacheFailure("فشل في جلب التسلسل الزمني للمبيعات"));
+      return Left(CacheFailure("Failed to fetch daily time series"));
     }
   }
 
@@ -115,7 +115,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
       }
       return Right(reports);
     } catch (e) {
-      return Left(CacheFailure('فشل في جلب التقارير: ${e.toString()}'));
+      return Left(CacheFailure('Failed to fetch reports: ${e.toString()}'));
     }
   }
 
@@ -170,7 +170,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
         refundedAmount: totalRefunds,
       ));
     } catch (e) {
-      return Left(CacheFailure("خطأ في تحميل ملخص الجلسات: ${e.toString()}"));
+      return Left(CacheFailure("Error loading sessions summary: ${e.toString()}"));
     }
   }
 
@@ -218,7 +218,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
 
       return Right(toplist);
     } catch (e) {
-      return Left(CacheFailure("خطأ في تحميل المنتجات: ${e.toString()}"));
+      return Left(CacheFailure("Error loading products: ${e.toString()}"));
     }
   }
 
@@ -237,7 +237,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
       ''', [start.toIso8601String(), end.toIso8601String()]);
       
       if (salesRows.isEmpty) {
-        return Left(CacheFailure("لم يتم العثور على بيانات لهذا اليوم."));
+        return Left(CacheFailure("No data found for this day."));
       }
 
       final summary = await getSummary(start, end);
@@ -262,7 +262,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
         }
       );
     } catch (e) {
-      return Left(CacheFailure("خطأ في جلب التقرير اليومي: ${e.toString()}"));
+      return Left(CacheFailure("Error fetching daily report: ${e.toString()}"));
     }
   }
 
@@ -303,7 +303,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
           (sales) => Right(_generateReportFromSales(sales, DateTime.now()))
         );
       } catch (e) {
-        return Left(CacheFailure("فشل في تقرير تقرير الجلسة: ${e.toString()}"));
+        return Left(CacheFailure("Failed to fetch session report: ${e.toString()}"));
       }
   }
 
@@ -402,9 +402,9 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
     return result.fold(
       (f) => Left(f),
       (summary) => Right({
-        'اجمالي المبيعات': summary.totalRevenue,
-        'التكلفة الكلية': summary.totalCost,
-        'صافي الربح': summary.totalProfit,
+        'Total sales': summary.totalRevenue,
+        'Total cost': summary.totalCost,
+        'Net profit': summary.totalProfit,
       })
     );
   }
@@ -437,7 +437,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
       }
       return Right(result);
     } catch (e) {
-      return Left(CacheFailure("فشل في جلب المبيعات بالساعة للجلسة: ${e.toString()}"));
+      return Left(CacheFailure("Failed to fetch hourly sales for session: ${e.toString()}"));
     }
   }
 
@@ -510,7 +510,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
 
       return Right(toplist);
     } catch (e) {
-      return Left(CacheFailure("خطأ في تحميل المنتجات للجلسة: ${e.toString()}"));
+      return Left(CacheFailure("Error loading session products: ${e.toString()}"));
     }
   }
 
@@ -536,7 +536,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
       }
       return Right(result);
     } catch (e) {
-      return Left(CacheFailure("فشل في جلب المبيعات الشهرية"));
+      return Left(CacheFailure("Failed to fetch monthly sales"));
     }
   }
 
@@ -562,7 +562,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
       }
       return Right(result);
     } catch (e) {
-      return Left(CacheFailure("فشل في جلب المبيعات السنوية"));
+      return Left(CacheFailure("Failed to fetch yearly sales"));
     }
   }
 
@@ -601,7 +601,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
 
       return Right(products);
     } catch (e) {
-      return Left(CacheFailure("فشل في جلب منتجات الشهر"));
+      return Left(CacheFailure("Failed to fetch monthly products"));
     }
   }
 }

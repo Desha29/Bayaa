@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../data/models/activity_log.dart';
 import '../data/services/persistence_initializer.dart';
+import '../localization/translation_helper.dart';
 
 class ActivityLogger {
   static final ActivityLogger _instance = ActivityLogger._internal();
@@ -293,69 +294,6 @@ class ActivityLogger {
     }
   }
 
-  /// Formats activity details into a human-readable Arabic string.
-  static String formatDetailsArabic(ActivityType type, Map<String, dynamic>? details) {
-    if (details == null || details.isEmpty) return '';
-
-    try {
-      final parts = <String>[];
-
-      switch (type) {
-        case ActivityType.sale:
-        case ActivityType.refund:
-          if (details['items'] != null && details['items'] is List) {
-            parts.add('الأصناف: ${(details['items'] as List).join('، ')}');
-          } else if (details['refundedItems'] != null && details['refundedItems'] is List) {
-            parts.add('الأصناف: ${(details['refundedItems'] as List).join('، ')}');
-          }
-          if (details['total'] != null) {
-            parts.add('الإجمالي: ${details['total']} ج.م');
-          }
-          break;
-
-        case ActivityType.productUpdate:
-        case ActivityType.productQuantityUpdate:
-          if (details['name'] != null) parts.add('المنتج: ${details['name']}');
-          if (details['oldQty'] != null && details['newQty'] != null) {
-            parts.add('الكمية: ${details['oldQty']} ← ${details['newQty']}');
-          }
-          if (details['oldPrice'] != null && details['newPrice'] != null) {
-            parts.add('السعر: ${details['oldPrice']} ← ${details['newPrice']}');
-          }
-          break;
-
-        case ActivityType.restock:
-          if (details['productName'] != null) parts.add('المنتج: ${details['productName']}');
-          if (details['addedQty'] != null) parts.add('الكمية المضافة: ${details['addedQty']}');
-          break;
-
-        case ActivityType.expense:
-          if (details['category'] != null) parts.add('الفئة: ${details['category']}');
-          if (details['amount'] != null) parts.add('المبلغ: ${details['amount']} ج.م');
-          break;
-
-        case ActivityType.userAdd:
-        case ActivityType.userUpdate:
-        case ActivityType.userDelete:
-          if (details['targetUser'] != null) parts.add('المستخدم: ${details['targetUser']}');
-          if (details['role'] != null) parts.add('الصلاحية: ${details['role']}');
-          break;
-
-        default:
-          // Fallback: join all keys and values
-          details.forEach((key, value) {
-            if (value != null && value.toString().isNotEmpty) {
-              parts.add('$key: $value');
-            }
-          });
-      }
-
-      return parts.join(' • ');
-    } catch (e) {
-      return details.toString();
-    }
-  }
-
   /// Formats activity details into a human-readable localized string.
   static String formatDetails(BuildContext context, ActivityType type, Map<String, dynamic>? details) {
     if (details == null || details.isEmpty) return '';
@@ -429,11 +367,13 @@ class ActivityLogger {
 
     final l10n = AppLocalizations.of(context);
     final params = activity.parameters ?? {};
-    final user = params['user']?.toString() ?? '';
+    final rawUser = params['user']?.toString() ?? '';
+    final user = TranslationHelper.translateUserName(context, rawUser);
     final product = params['product']?.toString() ?? '';
     final qty = params['qty']?.toString() ?? '';
     final total = params['total']?.toString() ?? '';
-    final targetUser = params['targetUser']?.toString() ?? '';
+    final rawTargetUser = params['targetUser']?.toString() ?? '';
+    final targetUser = TranslationHelper.translateUserName(context, rawTargetUser);
     final id = params['id']?.toString() ?? '';
 
     switch (activity.eventKey) {
@@ -473,7 +413,7 @@ class ActivityLogger {
   static String _translateLegacyDescription(BuildContext context, ActivityLog activity) {
     final l10n = AppLocalizations.of(context);
     final desc = activity.description;
-    final user = activity.userName;
+    final user = TranslationHelper.translateUserName(context, activity.userName);
 
     if (desc.startsWith('فتح يوم')) return l10n.activitySessionOpened(user);
     if (desc.startsWith('إغلاق يوم') || desc.contains('إغلاق يوم')) return l10n.activitySessionClosed(user);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../sales/data/models/sale_model.dart';
 import '../../domain/refund_calculation_service.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 /// Item to refund with selected quantity
 class RefundItem {
@@ -27,10 +28,10 @@ class PartialRefundDialog extends StatefulWidget {
   final RefundCalculationService refundService;
 
   const PartialRefundDialog({
-    Key? key,
+    super.key,
     required this.originalSale,
     required this.refundService,
-  }) : super(key: key);
+  });
 
   @override
   State<PartialRefundDialog> createState() => _PartialRefundDialogState();
@@ -60,8 +61,9 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
   }
 
   Future<void> _loadRefundableItems() async {
-    final result = await widget.refundService.getRefundableItems(widget.originalSale.id);
-    
+    final result =
+        await widget.refundService.getRefundableItems(widget.originalSale.id);
+
     result.fold(
       (failure) {
         setState(() {
@@ -100,7 +102,7 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
 
   List<RefundItem> get selectedRefundItems {
     if (refundableItems == null) return [];
-    
+
     return refundableItems!
         .where((item) => (selectedQuantities[item.productId] ?? 0) > 0)
         .map((item) => RefundItem(
@@ -115,6 +117,7 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
@@ -135,14 +138,15 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.assignment_return, color: AppColors.primaryColor, size: 28),
+                  const Icon(Icons.assignment_return,
+                      color: AppColors.primaryColor, size: 28),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'استرجاع جزئي',
+                        Text(
+                          l10n.partialRefund,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -150,7 +154,9 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                           ),
                         ),
                         Text(
-                          'فاتورة #${widget.originalSale.id.length > 8 ? widget.originalSale.id.substring(0, 8) : widget.originalSale.id}',
+                          l10n.invoiceNumber(widget.originalSale.id.length > 8
+                              ? widget.originalSale.id.substring(0, 8)
+                              : widget.originalSale.id),
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.mutedColor,
@@ -177,7 +183,8 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                             padding: const EdgeInsets.all(20),
                             child: Text(
                               errorMessage!,
-                              style: const TextStyle(color: AppColors.errorColor),
+                              style:
+                                  const TextStyle(color: AppColors.errorColor),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -197,8 +204,8 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'إجمالي المبلغ المسترجع:',
+                      Text(
+                        l10n.totalRefundAmount,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -206,7 +213,7 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                         ),
                       ),
                       Text(
-                        '${totalRefundAmount.toStringAsFixed(2)} ج.م',
+                        '${totalRefundAmount.toStringAsFixed(2)} ${l10n.currencyEg}',
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -227,14 +234,15 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text('إلغاء'),
+                          child: Text(l10n.cancelBtn),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: hasSelectedItems
-                              ? () => Navigator.of(context).pop(selectedRefundItems)
+                              ? () =>
+                                  Navigator.of(context).pop(selectedRefundItems)
                               : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.errorColor,
@@ -244,7 +252,7 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text('تأكيد الاسترجاع'),
+                          child: Text(l10n.confirmRefund),
                         ),
                       ),
                     ],
@@ -259,9 +267,10 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
   }
 
   Widget _buildItemsList() {
+    final l10n = AppLocalizations.of(context);
     if (refundableItems == null || refundableItems!.isEmpty) {
-      return const Center(
-        child: Text('لا توجد منتجات قابلة للاسترجاع'),
+      return Center(
+        child: Text(l10n.noRefundableProducts),
       );
     }
 
@@ -282,19 +291,19 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
             fontSize: 13,
           ),
           columnSpacing: 20,
-          columns: const [
-            DataColumn(label: Text('المنتج')),
-            DataColumn(label: Text('الكمية المباعة'), numeric: true),
-            DataColumn(label: Text('تم استرجاعه'), numeric: true),
-            DataColumn(label: Text('المتبقي'), numeric: true),
-            DataColumn(label: Text('السعر'), numeric: true),
-            DataColumn(label: Text('الكمية المسترجعة'), numeric: true),
-            DataColumn(label: Text('الإجمالي'), numeric: true),
+          columns: [
+            DataColumn(label: Text(l10n.productColumn)),
+            DataColumn(label: Text(l10n.soldQty), numeric: true),
+            DataColumn(label: Text(l10n.alreadyRefunded), numeric: true),
+            DataColumn(label: Text(l10n.remaining), numeric: true),
+            DataColumn(label: Text(l10n.priceColumn), numeric: true),
+            DataColumn(label: Text(l10n.refundQty), numeric: true),
+            DataColumn(label: Text(l10n.totalColumn), numeric: true),
           ],
           rows: refundableItems!.map((item) {
             final selectedQty = selectedQuantities[item.productId] ?? 0;
             final subtotal = item.unitPrice * selectedQty;
-            
+
             return DataRow(
               cells: [
                 DataCell(
@@ -345,7 +354,7 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                     ),
                   ),
                 ),
-                DataCell(Text('${item.unitPrice.toStringAsFixed(2)}')),
+                DataCell(Text(item.unitPrice.toStringAsFixed(2))),
                 DataCell(
                   SizedBox(
                     width: 100,
@@ -398,21 +407,23 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                         }
 
                         final qty = int.tryParse(value);
-                        
+
                         if (qty == null) {
                           setState(() {
-                            validationErrors[item.productId] = 'رقم غير صالح';
+                            validationErrors[item.productId] =
+                                l10n.invalidNumber;
                             selectedQuantities[item.productId] = 0;
                           });
                         } else if (qty < 0) {
                           setState(() {
-                            validationErrors[item.productId] = 'لا يمكن أن يكون سالب';
+                            validationErrors[item.productId] =
+                                l10n.cannotBeNegative;
                             selectedQuantities[item.productId] = 0;
                           });
                         } else if (qty > item.remainingQuantity) {
                           setState(() {
-                            validationErrors[item.productId] = 
-                                'الحد الأقصى: ${item.remainingQuantity}';
+                            validationErrors[item.productId] =
+                                l10n.maxLimit(item.remainingQuantity);
                             selectedQuantities[item.productId] = 0;
                           });
                         } else {
@@ -427,7 +438,7 @@ class _PartialRefundDialogState extends State<PartialRefundDialog> {
                 ),
                 DataCell(
                   Text(
-                    '${subtotal.toStringAsFixed(2)} ج.م',
+                    '${subtotal.toStringAsFixed(2)} ${l10n.currencyEg}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: selectedQty > 0

@@ -186,6 +186,10 @@ class _SalesScreenState extends State<SalesScreen>
     final itemNames = _cartItems.map((e) => e['name'] as String).toList();
     final userName = getIt<UserCubit>().currentUser.name;
 
+    // Show payment method selection dialog
+    final paymentMethod = await _showPaymentMethodDialog();
+    if (paymentMethod == null) return; // User cancelled
+
     for (final item in _cartItems) {
       final productBarcode = item['id'] as String;
       final qtySold = item['qty'] as int;
@@ -215,6 +219,7 @@ class _SalesScreenState extends State<SalesScreen>
       items: itemCount,
       date: DateTime.now(),
       sessionId: sessionId,
+      paymentMethod: paymentMethod,
       saleItems: _cartItems
           .map((item) => SaleItem(
                 productId: item['id'] as String,
@@ -310,6 +315,7 @@ class _SalesScreenState extends State<SalesScreen>
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
+      paymentMethod: sale.paymentMethod,
     );
 
     await Navigator.of(context).push(
@@ -329,6 +335,91 @@ class _SalesScreenState extends State<SalesScreen>
             ),
           );
         },
+      ),
+    );
+  }
+
+  Future<String?> _showPaymentMethodDialog() {
+    final l10n = AppLocalizations.of(context);
+    return showDialog<String>(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          width: 380,
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.payments_outlined,
+                  color: AppColors.primaryColor,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.paymentMethodTitle,
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.saleCompleted(
+                    _totalAmount.toStringAsFixed(2), l10n.currencyEg),
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: _PaymentOption(
+                      icon: Icons.money,
+                      label: l10n.paymentCash,
+                      color: Colors.green,
+                      onTap: () => Navigator.of(context).pop('cash'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _PaymentOption(
+                      icon: Icons.account_balance_wallet,
+                      label: l10n.paymentWallet,
+                      color: AppColors.primaryColor,
+                      onTap: () => Navigator.of(context).pop('wallet'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  l10n.cancelPayment,
+                  style: const TextStyle(
+                    fontFamily: 'Cairo',
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -359,7 +450,7 @@ class _SalesScreenState extends State<SalesScreen>
     final l10n = AppLocalizations.of(context);
     return Directionality(
       textDirection:
-          l10n!.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+          l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -759,5 +850,53 @@ class _SalesScreenState extends State<SalesScreen>
     _barcodeFocusNode.dispose();
     _fadeController.dispose();
     super.dispose();
+  }
+}
+
+class _PaymentOption extends StatelessWidget {
+  const _PaymentOption({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color.withOpacity(0.06),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: color.withOpacity(0.2)),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 30),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

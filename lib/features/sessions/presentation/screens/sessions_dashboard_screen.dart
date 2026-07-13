@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/components/screen_header.dart';
+import '../../../../l10n/app_localizations.dart';
 import 'session_history_screen.dart';
 
 class SessionsDashboardScreen extends StatelessWidget {
@@ -9,6 +10,7 @@ class SessionsDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
 
@@ -21,8 +23,8 @@ class SessionsDashboardScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ScreenHeader(
-                title: 'سجل الجلسات',
-                subtitle: 'عرض وإدارة جلسات النظام والتقارير اليومية',
+                title: l10n.sessionsHistory,
+                subtitle: l10n.sessionsHistorySubtitle,
                 icon: LucideIcons.history,
                 iconColor: AppColors.primaryColor,
                 subtitleColor: AppColors.mutedColor,

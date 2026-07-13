@@ -36,12 +36,12 @@ class SalesRepositoryImpl
         wholesalePrice: m['wholesale_price'] as double? ?? 0.0,
         quantity: (m['stock'] as num).toInt(),
         minQuantity: (m['min_stock'] as num).toInt(),
-        category: m['category_id'] as String? ?? 'عام',
+        category: m['category_id'] as String? ?? 'General',
       );
 
       return Right(product);
     } catch (e) {
-      return Left(CacheFailure('فشل في العثور على المنتج: ${e.toString()}'));
+      return Left(CacheFailure('Product not found: ${e.toString()}'));
     }
   }
 
@@ -60,13 +60,13 @@ class SalesRepositoryImpl
                 wholesalePrice: m['wholesale_price'] as double? ?? 0.0,
                 quantity: (m['stock'] as num).toInt(),
                 minQuantity: (m['min_stock'] as num).toInt(),
-                category: m['category_id'] as String? ?? 'عام',
+                category: m['category_id'] as String? ?? 'General',
               ))
           .toList();
 
       return Right(products);
     } catch (e) {
-      return Left(CacheFailure('فشل في جلب المنتجات: ${e.toString()}'));
+      return Left(CacheFailure('Error fetching products: ${e.toString()}'));
     }
   }
 
@@ -92,6 +92,7 @@ class SalesRepositoryImpl
                   'shift_id': sale.sessionId,
                   'is_refund': sale.isRefund ? 1 : 0,
                   'original_sale_id': sale.refundOriginalInvoiceId,
+                  'payment_method': sale.paymentMethod,
                 },
                 conflictAlgorithm: ConflictAlgorithm.replace);
 
@@ -127,7 +128,7 @@ class SalesRepositoryImpl
         return const Right(unit);
       },
       operationName: 'saveSale',
-      userFriendlyMessage: 'فشل في حفظ البيع',
+      userFriendlyMessage: 'Failed to save sale',
       source: 'SalesRepository',
     );
   }
@@ -180,6 +181,7 @@ class SalesRepositoryImpl
         sessionId: row['shift_id'] as String?,
         invoiceTypeIndex: (row['is_refund'] as int? ?? 0) == 1 ? 1 : 0,
         refundOriginalInvoiceId: row['original_sale_id'] as String?,
+        paymentMethod: row['payment_method'] as String? ?? 'cash',
       );
     }).toList();
   }
@@ -230,7 +232,7 @@ class SalesRepositoryImpl
       final sales = await _getSalesWithItems(saleRows);
       return Right(sales);
     } catch (e) {
-      return Left(CacheFailure('فشل في جلب آخر المبيعات: ${e.toString()}'));
+      return Left(CacheFailure('Error fetching recent sales: ${e.toString()}'));
     }
   }
 
@@ -254,7 +256,7 @@ class SalesRepositoryImpl
       );
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure('فشل في تحديث الكمية: ${e.toString()}'));
+      return Left(CacheFailure('Error updating quantity: ${e.toString()}'));
     }
   }
 
@@ -274,7 +276,7 @@ class SalesRepositoryImpl
 
       return Right(salePrice >= productPrice);
     } catch (e) {
-      return Left(CacheFailure('فشل في التحقق من السعر: ${e.toString()}'));
+      return Left(CacheFailure('Error checking price: ${e.toString()}'));
     }
   }
 
@@ -322,6 +324,7 @@ class SalesRepositoryImpl
             'shift_id': sale.sessionId,
             'is_refund': sale.isRefund ? 1 : 0,
             'original_sale_id': sale.refundOriginalInvoiceId,
+            'payment_method': sale.paymentMethod,
           });
 
           // 2. Save sale items
@@ -365,7 +368,7 @@ class SalesRepositoryImpl
         return const Right(unit);
       },
       operationName: 'createSaleWithCashier',
-      userFriendlyMessage: 'فشل في إنشاء البيع',
+      userFriendlyMessage: 'Failed to create sale',
       source: 'SalesRepository',
     );
   }
@@ -414,7 +417,7 @@ class SalesRepositoryImpl
       return const Right(unit);
     } catch (e) {
       return Left(
-          CacheFailure('فشل في حذف الفواتير خلال الفترة: ${e.toString()}'));
+          CacheFailure('Error deleting invoices: ${e.toString()}'));
     }
   }
 
@@ -444,7 +447,7 @@ class SalesRepositoryImpl
       return const Right(unit);
     } catch (e) {
       return Left(
-          CacheFailure('فشل في حذف الفواتير المطابقة: ${e.toString()}'));
+          CacheFailure('Error deleting matching invoices: ${e.toString()}'));
     }
   }
 
@@ -464,7 +467,7 @@ class SalesRepositoryImpl
       );
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure('فشل في حذف البيع: ${e.toString()}'));
+      return Left(CacheFailure('Error deleting sale: ${e.toString()}'));
     }
   }
 
@@ -481,7 +484,7 @@ class SalesRepositoryImpl
       final sales = await _getSalesWithItems(saleRows);
       return Right(sales);
     } catch (e) {
-      return Left(CacheFailure('فشل في جلب البيعات: ${e.toString()}'));
+      return Left(CacheFailure('Error fetching sales: ${e.toString()}'));
     }
   }
 
@@ -502,7 +505,7 @@ class SalesRepositoryImpl
       final sales = await _getSalesWithItems(saleRows);
       return Right(sales);
     } catch (e) {
-      return Left(CacheFailure('فشل في جلب الفواتير المحددة: ${e.toString()}'));
+      return Left(CacheFailure('Error fetching selected invoices: ${e.toString()}'));
     }
   }
 
@@ -520,7 +523,7 @@ class SalesRepositoryImpl
       final sales = await _getSalesWithItems(saleRows);
       return Right(sales);
     } catch (e) {
-      return Left(CacheFailure('فشل في جلب المرتجعات: ${e.toString()}'));
+      return Left(CacheFailure('Error fetching refunds: ${e.toString()}'));
     }
   }
 
@@ -546,7 +549,7 @@ class SalesRepositoryImpl
       );
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure('فشل في ربط الفواتير بالجلسة: ${e.toString()}'));
+      return Left(CacheFailure('Error linking invoices to session: ${e.toString()}'));
     }
   }
 }

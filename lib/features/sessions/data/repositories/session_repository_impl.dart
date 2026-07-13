@@ -172,7 +172,7 @@ class SessionRepositoryImpl with RepositoryPersistenceMixin {
   /// Delete a closed session
   Future<void> deleteSession(Session session) async {
     if (session.isOpen) {
-      throw Exception('لا يمكن حذف جلسة ما زالت مفتوحة.');
+      throw Exception('Cannot delete an open session.');
     }
 
     await deleteCritical(

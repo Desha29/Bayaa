@@ -34,18 +34,22 @@ class AppLogo extends StatelessWidget {
               width: width,
               height: height,
               fit: fit,
-              errorBuilder: (_, __, ___) => _buildAssetLogo(),
+              errorBuilder: (_, __, ___) => _buildAssetLogo(context),
             );
           }
         }
-        return _buildAssetLogo();
+        return _buildAssetLogo(context);
       },
     );
   }
 
-  Widget _buildAssetLogo() {
+  Widget _buildAssetLogo(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+    final logoPath = locale.languageCode == 'en'
+        ? 'assets/images/logo_en.png'
+        : 'assets/images/logo.png';
     return Image.asset(
-      'assets/images/logo.png',
+      logoPath,
       width: width,
       height: height,
       fit: fit,

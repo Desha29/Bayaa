@@ -35,7 +35,7 @@ class DebugSeeder {
       await txn.insert('users', {
         'id': 'admin',
         'username': 'admin',
-        'display_name': 'مدير النظام',
+        'display_name': 'System Administrator',
         'password_hash': 'admin',
         'role': 'manager',
         'is_active': 1,
@@ -45,7 +45,7 @@ class DebugSeeder {
       await txn.insert('users', {
         'id': 'cashier',
         'username': 'cashier',
-        'display_name': 'كاشير تجريبي',
+        'display_name': 'Trial Cashier',
         'password_hash': 'cashier',
         'role': 'cashier',
         'is_active': 1,
@@ -257,7 +257,7 @@ class DebugSeeder {
             'total': saleTotal,
             'items_count': saleItems.length,
             'created_at': saleDate.toIso8601String(),
-            'cashier_name': 'مدير النظام',
+            'cashier_name': 'System Administrator',
             'user_id': 'admin',
             'shift_id': shiftId,
             'is_refund': 0,

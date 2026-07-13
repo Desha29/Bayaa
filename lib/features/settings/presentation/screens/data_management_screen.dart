@@ -12,6 +12,7 @@ import '../../../../core/data/services/checkpoint_service.dart';
 import '../../../../core/functions/messege.dart';
 import '../../../../core/data/services/persistence_initializer.dart';
 import '../../../../core/data/services/debug_seeder.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class DataManagementScreen extends StatefulWidget {
   const DataManagementScreen({super.key});
@@ -65,7 +66,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      if (mounted) MotionSnackBarError(context, 'فشل تحميل البيانات: $e');
+      if (mounted) MotionSnackBarError(context, AppLocalizations.of(context).loadDataError(e.toString()));
     }
   }
 
@@ -82,22 +83,23 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     try {
       final success = await manager.createBackup();
       if (success) {
-        if (mounted) MotionSnackBarSuccess(context, 'تم إنشاء النسخة الاحتياطية بنجاح');
+        if (mounted) MotionSnackBarSuccess(context, AppLocalizations.of(context).msgDataSaved);
         await _loadData();
       } else {
-        if (mounted) MotionSnackBarError(context, 'فشل إنشاء النسخة الاحتياطية');
+        if (mounted) MotionSnackBarError(context, AppLocalizations.of(context).backupFailed);
       }
     } catch (e) {
-      if (mounted) MotionSnackBarError(context, 'خطأ: $e');
+      if (mounted) MotionSnackBarError(context, AppLocalizations.of(context).error);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _restoreBackup(String backupPath) async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await _showConfirmDialog(
-      'تأكيد الاستعادة',
-      'سيتم استبدال البيانات الحالية بالبيانات الموجودة في النسخة المختارة.\n\nسيتم إعادة تشغيل التطبيق بعد الاستعادة.',
+      l10n.confirmRestore,
+      l10n.confirmRestoreMessage,
       icon: LucideIcons.triangleAlert,
       iconColor: AppColors.warningColor,
     );
@@ -110,24 +112,25 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       final success = await manager.restoreFromBackup(backupPath);
       if (success) {
         if (mounted) {
-          MotionSnackBarSuccess(context, 'تمت الاستعادة بنجاح. جارٍ إعادة التشغيل...');
+          MotionSnackBarSuccess(context, l10n.restoreSuccess);
           await Future.delayed(const Duration(seconds: 2));
           exit(0);
         }
       } else {
-        if (mounted) MotionSnackBarError(context, 'فشل استعادة النسخة الاحتياطية');
+        if (mounted) MotionSnackBarError(context, l10n.restoreFailed);
       }
     } catch (e) {
-      if (mounted) MotionSnackBarError(context, 'خطأ أثناء الاستعادة: $e');
+      if (mounted) MotionSnackBarError(context, l10n.restoreError(e.toString()));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _restoreCheckpoint(String checkpointPath) async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await _showConfirmDialog(
-      'تأكيد استعادة نقطة الحفظ',
-      'سيتم الرجوع إلى نقطة الحفظ هذه وفقدان أي بيانات مسجلة بعدها.\n\nسيتم إعادة تشغيل التطبيق.',
+      l10n.confirmAutoRestore,
+      l10n.confirmAutoRestoreMessage,
       icon: LucideIcons.triangleAlert,
       iconColor: AppColors.warningColor,
     );
@@ -138,24 +141,25 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       final success = await _checkpointService.restoreFromCheckpoint(checkpointPath);
       if (success) {
         if (mounted) {
-          MotionSnackBarSuccess(context, 'تمت استعادة نقطة الحفظ بنجاح. جارٍ إعادة التشغيل...');
+          MotionSnackBarSuccess(context, l10n.autoRestoreSuccess);
           await Future.delayed(const Duration(seconds: 2));
           exit(0);
         }
       } else {
-        if (mounted) MotionSnackBarError(context, 'فشل استعادة نقطة الحفظ');
+        if (mounted) MotionSnackBarError(context, l10n.autoRestoreFailed);
       }
     } catch (e) {
-      if (mounted) MotionSnackBarError(context, 'خطأ أثناء الاستعادة: $e');
+      if (mounted) MotionSnackBarError(context, l10n.restoreError(e.toString()));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _deleteBackup(String backupPath) async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await _showConfirmDialog(
-      'حذف النسخة',
-      'هل أنت متأكد من حذف هذه النسخة الاحتياطية؟\n\nلا يمكن التراجع عن هذا الإجراء.',
+      l10n.deleteBackup,
+      l10n.deleteBackupMessage,
       icon: LucideIcons.trash2,
       iconColor: AppColors.errorColor,
     );
@@ -166,11 +170,11 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       final dir = Directory(backupPath);
       if (await dir.exists()) {
         await dir.delete(recursive: true);
-        if (mounted) MotionSnackBarSuccess(context, 'تم حذف النسخة بنجاح');
+        if (mounted) MotionSnackBarSuccess(context, l10n.deleteBackupSuccess);
         await _loadData();
       }
     } catch (e) {
-      if (mounted) MotionSnackBarError(context, 'فشل الحذف: $e');
+      if (mounted) MotionSnackBarError(context, l10n.deleteBackupFailed(e.toString()));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -225,7 +229,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+            child: Text(AppLocalizations.of(context).cancelBtn, style: TextStyle(color: AppColors.textSecondary)),
           ),
           const SizedBox(width: 8),
           ElevatedButton(
@@ -239,7 +243,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
               elevation: 0,
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('تأكيد', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(AppLocalizations.of(context).confirmBtn, style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 8),
         ],
@@ -250,11 +254,12 @@ class _DataManagementScreenState extends State<DataManagementScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final dateFormat = DateFormat('yyyy/MM/dd');
     final timeFormat = DateFormat('hh:mm a');
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: !_isPersistenceReady
@@ -264,20 +269,20 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                   children: [
                     Icon(LucideIcons.shieldOff, size: 64, color: Colors.orange.shade300),
                     const SizedBox(height: 16),
-                    const Text(
-                      'نظام الحماية غير مُفعّل',
+                    Text(
+                      l10n.protectionInactive,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'يجب تفعيل نظام الحماية أولاً من الإعدادات',
+                      l10n.enableProtection,
                       style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(LucideIcons.arrowRight),
-                      label: const Text('رجوع'),
+                      label: Text(l10n.cancel),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryColor,
                         foregroundColor: Colors.white,
@@ -304,7 +309,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                           CircularProgressIndicator(color: AppColors.primaryColor),
                           const SizedBox(height: 16),
                           Text(
-                            'جارٍ التحميل...',
+                            l10n.loadingData,
                             style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                           ),
                         ],
@@ -326,6 +331,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 12,
@@ -372,8 +378,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'إدارة البيانات',
+                Text(
+                  l10n.dataManagementTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -382,7 +388,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'النسخ الاحتياطي ونقاط الحفظ التلقائي',
+                  l10n.backupAndRestore,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 13,
@@ -395,13 +401,13 @@ class _DataManagementScreenState extends State<DataManagementScreen>
           _buildStatBadge(
             icon: LucideIcons.database,
             count: _backups.length,
-            label: 'نسخة',
+            label: l10n.backupLabel,
           ),
           const SizedBox(width: 8),
           _buildStatBadge(
             icon: LucideIcons.clock,
             count: _checkpoints.length,
-            label: 'نقطة',
+            label: l10n.restorePointLabel,
           ),
         ],
       ),
@@ -442,6 +448,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Widget _buildTabBar() {
+      final l10n = AppLocalizations.of(context);
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       decoration: BoxDecoration(
@@ -475,7 +483,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
               children: [
                 Icon(LucideIcons.database, size: 16),
                 const SizedBox(width: 8),
-                const Text('النسخ الاحتياطي'),
+                Text(l10n.backupSection),
               ],
             ),
           ),
@@ -485,7 +493,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
               children: [
                 Icon(LucideIcons.clock, size: 16),
                 const SizedBox(width: 8),
-                const Text('نقاط الحفظ التلقائي'),
+                Text(l10n.autoSaveSection),
               ],
             ),
           ),
@@ -495,7 +503,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
               children: [
                 Icon(LucideIcons.settings, size: 16),
                 const SizedBox(width: 8),
-                const Text('وضع النظام'),
+                Text(l10n.systemStatus),
               ],
             ),
           ),
@@ -505,6 +513,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Widget _buildBackupsTab(DateFormat dateFormat, DateFormat timeFormat) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         // Create backup button
@@ -543,8 +552,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                       child: const Icon(LucideIcons.save, color: Colors.white, size: 20),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'إنشاء نسخة احتياطية جديدة',
+                    Text(
+                      l10n.createBackup,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -562,8 +571,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
           child: _backups.isEmpty
               ? _buildEmptyState(
                   icon: LucideIcons.database,
-                  title: 'لا توجد نسخ احتياطية',
-                  subtitle: 'أنشئ نسخة احتياطية للحفاظ على بياناتك',
+                  title: l10n.noBackups,
+                  subtitle: l10n.createBackupHint,
                 )
               : ListView.builder(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -594,11 +603,12 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Widget _buildCheckpointsTab(DateFormat dateFormat, DateFormat timeFormat) {
+    final l10n = AppLocalizations.of(context);
     if (_checkpoints.isEmpty) {
       return _buildEmptyState(
         icon: LucideIcons.clock,
-        title: 'لا توجد نقاط حفظ تلقائية',
-        subtitle: 'يتم إنشاء نقاط الحفظ تلقائياً عند إجراء عمليات مهمة',
+        title: l10n.noAutoSavePoints,
+        subtitle: l10n.autoSaveHint,
       );
     }
 
@@ -607,8 +617,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       itemCount: _checkpoints.length,
       itemBuilder: (context, index) {
         final chk = _checkpoints[index];
-        final reason = chk['reason'] as String? ?? 'نقطة حفظ تلقائية';
-        final user = chk['user'] as String? ?? 'النظام';
+        final reason = chk['reason'] as String? ?? l10n.autoSavePoint;
+        final user = chk['user'] as String? ?? l10n.systemLabel;
         final timestampStr = chk['timestamp'] as String?;
         final date = timestampStr != null ? DateTime.parse(timestampStr) : DateTime.now();
         final isLatest = index == 0;
@@ -637,6 +647,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     required VoidCallback onDelete,
   }) {
     final sizeMB = (sizeBytes / 1024 / 1024).toStringAsFixed(2);
+  final l10n = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -702,7 +713,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'الأحدث',
+                            l10n.newestFirst,
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -742,14 +753,14 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                 _buildActionButton(
                   icon: LucideIcons.rotateCcw,
                   color: AppColors.primaryColor,
-                  tooltip: 'استعادة',
+                  tooltip: l10n.restoreBtn,
                   onTap: onRestore,
                 ),
                 const SizedBox(width: 6),
                 _buildActionButton(
                   icon: LucideIcons.trash2,
                   color: AppColors.errorColor,
-                  tooltip: 'حذف',
+                  tooltip: l10n.deleteBtn2,
                   onTap: onDelete,
                 ),
               ],
@@ -769,6 +780,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     required DateFormat timeFormat,
     required VoidCallback onRestore,
   }) {
+      final l10n = AppLocalizations.of(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -833,7 +846,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'الأحدث',
+                            l10n.newestFirst,
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -870,7 +883,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
             _buildActionButton(
               icon: LucideIcons.rotateCcw,
               color: Colors.green,
-              tooltip: 'استعادة',
+              tooltip: l10n.restoreBtn,
               onTap: onRestore,
             ),
           ],
@@ -976,6 +989,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   Widget _buildAppModeTab() {
     final currentMode = PersistenceInitializer.persistenceManager?.config.appMode ?? 'release';
     final isDebug = currentMode == 'debug';
+  final l10n = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -1019,8 +1033,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'وضع تشغيل النظام الحالي',
+                          Text(
+                            l10n.currentMode,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -1030,8 +1044,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                           const SizedBox(height: 2),
                           Text(
                             isDebug
-                                ? 'التطبيق يعمل حالياً في وضع التطوير (بيانات تجريبية مُفعّلة)'
-                                : 'التطبيق يعمل حالياً في وضع الإنتاج الفعلي',
+                                ? l10n.debugModeDesc
+                                : l10n.releaseModeDesc,
                             style: TextStyle(
                               fontSize: 13,
                               color: isDebug ? Colors.orange.shade700 : AppColors.successColor,
@@ -1046,8 +1060,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
-                const Text(
-                  'اختر وضع التشغيل:',
+                Text(
+                  l10n.chooseMode,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -1059,8 +1073,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                   children: [
                     Expanded(
                       child: _buildModeOptionCard(
-                        title: 'وضع الإنتاج الفعلي (Release)',
-                        description: 'استخدام قاعدة البيانات الحقيقية فقط بدون أي بيانات تجريبية.',
+                        title: l10n.releaseMode,
+                        description: l10n.releaseModeDesc2,
                         icon: LucideIcons.shieldCheck,
                         isActive: !isDebug,
                         activeColor: AppColors.successColor,
@@ -1070,8 +1084,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildModeOptionCard(
-                        title: 'وضع التطوير والتحقق (Debug)',
-                        description: 'توليد بيانات تجريبية تلقائياً للمنتجات والمبيعات لاختبار النظام.',
+                        title: l10n.debugMode,
+                        description: l10n.debugModeDesc2,
                         icon: LucideIcons.code,
                         isActive: isDebug,
                         activeColor: Colors.orange,
@@ -1119,12 +1133,12 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                         ),
                       ),
                       const SizedBox(width: 16),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'منطقة خطر البيانات التجريبية',
+                              l10n.demoDataDangerZone,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -1133,7 +1147,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                             ),
                             SizedBox(height: 2),
                             Text(
-                              'أدوات التحكم بقاعدة البيانات وتوليد البيانات التجريبية.',
+                              l10n.dbToolsDesc,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: AppColors.mutedColor,
@@ -1148,7 +1162,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                   const Divider(),
                   const SizedBox(height: 16),
                   Text(
-                    'يتيح لك هذا الزر مسح جميع المدخلات وتوليد مبيعات تجريبية كاملة لفترة الـ 7 أيام الماضية، بالإضافة إلى 7 منتجات ذات كميات وتصنيفات مختلفة ومستخدمين تجريبيين لتمكينك من فحص لوحة التحكم والرسوم البيانية.',
+                    l10n.reseedWarning,
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.6,
@@ -1160,8 +1174,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                   ElevatedButton.icon(
                     onPressed: _isLoading ? null : _resetAndSeedData,
                     icon: const Icon(LucideIcons.rotateCcw),
-                    label: const Text(
-                      'تهيئة قاعدة البيانات وتوليد البيانات التجريبية',
+                    label: Text(
+                      l10n.reseedDatabase,
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -1261,10 +1275,11 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       }
       
       if (mounted) {
-        MotionSnackBarSuccess(context, 'تم تغيير وضع النظام إلى: ${mode == 'debug' ? "وضع التطوير" : "وضع الإنتاج"}');
+        final l10n = AppLocalizations.of(context);
+        MotionSnackBarSuccess(context, l10n.modeChanged(mode == 'debug' ? l10n.modeDebug : l10n.modeRelease));
       }
     } catch (e) {
-      if (mounted) MotionSnackBarError(context, 'فشل حفظ الإعدادات: $e');
+      if (mounted) MotionSnackBarError(context, AppLocalizations.of(context).saveSettingsFailed(e.toString()));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -1273,9 +1288,10 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Future<void> _resetAndSeedData() async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await _showConfirmDialog(
-      'تأكيد إعادة تهيئة البيانات',
-      'سيتم مسح جميع البيانات الحالية (المستخدمين، المنتجات، الفواتير، اليوميات، وسجلات النشاط) بشكل كامل وتوليد بيانات تجريبية جديدة.\n\nلا يمكن التراجع عن هذا الإجراء.',
+      l10n.confirmReseed,
+      l10n.reseedConfirmMessage,
       icon: LucideIcons.triangleAlert,
       iconColor: AppColors.errorColor,
     );
@@ -1285,10 +1301,10 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     try {
       await DebugSeeder.clearAndReSeed();
       if (mounted) {
-        MotionSnackBarSuccess(context, 'تمت إعادة تهيئة البيانات وتوليد البيانات التجريبية بنجاح');
+        MotionSnackBarSuccess(context, l10n.reseedSuccess);
       }
     } catch (e) {
-      if (mounted) MotionSnackBarError(context, 'خطأ أثناء تهيئة البيانات: $e');
+      if (mounted) MotionSnackBarError(context, l10n.reseedError(e.toString()));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

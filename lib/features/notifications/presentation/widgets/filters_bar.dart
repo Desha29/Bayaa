@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../dashboard/data/models/notify_model.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class FiltersBar extends StatelessWidget {
   const FiltersBar({
@@ -26,6 +27,7 @@ class FiltersBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -44,11 +46,11 @@ class FiltersBar extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: onMarkAllRead,
                       icon: const Icon(LucideIcons.checkCheck, size: 15),
-                      label: const FittedBox(
+                      label: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          'تحديد المقروءة',
-                          style: TextStyle(
+                          l10n.selectRead,
+                          style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.bold,
                               fontSize: 12),
@@ -68,11 +70,11 @@ class FiltersBar extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: onDeleteSelected,
                       icon: const Icon(LucideIcons.trash2, size: 15),
-                      label: const FittedBox(
+                      label: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          'حذف المحدد',
-                          style: TextStyle(
+                          l10n.deleteSelectedLabel,
+                          style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.bold,
                               fontSize: 12),
@@ -99,7 +101,7 @@ class FiltersBar extends StatelessWidget {
                   _FilterChip(
                     selected: filter == NotifyFilter.all,
                     onTap: () => onFilterChanged(NotifyFilter.all),
-                    label: 'الكل',
+                    label: l10n.allFilter,
                     count: total,
                     color: AppColors.primaryColor,
                     compact: true,
@@ -107,7 +109,7 @@ class FiltersBar extends StatelessWidget {
                   _FilterChip(
                     selected: filter == NotifyFilter.unread,
                     onTap: () => onFilterChanged(NotifyFilter.unread),
-                    label: 'غير مقروءة',
+                    label: l10n.unreadLabel,
                     count: unread,
                     color: AppColors.warningColor,
                     compact: true,
@@ -115,7 +117,7 @@ class FiltersBar extends StatelessWidget {
                   _FilterChip(
                     selected: filter == NotifyFilter.urgent,
                     onTap: () => onFilterChanged(NotifyFilter.urgent),
-                    label: 'عاجلة',
+                    label: l10n.urgentNotifications,
                     count: urgent,
                     color: AppColors.errorColor,
                     compact: true,
@@ -134,7 +136,7 @@ class FiltersBar extends StatelessWidget {
               onPressed: onMarkAllRead,
               icon: const Icon(LucideIcons.checkCheck, size: 16),
               label: Text(
-                isTablet ? 'تحديد المقروءة' : 'تحديد الكل كمقروءة',
+                isTablet ? l10n.selectRead : l10n.markAllRead,
                 style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.bold,
@@ -152,9 +154,9 @@ class FiltersBar extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onDeleteSelected,
               icon: const Icon(LucideIcons.trash2, size: 16),
-              label: const Text(
-                'حذف المحدد',
-                style: TextStyle(
+              label: Text(
+                l10n.deleteSelectedLabel,
+                style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.bold,
                     fontSize: 13),
@@ -176,7 +178,7 @@ class FiltersBar extends StatelessWidget {
             _FilterChip(
               selected: filter == NotifyFilter.all,
               onTap: () => onFilterChanged(NotifyFilter.all),
-              label: 'الكل',
+              label: l10n.allFilter,
               count: total,
               color: AppColors.primaryColor,
               compact: isTablet,
@@ -185,7 +187,7 @@ class FiltersBar extends StatelessWidget {
             _FilterChip(
               selected: filter == NotifyFilter.unread,
               onTap: () => onFilterChanged(NotifyFilter.unread),
-              label: 'غير مقروءة',
+              label: l10n.unreadLabel,
               count: unread,
               color: AppColors.warningColor,
               compact: isTablet,
@@ -194,7 +196,7 @@ class FiltersBar extends StatelessWidget {
             _FilterChip(
               selected: filter == NotifyFilter.urgent,
               onTap: () => onFilterChanged(NotifyFilter.urgent),
-              label: 'عاجلة',
+              label: l10n.urgentNotifications,
               count: urgent,
               color: AppColors.errorColor,
               compact: isTablet,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class AnalyticsYearlySummary extends StatelessWidget {
   final Map<String, double> yearlySales;
@@ -8,6 +9,7 @@ class AnalyticsYearlySummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -51,9 +53,9 @@ class AnalyticsYearlySummary extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'ملخص المبيعات السنوي',
-                    style: TextStyle(
+                  Text(
+                    l10n.yearlySalesSummary,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.kDarkChip,
@@ -72,7 +74,7 @@ class AnalyticsYearlySummary extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'الإجمالي: ${_formatAmount(totalAll)}',
+                      l10n.totalLabel(_formatAmount(totalAll)),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -84,17 +86,17 @@ class AnalyticsYearlySummary extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               if (entries.isEmpty)
-                const Center(
+                Center(
                   child: Padding(
-                    padding: EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(32),
                     child: Text(
-                      'لا توجد بيانات سنوية',
-                      style: TextStyle(color: AppColors.mutedColor),
+                      l10n.noYearlyData,
+                      style: const TextStyle(color: AppColors.mutedColor),
                     ),
                   ),
                 )
               else
-                ...entries.map((e) => _buildYearRow(e.key, e.value, totalAll)),
+                ...entries.map((e) => _buildYearRow(e.key, e.value, totalAll, l10n)),
             ],
           ),
         ),
@@ -102,7 +104,7 @@ class AnalyticsYearlySummary extends StatelessWidget {
     );
   }
 
-  Widget _buildYearRow(String year, double amount, double total) {
+  Widget _buildYearRow(String year, double amount, double total, AppLocalizations l10n) {
     final ratio = total > 0 ? (amount / total) : 0.0;
     final percentage = (ratio * 100).toStringAsFixed(1);
 
@@ -130,7 +132,7 @@ class AnalyticsYearlySummary extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '${_formatAmount(amount)} ج.م',
+                '${_formatAmount(amount)} ${l10n.currencyEg}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

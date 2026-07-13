@@ -29,7 +29,11 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
   @override
   void initState() {
     super.initState();
-    nameCtrl = TextEditingController(text: widget.storeInfo['name'] ?? '');
+    final rawName = widget.storeInfo['name'] ?? '';
+    nameCtrl = TextEditingController(
+        text: (rawName == 'Bayaa POS' || rawName == 'Bayaa Store' || rawName.isEmpty)
+            ? ''
+            : rawName);
     phoneCtrl = TextEditingController(text: widget.storeInfo['phone'] ?? '');
     emailCtrl = TextEditingController(text: widget.storeInfo['email'] ?? '');
     vatCtrl = TextEditingController(text: widget.storeInfo['vat'] ?? '');
@@ -50,13 +54,11 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
 
   void _submit() {
     final l10n = AppLocalizations.of(context);
-    if (nameCtrl.text.trim().isEmpty) {
-      MotionSnackBarError(context, l10n.enterStoreName);
-      return;
-    }
+    // If the user cleared it, we save an empty string so it falls back to localized name
+    final nameToSave = nameCtrl.text.trim();
 
     final Map<String, String> updatedInfo = {
-      'name': nameCtrl.text.trim(),
+      'name': nameToSave,
       'phone': phoneCtrl.text.trim(),
       'email': emailCtrl.text.trim(),
       'vat': vatCtrl.text.trim(),
@@ -175,6 +177,8 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                                 nameCtrl,
                                 l10n.storeNameRequired,
                                 Icons.store,
+                                null,
+                                l10n.appName,
                               ),
                               _buildTextField(
                                 phoneCtrl,
@@ -208,6 +212,8 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                               nameCtrl,
                               l10n.storeNameRequired,
                               Icons.store,
+                              null,
+                              l10n.appName,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
@@ -297,6 +303,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
     String label,
     IconData icon, [
     TextInputType? keyboardType,
+    String? hintText,
   ]) {
     return Container(
       decoration: BoxDecoration(
@@ -316,6 +323,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
         keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
+          hintText: hintText,
           prefixIcon: Icon(icon, color: AppColors.primaryColor),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(

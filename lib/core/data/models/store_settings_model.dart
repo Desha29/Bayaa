@@ -94,7 +94,7 @@ class StoreSettingsModel {
 
   factory StoreSettingsModel.defaultSettings() {
     return StoreSettingsModel(
-      storeName: 'Bayaa Store',
+      storeName: 'Bayaa POS',
       storeAddress: 'Address not set',
       storePhone: '0000000000',
       currency: 'EGP',

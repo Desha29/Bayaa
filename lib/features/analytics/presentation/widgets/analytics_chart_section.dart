@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 
 
 
@@ -13,6 +14,7 @@ class AnalyticsChartSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -61,9 +63,9 @@ class AnalyticsChartSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'المبيعات اليومية',
-                    style: TextStyle(
+                  Text(
+                    l10n.dailySales,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.kDarkChip,
@@ -75,10 +77,10 @@ class AnalyticsChartSection extends StatelessWidget {
               SizedBox(
                 height: isDesktop ? 200 : isTablet ? 160 : 150,
                 child: dailySales.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
-                          'لا توجد بيانات للعرض',
-                          style: TextStyle(color: AppColors.mutedColor),
+                          l10n.noDataToShow,
+                          style: const TextStyle(color: AppColors.mutedColor),
                         ),
                       )
                     : LineChart(
@@ -94,7 +96,7 @@ class AnalyticsChartSection extends StatelessWidget {
                               getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
                                 return touchedBarSpots.map((barSpot) {
                                   return LineTooltipItem(
-                                    '${barSpot.y.toInt()} ج.م',
+                                    '${barSpot.y.toInt()} ${l10n.currencyEg}',
                                     const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,

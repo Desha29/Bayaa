@@ -1846,4 +1846,921 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trialCashier => 'Trial Cashier';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get enterValidNumber => 'Please enter a valid number';
+
+  @override
+  String get confirmDeleteCategory => 'Confirm Delete Category';
+
+  @override
+  String get confirmDeleteCategoryMessage =>
+      'Are you sure you want to delete this category?';
+
+  @override
+  String get viewGrid => 'Grid View';
+
+  @override
+  String get viewTable => 'Table View';
+
+  @override
+  String get searchProductHint => 'Search by name, code, barcode or price...';
+
+  @override
+  String get filterByAvailability => 'By Availability';
+
+  @override
+  String get selectAvailability => 'Select Availability';
+
+  @override
+  String get selectCategory => 'Select Category';
+
+  @override
+  String get urgencyVeryHigh => 'Very Urgent';
+
+  @override
+  String get urgencyHigh => 'Urgent';
+
+  @override
+  String get urgencyMedium => 'Medium';
+
+  @override
+  String get urgencyLow => 'Low';
+
+  @override
+  String get categoryHasProductsError =>
+      'Cannot delete category because it contains products';
+
+  @override
+  String get sameCategoryError => 'Cannot move products to the same category';
+
+  @override
+  String get dailyReports => 'Daily Reports';
+
+  @override
+  String get todayRevenue => 'Today\'s Revenue & Sales';
+
+  @override
+  String get dailyReportDesc =>
+      'Review financial metrics, sales, refunds, and top selling products';
+
+  @override
+  String get noDataForDate => 'No data available for this date';
+
+  @override
+  String get ensureValidDate =>
+      'Please ensure a valid date is selected or complete sales first';
+
+  @override
+  String get filterReportByDate => 'Filter report by date';
+
+  @override
+  String get currentSelectedDay => 'Currently selected day';
+
+  @override
+  String get reportGeneratedDate => 'Report generation date';
+
+  @override
+  String closedByUser(Object user) {
+    return 'Closed: $user';
+  }
+
+  @override
+  String get todayTotalSales => 'Today\'s Total Sales';
+
+  @override
+  String get dailyNetProfit => 'Daily Net Profit';
+
+  @override
+  String get salesReportPreview => 'Sales Report Preview';
+
+  @override
+  String get viewDetailedTable => 'View detailed sales table';
+
+  @override
+  String get instantPrintReport => 'Instant print for report';
+
+  @override
+  String get sharePdfReport => 'Share PDF Report';
+
+  @override
+  String get viewTableBtn => 'View Table';
+
+  @override
+  String get noProductsSoldDate => 'No products sold for this date';
+
+  @override
+  String dailyProductsPerformance(Object count) {
+    return 'Daily Products Performance ($count)';
+  }
+
+  @override
+  String salesUnits(Object qty) {
+    return 'Sales: $qty units';
+  }
+
+  @override
+  String profitAmount(Object amount) {
+    return 'Profit: $amount';
+  }
+
+  @override
+  String get returnedProductsDetails => 'Returned Products Details';
+
+  @override
+  String get returnedQty => 'Returned Quantity';
+
+  @override
+  String get returnedValue => 'Return Value';
+
+  @override
+  String get dailyFinancialLog => 'Daily Financial Operations Log';
+
+  @override
+  String get operationTime => 'Operation Time';
+
+  @override
+  String get operationType => 'Operation Type';
+
+  @override
+  String get totalAmountLabel => 'Total Amount';
+
+  @override
+  String get transactionDetails => 'Transaction Details';
+
+  @override
+  String transactionCount(Object count) {
+    return '$count transactions';
+  }
+
+  @override
+  String get netSalesLabel => 'Net Sales';
+
+  @override
+  String get transactionsCountLabel2 => 'Number of Transactions';
+
+  @override
+  String get transactionUnit => 'transaction';
+
+  @override
+  String get noTransactionsReport => 'No transactions in this report';
+
+  @override
+  String get transactionsWillAppearHere =>
+      'Transactions will appear here when available';
+
+  @override
+  String get detailedOperationsLog => 'Detailed Operations Log';
+
+  @override
+  String get transactionNumber => 'Transaction Number';
+
+  @override
+  String get timeLabel => 'Time';
+
+  @override
+  String get typeLabel => 'Type';
+
+  @override
+  String get byLabel => 'By';
+
+  @override
+  String get valueLabel => 'Value';
+
+  @override
+  String get previewReportTitle => 'Preview Report';
+
+  @override
+  String get shareBtn => 'Share';
+
+  @override
+  String get openTimeLabel => 'Open Time';
+
+  @override
+  String get closeTimeLabel => 'Close Time';
+
+  @override
+  String get openLabel => 'Open';
+
+  @override
+  String get sessionsHistorySubtitle =>
+      'View and manage system sessions and daily reports';
+
+  @override
+  String get taxSalesReceipt => 'Tax Sales Receipt';
+
+  @override
+  String get taxSalesInvoice => 'Tax Sales Invoice';
+
+  @override
+  String get dateTimeLabel => 'Date and Time:';
+
+  @override
+  String get responsibleCashier => 'Responsible Cashier:';
+
+  @override
+  String get itemsTotalLabel => 'Items Total:';
+
+  @override
+  String get appliedDiscount => 'Applied Discount:';
+
+  @override
+  String get valueAddedTax => 'Value Added Tax:';
+
+  @override
+  String get grandTotalLabelPdf => 'Grand Total:';
+
+  @override
+  String get thankYouShopping => 'Thank you for shopping with us!';
+
+  @override
+  String get posSystemName => 'Bayaa POS Sales Management System';
+
+  @override
+  String get enterpriseTaxNumber => 'Enterprise Tax Number:';
+
+  @override
+  String get invoiceStatusLabel => 'Invoice Status:';
+
+  @override
+  String get fullyPaid => 'Fully Paid';
+
+  @override
+  String get productHeaderA4 => 'Product / Item';
+
+  @override
+  String get unitPrice => 'Unit Price';
+
+  @override
+  String get grandTotalColumn => 'Grand Total';
+
+  @override
+  String get termsAndConditions => 'Terms and Conditions:';
+
+  @override
+  String get termsLine1 => '1. Sold goods cannot be returned.';
+
+  @override
+  String get termsLine2 => '2. Invoice must be presented for exchange.';
+
+  @override
+  String get invoiceDiscountsLabel => 'Invoice Discounts:';
+
+  @override
+  String get finalTotal => 'Final Total:';
+
+  @override
+  String get thankYouDealing => 'Thank you for your business!';
+
+  @override
+  String get dailySalesReport => 'Daily Sales Report';
+
+  @override
+  String get advancedPosSystem => 'Advanced POS System - Bayaa';
+
+  @override
+  String get reportDateLabel => 'Report Date:';
+
+  @override
+  String get transactionCountLabel => 'Number of Transactions:';
+
+  @override
+  String get netRevenueLabel => 'Net Revenue';
+
+  @override
+  String get totalSalesLabel => 'Total Sales';
+
+  @override
+  String get totalRefundsLabel => 'Total Refunds';
+
+  @override
+  String get netProfitLabel => 'Net Profit';
+
+  @override
+  String get closedByLabel => 'Closed By';
+
+  @override
+  String get dailyPerformanceSummary => 'Daily Performance Summary';
+
+  @override
+  String get costLabel => 'Cost';
+
+  @override
+  String get profitLabel => 'Profit';
+
+  @override
+  String get profitMarginLabel => 'Profit Margin';
+
+  @override
+  String get topProductsPerformance => 'Top Selling Products Performance';
+
+  @override
+  String reportCreatedAt(Object time) {
+    return 'Report created at: $time';
+  }
+
+  @override
+  String get allRightsReserved => 'All Rights Reserved';
+
+  @override
+  String get settingsUpdated => 'Store information updated';
+
+  @override
+  String stockUpdateActivity(Object product, Object qty) {
+    return 'Stock update: $product (+$qty)';
+  }
+
+  @override
+  String activityStockUpdate(Object user, Object product, Object qty) {
+    return '$user updated stock of $product (+$qty)';
+  }
+
+  @override
+  String activitySettingsUpdate(Object user) {
+    return '$user updated store settings';
+  }
+
+  @override
+  String get selectRead => 'Select Read';
+
+  @override
+  String get deleteSelectedLabel => 'Delete Selected';
+
+  @override
+  String get allFilter => 'All';
+
+  @override
+  String get saleLabel => 'Sale';
+
+  @override
+  String get refundLabel => 'Refund';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String sessionLabel(Object id) {
+    return 'Session: $id';
+  }
+
+  @override
+  String get analyticsOverview => 'Overview';
+
+  @override
+  String get analyticsSales => 'Sales Analysis';
+
+  @override
+  String get analyticsProducts => 'Product Analysis';
+
+  @override
+  String get todayFilter => 'Today';
+
+  @override
+  String get yesterdayFilter => 'Yesterday';
+
+  @override
+  String get last7Days => 'Last 7 Days';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get last30Days => 'Last 30 Days';
+
+  @override
+  String get thisMonth => 'This Month';
+
+  @override
+  String get thisYear => 'This Year';
+
+  @override
+  String get customDate => 'Custom Date';
+
+  @override
+  String get customRange => 'Custom Range';
+
+  @override
+  String get allSessions => 'All Sessions';
+
+  @override
+  String get sessionFilter => 'Filter by Session';
+
+  @override
+  String sessionNumber(Object id) {
+    return 'Session #$id';
+  }
+
+  @override
+  String get selectedDate => 'Selected Date';
+
+  @override
+  String get todayDate => 'Today\'s Date';
+
+  @override
+  String closedByLabel2(Object user) {
+    return 'Closed by: $user';
+  }
+
+  @override
+  String get noDataSalesAnalytics => 'No data available for sales analysis';
+
+  @override
+  String get noDataToDisplay => 'No data to display';
+
+  @override
+  String get analyticsTitle => 'Analytics & Statistics';
+
+  @override
+  String get overviewTab => 'Overview';
+
+  @override
+  String get salesTab => 'Sales Analysis';
+
+  @override
+  String get productsTab => 'Product Analysis';
+
+  @override
+  String get fromDateLabel => 'From';
+
+  @override
+  String get toDateLabel => 'To';
+
+  @override
+  String get totalSalesAnalytics => 'Total Sales';
+
+  @override
+  String get costAnalytics => 'Total Cost';
+
+  @override
+  String get netProfitAnalytics => 'Net Profit';
+
+  @override
+  String get lossLabel => 'Loss';
+
+  @override
+  String marginLabel(Object percent) {
+    return '$percent% Margin';
+  }
+
+  @override
+  String get avgSaleAnalytics => 'Average Sale';
+
+  @override
+  String get perSaleLabel => 'Per Sale';
+
+  @override
+  String get salesByHourAnalytics => 'Sales by Hour';
+
+  @override
+  String get amLabel => 'AM';
+
+  @override
+  String get pmLabel => 'PM';
+
+  @override
+  String get salesByCategoryAnalytics => 'Sales by Category';
+
+  @override
+  String get returnRateLabel => 'Return Rate';
+
+  @override
+  String netSoldLabel(Object qty) {
+    return 'Net Sold ($qty)';
+  }
+
+  @override
+  String refundCountLabel(Object qty) {
+    return 'Refunds ($qty)';
+  }
+
+  @override
+  String get viewAsTable => 'View as Table';
+
+  @override
+  String get quickPrint => 'Quick Print';
+
+  @override
+  String get sharePdf => 'Share PDF';
+
+  @override
+  String get previewReportBtn => 'Preview Report';
+
+  @override
+  String returnedProductsTitle(Object count) {
+    return 'Returned Products ($count)';
+  }
+
+  @override
+  String get operationByLabel => 'Operation by';
+
+  @override
+  String get dailySalesAnalytics => 'Daily Sales';
+
+  @override
+  String get dailyNetRevenue => 'Daily Net Revenue';
+
+  @override
+  String productPerformance(Object count) {
+    return 'Product Performance ($count)';
+  }
+
+  @override
+  String unitsSold(Object qty) {
+    return 'Sold: $qty units';
+  }
+
+  @override
+  String profitMarginAnalytics(Object percent) {
+    return 'Margin: $percent%';
+  }
+
+  @override
+  String get noProductsSoldToday => 'No products sold for this date';
+
+  @override
+  String get printReportSuccess => 'Report sent to printer successfully';
+
+  @override
+  String printReportError(Object error) {
+    return 'Error printing report: $error';
+  }
+
+  @override
+  String get shareReportSuccess => 'Report shared successfully';
+
+  @override
+  String shareReportError(Object error) {
+    return 'Error sharing report: $error';
+  }
+
+  @override
+  String get loadingReport => 'Preparing report for printing...';
+
+  @override
+  String get loadingShare => 'Preparing report for sharing...';
+
+  @override
+  String loadReportError(Object error) {
+    return 'Error loading report: $error';
+  }
+
+  @override
+  String get reportLoadedSuccess => 'Report loaded successfully';
+
+  @override
+  String get searchInvoiceHint2 => 'Scan barcode or enter invoice number...';
+
+  @override
+  String get refundBtn => 'Return';
+
+  @override
+  String get deleteBtn => 'Delete';
+
+  @override
+  String get printBtn => 'Print';
+
+  @override
+  String get invoicePreviewTitle => 'Invoice Preview';
+
+  @override
+  String get thermalReceiptLabel => 'Thermal Receipt (80mm)';
+
+  @override
+  String get a4InvoiceLabel => 'Sales Invoice (A4)';
+
+  @override
+  String get quickPrintTooltip => 'Quick Print';
+
+  @override
+  String get sharePdfTooltip => 'Share PDF';
+
+  @override
+  String deleteInvoiceFailed(Object error) {
+    return 'Failed to delete invoice: $error';
+  }
+
+  @override
+  String refundInvoiceFailed(Object error) {
+    return 'Failed to process refund: $error';
+  }
+
+  @override
+  String bulkDeleteFailed(Object error) {
+    return 'Failed to delete invoices: $error';
+  }
+
+  @override
+  String get dataProtection => 'Data Protection System';
+
+  @override
+  String get protectionEnabled => 'Enabled';
+
+  @override
+  String get protectionDisabled => 'Disabled';
+
+  @override
+  String get protectionSystemActive => 'System is Active';
+
+  @override
+  String get yourDataProtected => 'Your data is protected from:';
+
+  @override
+  String get accidentalDeletion => 'Accidental deletion';
+
+  @override
+  String get systemCrashes => 'System crashes';
+
+  @override
+  String get powerOutage => 'Power outage';
+
+  @override
+  String get windowsReinstall => 'Windows reinstallation';
+
+  @override
+  String get dataLocation => 'Data Location:';
+
+  @override
+  String get changeLocation => 'Change Location';
+
+  @override
+  String get protectionInactive => 'System is Inactive';
+
+  @override
+  String get dataAtRisk => 'Your data is at risk of being lost in case of:';
+
+  @override
+  String get appDeletion => 'App deletion';
+
+  @override
+  String get virusScan => 'Virus scanning';
+
+  @override
+  String get systemCrash => 'System crash';
+
+  @override
+  String get enableProtection => 'Enable Data Protection Now';
+
+  @override
+  String get dataMigrationSuccess => 'Data migrated successfully';
+
+  @override
+  String get migrationSuccess => 'Migration completed successfully';
+
+  @override
+  String migrationDetails(Object path) {
+    return 'Data moved to: $path. Please restart the app.';
+  }
+
+  @override
+  String get migrationFailed => 'Data migration failed or was cancelled';
+
+  @override
+  String get dataManagementTitle => 'Data Management';
+
+  @override
+  String get backupAndRestore => 'Backups & Auto-Save Points';
+
+  @override
+  String get backupLabel => 'Backup';
+
+  @override
+  String get restorePointLabel => 'Restore Point';
+
+  @override
+  String get backupSection => 'Backups';
+
+  @override
+  String get autoSaveSection => 'Auto-Save Points';
+
+  @override
+  String get systemStatus => 'System Status';
+
+  @override
+  String get createBackup => 'Create New Backup';
+
+  @override
+  String get noBackups => 'No backups available';
+
+  @override
+  String get createBackupHint => 'Create a backup to protect your data';
+
+  @override
+  String get noAutoSavePoints => 'No auto-save points';
+
+  @override
+  String get autoSaveHint =>
+      'Save points are created automatically during important operations';
+
+  @override
+  String get autoSavePoint => 'Auto-Save Point';
+
+  @override
+  String get systemLabel => 'System';
+
+  @override
+  String get newestFirst => 'Newest First';
+
+  @override
+  String get restoreBtn => 'Restore';
+
+  @override
+  String get deleteBtn2 => 'Delete';
+
+  @override
+  String get currentMode => 'Current System Mode';
+
+  @override
+  String get debugModeDesc =>
+      'The app is currently in development mode (demo data enabled)';
+
+  @override
+  String get releaseModeDesc => 'The app is currently in production mode';
+
+  @override
+  String get chooseMode => 'Choose operating mode:';
+
+  @override
+  String get releaseMode => 'Production Mode (Release)';
+
+  @override
+  String get releaseModeDesc2 =>
+      'Use the real database only, without any demo data.';
+
+  @override
+  String get debugMode => 'Development Mode (Debug)';
+
+  @override
+  String get debugModeDesc2 =>
+      'Auto-generate demo products and sales to test the system.';
+
+  @override
+  String get demoDataDangerZone => 'Demo Data Danger Zone';
+
+  @override
+  String get dbToolsDesc =>
+      'Database management tools and demo data generation.';
+
+  @override
+  String get reseedWarning =>
+      'This button will clear all entries and generate complete demo sales data...';
+
+  @override
+  String get reseedDatabase => 'Initialize Database & Generate Demo Data';
+
+  @override
+  String modeChanged(Object mode) {
+    return 'System mode changed to: $mode';
+  }
+
+  @override
+  String get modeDebug => 'Development';
+
+  @override
+  String get modeRelease => 'Production';
+
+  @override
+  String saveSettingsFailed(Object error) {
+    return 'Failed to save settings: $error';
+  }
+
+  @override
+  String get confirmReseed => 'Confirm Data Reset';
+
+  @override
+  String get reseedConfirmMessage =>
+      'All current data will be erased and new demo data will be generated...';
+
+  @override
+  String get reseedSuccess =>
+      'Data reset and demo generation completed successfully';
+
+  @override
+  String reseedError(Object error) {
+    return 'Error during data reset: $error';
+  }
+
+  @override
+  String get confirmRestore => 'Confirm Restore';
+
+  @override
+  String get confirmRestoreMessage =>
+      'Current data will be replaced with the selected backup...';
+
+  @override
+  String get restoreSuccess => 'Restore completed successfully. Restarting...';
+
+  @override
+  String get restoreFailed => 'Failed to restore backup';
+
+  @override
+  String restoreError(Object error) {
+    return 'Error during restore: $error';
+  }
+
+  @override
+  String get confirmAutoRestore => 'Confirm Auto-Save Restore';
+
+  @override
+  String get confirmAutoRestoreMessage =>
+      'System will revert to this save point and lose any data recorded after it...';
+
+  @override
+  String get autoRestoreSuccess =>
+      'Auto-save point restored successfully. Restarting...';
+
+  @override
+  String get autoRestoreFailed => 'Failed to restore auto-save point';
+
+  @override
+  String get deleteBackup => 'Delete Backup';
+
+  @override
+  String get deleteBackupMessage =>
+      'Are you sure you want to delete this backup?...';
+
+  @override
+  String get deleteBackupSuccess => 'Backup deleted successfully';
+
+  @override
+  String deleteBackupFailed(Object error) {
+    return 'Failed to delete: $error';
+  }
+
+  @override
+  String get settingsClose => 'Close';
+
+  @override
+  String get loadingData => 'Loading...';
+
+  @override
+  String get confirmBtn => 'Confirm';
+
+  @override
+  String get restoreDataBtn => 'Restore';
+
+  @override
+  String get backupFailed => 'Failed to create backup';
+
+  @override
+  String loadDataError(Object error) {
+    return 'Failed to load data: $error';
+  }
+
+  @override
+  String settingsSaveFailed(Object error) {
+    return 'Failed to save settings: $error';
+  }
+
+  @override
+  String get paymentMethodTitle => 'Select Payment Method';
+
+  @override
+  String get paymentCash => 'Cash';
+
+  @override
+  String get paymentWallet => 'Wallet';
+
+  @override
+  String get paymentMethodLabel => 'Payment Method';
+
+  @override
+  String get notificationLowStockTitle => 'Low Stock';
+
+  @override
+  String get notificationOutOfStockTitle => 'Out of Stock';
+
+  @override
+  String get notificationLowStockBadge => 'Medium';
+
+  @override
+  String get notificationOutOfStockBadge => 'Urgent';
+
+  @override
+  String notificationLowStockMessage(Object qty, Object product) {
+    return 'Only $qty units left - $product';
+  }
+
+  @override
+  String notificationOutOfStockMessage(Object product) {
+    return '0 units left - $product';
+  }
+
+  @override
+  String quantityUnits(Object count) {
+    return '$count units';
+  }
+
+  @override
+  String paymentLabel(Object method) {
+    return 'Payment Method: $method';
+  }
+
+  @override
+  String get confirmPayment => 'Confirm';
+
+  @override
+  String get cancelPayment => 'Cancel';
 }

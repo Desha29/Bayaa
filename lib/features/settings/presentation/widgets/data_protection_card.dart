@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bayaa_pos/core/data/services/persistence_initializer.dart';
 import 'package:bayaa_pos/core/functions/messege.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class DataProtectionCard extends StatefulWidget {
   final bool isMobile;
@@ -40,21 +41,19 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
       });
       
       if (mounted) {
-        MotionSnackBarSuccess(context, 'تم تفعيل نظام الحماية بنجاح');
+        final l10n = AppLocalizations.of(context);
+        MotionSnackBarSuccess(context, l10n.protectionActivated);
         
         // Restart app prompt
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('إعادة تشغيل التطبيق'),
-            content: const Text(
-              'تم تفعيل نظام الحماية بنجاح!\n\n'
-              'للاستفادة الكاملة من النظام، يُفضل إعادة تشغيل التطبيق.',
-            ),
+            title: Text(l10n.restartApp),
+            content: Text(l10n.protectionActivatedMessage),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('حسناً'),
+                child: Text(l10n.ok),
               ),
             ],
           ),
@@ -62,7 +61,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
       }
     } else {
       if (mounted) {
-        MotionSnackBarError(context, 'تم إلغاء العملية');
+        MotionSnackBarError(context, AppLocalizations.of(context).operationCancelled);
       }
     }
   }
@@ -73,26 +72,27 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
     if (success) {
       _checkStatus();
       if (mounted) {
-        MotionSnackBarSuccess(context, 'تم نقل البيانات بنجاح');
+        final l10n = AppLocalizations.of(context);
+        MotionSnackBarSuccess(context, l10n.dataMigrationSuccess);
         
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Row(
+            title: Row(
               children: [
                 Icon(Icons.check_circle, color: Colors.green, size: 28),
                 SizedBox(width: 10),
-                Text('تم النقل بنجاح'),
+                Text(l10n.migrationSuccess),
               ],
             ),
             content: Text(
-              'تم نقل البيانات إلى:\n$_dataPath\n\nيُفضل إعادة تشغيل التطبيق.',
+              l10n.migrationDetails(_dataPath!),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('حسناً'),
+                child: Text(l10n.ok),
               ),
             ],
           ),
@@ -100,13 +100,14 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
       }
     } else {
       if (mounted) {
-        MotionSnackBarError(context, 'فشل نقل البيانات أو تم الإلغاء');
+        MotionSnackBarError(context, AppLocalizations.of(context).migrationFailed);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -135,7 +136,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'نظام الحماية من فقدان البيانات',
+                        l10n.dataProtection,
                         style: TextStyle(
                           fontSize: widget.isMobile ? 16 : 18,
                           fontWeight: FontWeight.bold,
@@ -143,7 +144,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _isEnabled ? 'مُفعّل' : 'غير مُفعّل',
+                        _isEnabled ? l10n.protectionEnabled : l10n.protectionDisabled,
                         style: TextStyle(
                           fontSize: 14,
                           color: _isEnabled ? Colors.green : Colors.orange,
@@ -176,8 +177,8 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                           size: 20
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          'النظام مُفعّل',
+                        Text(
+                          l10n.protectionSystemActive,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.green,
@@ -187,7 +188,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'بياناتك محمية من:',
+                      l10n.yourDataProtected,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.green.shade900,
@@ -195,10 +196,10 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    _buildFeature('الحذف الغير مقصود', Icons.delete_outline),
-                    _buildFeature('الأعطال والانهيارات', Icons.error_outline),
-                    _buildFeature('انقطاع الكهرباء', Icons.power_off),
-                    _buildFeature('إعادة تثبيت Windows', Icons.refresh),
+                    _buildFeature(l10n.accidentalDeletion, Icons.delete_outline),
+                    _buildFeature(l10n.systemCrashes, Icons.error_outline),
+                    _buildFeature(l10n.powerOutage, Icons.power_off),
+                    _buildFeature(l10n.windowsReinstall, Icons.refresh),
                     const SizedBox(height: 12),
                     Row(
                       children: [
@@ -209,7 +210,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'موقع البيانات:\n$_dataPath',
+                            '${l10n.dataLocation}\n$_dataPath',
                             style: TextStyle(
                               fontSize: 11,
                               color: Colors.green.shade800,
@@ -224,7 +225,7 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                       child: OutlinedButton.icon(
                         onPressed: _changeDataLocation,
                         icon: const Icon(Icons.drive_file_move_outline, size: 18),
-                        label: const Text('تغيير مكان الحفظ'),
+                        label: Text(l10n.changeLocation),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.orange.shade800,
                           side: BorderSide(color: Colors.orange.shade300, width: 1.5),
@@ -259,8 +260,8 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                           size: 20
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          'النظام غير مُفعّل',
+                        Text(
+                          l10n.protectionInactive,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.orange,
@@ -270,24 +271,24 @@ class _DataProtectionCardState extends State<DataProtectionCard> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'حالياً، بياناتك معرضة للفقدان في حالة:',
+                      l10n.dataAtRisk,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.orange.shade900,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    _buildWarning('حذف البرنامج'),
-                    _buildWarning('إعادة تثبيت Windows'),
-                    _buildWarning('فحص الفيروسات'),
-                    _buildWarning('انهيار النظام'),
+                    _buildWarning(l10n.appDeletion),
+                    _buildWarning(l10n.windowsReinstall),
+                    _buildWarning(l10n.virusScan),
+                    _buildWarning(l10n.systemCrash),
                     const SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: _enablePersistence,
                         icon: const Icon(Icons.shield),
-                        label: const Text('تفعيل نظام الحماية الآن'),
+                        label: Text(l10n.enableProtection),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,

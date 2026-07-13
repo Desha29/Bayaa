@@ -31,7 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   final _passwordController = TextEditingController();
   final _passwordFocusNode = FocusNode();
-  bool _rememberMe = true;
   final _usernameController = TextEditingController();
 
   @override
@@ -710,8 +709,8 @@ class _HoverableUserCardState extends State<HoverableUserCard> {
   bool _isHovered = false;
 
   String _displayName(BuildContext context) {
-    return TranslationHelper.translateUserName(
-      context, widget.user.name, username: widget.user.username);
+    return TranslationHelper.translateUserName(context, widget.user.name,
+        username: widget.user.username);
   }
 
   String _displayRole(BuildContext context) => widget.user.username;

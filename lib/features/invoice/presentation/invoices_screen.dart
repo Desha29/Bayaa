@@ -310,6 +310,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
+      paymentMethod: sale.paymentMethod,
     );
 
     await Navigator.of(context).push(PageRouteBuilder(
@@ -353,10 +354,11 @@ class _InvoiceScreenState extends State<InvoiceScreen>
       discount: 0.0,
       tax: 0.0,
       grandTotal: sale.total,
+      paymentMethod: sale.paymentMethod,
     );
 
     await Printing.layoutPdf(
-      onLayout: (format) => InvoicePdfService.buildReceipt80mm(data),
+      onLayout: (format) => InvoicePdfService.buildReceipt80mm(data, locale: Localizations.localeOf(context)),
     );
   }
 

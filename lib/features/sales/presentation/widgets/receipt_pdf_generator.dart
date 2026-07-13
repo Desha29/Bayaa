@@ -1,17 +1,21 @@
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:bayaa_pos/features/sales/data/models/sale_model.dart';
 import 'package:bayaa_pos/features/settings/data/models/store_info_model.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class ReceiptPdfGenerator {
   static Future<Uint8List> generateReceipt({
     required Sale sale,
     required StoreInfo storeInfo,
     bool isThermal = true,
+    required Locale locale,
   }) async {
     final pdf = pw.Document();
+    final l10n = await AppLocalizations.delegate.load(locale);
 
     final arabicRegularData = await rootBundle.load('assets/fonts/Amiri-Regular.ttf');
     final arabicBoldData = await rootBundle.load('assets/fonts/Amiri-Bold.ttf');
@@ -35,7 +39,7 @@ class ReceiptPdfGenerator {
     pdf.addPage(
       pw.Page(
         pageFormat: format,
-        textDirection: pw.TextDirection.rtl,
+        textDirection: locale.languageCode == 'ar' ? pw.TextDirection.rtl : pw.TextDirection.ltr,
         theme: pw.ThemeData.withFont(base: regular, bold: bold),
         build: (context) {
           return pw.Column(
@@ -49,21 +53,21 @@ class ReceiptPdfGenerator {
                 ),
               pw.Text(storeInfo.name, style: pw.TextStyle(font: bold, fontSize: isThermal ? 16 : 24)),
               pw.Text(storeInfo.address, style: const pw.TextStyle(fontSize: 10)),
-              pw.Text('هاتف: ${storeInfo.phone}', style: const pw.TextStyle(fontSize: 10)),
+              pw.Text(l10n.receiptPhone(storeInfo.phone), style: const pw.TextStyle(fontSize: 10)),
               pw.Divider(),
-              pw.Text(sale.isRefund ? 'فاتورة مرتجع' : 'فاتورة مبيعات', style: pw.TextStyle(font: bold, fontSize: 14)),
+              pw.Text(sale.isRefund ? l10n.refundInvoice : l10n.taxSalesInvoice, style: pw.TextStyle(font: bold, fontSize: 14)),
               pw.SizedBox(height: 5),
-              _buildRow('رقم الفاتورة:', sale.id, regular),
-              _buildRow('التاريخ:', _formatDate(sale.date), regular),
-              _buildRow('الكاشير:', sale.cashierName ?? 'غير معروف', regular),
+              _buildRow(l10n.invoiceNumberPdf, sale.id, regular),
+              _buildRow(l10n.dateTimeLabel, _formatDate(sale.date), regular),
+              _buildRow(l10n.responsibleCashier, sale.cashierName ?? 'Unknown', regular),
               pw.Divider(),
-              _buildItemsTable(sale.saleItems, bold, regular, isThermal),
+              _buildItemsTable(sale.saleItems, bold, regular, isThermal, l10n),
               pw.Divider(),
-              _buildRow('الإجمالي:', '${sale.total.toStringAsFixed(2)} ج.م', bold, fontSize: 14),
+              _buildRow(l10n.grandTotalLabelPdf, '${sale.total.toStringAsFixed(2)} ${l10n.currencyEg}', bold, fontSize: 14),
               pw.SizedBox(height: 10),
-              pw.Text('شكراً لزيارتكم!', style: pw.TextStyle(font: regular, fontSize: 10)),
+              pw.Text(l10n.thankYouShopping, style: pw.TextStyle(font: regular, fontSize: 10)),
               if (storeInfo.vat.isNotEmpty)
-                pw.Text('الرقم الضريبي: ${storeInfo.vat}', style: const pw.TextStyle(fontSize: 8)),
+                pw.Text(l10n.vatNumber(storeInfo.vat), style: const pw.TextStyle(fontSize: 8)),
             ],
           );
         },
@@ -83,10 +87,10 @@ class ReceiptPdfGenerator {
     );
   }
 
-  static pw.Widget _buildItemsTable(List<SaleItem> items, pw.Font bold, pw.Font regular, bool isThermal) {
+  static pw.Widget _buildItemsTable(List<SaleItem> items, pw.Font bold, pw.Font regular, bool isThermal, AppLocalizations l10n) {
     return pw.TableHelper.fromTextArray(
       context: null,
-      headers: ['المنتج', 'ق', 'س', 'ج'],
+      headers: [l10n.pdfProductHeader, l10n.pdfQtyHeader, l10n.pdfPriceHeader, l10n.pdfTotalHeader],
       data: items.map((i) => [
         i.name,
         i.quantity.toString(),

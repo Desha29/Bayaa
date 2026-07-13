@@ -6,6 +6,7 @@ import 'package:bayaa_pos/features/products/presentation/widgets/enhanced_add_ed
 import 'package:flutter/material.dart';
 
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/models/product_model.dart';
 import '../cubit/product_cubit.dart';
 import 'add_button.dart';
@@ -43,6 +44,7 @@ class DesktopLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         // Search Bar
@@ -65,7 +67,7 @@ class DesktopLayout extends StatelessWidget {
               getIt<ProductCubit>().searchProducts(s);
             },
             decoration: InputDecoration(
-              hintText: 'ابحث عن منتج بالاسم، الكود، الباركود أو السعر...',
+              hintText: l10n.searchProductHint,
               hintStyle: TextStyle(color: AppColors.mutedColor, fontSize: 13),
               prefixIcon: const Icon(
                 Icons.search,
@@ -94,7 +96,7 @@ class DesktopLayout extends StatelessWidget {
                       onAddPressed: () {
                         showAddEditDialog(context);
                       },
-                      text: "إضافة صنف جديد",
+                      text: l10n.addNewCategory,
                       color: const Color(0xff8b5cf6),
                     )),
             const SizedBox(width: 10),
@@ -104,32 +106,32 @@ class DesktopLayout extends StatelessWidget {
                     flex: 1,
                     child: AddButton(
                       onAddPressed: onAddPressed,
-                      text: "إضافة منتج جديد",
+                      text: l10n.addNewProduct,
                       color: AppColors.primaryColor,
                     )),
             const SizedBox(width: 10),
             Expanded(
               flex: 2,
               child: DropDownFilter(
-                label: 'حسب التوفر',
+                label: l10n.filterByAvailability,
                 value: availabilityFilter,
                 items: availabilities,
                 onChanged: onAvailabilityChanged,
                 icon: Icons.inventory_outlined,
-                hint: 'اختر التوفر',
+                hint: l10n.selectAvailability,
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               flex: 2,
               child: DropDownFilter(
-                label: 'حسب الفئة',
+                label: l10n.filterByCategory,
                 value: categoryFilter,
                 items: categories,
                 onChanged: onCategoryChanged,
                 icon: Icons.category_outlined,
                 iconRemove: Icons.cancel,
-                hint: 'اختر الفئة',
+                hint: l10n.selectCategory,
               ),
             ),
           ],
@@ -149,7 +151,7 @@ class DesktopLayout extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'المنتجات',
+                  l10n.products,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
@@ -189,7 +191,7 @@ class DesktopLayout extends StatelessWidget {
                     icon: const Icon(Icons.grid_view, size: 16),
                     color: !isTableView ? AppColors.primaryColor : Colors.grey,
                     onPressed: () => onViewToggle(false),
-                    tooltip: 'عرض الشبكة',
+                    tooltip: l10n.viewGrid,
                     constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                     padding: const EdgeInsets.all(4),
                   ),
@@ -198,7 +200,7 @@ class DesktopLayout extends StatelessWidget {
                     icon: const Icon(Icons.table_chart_outlined, size: 16),
                     color: isTableView ? AppColors.primaryColor : Colors.grey,
                     onPressed: () => onViewToggle(true),
-                    tooltip: 'عرض الجدول',
+                    tooltip: l10n.viewTable,
                     constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                     padding: const EdgeInsets.all(4),
                   ),

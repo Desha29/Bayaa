@@ -54,8 +54,8 @@ class PersistenceInitializer {
     }
 
     final String message = allowCancel 
-        ? 'اختر مجلداً آمناً لحفظ بيانات النظام.\nسيتم إنشاء مجلد "BayaaData" في المكان الذي تختاره.\n\nملاحظة: البيانات محمية ولن يتم حذفها عند إزالة البرنامج.'
-        : 'الإعداد الأولي: اختر مكاناً لحفظ بيانات النظام.\n\nسيتم إنشاء مجلد "BayaaData".\nإذا كان لديك بيانات سابقة، اختر المجلد الذي يحتويها.\n\nالموقع الافتراضي: بجانب ملف التطبيق.';
+        ? 'Choose a safe folder to store system data.\nA "BayaaData" folder will be created in your chosen location.\n\nNote: Your data is protected and will not be deleted when the app is uninstalled.'
+        : 'Initial setup: Choose a location to store system data.\n\nA "BayaaData" folder will be created.\nIf you have previous data, select the folder that contains it.\n\nDefault location: Next to the app file.';
 
     final shouldContinue = await showDialog<bool>(
       context: context,
@@ -115,7 +115,7 @@ class PersistenceInitializer {
               ),
               const SizedBox(height: 24),
               Text(
-                allowCancel ? 'مكان حفظ البيانات' : 'إعداد مسار البيانات',
+                allowCancel ? 'Data Storage Location' : 'Data Path Setup',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 22,
@@ -157,7 +157,7 @@ class PersistenceInitializer {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'إذا كان لديك مجلد BayaaData سابق، اختر المجلد الأب الذي يحتويه وسيتم التعرف عليه تلقائياً.',
+                          'If you have a previous BayaaData folder, select the parent folder that contains it and it will be detected automatically.',
                           style: TextStyle(
                             fontSize: 12,
                             height: 1.5,
@@ -185,7 +185,7 @@ class PersistenceInitializer {
                           ),
                         ),
                         child: const Text(
-                          "إلغاء",
+                          "Cancel",
                           style: TextStyle(
                             color: AppColors.mutedColor,
                             fontSize: 16,
@@ -213,7 +213,7 @@ class PersistenceInitializer {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "اختيار المجلد",
+                            "Select Folder",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
@@ -296,7 +296,7 @@ class PersistenceInitializer {
               ),
               const SizedBox(height: 20),
               const Text(
-                'نقل البيانات إلى مكان جديد',
+                'Move data to a new location',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 20,
@@ -316,7 +316,7 @@ class PersistenceInitializer {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'المكان الحالي:',
+                      'Current location:',
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.mutedColor),
                     ),
                     const SizedBox(height: 4),
@@ -341,7 +341,7 @@ class PersistenceInitializer {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'سيتم نقل جميع البيانات والنسخ الاحتياطية.\nلا تغلق التطبيق أثناء النقل.',
+                        'All data and backups will be moved.\nDo not close the app during the transfer.',
                         style: TextStyle(
                           fontSize: 12,
                           height: 1.5,
@@ -365,7 +365,7 @@ class PersistenceInitializer {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       child: const Text(
-                        "إلغاء",
+                        "Cancel",
                         style: TextStyle(color: AppColors.mutedColor, fontSize: 15, fontWeight: FontWeight.w700),
                       ),
                     ),
@@ -386,7 +386,7 @@ class PersistenceInitializer {
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("اختيار المكان الجديد", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                          Text("Select New Location", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                           SizedBox(width: 8),
                           Icon(LucideIcons.folderOutput, size: 18),
                         ],
@@ -407,7 +407,7 @@ class PersistenceInitializer {
     String? newPath;
     try {
       newPath = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'اختر المكان الجديد لحفظ البيانات',
+        dialogTitle: 'Choose the new location for data storage',
         lockParentWindow: false,
       );
     } catch (e) {
@@ -433,12 +433,12 @@ class PersistenceInitializer {
                 CircularProgressIndicator(color: AppColors.primaryColor),
                 SizedBox(height: 24),
                 Text(
-                  'جاري نقل البيانات...',
+                  'Moving data...',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'لا تغلق التطبيق',
+                  'Do not close the app',
                   style: TextStyle(fontSize: 14, color: AppColors.mutedColor),
                 ),
               ],

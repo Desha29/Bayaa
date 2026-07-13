@@ -681,6 +681,7 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 850;
 
+    final l10n = AppLocalizations.of(context);
     // 1. Process Value Data
     final valueList = List<StockSummaryCategoryModel>.from(widget.categories)
       ..sort((a, b) => b.totalCurrentWholesaleValue.compareTo(a.totalCurrentWholesaleValue));
@@ -704,7 +705,7 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
         }
         if (remainingValue > 0) {
           valueItems.add(_ChartItem(
-            name: "أقسام أخرى",
+            name: l10n.otherSections,
             value: remainingValue,
             percentage: (remainingValue / totalValue) * 100,
             color: _colors.last,
@@ -747,7 +748,7 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
         }
         if (remainingQty > 0) {
           qtyItems.add(_ChartItem(
-            name: "أقسام أخرى",
+            name: l10n.otherSections,
             value: remainingQty,
             percentage: (remainingQty / totalQty) * 100,
             color: _colors.last,
@@ -773,9 +774,9 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
             children: [
               Expanded(
                 child: _buildPieChartCard(
-                  title: "توزيع قيمة المخزون الحالي (جملة)",
-                  subtitle: "رأس المال المستثمر في البضائع حسب القسم",
-                  totalText: "إجمالي القيمة: ${totalValue.toStringAsFixed(0)} ج.م",
+                  title: l10n.stockValueDistribution,
+                  subtitle: l10n.capitalInGoods,
+                  totalText: l10n.totalValueAmount(totalValue.toStringAsFixed(0)),
                   items: valueItems,
                   isQty: false,
                   touchedIndex: _touchedValueIndex,
@@ -785,9 +786,9 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildPieChartCard(
-                  title: "توزيع كميات السلع المتوفرة",
-                  subtitle: "عدد القطع المتوفرة في المخازن حسب القسم",
-                  totalText: "إجمالي الكمية: ${totalQty.toStringAsFixed(0)} قطعة",
+                  title: l10n.stockQtyDistribution,
+                  subtitle: l10n.qtyBySection,
+                  totalText: l10n.totalQtyAmount(totalQty.toStringAsFixed(0)),
                   items: qtyItems,
                   isQty: true,
                   touchedIndex: _touchedQtyIndex,
@@ -799,9 +800,9 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
         : Column(
             children: [
               _buildPieChartCard(
-                title: "توزيع قيمة المخزون الحالي (جملة)",
-                subtitle: "رأس المال المستثمر في البضائع حسب القسم",
-                totalText: "إجمالي القيمة: ${totalValue.toStringAsFixed(0)} ج.م",
+                title: l10n.stockValueDistribution,
+                subtitle: l10n.capitalInGoods,
+                totalText: l10n.totalValueAmount(totalValue.toStringAsFixed(0)),
                 items: valueItems,
                 isQty: false,
                 touchedIndex: _touchedValueIndex,
@@ -809,9 +810,9 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
               ),
               const SizedBox(height: 16),
               _buildPieChartCard(
-                title: "توزيع كميات السلع المتوفرة",
-                subtitle: "عدد القطع المتوفرة في المخازن حسب القسم",
-                totalText: "إجمالي الكمية: ${totalQty.toStringAsFixed(0)} قطعة",
+                title: l10n.stockQtyDistribution,
+                subtitle: l10n.qtyBySection,
+                totalText: l10n.totalQtyAmount(totalQty.toStringAsFixed(0)),
                 items: qtyItems,
                 isQty: true,
                 touchedIndex: _touchedQtyIndex,
@@ -832,6 +833,7 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
     required int touchedIndex,
     required Function(int) onTouch,
   }) {
+    final l10n = AppLocalizations.of(context);
     if (items.isEmpty) {
       return Container(
         height: 220,
@@ -840,9 +842,9 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.borderColor.withOpacity(0.8)),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
-            "لا توجد بيانات كافية لعرض المخطط",
+            l10n.insufficientDataForChart,
             style: TextStyle(fontFamily: 'Cairo', color: AppColors.textSecondary, fontSize: 13),
           ),
         ),
@@ -954,7 +956,7 @@ class _StockSummaryChartsState extends State<StockSummaryCharts> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            isQty ? "${e.value.toStringAsFixed(0)} قطعة" : "${e.value.toStringAsFixed(0)} ج.م",
+                            isQty ? l10n.unitCount(e.value.toInt()) : "${e.value.toStringAsFixed(0)} ${l10n.currencyEg}",
                             style: TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 10.5,

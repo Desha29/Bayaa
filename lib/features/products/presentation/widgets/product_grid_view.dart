@@ -1,6 +1,7 @@
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/components/empty_state.dart';
+import '../../../../l10n/app_localizations.dart';
 import 'enhanced_product_card.dart';
 
 class ProductsGridView extends StatelessWidget {
@@ -30,11 +31,12 @@ class ProductsGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (products.isEmpty) {
       return EmptyState(
         variant: EmptyStateVariant.products,
-        title: emptyTitle ?? 'لا توجد منتجات',
-         message: emptyMessage ?? 'قم بإضافة منتجات جديدة لعرضها هنا',
+        title: emptyTitle ?? l10n.noProducts,
+         message: emptyMessage ?? l10n.addProductsHint,
         icon: Icons.search,
       );
     }

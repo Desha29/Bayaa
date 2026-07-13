@@ -11,13 +11,20 @@ class PriorityChip extends StatelessWidget {
     Color color;
     switch (priority) {
       case "عاجل جداً":
+      case "veryHigh":
         color = AppColors.errorColor;
         break;
       case "عاجل":
+      case "high":
         color = AppColors.warningColor;
         break;
       case "متوسط":
+      case "medium":
         color = AppColors.primaryColor;
+        break;
+      case "منخفض":
+      case "low":
+        color = AppColors.successColor;
         break;
       default:
         color = AppColors.successColor;

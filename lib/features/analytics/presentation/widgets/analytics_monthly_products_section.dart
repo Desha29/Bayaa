@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/analytics_repository_impl.dart';
 import '../../../sessions/data/models/product_performance_model.dart';
 
@@ -22,27 +23,27 @@ class _AnalyticsMonthlyProductsSectionState
   List<ProductPerformanceModel> _products = [];
   bool _loading = false;
 
-  static const _arabicMonths = [
-    'يناير',
-    'فبراير',
-    'مارس',
-    'أبريل',
-    'مايو',
-    'يونيو',
-    'يوليو',
-    'أغسطس',
-    'سبتمبر',
-    'أكتوبر',
-    'نوفمبر',
-    'ديسمبر',
+  List<String> _getArabicMonths(AppLocalizations l10n) => [
+    l10n.monthJan,
+    l10n.monthFeb,
+    l10n.monthMar,
+    l10n.monthApr,
+    l10n.monthMay,
+    l10n.monthJun,
+    l10n.monthJul,
+    l10n.monthAug,
+    l10n.monthSep,
+    l10n.monthOct,
+    l10n.monthNov,
+    l10n.monthDec,
   ];
 
-  String _monthLabel(String key) {
+  String _monthLabel(String key, AppLocalizations l10n) {
     final parts = key.split('-');
     if (parts.length == 2) {
       final m = int.tryParse(parts[1]);
       if (m != null && m >= 1 && m <= 12) {
-        return '${_arabicMonths[m - 1]} ${parts[0]}';
+        return '${_getArabicMonths(l10n)[m - 1]} ${parts[0]}';
       }
     }
     return key;
@@ -91,6 +92,7 @@ class _AnalyticsMonthlyProductsSectionState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -136,9 +138,9 @@ class _AnalyticsMonthlyProductsSectionState
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'أكثر المنتجات مبيعاً بالشهر',
-                    style: TextStyle(
+                  Text(
+                    l10n.topProductsByMonth,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.kDarkChip,
@@ -186,7 +188,7 @@ class _AnalyticsMonthlyProductsSectionState
                               : null,
                         ),
                         child: Text(
-                          _monthLabel(month),
+                          _monthLabel(month, l10n),
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -220,7 +222,7 @@ class _AnalyticsMonthlyProductsSectionState
                           color: AppColors.primaryColor, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        'إجمالي ${_monthLabel(_selectedMonth!)}:',
+                        '${l10n.totalLabel(_monthLabel(_selectedMonth!, l10n))}:',
                         style: const TextStyle(
                           fontSize: 14,
                           color: AppColors.textSecondary,
@@ -228,7 +230,7 @@ class _AnalyticsMonthlyProductsSectionState
                       ),
                       const Spacer(),
                       Text(
-                        '${widget.monthlySales[_selectedMonth]!.toStringAsFixed(2)} ج.م',
+                        '${widget.monthlySales[_selectedMonth]!.toStringAsFixed(2)} ${l10n.currencyEg}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -258,9 +260,9 @@ class _AnalyticsMonthlyProductsSectionState
                             size: 48,
                             color: AppColors.mutedColor.withOpacity(0.4)),
                         const SizedBox(height: 8),
-                        const Text(
-                          'لا توجد منتجات في هذا الشهر',
-                          style: TextStyle(color: AppColors.mutedColor),
+                        Text(
+                          l10n.noProductsThisMonth,
+                          style: const TextStyle(color: AppColors.mutedColor),
                         ),
                       ],
                     ),
@@ -276,6 +278,7 @@ class _AnalyticsMonthlyProductsSectionState
   }
 
   Widget _buildProductsList() {
+    final l10n = AppLocalizations.of(context);
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -335,7 +338,7 @@ class _AnalyticsMonthlyProductsSectionState
                         ),
                       ),
                       Text(
-                        '${product.revenue.toStringAsFixed(0)} ج.م',
+                        '${product.revenue.toStringAsFixed(0)} ${l10n.currencyEg}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
@@ -346,7 +349,7 @@ class _AnalyticsMonthlyProductsSectionState
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'بيع: ${product.quantitySold} قطعة',
+                    l10n.soldCount(product.quantitySold),
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.mutedColor,

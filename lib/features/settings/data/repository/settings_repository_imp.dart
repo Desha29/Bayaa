@@ -21,7 +21,7 @@ class StoreInfoRepository implements StoreInfoRepositoryInt {
         return Right(defaultStore);
       }
     } catch (e) {
-      return Left(CacheFailure('فشل في جلب معلومات المتجر: ${e.toString()}'));
+      return Left(CacheFailure('Error fetching store info: ${e.toString()}'));
     }
   }
 
@@ -31,7 +31,7 @@ class StoreInfoRepository implements StoreInfoRepositoryInt {
       await dataSource.saveStoreInfo(storeInfo);
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure('فشل في حفظ معلومات المتجر: ${e.toString()}'));
+      return Left(CacheFailure('Error saving store info: ${e.toString()}'));
     }
   }
 
@@ -41,7 +41,7 @@ class StoreInfoRepository implements StoreInfoRepositoryInt {
       await dataSource.deleteStoreInfo();
       return const Right(unit);
     } catch (e) {
-      return Left(CacheFailure('فشل في حذف معلومات المتجر: ${e.toString()}'));
+      return Left(CacheFailure('Error deleting store info: ${e.toString()}'));
     }
   }
 }

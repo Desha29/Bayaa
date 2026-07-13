@@ -49,7 +49,7 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
     } catch (error, stackTrace) {
       print('Error loading analytics: $error\n$stackTrace');
       if (!isClosed) {
-        emit(AnalyticsError('حدث خطأ غير متوقع أثناء تحميل البيانات: ${error.toString()}'));
+        emit(AnalyticsError('Unexpected error loading data: ${error.toString()}'));
       }
     }
   }
@@ -78,7 +78,7 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
 
       final report = reportRes.getOrElse(() => null);
       if (report == null) {
-        emit(AnalyticsError('لم يتم العثور على بيانات لهذا اليوم'));
+        emit(AnalyticsError('No data found for this day'));
         return;
       }
 
@@ -102,14 +102,14 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
       emit(AnalyticsLoaded(
         summary: summary,
         topProducts: topProductsRes.getOrElse(() => []),
-        dailySales: {'اليوم': report.netRevenue},
+        dailySales: {'Today': report.netRevenue},
         hourlySales: hourlyRes.getOrElse(() => {}),
         categorySales: categoryRes.getOrElse(() => {}),
         dailyTimeSeries: const {},
       ));
     } catch (error) {
       if (!isClosed) {
-        emit(AnalyticsError('فشل تحميل بيانات الجلسة: ${error.toString()}'));
+        emit(AnalyticsError('Failed to load session data: ${error.toString()}'));
       }
     }
   }
@@ -159,9 +159,9 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
 
       // Derive dailySales from summary directly — avoids duplicate getSummary call
       final dailySales = <String, double>{
-        'اجمالي المبيعات': summary.totalRevenue,
-        'التكلفة الكلية': summary.totalCost,
-        'صافي الربح': summary.totalProfit,
+        'Total sales': summary.totalRevenue,
+        'Total cost': summary.totalCost,
+        'Net profit': summary.totalProfit,
       };
 
       emit(AnalyticsLoaded(
@@ -176,7 +176,7 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
       ));
     } catch (error) {
       if (!isClosed) {
-        emit(AnalyticsError('فشل تحميل الإحصائيات العامة: ${error.toString()}'));
+        emit(AnalyticsError('Failed to load analytics: ${error.toString()}'));
       }
     }
   }

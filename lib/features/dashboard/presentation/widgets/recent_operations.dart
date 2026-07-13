@@ -422,8 +422,8 @@ class _RecentOperationsState extends State<RecentOperations> {
               children: [
                 Text(
                   group.isOpen
-                      ? l10n.activeDayUser(group.openedBy)
-                      : l10n.closedDayUser(group.openedBy),
+                      ? l10n.activeDayUser(TranslationHelper.translateUserName(context, group.openedBy))
+                      : l10n.closedDayUser(TranslationHelper.translateUserName(context, group.openedBy)),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,

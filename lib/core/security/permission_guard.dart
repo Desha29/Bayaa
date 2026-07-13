@@ -3,7 +3,7 @@ import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 class PermissionDeniedException implements Exception {
   final String message;
   PermissionDeniedException(
-      [this.message = "تم رفض الوصول: ليس لديك صلاحية لتنفيذ هذا الإجراء."]);
+      [this.message = "Access denied: You don't have permission to perform this action."]);
 
   @override
   String toString() => message;

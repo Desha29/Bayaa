@@ -1,9 +1,11 @@
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../data/models/daily_report_model.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 
 class PdfAppColors {
@@ -18,8 +20,10 @@ class DailyReportPdfService {
   static Future<Uint8List> generateDailyReportPDF(
     DailyReport report, {
     bool landscape = false,
+    required Locale locale,
   }) async {
     final pdf = pw.Document();
+    final l10n = await AppLocalizations.delegate.load(locale);
 
     // تحميل الخطوط العربية (Regular + Bold)
     final arabicRegularFontData =
@@ -42,21 +46,21 @@ class DailyReportPdfService {
       pw.MultiPage(
         pageFormat: pageFormat,
         margin: const pw.EdgeInsets.all(28),
-        textDirection: pw.TextDirection.rtl,
+        textDirection: locale.languageCode == 'ar' ? pw.TextDirection.rtl : pw.TextDirection.ltr,
         theme: pw.ThemeData.withFont(
           base: arabicRegularFont,
           bold: arabicBoldFont,
         ),
         build: (context) => [
-          _buildHeader(logoImage, arabicBoldFont),
+          _buildHeader(logoImage, arabicBoldFont, l10n),
           pw.SizedBox(height: 15),
-          _buildReportInfo(report, arabicBoldFont),
+          _buildReportInfo(report, arabicBoldFont, l10n),
           pw.SizedBox(height: 20),
-          _buildSummarySection(report, arabicBoldFont),
+          _buildSummarySection(report, arabicBoldFont, l10n),
           pw.SizedBox(height: 20),
-          _buildProductTable(report, arabicRegularFont, arabicBoldFont),
+          _buildProductTable(report, arabicRegularFont, arabicBoldFont, l10n),
           pw.SizedBox(height: 25),
-          _buildFooter(arabicRegularFont),
+          _buildFooter(arabicRegularFont, l10n),
         ],
       ),
     );
@@ -65,7 +69,7 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- HEADER -------------------------
-  static pw.Widget _buildHeader(pw.MemoryImage logo, pw.Font boldFont) {
+  static pw.Widget _buildHeader(pw.MemoryImage logo, pw.Font boldFont, AppLocalizations l10n) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -74,7 +78,7 @@ class DailyReportPdfService {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-              'تقرير المبيعات اليومية',
+              l10n.dailySalesReport,
               style: pw.TextStyle(
                 font: boldFont,
                 fontWeight: pw.FontWeight.bold,
@@ -84,7 +88,7 @@ class DailyReportPdfService {
             ),
             pw.SizedBox(height: 6),
             pw.Text(
-              'نظام نقاط البيع المتطور - Bayaa',
+              l10n.advancedPosSystem,
               style: pw.TextStyle(
                 font: boldFont,
                 fontSize: 13,
@@ -107,7 +111,7 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- REPORT INFO -------------------------
-  static pw.Widget _buildReportInfo(DailyReport report, pw.Font boldFont) {
+  static pw.Widget _buildReportInfo(DailyReport report, pw.Font boldFont, AppLocalizations l10n) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
@@ -117,10 +121,10 @@ class DailyReportPdfService {
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
-          _infoItem('تاريخ التقرير:', _formatDate(report.date), boldFont),
-          _infoItem('عدد الحركات:', '${report.totalTransactions}', boldFont),
-          _infoItem('صافي الإيرادات:',
-              '${report.netRevenue.toStringAsFixed(2)} ج.م', boldFont),
+          _infoItem(l10n.reportDateLabel, _formatDate(report.date), boldFont),
+          _infoItem(l10n.transactionCountLabel, '${report.totalTransactions}', boldFont),
+          _infoItem(l10n.netRevenueLabel,
+              '${report.netRevenue.toStringAsFixed(2)} ${l10n.currencyEg}', boldFont),
         ],
       ),
     );
@@ -153,23 +157,23 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- SUMMARY SECTION -------------------------
-  static pw.Widget _buildSummarySection(DailyReport report, pw.Font boldFont) {
+  static pw.Widget _buildSummarySection(DailyReport report, pw.Font boldFont, AppLocalizations l10n) {
     final summaries = [
-      _summaryBox('المبيعات الكلية',
-          '${report.totalSales.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('المرتجعات الكلية',
-          '${report.totalRefunds.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('صافي الربح',
-          '${report.netRevenue.toStringAsFixed(2)} ج.م', boldFont),
-      _summaryBox('عدد المعاملات', '${report.totalTransactions}', boldFont),
-      _summaryBox('تم الإغلاق بواسطة', report.closedByUserName, boldFont),
+      _summaryBox(l10n.totalSalesLabel,
+          '${report.totalSales.toStringAsFixed(2)} ${l10n.currencyEg}', boldFont),
+      _summaryBox(l10n.totalRefundsLabel,
+          '${report.totalRefunds.toStringAsFixed(2)} ${l10n.currencyEg}', boldFont),
+      _summaryBox(l10n.netProfitLabel,
+          '${report.netRevenue.toStringAsFixed(2)} ${l10n.currencyEg}', boldFont),
+      _summaryBox(l10n.transactionCountLabel, '${report.totalTransactions}', boldFont),
+      _summaryBox(l10n.closedByLabel, _translateUserName(report.closedByUserName, l10n), boldFont),
     ];
 
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'ملخص الأداء اليومي',
+          l10n.dailyPerformanceSummary,
           style: pw.TextStyle(
             font: boldFont,
             fontSize: 17,
@@ -220,14 +224,14 @@ class DailyReportPdfService {
 
   /// ------------------------- PRODUCT TABLE -------------------------
   static pw.Widget _buildProductTable(
-      DailyReport report, pw.Font font, pw.Font boldFont) {
+      DailyReport report, pw.Font font, pw.Font boldFont, AppLocalizations l10n) {
     final headers = [
-      'المنتج',
-      'الكمية',
-      'الإيرادات',
-      'التكلفة',
-      'الأرباح',
-      'هامش الربح'
+      l10n.productColumn,
+      l10n.quantity,
+      l10n.netRevenueLabel,
+      l10n.costLabel,
+      l10n.profitLabel,
+      l10n.profitMarginLabel
     ];
 
     final data = report.topProducts.map((p) {
@@ -245,7 +249,7 @@ class DailyReportPdfService {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'أداء المنتجات الأكثر مبيعاً',
+          l10n.topProductsPerformance,
           style: pw.TextStyle(
             font: boldFont,
             fontSize: 17,
@@ -278,7 +282,7 @@ class DailyReportPdfService {
   }
 
   /// ------------------------- FOOTER -------------------------
-  static pw.Widget _buildFooter(pw.Font font) {
+  static pw.Widget _buildFooter(pw.Font font, AppLocalizations l10n) {
     return pw.Container(
       alignment: pw.Alignment.center,
       padding: const pw.EdgeInsets.all(10),
@@ -287,12 +291,12 @@ class DailyReportPdfService {
       ),
       child: pw.Column(children: [
         pw.Text(
-          'تم إنشاء التقرير في: ${_formatDateTime(DateTime.now())}',
+          l10n.reportCreatedAt(_formatDateTime(DateTime.now())),
           style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
         pw.SizedBox(height: 3),
         pw.Text(
-          '© 2026 Bayaa POS - جميع الحقوق محفوظة',
+          '© 2026 Bayaa POS - ${l10n.allRightsReserved}',
           style: pw.TextStyle(font: font, fontSize: 10, color: PdfAppColors.mutedColor700),
         ),
       ]),
@@ -305,4 +309,10 @@ class DailyReportPdfService {
 
   static String _formatDateTime(DateTime dateTime) =>
       '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year} - ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+
+  static String _translateUserName(String name, AppLocalizations l10n) {
+    if (name == 'System Administrator' || name == 'مدير النظام') return l10n.roleManager;
+    if (name == 'Trial Cashier' || name == 'كاشير تجريبي') return l10n.trialCashier;
+    return name;
+  }
 }

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
-    this.icon, 
+    this.icon,
     this.title,
     this.message,
     this.variant = EmptyStateVariant.notifications,
     this.background,
-    this.useCircle = true, 
+    this.useCircle = true,
     this.gap = 14,
-    this.center = true, 
+    this.center = true,
     this.actionText,
     this.onAction,
   });
@@ -32,7 +33,8 @@ class EmptyState extends StatelessWidget {
     final theme = Theme.of(context);
 
     // Defaults per variant
-    final defaults = _defaultsFor(variant, theme);
+    final l10n = AppLocalizations.of(context);
+    final defaults = _defaultsFor(variant, theme, l10n);
 
     final iconColor = defaults.iconColor;
     final bgColor = background ?? defaults.bgColor;
@@ -92,18 +94,20 @@ class EmptyState extends StatelessWidget {
     );
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection:
+          l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Center(child: content),
     );
   }
 
-  _EmptyDefaults _defaultsFor(EmptyStateVariant v, ThemeData theme) {
+  _EmptyDefaults _defaultsFor(
+      EmptyStateVariant v, ThemeData theme, AppLocalizations l10n) {
     switch (v) {
       case EmptyStateVariant.products:
         return _EmptyDefaults(
           icon: Icons.inventory_2_outlined,
-          title: 'لا توجد منتجات',
-          message: 'لم يتم العثور على منتجات تطابق البحث',
+          title: 'No products',
+          message: 'No products match your search',
           bgColor: Colors.grey.shade100,
           iconColor: Colors.grey[400]!,
           titleStyle: const TextStyle(
@@ -120,8 +124,8 @@ class EmptyState extends StatelessWidget {
       case EmptyStateVariant.notifications:
         return _EmptyDefaults(
           icon: LucideIcons.bell,
-          title: 'لا توجد تنبيهات',
-          message: 'سيتم عرض التنبيهات هنا عند توفرها',
+          title: l10n.noAlertsEmpty,
+          message: 'Alerts will appear here when available',
           bgColor: Colors.transparent,
           iconColor: theme.colorScheme.onSurface.withOpacity(0.25),
           titleStyle: theme.textTheme.titleLarge?.copyWith(

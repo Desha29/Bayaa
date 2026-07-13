@@ -5,6 +5,8 @@ enum NotifyPriority { high, medium }
 
 enum NotifyFilter { all, unread, urgent }
 
+enum NotifyType { lowStock, outOfStock }
+
 class NotifyItem {
   NotifyItem({
     required this.id,
@@ -17,28 +19,29 @@ class NotifyItem {
     required this.sku,
     this.quantityHint,
     this.read = false,
+    this.notifyType,
+    this.productName,
+    this.productQuantity,
   });
-  factory NotifyItem.fromProduct(Product Product) {
+
+  factory NotifyItem.fromProduct(Product product) {
+    final isLowStock = product.quantity <= product.minQuantity && product.quantity != 0;
     return NotifyItem(
-        id: Product.barcode,
-        title:
-            (Product.quantity <= Product.minQuantity && Product.quantity != 0)
-                ? 'مخزون منخفض'
-                : 'نفد من المخزون',
-        message: '${Product.name} - باقي ${Product.quantity} قطع فقط',
-        badge:
-            (Product.quantity <= Product.minQuantity && Product.quantity != 0)
-                ? 'متوسط'
-                : 'عاجل',
-        priority:
-            (Product.quantity <= Product.minQuantity && Product.quantity != 0)
-                ? NotifyPriority.medium
-                : NotifyPriority.high,
-        icon: Icons.inventory_2,
-        createdAgo: '',
-        sku: Product.barcode,
-        quantityHint: '${Product.quantity} قطع',
-        read: false);
+      id: product.barcode,
+      // These will be overridden by localized text in the card widget
+      title: '',
+      message: '',
+      badge: '',
+      priority: isLowStock ? NotifyPriority.medium : NotifyPriority.high,
+      icon: Icons.inventory_2,
+      createdAgo: '',
+      sku: product.barcode,
+      quantityHint: '',
+      read: false,
+      notifyType: isLowStock ? NotifyType.lowStock : NotifyType.outOfStock,
+      productName: product.name,
+      productQuantity: product.quantity,
+    );
   }
 
   final String id;
@@ -51,4 +54,7 @@ class NotifyItem {
   final String sku;
   final String? quantityHint;
   bool read;
+  final NotifyType? notifyType;
+  final String? productName;
+  final int? productQuantity;
 }

@@ -34,17 +34,17 @@ class Product {
   }
 
   String get status {
-    if (quantity == 0) return 'غير متوفر';
-    if (quantity < minQuantity) return 'مخزون منخفض';
-    return 'متوفر';
+    if (quantity == 0) return 'outOfStock';
+    if (quantity < minQuantity) return 'lowStock';
+    return 'available';
   }
 
   String get priority {
-    if (quantity == 0) return 'عاجل جداً';
+    if (quantity == 0) return 'veryHigh';
     final diff = minQuantity - quantity;
-    if (diff >= 3) return 'عاجل';
-    if (diff == 1 || diff == 2) return 'متوسط';
-    return 'منخفض';
+    if (diff >= 3) return 'high';
+    if (diff == 1 || diff == 2) return 'medium';
+    return 'low';
   }
 
   Product copyWith({

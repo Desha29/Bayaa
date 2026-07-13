@@ -13,6 +13,7 @@ class Sale {
   final String? sessionId;
   final int invoiceTypeIndex; // 0: Sale, 1: Refund
   final String? refundOriginalInvoiceId;
+  final String paymentMethod;
 
   Sale({
     required this.id,
@@ -25,6 +26,7 @@ class Sale {
     this.sessionId,
     this.invoiceTypeIndex = 0,
     this.refundOriginalInvoiceId,
+    this.paymentMethod = 'cash',
   });
 
   bool get isRefund => invoiceTypeIndex == 1;
@@ -41,6 +43,7 @@ class Sale {
       'sessionId': sessionId,
       'invoiceTypeIndex': invoiceTypeIndex,
       'refundOriginalInvoiceId': refundOriginalInvoiceId,
+      'paymentMethod': paymentMethod,
       'saleItems': saleItems.map((x) => x.toMap()).toList(),
     };
   }

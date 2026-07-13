@@ -95,8 +95,8 @@ class NotificationsCubit extends Cubit<NotificationsStates> {
     // await Future.delayed(const Duration(seconds: 1));
     emit(NotificationsError(
       product.quantity == 0
-          ? 'المنتج نفد من المخزون'
-          : 'كمية المنتج في المخزون منخفضة (${product.quantity})',
+          ? 'productOutOfStock'
+          : 'productLowStock: ${product.quantity}',
     ));
     // Restore loaded state immediately so list view continues to work
     emit(NotificationsLoaded(_notifications));

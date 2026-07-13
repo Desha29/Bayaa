@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 import '../data/invoice_models.dart';
 import '../domain/invoice_pdf_service.dart';
@@ -21,6 +22,7 @@ class InvoicePreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -28,20 +30,31 @@ class InvoicePreviewScreen extends StatelessWidget {
 
     // Responsive width
     final maxPageWidth = receiptMode
-        ? (isMobile ? 200.0 : isTablet ? 240.0 : 280.0)
-        : (isMobile ? 350.0 : isTablet ? 500.0 : 650.0);
+        ? (isMobile
+            ? 200.0
+            : isTablet
+                ? 240.0
+                : 280.0)
+        : (isMobile
+            ? 350.0
+            : isTablet
+                ? 500.0
+                : 650.0);
 
-    final titleText = receiptMode ? 'إيصال دفع حراري (80mm)' : 'فاتورة مبيعات (A4)';
+    final titleText =
+        receiptMode ? l10n.thermalReceiptLabel : l10n.a4InvoiceLabel;
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection:
+          l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(LucideIcons.arrowRight, color: AppColors.textPrimary),
+            icon: const Icon(LucideIcons.arrowRight,
+                color: AppColors.textPrimary),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Column(
@@ -58,7 +71,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'رقم الفاتورة: #${data.invoiceId}',
+                l10n.invoiceNumberLabel(data.invoiceId),
                 style: const TextStyle(
                   fontFamily: 'Cairo',
                   color: AppColors.mutedColor,
@@ -72,14 +85,14 @@ class InvoicePreviewScreen extends StatelessWidget {
           actions: [
             _buildHeaderAction(
               icon: LucideIcons.printer,
-              tooltip: 'طباعة فورية',
+              tooltip: l10n.quickPrintTooltip,
               color: AppColors.primaryColor,
               onPressed: () => _handlePrint(context),
             ),
             const SizedBox(width: 8),
             _buildHeaderAction(
               icon: LucideIcons.share2,
-              tooltip: 'مشاركة PDF',
+              tooltip: l10n.sharePdfTooltip,
               color: AppColors.secondaryColor,
               onPressed: () => _handleShare(context),
             ),
@@ -92,14 +105,23 @@ class InvoicePreviewScreen extends StatelessWidget {
               maxWidth: maxPageWidth + (isDesktop ? 120 : 40),
             ),
             padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 12 : isTablet ? 20 : 32,
-              vertical: isMobile ? 16 : isTablet ? 24 : 32,
+              horizontal: isMobile
+                  ? 12
+                  : isTablet
+                      ? 20
+                      : 32,
+              vertical: isMobile
+                  ? 16
+                  : isTablet
+                      ? 24
+                      : 32,
             ),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.borderColor.withOpacity(0.8)),
+                border:
+                    Border.all(color: AppColors.borderColor.withOpacity(0.8)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.015),
@@ -112,8 +134,11 @@ class InvoicePreviewScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: PdfPreview(
                   build: (format) => receiptMode
-                      ? InvoicePdfService.buildReceipt80mm(data)
-                      : InvoicePdfService.buildA4(data, format: format),
+                      ? InvoicePdfService.buildReceipt80mm(data,
+                          locale: Localizations.localeOf(context))
+                      : InvoicePdfService.buildA4(data,
+                          format: format,
+                          locale: Localizations.localeOf(context)),
                   allowPrinting: true,
                   allowSharing: true,
                   canChangeOrientation: false,
@@ -127,7 +152,11 @@ class InvoicePreviewScreen extends StatelessWidget {
                     color: Colors.white,
                   ),
                   previewPageMargin: EdgeInsets.all(
-                    isMobile ? 8 : isTablet ? 12 : 16,
+                    isMobile
+                        ? 8
+                        : isTablet
+                            ? 12
+                            : 16,
                   ),
                 ),
               ),
@@ -146,7 +175,8 @@ class InvoicePreviewScreen extends StatelessWidget {
   }) {
     return Tooltip(
       message: tooltip,
-      textStyle: const TextStyle(fontFamily: 'Cairo', color: Colors.white, fontSize: 11),
+      textStyle: const TextStyle(
+          fontFamily: 'Cairo', color: Colors.white, fontSize: 11),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -169,15 +199,19 @@ class InvoicePreviewScreen extends StatelessWidget {
   Future<void> _handlePrint(BuildContext context) async {
     await Printing.layoutPdf(
       onLayout: (format) => receiptMode
-          ? InvoicePdfService.buildReceipt80mm(data)
-          : InvoicePdfService.buildA4(data, format: format),
+          ? InvoicePdfService.buildReceipt80mm(data,
+              locale: Localizations.localeOf(context))
+          : InvoicePdfService.buildA4(data,
+              format: format, locale: Localizations.localeOf(context)),
     );
   }
 
   Future<void> _handleShare(BuildContext context) async {
     final bytes = await (receiptMode
-        ? InvoicePdfService.buildReceipt80mm(data)
-        : InvoicePdfService.buildA4(data, format: PdfPageFormat.a4));
+        ? InvoicePdfService.buildReceipt80mm(data,
+            locale: Localizations.localeOf(context))
+        : InvoicePdfService.buildA4(data,
+            format: PdfPageFormat.a4, locale: Localizations.localeOf(context)));
     await Printing.sharePdf(
       bytes: bytes,
       filename: 'invoice_${data.invoiceId}.pdf',

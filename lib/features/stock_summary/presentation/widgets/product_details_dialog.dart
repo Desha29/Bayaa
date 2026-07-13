@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../data/models/product_sales_detail.dart';
 
@@ -17,6 +18,7 @@ class ProductDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
@@ -47,7 +49,7 @@ class ProductDetailsDialog extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'تفاصيل حركة منتجات القسم',
+                        l10n.categoryDetails,
                         style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 16,
@@ -108,11 +110,11 @@ class ProductDetailsDialog extends StatelessWidget {
                           fontSize: 12.5,
                         ),
                         columnSpacing: 16,
-                        columns: const [
-                          DataColumn(label: Text('اسم المنتج')),
-                          DataColumn(label: Text('المبيعات'), numeric: true),
-                          DataColumn(label: Text('المرتجعات'), numeric: true),
-                          DataColumn(label: Text('صافي المباع'), numeric: true),
+                        columns: [
+                          DataColumn(label: Text(l10n.productNameColumn)),
+                          DataColumn(label: Text(l10n.salesColumn), numeric: true),
+                          DataColumn(label: Text(l10n.refundsColumn), numeric: true),
+                          DataColumn(label: Text(l10n.netSoldColumn), numeric: true),
                         ],
                         rows: products.map((product) {
                           final isPositive = product.netSoldQuantity >= 0;
@@ -134,7 +136,7 @@ class ProductDetailsDialog extends StatelessWidget {
                                     border: Border.all(color: AppColors.errorColor.withOpacity(0.16)),
                                   ),
                                   child: Text(
-                                    '${product.soldQuantity} وحدة',
+                                    l10n.unitCount(product.soldQuantity),
                                     style: const TextStyle(
                                       color: AppColors.errorColor,
                                       fontWeight: FontWeight.bold,
@@ -152,7 +154,7 @@ class ProductDetailsDialog extends StatelessWidget {
                                     border: Border.all(color: AppColors.successColor.withOpacity(0.16)),
                                   ),
                                   child: Text(
-                                    '${product.refundedQuantity} وحدة',
+                                    l10n.unitCount(product.refundedQuantity),
                                     style: const TextStyle(
                                       color: AppColors.successColor,
                                       fontWeight: FontWeight.bold,
@@ -163,7 +165,7 @@ class ProductDetailsDialog extends StatelessWidget {
                               ),
                               DataCell(
                                 Text(
-                                  '${product.netSoldQuantity} وحدة',
+                                  l10n.unitCount(product.netSoldQuantity),
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
                                     color: isPositive ? AppColors.primaryColor : AppColors.warningColor,
@@ -187,20 +189,17 @@ class ProductDetailsDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSummaryChip(
-                  'إجمالي المبيعات الكلية',
+                _buildSummaryChip(context, l10n.totalSalesOverall,
                   products.fold(0, (sum, p) => sum + p.soldQuantity),
                   AppColors.errorColor,
                   LucideIcons.arrowUpRight,
                 ),
-                _buildSummaryChip(
-                  'إجمالي المرتجعات الكلية',
+                _buildSummaryChip(context, l10n.totalRefundsOverall,
                   products.fold(0, (sum, p) => sum + p.refundedQuantity),
                   AppColors.successColor,
                   LucideIcons.arrowDownLeft,
                 ),
-                _buildSummaryChip(
-                  'صافي المبيعات الفعلية',
+                _buildSummaryChip(context, l10n.netActualSales,
                   products.fold(0, (sum, p) => sum + p.netSoldQuantity),
                   AppColors.primaryColor,
                   LucideIcons.checkSquare,
@@ -213,7 +212,8 @@ class ProductDetailsDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryChip(String label, int value, Color color, IconData icon) {
+  Widget _buildSummaryChip(BuildContext context, String label, int value, Color color, IconData icon) {
+    final l10n = AppLocalizations.of(context);
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -243,7 +243,7 @@ class ProductDetailsDialog extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              '$value وحدة',
+              l10n.unitCount(value),
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 15,

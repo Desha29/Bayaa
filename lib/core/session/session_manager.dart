@@ -72,7 +72,7 @@ class SessionManager {
       final autoUser = User(
         username: userName ?? 'system',
         password: '',
-        name: userName ?? 'النظام',
+        name: userName ?? 'System',
         userType: UserType.cashier,
         phone: '',
       );
@@ -84,7 +84,7 @@ class SessionManager {
         final logger = getIt<ActivityLogger>();
         await logger.logActivity(
           type: ActivityType.sessionOpen,
-          description: 'فتح يوم جديد — ${autoUser.name}',
+          description: 'Opened new day — ${autoUser.name}',
           userName: autoUser.name,
           sessionId: newSession.id,
           eventKey: 'sessionOpened',
