@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import '../../../../core/components/app_logo.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/functions/messege.dart';
+
 import '../../../../l10n/app_localizations.dart';
 
 class EditStoreInfoDialog extends StatefulWidget {
@@ -31,9 +32,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
     super.initState();
     final rawName = widget.storeInfo['name'] ?? '';
     nameCtrl = TextEditingController(
-        text: (rawName == 'Bayaa POS' || rawName.isEmpty)
-            ? ''
-            : rawName);
+        text: (rawName == 'Bayaa POS' || rawName.isEmpty) ? '' : rawName);
     phoneCtrl = TextEditingController(text: widget.storeInfo['phone'] ?? '');
     emailCtrl = TextEditingController(text: widget.storeInfo['email'] ?? '');
     vatCtrl = TextEditingController(text: widget.storeInfo['vat'] ?? '');

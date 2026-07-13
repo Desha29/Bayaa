@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../dashboard/data/models/notify_model.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
-import '../../../../l10n/app_localizations.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
@@ -62,19 +62,24 @@ class NotificationCard extends StatelessWidget {
   }
 
   String _getTitle(AppLocalizations l10n) {
-    if (item.notifyType == NotifyType.outOfStock) return l10n.notificationOutOfStockTitle;
+    if (item.notifyType == NotifyType.outOfStock) {
+      return l10n.notificationOutOfStockTitle;
+    }
     return l10n.notificationLowStockTitle;
   }
 
   String _getBadge(AppLocalizations l10n) {
-    if (item.notifyType == NotifyType.outOfStock) return l10n.notificationOutOfStockBadge;
+    if (item.notifyType == NotifyType.outOfStock) {
+      return l10n.notificationOutOfStockBadge;
+    }
     return l10n.notificationLowStockBadge;
   }
 
   String _getMessage(AppLocalizations l10n) {
     final name = item.productName ?? item.sku;
     final qty = item.productQuantity?.toString() ?? '0';
-    if (item.notifyType == NotifyType.outOfStock) return l10n.notificationOutOfStockMessage(name);
+    if (item.notifyType == NotifyType.outOfStock)
+      return l10n.notificationOutOfStockMessage(name);
     return l10n.notificationLowStockMessage(qty, name);
   }
 
@@ -127,12 +132,15 @@ class NotificationCard extends StatelessWidget {
                                 width: 18,
                                 height: 18,
                                 decoration: BoxDecoration(
-                                  color: checked ? AppColors.secondaryColor : Colors.white,
+                                  color: checked
+                                      ? AppColors.secondaryColor
+                                      : Colors.white,
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
                                     color: checked
                                         ? AppColors.secondaryColor
-                                        : AppColors.borderColor.withOpacity(0.8),
+                                        : AppColors.borderColor
+                                            .withOpacity(0.8),
                                     width: 1.5,
                                   ),
                                 ),
@@ -147,7 +155,7 @@ class NotificationCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          
+
                           // Icon
                           Container(
                             padding: const EdgeInsets.all(8),
@@ -159,12 +167,14 @@ class NotificationCard extends StatelessWidget {
                             ),
                             child: Icon(
                               item.icon,
-                              color: item.read ? AppColors.mutedColor : _priorityPrimary(),
+                              color: item.read
+                                  ? AppColors.mutedColor
+                                  : _priorityPrimary(),
                               size: 18,
                             ),
                           ),
                           const SizedBox(width: 10),
-                          
+
                           // Title + Badge
                           Expanded(
                             child: Column(
@@ -176,7 +186,9 @@ class NotificationCard extends StatelessWidget {
                                     fontFamily: 'Cairo',
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    color: item.read ? AppColors.textSecondary : AppColors.textPrimary,
+                                    color: item.read
+                                        ? AppColors.textSecondary
+                                        : AppColors.textPrimary,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -184,14 +196,16 @@ class NotificationCard extends StatelessWidget {
                                 const SizedBox(height: 2),
                                 _Badge(
                                   label: _getBadge(l10n),
-                                  color: item.read ? AppColors.mutedColor : _priorityPrimary(),
+                                  color: item.read
+                                      ? AppColors.mutedColor
+                                      : _priorityPrimary(),
                                   compact: true,
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 8),
-                          
+
                           // Mobile Actions
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -199,13 +213,18 @@ class NotificationCard extends StatelessWidget {
                               IconButton(
                                 onPressed: onMarkReadToggle,
                                 icon: Icon(
-                                  item.read ? LucideIcons.eye : LucideIcons.eyeOff,
+                                  item.read
+                                      ? LucideIcons.eye
+                                      : LucideIcons.eyeOff,
                                   size: 14,
                                 ),
-                                color: item.read ? AppColors.secondaryColor : AppColors.mutedColor,
+                                color: item.read
+                                    ? AppColors.secondaryColor
+                                    : AppColors.mutedColor,
                                 style: IconButton.styleFrom(
-                                  backgroundColor: item.read 
-                                      ? AppColors.secondaryColor.withOpacity(0.08)
+                                  backgroundColor: item.read
+                                      ? AppColors.secondaryColor
+                                          .withOpacity(0.08)
                                       : Colors.white,
                                   padding: const EdgeInsets.all(6),
                                   minimumSize: const Size(28, 28),
@@ -220,7 +239,8 @@ class NotificationCard extends StatelessWidget {
                                 ),
                                 color: AppColors.errorColor,
                                 style: IconButton.styleFrom(
-                                  backgroundColor: AppColors.errorColor.withOpacity(0.08),
+                                  backgroundColor:
+                                      AppColors.errorColor.withOpacity(0.08),
                                   padding: const EdgeInsets.all(6),
                                   minimumSize: const Size(28, 28),
                                 ),
@@ -230,7 +250,7 @@ class NotificationCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      
+
                       // Message Body
                       Padding(
                         padding: const EdgeInsetsDirectional.only(start: 38.0),
@@ -239,13 +259,15 @@ class NotificationCard extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 12,
-                            color: item.read ? AppColors.mutedColor : AppColors.textSecondary,
+                            color: item.read
+                                ? AppColors.mutedColor
+                                : AppColors.textSecondary,
                             height: 1.3,
                           ),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      
+
                       // Chips
                       Padding(
                         padding: const EdgeInsetsDirectional.only(start: 38.0),
@@ -268,10 +290,10 @@ class NotificationCard extends StatelessWidget {
                               ],
                               const SizedBox(width: 6),
                               _MetaChip(
-                                  icon: LucideIcons.clock,
-                                  text: item.createdAgo,
-                                  compact: true,
-                                ),
+                                icon: LucideIcons.clock,
+                                text: item.createdAgo,
+                                compact: true,
+                              ),
                             ],
                           ),
                         ),
@@ -280,7 +302,8 @@ class NotificationCard extends StatelessWidget {
                   ),
                 )
               : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -293,7 +316,9 @@ class NotificationCard extends StatelessWidget {
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: checked ? AppColors.secondaryColor : Colors.white,
+                            color: checked
+                                ? AppColors.secondaryColor
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
                               color: checked
@@ -312,7 +337,7 @@ class NotificationCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 14),
-                      
+
                       // 2. Icon Indicator
                       Container(
                         padding: const EdgeInsets.all(10),
@@ -324,12 +349,14 @@ class NotificationCard extends StatelessWidget {
                         ),
                         child: Icon(
                           item.icon,
-                          color: item.read ? AppColors.mutedColor : _priorityPrimary(),
+                          color: item.read
+                              ? AppColors.mutedColor
+                              : _priorityPrimary(),
                           size: 22,
                         ),
                       ),
                       const SizedBox(width: 16),
-                      
+
                       // 3. Main Text Content
                       Expanded(
                         child: Column(
@@ -345,7 +372,9 @@ class NotificationCard extends StatelessWidget {
                                       fontFamily: 'Cairo',
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
-                                      color: item.read ? AppColors.textSecondary : AppColors.textPrimary,
+                                      color: item.read
+                                          ? AppColors.textSecondary
+                                          : AppColors.textPrimary,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -353,7 +382,9 @@ class NotificationCard extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 _Badge(
                                   label: _getBadge(l10n),
-                                  color: item.read ? AppColors.mutedColor : _priorityPrimary(),
+                                  color: item.read
+                                      ? AppColors.mutedColor
+                                      : _priorityPrimary(),
                                 ),
                               ],
                             ),
@@ -363,7 +394,9 @@ class NotificationCard extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontSize: 12.5,
-                                color: item.read ? AppColors.mutedColor : AppColors.textSecondary,
+                                color: item.read
+                                    ? AppColors.mutedColor
+                                    : AppColors.textSecondary,
                                 height: 1.3,
                               ),
                             ),
@@ -392,28 +425,35 @@ class NotificationCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      
+
                       // 4. Actions (Mark as Read, Delete)
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           // Mark as Read button
                           Tooltip(
-                            message: item.read ? l10n.markAsReadUnread : l10n.markAsRead,
+                            message: item.read
+                                ? l10n.markAsReadUnread
+                                : l10n.markAsRead,
                             child: IconButton(
                               onPressed: onMarkReadToggle,
                               icon: Icon(
-                                item.read ? LucideIcons.eye : LucideIcons.eyeOff,
+                                item.read
+                                    ? LucideIcons.eye
+                                    : LucideIcons.eyeOff,
                                 size: 16,
                               ),
-                              color: item.read ? AppColors.secondaryColor : AppColors.mutedColor,
+                              color: item.read
+                                  ? AppColors.secondaryColor
+                                  : AppColors.mutedColor,
                               style: IconButton.styleFrom(
-                                backgroundColor: item.read 
+                                backgroundColor: item.read
                                     ? AppColors.secondaryColor.withOpacity(0.08)
                                     : Colors.white,
                                 side: BorderSide(
-                                  color: item.read 
-                                      ? AppColors.secondaryColor.withOpacity(0.2)
+                                  color: item.read
+                                      ? AppColors.secondaryColor
+                                          .withOpacity(0.2)
                                       : AppColors.borderColor.withOpacity(0.6),
                                 ),
                                 padding: const EdgeInsets.all(8),
@@ -433,7 +473,8 @@ class NotificationCard extends StatelessWidget {
                               ),
                               color: AppColors.errorColor,
                               style: IconButton.styleFrom(
-                                backgroundColor: AppColors.errorColor.withOpacity(0.08),
+                                backgroundColor:
+                                    AppColors.errorColor.withOpacity(0.08),
                                 side: BorderSide(
                                   color: AppColors.errorColor.withOpacity(0.2),
                                 ),
