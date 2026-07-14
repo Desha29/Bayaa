@@ -8,7 +8,6 @@ import 'package:bayaa_pos/core/state/state_synchronizer.dart';
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:bayaa_pos/features/products/domain/product_repository_int.dart';
 import 'package:either_dart/either.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersistenceMixin {
   // Removed Hive data sources
@@ -60,6 +59,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         quantity: (m['stock'] as num).toInt(),
         minQuantity: (m['min_stock'] as num).toInt(),
         category: m['category_id'] as String? ?? 'General',
+        imagePath: m['image_path'] as String?,
       )).toList();
       
       return Right(products);
@@ -111,7 +111,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         'products',
         where: whereClause,
         whereArgs: whereArgs,
-        orderBy: 'name ASC',
+        orderBy: 'name COLLATE NOCASE ASC, id ASC',
         limit: pageSize,
         offset: offset,
       );
@@ -127,6 +127,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
         quantity: (m['stock'] as num).toInt(),
         minQuantity: (m['min_stock'] as num).toInt(),
         category: m['category_id'] as String? ?? 'General',
+        imagePath: m['image_path'] as String?,
       )).toList();
       
       return Right(products);
@@ -152,10 +153,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
             // Check if product exists to preserve created_at
             final existing = await db.query('products', where: 'id = ?', whereArgs: [product.barcode]);
             final now = DateTime.now().toIso8601String();
-            final createdAt = existing.isNotEmpty ? existing.first['created_at'] : now;
-
-            await db.insert('products', {
-              'id': product.barcode,
+            final values = <String, Object?>{
               'barcode': product.barcode,
               'name': product.name,
               'price': product.price,
@@ -164,10 +162,24 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
               'stock': product.quantity.toDouble(),
               'min_stock': product.minQuantity.toDouble(),
               'category_id': product.category,
+              'image_path': product.imagePath,
               'is_active': 1,
-              'created_at': createdAt,
               'updated_at': now,
-            }, conflictAlgorithm: ConflictAlgorithm.replace);
+            };
+            if (existing.isNotEmpty) {
+              await db.update(
+                'products',
+                values,
+                where: 'id = ?',
+                whereArgs: [product.barcode],
+              );
+            } else {
+              await db.insert('products', {
+                'id': product.barcode,
+                ...values,
+                'created_at': now,
+              });
+            }
           },
         );
         
@@ -247,6 +259,7 @@ class ProductRepositoryImp extends ProductRepositoryInt with RepositoryPersisten
               minPrice: product.minPrice,
               minQuantity: product.minQuantity,
               wholesalePrice: product.wholesalePrice,
+              imagePath: product.imagePath,
             );
             await saveProduct(updatedProduct);
           }

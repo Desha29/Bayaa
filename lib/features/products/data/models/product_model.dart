@@ -8,6 +8,7 @@ class Product {
   int quantity;
   final int minQuantity;
   final String category;
+  final String? imagePath;
 
   Product({
     required this.name,
@@ -18,6 +19,7 @@ class Product {
     required this.quantity,
     required this.minQuantity,
     required this.category,
+    this.imagePath,
   });
 
   Map<String, dynamic> toMap() {
@@ -30,6 +32,7 @@ class Product {
       'quantity': quantity,
       'minQuantity': minQuantity,
       'category': category,
+      'imagePath': imagePath,
     };
   }
 
@@ -56,6 +59,7 @@ class Product {
     int? quantity,
     int? minQuantity,
     String? category,
+    String? imagePath,
   }) {
     return Product(
       name: name ?? this.name,
@@ -66,6 +70,7 @@ class Product {
       quantity: quantity ?? this.quantity,
       minQuantity: minQuantity ?? this.minQuantity,
       category: category ?? this.category,
+      imagePath: imagePath ?? this.imagePath,
     );
   }
 }

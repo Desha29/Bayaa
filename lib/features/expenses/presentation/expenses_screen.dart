@@ -44,7 +44,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           };
     return labels[normalized] ?? key;
   }
-  void _reload() => setState(() => _expenses = _repository.getExpenses());
+  void _reload() {
+    final refreshedExpenses = _repository.getExpenses();
+    setState(() {
+      _expenses = refreshedExpenses;
+    });
+  }
 
   Future<void> _addExpense() async {
     final title = TextEditingController();

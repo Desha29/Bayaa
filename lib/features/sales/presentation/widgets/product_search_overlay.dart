@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/components/local_image_view.dart';
 import '../../../products/data/models/product_model.dart';
 
 class ProductSearchOverlay extends StatelessWidget {
@@ -72,14 +73,17 @@ class ProductSearchOverlay extends StatelessWidget {
               ListTile(
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
+                leading: LocalImageView(
+                  path: product.imagePath,
+                  width: 42,
+                  height: 42,
+                  borderRadius: 9,
+                  fallback: Container(
                     color: AppColors.kPrimaryBlue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.inventory_2_outlined,
+                        color: AppColors.kPrimaryBlue, size: 20),
                   ),
-                  child: Icon(Icons.inventory_2_outlined,
-                      color: AppColors.kPrimaryBlue, size: 20),
                 ),
                 title: Text(
                   product.name,

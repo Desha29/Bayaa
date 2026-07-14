@@ -6,7 +6,6 @@ import 'package:bayaa_pos/core/state/state_synchronizer.dart';
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import 'package:bayaa_pos/features/auth/domain/repository/user_repository_int.dart';
 import 'package:either_dart/either.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class UserRepositoryImp extends UserRepositoryInt with RepositoryPersistenceMixin {
   // Removed UserDataSource dependency
@@ -41,9 +40,10 @@ class UserRepositoryImp extends UserRepositoryInt with RepositoryPersistenceMixi
       final users = results.map((m) => User(
         name: m['display_name'] as String,
         username: m['username'] as String,
-        password: '', // Password hash not needed for listing
+        password: m['password_hash'] as String? ?? '',
         userType: _mapRoleToUserType(m['role'] as String),
-        phone: '', 
+        phone: m['phone'] as String? ?? '',
+        imagePath: m['image_path'] as String?,
       )).toList();
       
       for (var user in users) {
@@ -85,7 +85,8 @@ class UserRepositoryImp extends UserRepositoryInt with RepositoryPersistenceMixi
           username: userMap['username'] as String,
           password: userMap['password_hash'] as String,
           userType: _mapRoleToUserType(userMap['role'] as String),
-          phone: '', 
+          phone: userMap['phone'] as String? ?? '',
+          imagePath: userMap['image_path'] as String?,
         );
         
         print('  ✅ User found: ${user.name}');
@@ -118,20 +119,31 @@ class UserRepositoryImp extends UserRepositoryInt with RepositoryPersistenceMixi
             final db = PersistenceInitializer.persistenceManager!.sqliteManager;
             
             final existing = await db.query('users', where: 'username = ?', whereArgs: [user.username]);
-            final now = DateTime.now().toIso8601String();
-            final createdAt = existing.isNotEmpty ? existing.first['created_at'] : now;
-            
             print('  🗄️ Database Action: ${existing.isNotEmpty ? "UPDATE" : "INSERT"}');
 
-            await db.insert('users', {
-              'id': user.username,
+            final values = <String, Object?>{
               'username': user.username,
               'display_name': user.name,
+              'phone': user.phone,
+              'image_path': user.imagePath,
               'password_hash': user.password,
               'role': user.userType == UserType.manager ? 'manager' : 'cashier',
               'is_active': 1,
-              'created_at': createdAt,
-            }, conflictAlgorithm: ConflictAlgorithm.replace);
+            };
+            if (existing.isNotEmpty) {
+              await db.update(
+                'users',
+                values,
+                where: 'username = ?',
+                whereArgs: [user.username],
+              );
+            } else {
+              await db.insert('users', {
+                'id': user.username,
+                ...values,
+                'created_at': DateTime.now().toIso8601String(),
+              });
+            }
           },
         );
         

@@ -289,9 +289,9 @@ class _CustomSidebarState extends State<CustomSidebar> {
               ),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Colors.white.withOpacity(0.16)
+                    ? const Color(0xFFD67941)
                     : isHovered
-                        ? Colors.white.withOpacity(0.08)
+                        ? const Color(0xFFD67941)
                         : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: isSelected
@@ -390,17 +390,28 @@ class _CustomSidebarState extends State<CustomSidebar> {
           ? Center(
               child: InkWell(
                 onTap: widget.onToggleCollapse,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 child: Container(
                   width: 36,
                   height: 36,
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(11),
+                    border: Border.all(color: Colors.white.withOpacity(.75)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(.16),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child:
-                      Image.asset('assets/images/iconr.png', fit: BoxFit.cover),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset(
+                    'assets/images/iconr.png',
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             )
@@ -413,12 +424,12 @@ class _CustomSidebarState extends State<CustomSidebar> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 46,
-                      height: 46,
-                      padding: const EdgeInsets.all(3),
+                      width: 38,
+                      height: 38,
+                      padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(11),
                         border: Border.all(color: Colors.white.withOpacity(.7)),
                         boxShadow: [
                           BoxShadow(
@@ -431,8 +442,8 @@ class _CustomSidebarState extends State<CustomSidebar> {
                       clipBehavior: Clip.antiAlias,
                       child: Image.asset(
                         'assets/images/iconr.png',
-                        width: 40,
-                        height: 40,
+                        width: 34,
+                        height: 34,
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -464,10 +475,10 @@ class _CustomSidebarState extends State<CustomSidebar> {
                               return Text(
                                 displayName,
                                 style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: .2,
+                                  color: Color(0xFFD67941),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: .3,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,

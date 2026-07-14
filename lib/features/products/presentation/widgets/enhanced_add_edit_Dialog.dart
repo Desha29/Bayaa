@@ -1,4 +1,7 @@
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
+import 'package:bayaa_pos/core/components/local_image_view.dart';
+import 'package:bayaa_pos/core/data/services/local_image_storage.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_injection.dart';
@@ -34,6 +37,8 @@ class _EnhancedAddEditProductDialogState
   late final TextEditingController wholesalePriceCtrl;
 
   late String selectedCategory;
+  String? _selectedImagePath;
+  bool _isSubmitting = false;
   final _formKey = GlobalKey<FormState>(); 
 
   @override
@@ -48,6 +53,7 @@ class _EnhancedAddEditProductDialogState
     minPriceCtrl = TextEditingController(text: p?.minPrice.toString() ?? '');
     wholesalePriceCtrl =
         TextEditingController(text: p?.wholesalePrice.toString() ?? '');
+    _selectedImagePath = p?.imagePath;
     
     // Filter out "All" from valid categories
     final validCategories = widget.categories.where((c) => c != 'All').toList();
@@ -107,6 +113,33 @@ class _EnhancedAddEditProductDialogState
       }
     }
 
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
+    var storedImagePath = _selectedImagePath;
+    try {
+      if (storedImagePath != null &&
+          storedImagePath != widget.productToEdit?.imagePath) {
+        storedImagePath = await LocalImageStorage.persist(
+          sourcePath: storedImagePath,
+          collection: 'products',
+          key: barcode,
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.localeName == 'ar'
+              ? 'تعذر حفظ صورة المنتج'
+              : 'Could not save the product image'),
+        ),
+      );
+      return;
+    }
+
     final productSave = Product(
       wholesalePrice: double.tryParse(wholesalePriceCtrl.text.trim()) ?? 0.0,
       minPrice: double.tryParse(minPriceCtrl.text.trim()) ?? 0.0,
@@ -116,6 +149,7 @@ class _EnhancedAddEditProductDialogState
       quantity: int.tryParse(qtyCtrl.text.trim()) ?? 0,
       minQuantity: int.tryParse(minQtyCtrl.text.trim()) ?? 0,
       category: selectedCategory,
+      imagePath: storedImagePath,
     );
     
     if (!mounted) return;
@@ -184,6 +218,8 @@ class _EnhancedAddEditProductDialogState
                 ],
               ),
               const SizedBox(height: 24),
+              _buildImagePicker(l10n),
+              const SizedBox(height: 20),
               // Form
               Flexible(
                 child: SingleChildScrollView(
@@ -277,7 +313,7 @@ class _EnhancedAddEditProductDialogState
                   const SizedBox(width: 16),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: _submit,
+                      onPressed: _isSubmitting ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryColor,
                         foregroundColor: AppColors.primaryForeground,
@@ -286,14 +322,23 @@ class _EnhancedAddEditProductDialogState
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          widget.productToEdit == null
-                              ? l10n.addProduct
-                              : l10n.saveChanges,
-                        ),
-                      ),
+                      child: _isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                widget.productToEdit == null
+                                    ? l10n.addProduct
+                                    : l10n.saveChanges,
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -301,6 +346,86 @@ class _EnhancedAddEditProductDialogState
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp', 'bmp'],
+    );
+    final selectedPath = result?.files.single.path;
+    if (selectedPath != null && mounted) {
+      setState(() => _selectedImagePath = selectedPath);
+    }
+  }
+
+  Widget _buildImagePicker(AppLocalizations l10n) {
+    final isArabic = l10n.localeName == 'ar';
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withOpacity(.045),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.borderColor),
+      ),
+      child: Row(
+        children: [
+          LocalImageView(
+            path: _selectedImagePath,
+            width: 82,
+            height: 82,
+            borderRadius: 14,
+            fallback: Container(
+              color: AppColors.primaryColor.withOpacity(.1),
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.inventory_2_outlined,
+                color: AppColors.primaryColor,
+                size: 32,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isArabic ? 'صورة المنتج' : 'Product image',
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  isArabic ? 'اختيارية وتظهر في المنتجات والمبيعات' : 'Optional; shown in products and sales',
+                  style: const TextStyle(
+                    color: AppColors.mutedColor,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.add_photo_alternate_outlined, size: 17),
+                      label: Text(isArabic ? 'اختيار صورة' : 'Choose image'),
+                    ),
+                    if (_selectedImagePath != null)
+                      TextButton.icon(
+                        onPressed: () => setState(() => _selectedImagePath = null),
+                        icon: const Icon(Icons.delete_outline, size: 17),
+                        label: Text(isArabic ? 'إزالة' : 'Remove'),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

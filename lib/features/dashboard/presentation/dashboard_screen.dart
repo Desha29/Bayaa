@@ -10,12 +10,15 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/components/screen_header.dart';
+import '../../../core/components/local_image_view.dart';
 import '../../../core/di/dependency_injection.dart';
 import '../../../core/functions/messege.dart';
 import '../../../core/security/permission_guard.dart';
 import '../../../core/localization/translation_helper.dart';
 import '../../../core/localization/locale_provider.dart';
 import '../../auth/presentation/cubit/user_cubit.dart';
+import '../../auth/presentation/cubit/user_states.dart';
+import '../../settings/presentation/widgets/add_edit_user_dialog.dart';
 import '../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../products/presentation/cubit/product_cubit.dart';
@@ -52,7 +55,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   late final SalesRepositoryImpl _salesRepository;
   late final AnalyticsRepositoryImpl _analyticsRepository;
-  late final User curUser = getIt<UserCubit>().currentUser;
+  User get curUser => getIt<UserCubit>().currentUser;
 
   List<SidebarItem> get sidebarItems => _getSidebarItems(context);
 
@@ -318,7 +321,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
         },
       ),
-      _ProfileMenu(user: curUser, compact: compact),
+      BlocBuilder<UserCubit, UserStates>(
+        bloc: getIt<UserCubit>(),
+        builder: (_, __) => _ProfileMenu(
+          user: getIt<UserCubit>().currentUser,
+          compact: compact,
+        ),
+      ),
       const SizedBox(width: 8),
     ];
   }
@@ -471,11 +480,22 @@ class _ProfileMenu extends StatelessWidget {
     final name = TranslationHelper.translateUserName(context, user.name,
         username: user.username);
     final initial = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?';
-    return PopupMenuButton<void>(
+    return PopupMenuButton<String>(
       tooltip: name,
       offset: const Offset(0, 48),
+      onSelected: (value) {
+        if (value == 'edit-profile') {
+          showDialog<User>(
+            context: context,
+            builder: (_) => AddEditUserDialog(
+              userToEdit: user,
+              profileOnly: true,
+            ),
+          );
+        }
+      },
       itemBuilder: (_) => [
-        PopupMenuItem<void>(
+        PopupMenuItem<String>(
           enabled: false,
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,6 +510,21 @@ class _ProfileMenu extends StatelessWidget {
                         fontSize: 12, color: AppColors.mutedColor)),
               ]),
         ),
+        PopupMenuItem<String>(
+          value: 'edit-profile',
+          child: Row(
+            children: [
+              const Icon(LucideIcons.pencil,
+                  size: 18, color: AppColors.secondaryColor),
+              const SizedBox(width: 10),
+              Text(
+                AppLocalizations.of(context).localeName == 'ar'
+                    ? 'تعديل الملف الشخصي'
+                    : 'Edit profile',
+              ),
+            ],
+          ),
+        ),
       ],
       child: Container(
         padding:
@@ -501,12 +536,23 @@ class _ProfileMenu extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColors.secondaryColor,
-              child: Text(initial,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold))),
+          LocalImageView(
+            path: user.imagePath,
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            fallback: Container(
+              color: AppColors.secondaryColor,
+              alignment: Alignment.center,
+              child: Text(
+                initial,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           if (!compact) ...[
             const SizedBox(width: 8),
             ConstrainedBox(

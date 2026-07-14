@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
+import '../../../../core/components/local_image_view.dart';
 import '../../../products/data/models/product_model.dart';
 import 'priorty_chip.dart';
 import 'status_chip.dart';
@@ -102,6 +103,19 @@ class _ProductCardState extends State<ProductCard> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        LocalImageView(
+                          path: product.imagePath,
+                          width: 48,
+                          height: 48,
+                          borderRadius: 11,
+                          fallback: Container(
+                            color: statusColor.withOpacity(.08),
+                            alignment: Alignment.center,
+                            child: Icon(LucideIcons.package,
+                                size: 21, color: statusColor),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
                         // Product Name & Barcode
                         Expanded(
                           flex: 4,

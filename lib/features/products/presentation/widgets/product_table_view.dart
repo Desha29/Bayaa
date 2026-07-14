@@ -2,6 +2,7 @@ import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/components/empty_state.dart';
+import '../../../../core/components/local_image_view.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -150,16 +151,31 @@ class ProductsTableView extends StatelessWidget {
 
                         return DataRow(cells: [
                           DataCell(
-                            Container(
-                              constraints:
-                                  const BoxConstraints(maxWidth: 200),
-                              child: Text(
-                                product.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            Row(
+                              children: [
+                                LocalImageView(
+                                  path: product.imagePath,
+                                  width: 38,
+                                  height: 38,
+                                  borderRadius: 9,
+                                  fallback: Container(
+                                    color: AppColors.primaryColor.withOpacity(.08),
+                                    alignment: Alignment.center,
+                                    child: const Icon(Icons.inventory_2_outlined,
+                                        size: 18, color: AppColors.primaryColor),
+                                  ),
+                                ),
+                                const SizedBox(width: 9),
+                                Flexible(
+                                  child: Text(
+                                    product.name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           DataCell(Text(product.barcode,
@@ -250,16 +266,24 @@ class ProductsTableView extends StatelessWidget {
                         ]);
                       }),
                       if (isLoadingMore)
-                        const DataRow(cells: [
-                          DataCell(
-                              Center(child: CircularProgressIndicator())),
-                          DataCell(SizedBox()),
-                          DataCell(SizedBox()),
-                          DataCell(SizedBox()),
-                          DataCell(SizedBox()),
-                          DataCell(SizedBox()),
-                          DataCell(SizedBox()),
-                        ]),
+                        DataRow(
+                          cells: List<DataCell>.generate(
+                            isManager ? 9 : 7,
+                            (index) => DataCell(
+                              index == 0
+                                  ? const Center(
+                                      child: SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),

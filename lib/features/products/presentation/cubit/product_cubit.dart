@@ -45,8 +45,8 @@ class ProductCubit extends Cubit<ProductStates> {
   List<Product> products = [];
   List<Product> get allProducts => products;
   List<String> categories = [];
-  String selectedCategory = 'All';
-  String selectedAvailability = 'All';
+  String selectedCategory = '*';
+  String selectedAvailability = '*';
   
   String currentSearchQuery = '';
 
@@ -55,6 +55,7 @@ class ProductCubit extends Cubit<ProductStates> {
   bool hasMoreProducts = true;
   bool isLoadingMore = false;
   static const int pageSize = 50;
+  int _requestVersion = 0;
 
   void clearProducts() {
     products = [];
@@ -66,12 +67,14 @@ class ProductCubit extends Cubit<ProductStates> {
     emit(ProductLoadedState([]));
   }
 
-  void getAllProducts() async {
+  Future<void> getAllProducts() async {
+    final requestVersion = ++_requestVersion;
     emit(ProductLoadingState());
     
     // Reset pagination
     currentPage = 0;
     hasMoreProducts = true;
+    isLoadingMore = false;
     products = [];
     
     // Load first page
@@ -84,24 +87,30 @@ class ProductCubit extends Cubit<ProductStates> {
     );
     
     result.fold(
-      (failure) => emit(ProductErrorState(failure.message)),
+      (failure) {
+        if (requestVersion == _requestVersion) {
+          emit(ProductErrorState(failure.message));
+        }
+      },
       (productsList) {
-        products = productsList;
-        hasMoreProducts = productsList.length >= pageSize;
-        emit(ProductLoadedState(productsList));
+        if (requestVersion != _requestVersion) return;
+        products = List<Product>.from(productsList);
+        hasMoreProducts = productsList.length == pageSize;
+        emit(ProductLoadedState(List<Product>.unmodifiable(products)));
       },
     );
   }
   
   void loadMoreProducts() async {
     if (isLoadingMore || !hasMoreProducts) return;
-    
+
+    final requestVersion = _requestVersion;
+    final nextPage = currentPage + 1;
     isLoadingMore = true;
-    emit(ProductLoadedState(products)); // Emit to show execution loading indicator
-    currentPage++;
+    emit(ProductLoadedState(List<Product>.unmodifiable(products)));
     
     final result = await productRepositoryInt.getProductsPaginated(
-      page: currentPage,
+      page: nextPage,
       pageSize: pageSize,
       category: selectedCategory,
       availability: selectedAvailability,
@@ -110,14 +119,21 @@ class ProductCubit extends Cubit<ProductStates> {
     
     result.fold(
       (failure) {
+        if (requestVersion != _requestVersion) return;
         isLoadingMore = false;
-        currentPage--; // Revert page increment on error
+        emit(ProductErrorState(failure.message));
+        emit(ProductLoadedState(List<Product>.unmodifiable(products)));
       },
       (productsList) {
-        products.addAll(productsList);
-        hasMoreProducts = productsList.length >= pageSize;
+        if (requestVersion != _requestVersion) return;
+        final existingBarcodes = products.map((p) => p.barcode).toSet();
+        products.addAll(
+          productsList.where((p) => existingBarcodes.add(p.barcode)),
+        );
+        currentPage = nextPage;
+        hasMoreProducts = productsList.length == pageSize;
         isLoadingMore = false;
-        emit(ProductLoadedState(products));
+        emit(ProductLoadedState(List<Product>.unmodifiable(products)));
       },
     );
   }

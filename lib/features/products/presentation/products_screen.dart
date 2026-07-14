@@ -77,12 +77,10 @@ class ProductsScreenState extends State<ProductsScreen> {
     _scrollController.addListener(_onScroll);
     searchController.addListener(_onSearchChanged);
 
-    // Clear any previous state (singleton cubit)
     final cubit = getIt<ProductCubit>();
-    cubit.clearProducts();
-
-    // Only load categories
+    products = List<Product>.from(cubit.allProducts);
     cubit.getAllCategories();
+    unawaited(cubit.getAllProducts());
   }
 
   @override
@@ -199,6 +197,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                             }
                           },
                           buildWhen: (previous, current) =>
+                              current is ProductLoadingState ||
                               current is CategoryLoadedState ||
                               current is CategoryErrorState ||
                               current is ProductLoadedState,
@@ -209,6 +208,13 @@ class ProductsScreenState extends State<ProductsScreen> {
 
                             // Use products list directly as it's filtered by server
                             final currentFilteredProducts = products;
+
+                            if (state is ProductLoadingState &&
+                                currentFilteredProducts.isEmpty) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
 
                             return Column(
                               children: [

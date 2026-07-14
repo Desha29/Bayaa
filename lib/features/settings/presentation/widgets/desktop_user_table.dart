@@ -10,6 +10,7 @@ import '../../../auth/presentation/cubit/user_cubit.dart';
 import '../../data/models/user_row.dart';
 import 'add_edit_user_dialog.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import '../../../../core/components/local_image_view.dart';
 
 class DesktopUserTable extends StatelessWidget {
   const DesktopUserTable({
@@ -78,17 +79,34 @@ class DesktopUserTable extends StatelessWidget {
           return DataRow2(
             cells: [
               DataCell(
-                Center(
-                  child: Text(
-                    user.name,
-                    style: const TextStyle(
-                      fontFamily: 'Cairo',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: AppColors.textPrimary,
+                Row(
+                  children: [
+                    LocalImageView(
+                      path: userData.imagePath,
+                      width: 36,
+                      height: 36,
+                      borderRadius: 18,
+                      fallback: Container(
+                        color: AppColors.primaryColor.withOpacity(.1),
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.person_outline,
+                            size: 18, color: AppColors.primaryColor),
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        user.name,
+                        style: const TextStyle(
+                          fontFamily: 'Cairo',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: AppColors.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               DataCell(

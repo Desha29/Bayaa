@@ -6,12 +6,14 @@ class User {
   String phone;
   UserType userType;
   String password;
+  String? imagePath;
   User({
     required this.username,
     required this.name,
     required this.phone,
     required this.userType,
     required this.password,
+    this.imagePath,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,6 +23,7 @@ class User {
       'phone': phone,
       'userType': userType.index,
       'password': password,
+      'imagePath': imagePath,
     };
   }
 }

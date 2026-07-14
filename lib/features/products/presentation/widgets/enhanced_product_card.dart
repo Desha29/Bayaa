@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:bayaa_pos/core/constants/app_colors.dart';
+import '../../../../core/components/local_image_view.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../auth/data/models/user_model.dart';
@@ -62,6 +63,19 @@ class EnhancedProductCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          LocalImageView(
+            path: product.imagePath,
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            fallback: Container(
+              color: AppColors.primaryColor.withOpacity(.08),
+              alignment: Alignment.center,
+              child: const Icon(Icons.inventory_2_outlined,
+                  color: AppColors.primaryColor, size: 24),
+            ),
+          ),
+          const SizedBox(width: 14),
           // 🔹 Product Name, Category & Barcode
           Expanded(
             flex: 3,

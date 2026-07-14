@@ -21,7 +21,7 @@ class SQLiteManager {
 
     _database = await openDatabase(
       databasePath,
-      version: 8,
+      version: 10,
       onCreate: _onCreate,
       onConfigure: _onConfigure,
       onUpgrade: _onUpgrade,
@@ -211,6 +211,31 @@ class SQLiteManager {
         'ON expenses(created_at DESC)',
       );
     }
+
+    if (oldVersion < 9) {
+      print('  ➕ Adding optional user and product images...');
+      final columns = <String, List<String>>{
+        'users': ['phone TEXT', 'image_path TEXT'],
+        'products': ['image_path TEXT'],
+      };
+      for (final table in columns.entries) {
+        for (final definition in table.value) {
+          try {
+            await db.execute(
+              'ALTER TABLE ${table.key} ADD COLUMN $definition',
+            );
+          } catch (e) {
+            if (!e.toString().contains('duplicate column name')) rethrow;
+          }
+        }
+      }
+      print('  ✅ Migration to v9 complete');
+    }
+
+    if (oldVersion < 10) {
+      await _createProductIndexes(db);
+      print('  ✅ Migration to v10 complete');
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -278,12 +303,14 @@ class SQLiteManager {
         stock REAL DEFAULT 0.0,
         min_stock REAL DEFAULT 0.0,
         category_id TEXT,
+        image_path TEXT,
         is_active INTEGER NOT NULL DEFAULT 1,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         FOREIGN KEY (category_id) REFERENCES categories(id)
       )
     ''');
+    await _createProductIndexes(db);
 
     // Users table
     await db.execute('''
@@ -291,6 +318,8 @@ class SQLiteManager {
         id TEXT PRIMARY KEY NOT NULL,
         username TEXT NOT NULL UNIQUE,
         display_name TEXT NOT NULL,
+        phone TEXT,
+        image_path TEXT,
         password_hash TEXT NOT NULL,
         role TEXT NOT NULL DEFAULT 'cashier',
         is_active INTEGER NOT NULL DEFAULT 1,
@@ -415,6 +444,21 @@ class SQLiteManager {
         '${DateTime.now().toIso8601String()}'
       )
     ''');
+  }
+
+  Future<void> _createProductIndexes(Database db) async {
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_products_active_name '
+      'ON products(is_active, name COLLATE NOCASE, id)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_products_category_active_name '
+      'ON products(category_id, is_active, name COLLATE NOCASE, id)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_products_stock '
+      'ON products(is_active, stock, min_stock)',
+    );
   }
 
   Database get database {

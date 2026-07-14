@@ -564,7 +564,7 @@ class _SalesScreenState extends State<SalesScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 86),
+                const ScreenHeaderGap(height: 86),
                 TotalSectionCard(
                   totalAmount: _totalAmount,
                   itemCount: _cartItems.length,

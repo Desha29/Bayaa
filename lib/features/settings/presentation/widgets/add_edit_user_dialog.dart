@@ -1,5 +1,8 @@
 import 'package:bayaa_pos/core/di/dependency_injection.dart';
+import 'package:bayaa_pos/core/components/local_image_view.dart';
+import 'package:bayaa_pos/core/data/services/local_image_storage.dart';
 import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -8,10 +11,12 @@ import '../../../../l10n/app_localizations.dart';
 
 class AddEditUserDialog extends StatefulWidget {
   final User? userToEdit;
+  final bool profileOnly;
 
   const AddEditUserDialog({
     super.key,
     this.userToEdit,
+    this.profileOnly = false,
   });
 
   @override
@@ -24,6 +29,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   late final TextEditingController usernameCtrl;
   late final TextEditingController passwordCtrl;
   late UserType selectedUserType;
+  String? _selectedImagePath;
   bool _isPasswordVisible = false;
 
   @override
@@ -35,6 +41,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
     usernameCtrl = TextEditingController(text: user?.username ?? '');
     passwordCtrl = TextEditingController(text: user?.password ?? '');
     selectedUserType = user?.userType ?? UserType.cashier;
+    _selectedImagePath = user?.imagePath;
   }
 
   @override
@@ -48,38 +55,71 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
 
   bool _isSubmitting = false;
 
-  void _submit() {
+  Future<void> _pickImage() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp', 'bmp'],
+    );
+    final selectedPath = result?.files.single.path;
+    if (selectedPath != null && mounted) {
+      setState(() => _selectedImagePath = selectedPath);
+    }
+  }
+
+  Future<void> _submit() async {
     final l10n = AppLocalizations.of(context);
     if (_isSubmitting) return;
 
     if (nameCtrl.text.trim().isEmpty ||
         usernameCtrl.text.trim().isEmpty ||
-        passwordCtrl.text.trim().isEmpty) {
+        (widget.userToEdit == null && passwordCtrl.text.trim().isEmpty)) {
       MotionSnackBarError(context, l10n.fillRequiredFields);
       return;
     }
 
     setState(() => _isSubmitting = true);
 
-    final User user = User(
-      name: nameCtrl.text.trim(),
-      phone: phoneCtrl.text.trim(),
-      username: usernameCtrl.text.trim(),
-      password: passwordCtrl.text.trim(),
-      userType: selectedUserType,
-    );
+    try {
+      final username = usernameCtrl.text.trim();
+      var storedImagePath = _selectedImagePath;
+      if (storedImagePath != null &&
+          storedImagePath != widget.userToEdit?.imagePath) {
+        storedImagePath = await LocalImageStorage.persist(
+          sourcePath: storedImagePath,
+          collection: 'profiles',
+          key: username,
+        );
+      }
 
-    if (widget.userToEdit == null) {
-      getIt<UserCubit>().saveUser(user);
-      MotionSnackBarSuccess(context, l10n.msgUserCreated);
-      getIt<UserCubit>().getAllUsers();
-    } else {
-      getIt<UserCubit>().updateUser(user);
-      MotionSnackBarSuccess(context, l10n.msgUserUpdated);
-      getIt<UserCubit>().getAllUsers();
+      final User user = User(
+        name: nameCtrl.text.trim(),
+        phone: phoneCtrl.text.trim(),
+        username: username,
+        password: passwordCtrl.text.trim(),
+        userType: selectedUserType,
+        imagePath: storedImagePath,
+      );
+
+      if (!mounted) return;
+      if (widget.userToEdit == null) {
+        getIt<UserCubit>().saveUser(user);
+        MotionSnackBarSuccess(context, l10n.msgUserCreated);
+      } else {
+        getIt<UserCubit>().updateUser(user);
+        MotionSnackBarSuccess(context, l10n.msgUserUpdated);
+      }
+
+      Navigator.of(context).pop(user);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      MotionSnackBarError(
+        context,
+        l10n.localeName == 'ar'
+            ? 'تعذر حفظ صورة الملف الشخصي'
+            : 'Could not save the profile image',
+      );
     }
-
-    Navigator.of(context).pop(user);
   }
 
   @override
@@ -138,6 +178,9 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
               ),
               const SizedBox(height: 24),
 
+              _buildImagePicker(l10n),
+              const SizedBox(height: 20),
+
               // Form
               Flexible(
                 child: SingleChildScrollView(
@@ -157,8 +200,10 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                       ),
                       const SizedBox(height: 16),
                       _buildPasswordField(l10n),
-                      const SizedBox(height: 16),
-                      _buildUserTypeDropdown(l10n),
+                      if (!widget.profileOnly) ...[
+                        const SizedBox(height: 16),
+                        _buildUserTypeDropdown(l10n),
+                      ],
                     ],
                   ),
                 ),
@@ -210,6 +255,81 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildImagePicker(AppLocalizations l10n) {
+    final isArabic = l10n.localeName == 'ar';
+    final initial = nameCtrl.text.trim().isNotEmpty
+        ? nameCtrl.text.trim().substring(0, 1).toUpperCase()
+        : '?';
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withOpacity(.045),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.borderColor),
+      ),
+      child: Row(
+        children: [
+          LocalImageView(
+            path: _selectedImagePath,
+            width: 72,
+            height: 72,
+            borderRadius: 36,
+            fallback: Container(
+              color: AppColors.primaryColor,
+              alignment: Alignment.center,
+              child: Text(
+                initial,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isArabic ? 'صورة الملف الشخصي' : 'Profile image',
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  isArabic ? 'اختيارية ويمكن تغييرها لاحقاً' : 'Optional and changeable later',
+                  style: const TextStyle(
+                    color: AppColors.mutedColor,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.photo_camera_outlined, size: 17),
+                      label: Text(isArabic ? 'اختيار صورة' : 'Choose image'),
+                    ),
+                    if (_selectedImagePath != null)
+                      TextButton.icon(
+                        onPressed: () => setState(() => _selectedImagePath = null),
+                        icon: const Icon(Icons.delete_outline, size: 17),
+                        label: Text(isArabic ? 'إزالة' : 'Remove'),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
