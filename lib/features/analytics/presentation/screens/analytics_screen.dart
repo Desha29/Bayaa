@@ -206,13 +206,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.all(isDesktop ? 32 : isTablet ? 24 : 16),
+                    padding: EdgeInsets.fromLTRB(
+                      isDesktop ? 32 : isTablet ? 24 : 16,
+                      8,
+                      isDesktop ? 32 : isTablet ? 24 : 16,
+                      isDesktop ? 32 : isTablet ? 24 : 16,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Title row (History button removed)
                         _buildHeaderRow(isDesktop),
-                        const SizedBox(height: 16),
+                        const ScreenHeaderGap(height: 16),
                         // Period selector chips
                         _buildPeriodSelector(),
                         // Tab Selector

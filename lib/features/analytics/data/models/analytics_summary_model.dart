@@ -17,10 +17,12 @@ class AnalyticsSummaryModel {
     required this.endDate,
     this.grossRevenue = 0.0,
     this.refundedAmount = 0.0,
+    this.totalExpenses = 0.0,
   });
   
   final double? grossRevenue;
   final double? refundedAmount;
+  final double totalExpenses;
 
   double get loss => totalProfit < 0 ? totalProfit.abs() : 0;
   bool get isProfitable => totalProfit >= 0;

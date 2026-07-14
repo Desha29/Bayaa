@@ -44,7 +44,12 @@ class NotificationsScreen extends StatelessWidget {
                     );
                   } else if (state is NotificationsLoaded) {
                     return Padding(
-                      padding: EdgeInsets.all(padding),
+                      padding: EdgeInsets.fromLTRB(
+                        padding,
+                        8,
+                        padding,
+                        padding,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -56,7 +61,7 @@ class NotificationsScreen extends StatelessWidget {
                             titleColor: AppColors.textPrimary,
                             iconColor: AppColors.primaryColor,
                           ),
-                          SizedBox(height: spacing),
+                          ScreenHeaderGap(height: spacing),
 
                           // Summary Row (Render directly on background for a premium flat feel)
                           SummaryRow(

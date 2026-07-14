@@ -155,7 +155,13 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
       final totalCostRefunded = (costResult.first['total_cost_refunded'] as num?)?.toDouble() ?? 0.0;
       
       final netCost = totalCostSold - totalCostRefunded;
-      final netProfit = netRevenue - netCost;
+      final expensesResult = await _query('''
+        SELECT COALESCE(SUM(amount), 0) AS total_expenses
+        FROM expenses WHERE created_at BETWEEN ? AND ?
+      ''', [startIso, endIso]);
+      final totalExpenses =
+          (expensesResult.first['total_expenses'] as num?)?.toDouble() ?? 0.0;
+      final netProfit = netRevenue - netCost - totalExpenses;
       final profitMargin = netRevenue > 0 ? (netProfit / netRevenue) * 100 : 0.0;
 
       return Right(AnalyticsSummaryModel(
@@ -168,6 +174,7 @@ class AnalyticsRepositoryImpl with RepositoryPersistenceMixin implements Analyti
         totalSales: totalSalesCount,
         grossRevenue: totalRevenue,
         refundedAmount: totalRefunds,
+        totalExpenses: totalExpenses,
       ));
     } catch (e) {
       return Left(CacheFailure("Error loading sessions summary: ${e.toString()}"));

@@ -435,7 +435,12 @@ class _SalesScreenState extends State<SalesScreen>
             final isTablet =
                 constraints.maxWidth >= 768 && constraints.maxWidth <= 1100;
             return Padding(
-              padding: EdgeInsets.all(isDesktop ? 24 : (isTablet ? 16 : 12)),
+              padding: EdgeInsets.fromLTRB(
+                isDesktop ? 24 : (isTablet ? 16 : 12),
+                8,
+                isDesktop ? 24 : (isTablet ? 16 : 12),
+                isDesktop ? 24 : (isTablet ? 16 : 12),
+              ),
               child: (isDesktop || isTablet)
                   ? _buildDesktopTabletLayout(isDesktop)
                   : _buildMobileLayout(),
@@ -468,7 +473,7 @@ class _SalesScreenState extends State<SalesScreen>
                   iconColor: AppColors.primaryColor,
                   titleColor: AppColors.textPrimary,
                 ),
-                const SizedBox(height: 16),
+                const ScreenHeaderGap(height: 16),
                 Expanded(
                   child: Stack(
                     clipBehavior: Clip.none,
@@ -642,7 +647,7 @@ class _SalesScreenState extends State<SalesScreen>
           iconColor: AppColors.primaryColor,
           titleColor: AppColors.textPrimary,
         ),
-        const SizedBox(height: 12),
+        const ScreenHeaderGap(height: 12),
         Expanded(
           child: Stack(
             clipBehavior: Clip.none,

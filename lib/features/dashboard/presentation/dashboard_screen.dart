@@ -9,9 +9,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/components/screen_header.dart';
 import '../../../core/di/dependency_injection.dart';
 import '../../../core/functions/messege.dart';
 import '../../../core/security/permission_guard.dart';
+import '../../../core/localization/translation_helper.dart';
+import '../../../core/localization/locale_provider.dart';
 import '../../auth/presentation/cubit/user_cubit.dart';
 import '../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../notifications/presentation/notifications_screen.dart';
@@ -25,9 +28,6 @@ import '../../stock/presentation/cubit/stock_states.dart';
 import '../../stock/presentation/stock_screen.dart';
 import '../../invoice/presentation/invoices_screen.dart';
 
-import '../../settings/presentation/cubit/settings_cubit.dart';
-import '../../settings/presentation/cubit/settings_states.dart';
-
 import '../../sessions/presentation/screens/sessions_dashboard_screen.dart';
 import '../../analytics/presentation/screens/analytics_screen.dart';
 import '../../analytics/presentation/cubit/analytics_cubit.dart';
@@ -37,6 +37,7 @@ import 'widgets/dashboard_home.dart';
 import 'widgets/side_bar.dart';
 import '../../stock_summary/presentation/screens/stock_summary_screen.dart';
 import '../../stock_summary/presentation/cubit/stock_summary_cubit.dart';
+import '../../expenses/presentation/expenses_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -140,6 +141,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         screen: const NotificationsScreen(),
       ),
       SidebarItem(
+        id: 'expenses',
+        icon: LucideIcons.walletCards,
+        title: l10n.localeName == 'ar' ? 'المصروفات' : 'Expenses',
+        screen: const ExpensesScreen(),
+      ),
+      SidebarItem(
         id: 'settings',
         icon: LucideIcons.settings,
         title: l10n.settings,
@@ -189,28 +196,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Scaffold(
             appBar: isMobileOrTablet
                 ? AppBar(
-                    backgroundColor: AppColors.primaryColor,
-                    title: BlocBuilder<SettingsCubit, SettingsStates>(
-                        bloc: getIt<SettingsCubit>(),
-                        builder: (context, state) {
-                          final l10n = AppLocalizations.of(context);
-                          final configuredName =
-                              getIt<SettingsCubit>().currentStoreInfo?.name;
-                          final isDefaultBrand = configuredName == null ||
-                              configuredName.isEmpty ||
-                              configuredName == 'Bayaa POS' ||
-                              configuredName == 'Bayaa Store';
-                          final name = isDefaultBrand
-                              ? l10n.loginBrandName
-                              : configuredName;
-                          return Text(name);
-                        }),
+                    backgroundColor: AppColors.sidebarColor,
+                    title: Text(sidebarItems[selectedIndex].title),
                     leading: Builder(
                       builder: (context) => IconButton(
                         icon: const Icon(LucideIcons.menu),
                         onPressed: () => Scaffold.of(context).openDrawer(),
                       ),
                     ),
+                    actions: _headerActions(context, compact: true),
                   )
                 : null,
             drawer: isMobileOrTablet
@@ -241,7 +235,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: Container(
                     color: AppColors.backgroundColor,
-                    child: sidebarItems[selectedIndex].screen,
+                    child: Column(
+                      children: [
+                        if (!isMobileOrTablet)
+                          _DesktopHeader(
+                            pageTitle: sidebarItems[selectedIndex].title,
+                            pageIcon: sidebarItems[selectedIndex].icon,
+                            actions: _headerActions(context),
+                          ),
+                        Expanded(
+                          child: ScreenHeaderScope(
+                            showInPage: false,
+                            child: sidebarItems[selectedIndex].screen,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -250,6 +259,73 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+  List<Widget> _headerActions(BuildContext context, {bool compact = false}) {
+    return [
+      _LanguageToggle(compact: compact),
+      BlocBuilder<NotificationsCubit, NotificationsStates>(
+        builder: (context, state) {
+          final total = getIt<NotificationsCubit>().total;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: compact
+                        ? Colors.white.withOpacity(.12)
+                        : AppColors.backgroundColor,
+                    borderRadius: BorderRadius.circular(13),
+                    border: compact
+                        ? null
+                        : Border.all(color: AppColors.borderColor),
+                  ),
+                  child: IconButton(
+                    tooltip: AppLocalizations.of(context).notifications,
+                    padding: EdgeInsets.zero,
+                    iconSize: 19,
+                    icon: Icon(
+                      LucideIcons.bell,
+                      color: compact ? Colors.white : AppColors.textSecondary,
+                    ),
+                    onPressed: () => _openNotifications(context),
+                  ),
+                ),
+                if (total > 0)
+                  Positioned(
+                    right: -2,
+                    top: -3,
+                    child: Container(
+                      constraints:
+                          const BoxConstraints(minWidth: 16, minHeight: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                          color: AppColors.errorColor, shape: BoxShape.circle),
+                      child: Text('$total',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+      _ProfileMenu(user: curUser, compact: compact),
+      const SizedBox(width: 8),
+    ];
+  }
+
+  void _openNotifications(BuildContext context) {
+    final index = sidebarItems.indexWhere((item) => item.id == 'notifications');
+    if (index != -1) _onSidebarSelected(context, index);
   }
 
   void _onSidebarSelected(BuildContext context, int index) {
@@ -281,5 +357,172 @@ class _DashboardScreenState extends State<DashboardScreen> {
       MotionSnackBarWarning(
           context, AppLocalizations.of(context).screenUnavailable);
     }
+  }
+}
+
+class _LanguageToggle extends StatelessWidget {
+  final bool compact;
+  const _LanguageToggle({required this.compact});
+
+  @override
+  Widget build(BuildContext context) {
+    final isArabic = AppLocalizations.of(context).localeName == 'ar';
+    final foreground = compact ? Colors.white : AppColors.textSecondary;
+
+    return Tooltip(
+      message: isArabic ? 'English' : 'العربية',
+      child: InkWell(
+        onTap: () => getIt<LocaleProvider>().toggleLocale(),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          height: 38,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: EdgeInsets.symmetric(horizontal: compact ? 9 : 12),
+          decoration: BoxDecoration(
+            color: compact
+                ? Colors.white.withOpacity(.12)
+                : AppColors.backgroundColor,
+            borderRadius: BorderRadius.circular(20),
+            border: compact ? null : Border.all(color: AppColors.borderColor),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.language, size: 18, color: foreground),
+            if (!compact) ...[
+              const SizedBox(width: 6),
+              Text(
+                isArabic ? 'EN' : 'ع',
+                style: TextStyle(
+                    color: foreground,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700),
+              ),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+class _DesktopHeader extends StatelessWidget {
+  final String pageTitle;
+  final IconData pageIcon;
+  final List<Widget> actions;
+  const _DesktopHeader({
+    required this.pageTitle,
+    required this.pageIcon,
+    required this.actions,
+  });
+
+  @override
+  Widget build(BuildContext context) => Container(
+        height: 80,
+        padding: const EdgeInsets.symmetric(horizontal: 26),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Colors.white, Color(0xFFFBFDFF)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          border:
+              const Border(bottom: BorderSide(color: AppColors.borderColor)),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withOpacity(.04),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppColors.secondaryColor.withOpacity(.09),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(pageIcon, size: 19, color: AppColors.secondaryColor),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Text(
+              pageTitle,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          ...actions,
+        ]),
+      );
+}
+
+class _ProfileMenu extends StatelessWidget {
+  final User user;
+  final bool compact;
+  const _ProfileMenu({required this.user, required this.compact});
+
+  @override
+  Widget build(BuildContext context) {
+    final name = TranslationHelper.translateUserName(context, user.name,
+        username: user.username);
+    final initial = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?';
+    return PopupMenuButton<void>(
+      tooltip: name,
+      offset: const Offset(0, 48),
+      itemBuilder: (_) => [
+        PopupMenuItem<void>(
+          enabled: false,
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary)),
+                Text(user.username,
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.mutedColor)),
+              ]),
+        ),
+      ],
+      child: Container(
+        padding:
+            EdgeInsets.symmetric(horizontal: compact ? 4 : 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: compact
+              ? Colors.white.withOpacity(.12)
+              : AppColors.backgroundColor,
+          borderRadius: BorderRadius.circular(22),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.secondaryColor,
+              child: Text(initial,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold))),
+          if (!compact) ...[
+            const SizedBox(width: 8),
+            ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 130),
+                child: Text(name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary))),
+            const SizedBox(width: 4),
+            const Icon(LucideIcons.chevronDown,
+                size: 16, color: AppColors.mutedColor),
+          ],
+        ]),
+      ),
+    );
   }
 }

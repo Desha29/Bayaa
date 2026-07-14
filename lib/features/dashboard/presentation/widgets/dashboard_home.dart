@@ -1,4 +1,5 @@
-import 'package:bayaa_pos/core/components/screen_header.dart';
+import 'dart:ui' as ui;
+
 import 'package:bayaa_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -8,19 +9,16 @@ import 'package:intl/intl.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 import '../../../../core/di/dependency_injection.dart';
-import '../../../settings/presentation/cubit/settings_cubit.dart'
-    show SettingsCubit;
 import '../../../invoice/presentation/cubit/invoice_cubit.dart';
 import '../../../invoice/presentation/cubit/invoice_state.dart';
 import '../../../stock/presentation/cubit/stock_cubit.dart';
 import '../../../stock/presentation/cubit/stock_states.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
-import '../../../notifications/presentation/cubit/notifications_states.dart';
 import '../../../products/presentation/cubit/product_cubit.dart';
 import '../../../sessions/data/repositories/session_repository_impl.dart';
-import 'dashboard_card.dart';
 import 'recent_operations.dart';
 import '../../../../core/session/session_manager.dart';
+import '../../../expenses/data/expense_repository.dart';
 
 class DashboardHome extends StatefulWidget {
   const DashboardHome({
@@ -36,14 +34,10 @@ class DashboardHome extends StatefulWidget {
   State<DashboardHome> createState() => _DashboardHomeState();
 }
 
-class _DashboardHomeState extends State<DashboardHome>
-    with TickerProviderStateMixin {
-  late final List<AnimationController> _controllers;
-  late final List<Animation<double>> _animations;
-  final store = getIt<SettingsCubit>().currentStoreInfo;
-  
+class _DashboardHomeState extends State<DashboardHome> {
   int? _sessionCount;
 
+  // ignore: unused_element
   List<Map<String, dynamic>> _getCards(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return [
@@ -119,6 +113,7 @@ class _DashboardHomeState extends State<DashboardHome>
     ];
   }
 
+  // ignore: unused_element
   List<Map<String, dynamic>> get cards => _getCards(context);
 
   @override
@@ -134,24 +129,6 @@ class _DashboardHomeState extends State<DashboardHome>
       _loadSessionCount();
     }
 
-    _controllers = List.generate(
-      7, // Dashboard always contains exactly 7 items
-      (index) => AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 600),
-      ),
-    );
-
-    _animations = _controllers
-        .map((c) => CurvedAnimation(parent: c, curve: Curves.easeOutBack))
-        .toList();
-
-    Future.forEach(List.generate(7, (i) => i), (i) async {
-      await Future.delayed(Duration(milliseconds: i * 100));
-      if (mounted && i < _controllers.length) {
-        _controllers[i].forward();
-      }
-    });
   }
 
   Future<void> _loadSessionCount() async {
@@ -169,14 +146,6 @@ class _DashboardHomeState extends State<DashboardHome>
     }
   }
 
-  @override
-  void dispose() {
-    for (final c in _controllers) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
   Widget _buildStatCard({
     required String title,
     required String value,
@@ -184,62 +153,81 @@ class _DashboardHomeState extends State<DashboardHome>
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: AppColors.primaryForeground,
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.surfaceColor,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: color.withOpacity(0.12),
+          color: color.withOpacity(0.18),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.015),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: const Color(0xFF0F172A).withOpacity(0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 22,
+          PositionedDirectional(
+            top: 0,
+            end: 0,
+            child: Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.055),
+                borderRadius: const BorderRadiusDirectional.only(
+                  bottomStart: Radius.circular(72),
+                ),
+              ),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.mutedColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.10),
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  child: Icon(icon, color: color, size: 23),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.mutedColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 18,
+                          height: 1.1,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -253,9 +241,9 @@ class _DashboardHomeState extends State<DashboardHome>
     final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth < 600
+        final crossAxisCount = constraints.maxWidth < 560
             ? 1
-            : constraints.maxWidth < 1100
+            : constraints.maxWidth < 760
                 ? 2
                 : 4;
 
@@ -263,9 +251,9 @@ class _DashboardHomeState extends State<DashboardHome>
           crossAxisCount: crossAxisCount,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 2.8,
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+          childAspectRatio: constraints.maxWidth < 560 ? 3.1 : 2.05,
           children: [
             // Net sales today
             BlocBuilder<InvoiceCubit, InvoiceState>(
@@ -305,29 +293,35 @@ class _DashboardHomeState extends State<DashboardHome>
                 );
               },
             ),
-            // Stock alerts
-            BlocBuilder<StockCubit, StockStates>(
-              bloc: getIt<StockCubit>(),
+            // Invoices issued today
+            BlocBuilder<InvoiceCubit, InvoiceState>(
+              bloc: getIt<InvoiceCubit>(),
               builder: (context, state) {
-                final count = getIt<StockCubit>().totalCount;
+                final now = DateTime.now();
+                final count = state.sales.where((sale) =>
+                    !sale.isRefund && sale.date.year == now.year &&
+                    sale.date.month == now.month && sale.date.day == now.day).length;
                 return _buildStatCard(
-                  title: l10n.lowStockAlerts,
-                  value: l10n.lowStockCount(count),
-                  icon: LucideIcons.triangleAlert,
-                  color: AppColors.warningColor,
+                  title: l10n.localeName == 'ar' ? 'فواتير اليوم' : 'Today invoices',
+                  value: '$count',
+                  icon: LucideIcons.receiptText,
+                  color: AppColors.accentColor,
                 );
               },
             ),
-            // Unread notifications
-            BlocBuilder<NotificationsCubit, NotificationsStates>(
-              bloc: getIt<NotificationsCubit>(),
-              builder: (context, state) {
-                final count = getIt<NotificationsCubit>().total;
+            // Today's operating expenses
+            FutureBuilder<double>(
+              future: ExpenseRepository().total(
+                DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+                DateTime.now(),
+              ),
+              builder: (context, snapshot) {
+                final total = snapshot.data ?? 0;
                 return _buildStatCard(
-                  title: l10n.unreadNotifications,
-                  value: l10n.notificationsCount(count),
-                  icon: LucideIcons.bell,
-                  color: AppColors.accentGold,
+                  title: l10n.localeName == 'ar' ? 'مصروفات اليوم' : 'Today expenses',
+                  value: '${total.toStringAsFixed(2)} ${l10n.currencyEg}',
+                  icon: LucideIcons.walletCards,
+                  color: AppColors.errorColor,
                 );
               },
             ),
@@ -578,33 +572,15 @@ class _DashboardHomeState extends State<DashboardHome>
     final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount = 2;
-        double aspectRatio = 1.4;
-
-        if (constraints.maxWidth < 800) {
-          crossAxisCount = 1;
-          aspectRatio = 1.8;
-        } else if (constraints.maxWidth < 1200) {
-          crossAxisCount = 2;
-          aspectRatio = 1.3;
-        } else {
-          crossAxisCount = 3;
-          aspectRatio = 1.4;
-        }
-
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ScreenHeader(
-                title: l10n.dashboard,
-                subtitle: l10n.welcomeUser(store?.name ?? l10n.appName),
-                icon: LucideIcons.layoutDashboard,
-                titleColor: AppColors.textPrimary,
-                iconColor: AppColors.primaryColor,
-              ),
-              const SizedBox(height: 12),
+              // The global dashboard header owns the page title. Keep the
+              // key business metrics immediately below it.
+              _buildStatisticalCards(),
+              const SizedBox(height: 18),
 
               Expanded(
                 child: Row(
@@ -713,48 +689,10 @@ class _DashboardHomeState extends State<DashboardHome>
                               },
                             ),
 
-                            // Real-time statistical cards grid
-                            _buildStatisticalCards(),
-
                             // 7-day Sales Trend chart
                             _buildSalesTrendChart(),
 
-                            // Quick Actions title
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8, bottom: 12),
-                              child: Text(
-                                l10n.quickActions,
-                                style: const TextStyle(
-                                  color: AppColors.textPrimary,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-
-                            // Original quick navigation cards grid
-                            GridView.count(
-                              crossAxisCount: crossAxisCount,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: aspectRatio,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: List.generate(cards.length, (index) {
-                                final card = cards[index];
-                                return _buildAnimatedCard(
-                                  index: index,
-                                  child: DashboardCard(
-                                    id: card["id"],
-                                    icon: card["icon"],
-                                    title: card["title"],
-                                    subtitle: card["subtitle"],
-                                    color: card["color"],
-                                    onTap: () => widget.onCardTap(card["id"]),
-                                  ),
-                                );
-                              }),
-                            ),
+                            _buildFinancialComparison(),
                             const SizedBox(height: 16),
                           ],
                         ),
@@ -777,10 +715,124 @@ class _DashboardHomeState extends State<DashboardHome>
     );
   }
 
-  Widget _buildAnimatedCard({required int index, required Widget child}) {
-    return ScaleTransition(
-      scale: _animations[index],
-      child: FadeTransition(opacity: _animations[index], child: child),
+  Widget _buildFinancialComparison() {
+    final today = DateTime.now();
+    final start = DateTime(today.year, today.month, today.day);
+    final l10n = AppLocalizations.of(context);
+    final isArabic = l10n.localeName == 'ar';
+    final expenseLabel = isArabic ? 'المصروفات' : 'Expenses';
+    return FutureBuilder<double>(
+      future: ExpenseRepository().total(start, today),
+      builder: (context, expenseSnapshot) => BlocBuilder<InvoiceCubit, InvoiceState>(
+        bloc: getIt<InvoiceCubit>(),
+        builder: (context, state) {
+          final sales = state.sales
+              .where((sale) => !sale.isRefund && sale.date.isAfter(start.subtract(const Duration(seconds: 1))))
+              .fold<double>(0, (sum, sale) => sum + sale.total);
+          final expenses = expenseSnapshot.data ?? 0;
+          final maxValue = [sales, expenses, 1.0]
+                  .reduce((a, b) => a > b ? a : b) *
+              1.2;
+          return Container(
+            margin: const EdgeInsets.only(top: 8, bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceColor,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppColors.borderColor),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(.035), blurRadius: 16, offset: const Offset(0, 6))],
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Container(width: 38, height: 38, decoration: BoxDecoration(color: AppColors.secondaryColor.withOpacity(.09), borderRadius: BorderRadius.circular(12)), child: const Icon(LucideIcons.trendingUp, size: 19, color: AppColors.secondaryColor)),
+                const SizedBox(width: 10),
+                Expanded(child: Text(
+                  l10n.localeName == 'ar' ? 'مقارنة المبيعات والمصروفات اليوم' : 'Today sales and expenses',
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                )),
+              ]),
+              const SizedBox(height: 16),
+              Directionality(
+                textDirection: ui.TextDirection.ltr,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Directionality(
+                        textDirection: isArabic
+                            ? ui.TextDirection.rtl
+                            : ui.TextDirection.ltr,
+                        child: isArabic
+                            ? _financeValue(expenseLabel, expenses,
+                                l10n.currencyEg, AppColors.errorColor)
+                            : _financeValue(l10n.sales, sales,
+                                l10n.currencyEg, AppColors.secondaryColor),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Directionality(
+                        textDirection: isArabic
+                            ? ui.TextDirection.rtl
+                            : ui.TextDirection.ltr,
+                        child: isArabic
+                            ? _financeValue(l10n.sales, sales,
+                                l10n.currencyEg, AppColors.secondaryColor)
+                            : _financeValue(expenseLabel, expenses,
+                                l10n.currencyEg, AppColors.errorColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (sales == 0 && expenses == 0)
+                SizedBox(height: 130, child: Center(child: Text(l10n.localeName == 'ar' ? 'لا توجد حركات مالية اليوم' : 'No financial activity today', style: const TextStyle(color: AppColors.mutedColor))))
+              else
+                Directionality(textDirection: ui.TextDirection.ltr, child: SizedBox(
+                  height: 145,
+                  child: BarChart(BarChartData(
+                    maxY: maxValue,
+                    alignment: BarChartAlignment.spaceAround,
+                    borderData: FlBorderData(show: false),
+                    gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (_) => FlLine(color: AppColors.borderColor.withOpacity(.65), strokeWidth: 1)),
+                    titlesData: const FlTitlesData(leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)), rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)), topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)), bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false))),
+                    barGroups: [
+                      if (isArabic) ...[
+                        _financeBar(0, expenses, maxValue, AppColors.errorColor),
+                        _financeBar(1, sales, maxValue, AppColors.secondaryColor),
+                      ] else ...[
+                        _financeBar(0, sales, maxValue, AppColors.secondaryColor),
+                        _financeBar(1, expenses, maxValue, AppColors.errorColor),
+                      ],
+                    ],
+                  )),
+                )),
+            ]),
+          );
+        },
+      ),
     );
   }
+
+  Widget _financeValue(String label, double value, String currency, Color color) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        decoration: BoxDecoration(color: color.withOpacity(.055), borderRadius: BorderRadius.circular(13)),
+        child: Row(children: [
+          Container(width: 9, height: 9, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(label, style: const TextStyle(fontSize: 12, color: AppColors.mutedColor))),
+          Text('${value.toStringAsFixed(2)} $currency', style: TextStyle(fontWeight: FontWeight.w800, color: color)),
+        ]),
+      );
+
+  BarChartGroupData _financeBar(int x, double value, double maxValue, Color color) => BarChartGroupData(
+        x: x,
+        barRods: [BarChartRodData(
+          toY: value,
+          width: 38,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
+          gradient: LinearGradient(colors: [color.withOpacity(.72), color], begin: Alignment.bottomCenter, end: Alignment.topCenter),
+          backDrawRodData: BackgroundBarChartRodData(show: true, toY: maxValue, color: color.withOpacity(.055)),
+        )],
+      );
 }

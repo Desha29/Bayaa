@@ -95,7 +95,7 @@ class _SettingsScreenContent extends StatelessWidget {
                 children: [
                   // Header
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                     child: ScreenHeader(
                       title: AppLocalizations.of(context).settings,
                       subtitle:
@@ -105,7 +105,7 @@ class _SettingsScreenContent extends StatelessWidget {
                       iconColor: AppColors.primaryColor,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const ScreenHeaderGap(height: 12),
                   // Content
                   Expanded(
                     child: ListView(

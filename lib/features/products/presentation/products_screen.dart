@@ -124,9 +124,11 @@ class ProductsScreenState extends State<ProductsScreen> {
                 final horizontalPadding = isMobile ? 12.0 : 20.0;
 
                 return Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: 16,
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    8,
+                    horizontalPadding,
+                    16,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +140,7 @@ class ProductsScreenState extends State<ProductsScreen> {
                         iconColor: AppColors.primaryColor,
                         titleColor: AppColors.kDarkChip,
                       ),
-                      const SizedBox(height: 12),
+                      const ScreenHeaderGap(height: 12),
                       Expanded(
                         child: BlocConsumer<ProductCubit, ProductStates>(
                           listener: (context, state) {

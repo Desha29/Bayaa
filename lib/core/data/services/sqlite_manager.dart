@@ -21,7 +21,7 @@ class SQLiteManager {
 
     _database = await openDatabase(
       databasePath,
-      version: 7,
+      version: 8,
       onCreate: _onCreate,
       onConfigure: _onConfigure,
       onUpgrade: _onUpgrade,
@@ -192,6 +192,25 @@ class SQLiteManager {
       }
       print('  ✅ Migration to v7 complete');
     }
+
+    if (oldVersion < 8) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS expenses (
+          id TEXT PRIMARY KEY NOT NULL,
+          title TEXT NOT NULL,
+          amount REAL NOT NULL,
+          category TEXT NOT NULL DEFAULT 'General',
+          notes TEXT,
+          created_at TEXT NOT NULL,
+          user_id TEXT,
+          shift_id TEXT
+        )
+      ''');
+      await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_expenses_created_at '
+        'ON expenses(created_at DESC)',
+      );
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -337,6 +356,19 @@ class SQLiteManager {
         CHECK (price >= 0),
         CHECK (refunded_quantity >= 0),
         CHECK (refunded_quantity <= quantity)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS expenses (
+        id TEXT PRIMARY KEY NOT NULL,
+        title TEXT NOT NULL,
+        amount REAL NOT NULL,
+        category TEXT NOT NULL DEFAULT 'General',
+        notes TEXT,
+        created_at TEXT NOT NULL,
+        user_id TEXT,
+        shift_id TEXT
       )
     ''');
 

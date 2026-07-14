@@ -13,6 +13,7 @@ class DebugSeeder {
       final productsCount = await db.query('products', columns: ['COUNT(*) as count']);
       final count = productsCount.isNotEmpty ? (productsCount.first['count'] as int? ?? 0) : 0;
       if (count > 0) {
+        await _seedExpensesIfNeeded();
         print('ℹ️ Products already seeded. Skipping auto-seeding.');
         return;
       }
@@ -21,6 +22,35 @@ class DebugSeeder {
       await seedAll();
     } catch (e) {
       print('❌ Error checking / seeding database: $e');
+    }
+  }
+
+  static Future<void> _seedExpensesIfNeeded() async {
+    final db = PersistenceInitializer.persistenceManager?.sqliteManager;
+    if (db == null) return;
+    final result = await db.query('expenses', columns: ['COUNT(*) as count']);
+    final count = result.isEmpty ? 0 : (result.first['count'] as int? ?? 0);
+    if (count > 0) return;
+
+    final now = DateTime.now();
+    final samples = [
+      ('rent', 'إيجار المحل', 6200.0, 'rent', 6),
+      ('electricity', 'فاتورة الكهرباء', 1450.0, 'utilities', 4),
+      ('internet', 'الإنترنت والاتصالات', 780.0, 'utilities', 3),
+      ('delivery', 'شحن وتوصيل طلبات', 560.0, 'operations', 2),
+      ('maintenance', 'صيانة وتجهيزات', 900.0, 'maintenance', 1),
+      ('supplies', 'أدوات مكتبية وتغليف', 430.0, 'supplies', 0),
+    ];
+    for (final sample in samples) {
+      await db.insert('expenses', {
+        'id': 'debug_expense_${sample.$1}',
+        'title': sample.$2,
+        'amount': sample.$3,
+        'category': sample.$4,
+        'notes': 'بيانات تجريبية لوضع التطوير',
+        'created_at': now.subtract(Duration(days: sample.$5)).toIso8601String(),
+        'user_id': 'admin',
+      }, conflictAlgorithm: ConflictAlgorithm.ignore);
     }
   }
 
@@ -279,6 +309,26 @@ class DebugSeeder {
           }
         }
       }
+
+      final expenseSamples = [
+        ('rent', 'إيجار المحل', 6200.0, 'rent', 6),
+        ('electricity', 'فاتورة الكهرباء', 1450.0, 'utilities', 4),
+        ('internet', 'الإنترنت والاتصالات', 780.0, 'utilities', 3),
+        ('delivery', 'شحن وتوصيل طلبات', 560.0, 'operations', 2),
+        ('maintenance', 'صيانة وتجهيزات', 900.0, 'maintenance', 1),
+        ('supplies', 'أدوات مكتبية وتغليف', 430.0, 'supplies', 0),
+      ];
+      for (final sample in expenseSamples) {
+        await txn.insert('expenses', {
+          'id': 'debug_expense_${sample.$1}',
+          'title': sample.$2,
+          'amount': sample.$3,
+          'category': sample.$4,
+          'notes': 'بيانات تجريبية لوضع التطوير',
+          'created_at': DateTime.now().subtract(Duration(days: sample.$5)).toIso8601String(),
+          'user_id': 'admin',
+        }, conflictAlgorithm: ConflictAlgorithm.ignore);
+      }
     });
 
     print('🌱 Seeding complete successfully!');
@@ -297,6 +347,7 @@ class DebugSeeder {
       await txn.delete('categories');
       await txn.delete('users');
       await txn.delete('activity_logs');
+      await txn.delete('expenses');
     });
 
     print('🌱 Re-seeding database...');

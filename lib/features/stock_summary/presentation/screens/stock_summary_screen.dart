@@ -109,9 +109,11 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: isDesktop ? 32 : 16,
-              vertical: 20,
+            padding: EdgeInsets.fromLTRB(
+              isDesktop ? 32 : 16,
+              8,
+              isDesktop ? 32 : 16,
+              20,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -124,7 +126,7 @@ class _StockSummaryScreenState extends State<StockSummaryScreen> {
                   iconColor: AppColors.primaryColor,
                   titleColor: AppColors.textPrimary,
                 ),
-                const SizedBox(height: 20),
+                const ScreenHeaderGap(height: 20),
 
                 // Summary cards row
                 // Summary cards row

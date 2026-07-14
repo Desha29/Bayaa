@@ -376,7 +376,12 @@ class _InvoiceScreenState extends State<InvoiceScreen>
             backgroundColor: AppColors.backgroundColor,
             body: SafeArea(
               child: Padding(
-                padding: EdgeInsets.all(isDesktop ? 32 : 24),
+                padding: EdgeInsets.fromLTRB(
+                  isDesktop ? 32 : 24,
+                  8,
+                  isDesktop ? 32 : 24,
+                  isDesktop ? 32 : 24,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -399,7 +404,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const ScreenHeaderGap(height: 24),
                     FadeTransition(
                       opacity: _animationController,
                       child: SlideTransition(

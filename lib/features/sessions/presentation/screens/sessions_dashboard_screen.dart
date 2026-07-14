@@ -18,7 +18,12 @@ class SessionsDashboardScreen extends StatelessWidget {
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(isDesktop ? 32 : 24),
+          padding: EdgeInsets.fromLTRB(
+            isDesktop ? 32 : 24,
+            8,
+            isDesktop ? 32 : 24,
+            isDesktop ? 32 : 24,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -29,7 +34,7 @@ class SessionsDashboardScreen extends StatelessWidget {
                 iconColor: AppColors.primaryColor,
                 subtitleColor: AppColors.mutedColor,
               ),
-              const SizedBox(height: 16),
+              const ScreenHeaderGap(height: 16),
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),

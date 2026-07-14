@@ -48,9 +48,11 @@ class StockScreen extends StatelessWidget {
                       children: [
                         // Header + Filter (Fixed)
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isDesktop ? 32 : 16,
-                            vertical: 16,
+                          padding: EdgeInsets.fromLTRB(
+                            isDesktop ? 32 : 16,
+                            8,
+                            isDesktop ? 32 : 16,
+                            16,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +64,7 @@ class StockScreen extends StatelessWidget {
                                 iconColor: AppColors.primaryColor,
                                 titleColor: AppColors.textPrimary,
                               ),
-                              const SizedBox(height: 16),
+                              const ScreenHeaderGap(height: 16),
                               FilterButtonsWidget(
                                 filter: getIt<StockCubit>().filter,
                                 totalCount: getIt<StockCubit>().totalCount,
