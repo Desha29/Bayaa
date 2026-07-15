@@ -233,7 +233,15 @@ class ProductsScreenState extends State<ProductsScreen> {
                                           .filterByCategory(cubitValue);
                                     },
                                     onAvailabilityChanged: (v) {
-                                      final cubitValue = (v == l10n.all) ? '*' : v;
+                                      // The dropdown uses localized labels, but the
+                                      // repository filters with stable status keys.
+                                      final cubitValue = switch (v) {
+                                        _ when v == l10n.all => '*',
+                                        _ when v == l10n.available => 'available',
+                                        _ when v == l10n.lowStock => 'lowStock',
+                                        _ when v == l10n.outOfStock => 'outOfStock',
+                                        _ => '*',
+                                      };
                                       setState(() => availabilityFilter = v);
                                       ProductCubit.get(context)
                                           .filterByAvailability(cubitValue);
