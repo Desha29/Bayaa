@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/Icon_app.png" alt="Bayaa POS logo" width="120" />
+  <img src="assets/images/iconr.png" alt="Bayaa POS logo" width="120" />
 </p>
 
 <h1 align="center">Bayaa POS</h1>
