@@ -17,6 +17,9 @@ import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../../../products/presentation/cubit/product_cubit.dart';
 import '../../../sessions/data/repositories/session_repository_impl.dart';
 import 'recent_operations.dart';
+import 'daily_plan_gauge.dart';
+import 'stock_capacity_card.dart';
+import 'recent_operations_table.dart';
 import '../../../../core/session/session_manager.dart';
 import '../../../expenses/data/expense_repository.dart';
 
@@ -142,7 +145,7 @@ class _DashboardHomeState extends State<DashboardHome> {
         });
       }
     } catch (e) {
-      print('Failed to load session count: $e');
+      debugPrint('Failed to load session count: $e');
     }
   }
 
@@ -151,101 +154,124 @@ class _DashboardHomeState extends State<DashboardHome> {
     required String value,
     required IconData icon,
     required Color color,
+    String? subtitle,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: color.withOpacity(0.18),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withOpacity(0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          PositionedDirectional(
-            top: 0,
-            end: 0,
-            child: Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.055),
-                borderRadius: const BorderRadiusDirectional.only(
-                  bottomStart: Radius.circular(72),
-                ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.borderColor,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0F172A).withOpacity(0.035),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
               ),
-            ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-            child: Row(
-              children: [
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.mutedColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                  child: Icon(icon, color: color, size: 23),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.mutedColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.10),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(icon, color: color, size: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Expanded(
+                    child: Text(
+                      value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 20,
+                        height: 1.1,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: color,
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        value,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 18,
-                          height: 1.1,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildStatisticalCards() {
     final l10n = AppLocalizations.of(context);
+    final isArabic = l10n.localeName == 'ar';
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth < 560
+        final crossAxisCount = constraints.maxWidth < 600
             ? 1
-            : constraints.maxWidth < 760
+            : constraints.maxWidth < 950
                 ? 2
                 : 4;
+
+        final childAspectRatio = constraints.maxWidth < 600
+            ? 3.2
+            : constraints.maxWidth < 950
+                ? 2.3
+                : 2.1;
 
         return GridView.count(
           crossAxisCount: crossAxisCount,
@@ -253,7 +279,7 @@ class _DashboardHomeState extends State<DashboardHome> {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 14,
           crossAxisSpacing: 14,
-          childAspectRatio: constraints.maxWidth < 560 ? 3.1 : 2.05,
+          childAspectRatio: childAspectRatio,
           children: [
             // Net sales today
             BlocBuilder<InvoiceCubit, InvoiceState>(
@@ -277,6 +303,8 @@ class _DashboardHomeState extends State<DashboardHome> {
                   value: "${totalSales.toStringAsFixed(2)} ${l10n.currencyEg}",
                   icon: LucideIcons.trendingUp,
                   color: AppColors.primaryColor,
+                  subtitle: isArabic ? 'اليوم' : 'Today',
+                  onTap: () => widget.onCardTap('sales'),
                 );
               },
             ),
@@ -290,6 +318,8 @@ class _DashboardHomeState extends State<DashboardHome> {
                   value: l10n.productCount(count),
                   icon: LucideIcons.package,
                   color: AppColors.successColor,
+                  subtitle: isArabic ? 'في المخزن' : 'In Stock',
+                  onTap: () => widget.onCardTap('products'),
                 );
               },
             ),
@@ -299,13 +329,17 @@ class _DashboardHomeState extends State<DashboardHome> {
               builder: (context, state) {
                 final now = DateTime.now();
                 final count = state.sales.where((sale) =>
-                    !sale.isRefund && sale.date.year == now.year &&
-                    sale.date.month == now.month && sale.date.day == now.day).length;
+                    !sale.isRefund &&
+                    sale.date.year == now.year &&
+                    sale.date.month == now.month &&
+                    sale.date.day == now.day).length;
                 return _buildStatCard(
-                  title: l10n.localeName == 'ar' ? 'فواتير اليوم' : 'Today invoices',
+                  title: isArabic ? 'فواتير اليوم' : 'Today Invoices',
                   value: '$count',
                   icon: LucideIcons.receiptText,
                   color: AppColors.accentColor,
+                  subtitle: isArabic ? 'فاتورة' : 'Invoices',
+                  onTap: () => widget.onCardTap('invoices'),
                 );
               },
             ),
@@ -318,14 +352,126 @@ class _DashboardHomeState extends State<DashboardHome> {
               builder: (context, snapshot) {
                 final total = snapshot.data ?? 0;
                 return _buildStatCard(
-                  title: l10n.localeName == 'ar' ? 'مصروفات اليوم' : 'Today expenses',
+                  title: isArabic ? 'مصروفات اليوم' : 'Today Expenses',
                   value: '${total.toStringAsFixed(2)} ${l10n.currencyEg}',
                   icon: LucideIcons.walletCards,
                   color: AppColors.errorColor,
+                  subtitle: isArabic ? 'تشغيل' : 'Operating',
+                  onTap: () => widget.onCardTap('reports'),
                 );
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDailyPlanCard() {
+    final l10n = AppLocalizations.of(context);
+    final isArabic = l10n.localeName == 'ar';
+
+    return BlocBuilder<InvoiceCubit, InvoiceState>(
+      bloc: getIt<InvoiceCubit>(),
+      builder: (context, state) {
+        final now = DateTime.now();
+        final todaySalesList = state.sales.where((s) =>
+            s.date.year == now.year &&
+            s.date.month == now.month &&
+            s.date.day == now.day);
+
+        double currentSales = 0;
+        int invoicesCount = 0;
+        for (var sale in todaySalesList) {
+          if (sale.isRefund) {
+            currentSales -= sale.total;
+          } else {
+            currentSales += sale.total;
+            invoicesCount++;
+          }
+        }
+        if (currentSales < 0) currentSales = 0;
+
+        const int targetInvoices = 20;
+        const double targetSales = 5000.0;
+
+        final invoiceProgress = targetInvoices > 0 ? invoicesCount / targetInvoices : 0.0;
+        final salesProgress = targetSales > 0 ? currentSales / targetSales : 0.0;
+        final compositePercentage = ((invoiceProgress + salesProgress) / 2).clamp(0.0, 1.0);
+
+        return Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.borderColor),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0F172A).withOpacity(0.03),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(7),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          LucideIcons.target,
+                          size: 18,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        isArabic ? 'خطة وأداء اليوم' : 'Daily Plan & Targets',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.accentColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      isArabic ? 'اليوم' : 'Today',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.accentColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              DailyPlanGauge(
+                percentage: compositePercentage,
+                invoicesCount: invoicesCount,
+                invoicesTarget: targetInvoices,
+                currentSales: currentSales,
+                salesTarget: targetSales,
+                currency: l10n.currencyEg,
+              ),
+            ],
+          ),
         );
       },
     );
@@ -375,16 +521,16 @@ class _DashboardHomeState extends State<DashboardHome> {
         }).toList();
 
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 16),
+          margin: EdgeInsets.zero,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.primaryForeground,
+            color: AppColors.surfaceColor,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.borderColor, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.015),
-                blurRadius: 10,
+                color: const Color(0xFF0F172A).withOpacity(0.03),
+                blurRadius: 14,
                 offset: const Offset(0, 4),
               ),
             ],
@@ -567,147 +713,179 @@ class _DashboardHomeState extends State<DashboardHome> {
     );
   }
 
+  Widget _buildStaleSessionBanner(AppLocalizations l10n) {
+    final manager = getIt<SessionManager>();
+    final sessionAge = manager.sessionAge;
+
+    if (sessionAge == null) return const SizedBox.shrink();
+
+    if (manager.isSessionStale) {
+      final hours = sessionAge.inHours;
+      final days = hours ~/ 24;
+      final remainingHours = hours % 24;
+      String ageText = '';
+      if (days > 0) {
+        ageText += '$days ${l10n.daysText} ';
+      }
+      if (remainingHours > 0 || days == 0) {
+        ageText += '$remainingHours ${l10n.hoursText}';
+      }
+
+      return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.orange.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.orange.shade300),
+        ),
+        child: Row(
+          children: [
+            Icon(LucideIcons.triangleAlert,
+                color: Colors.orange.shade700, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.sessionStaleWarning(ageText),
+                style: TextStyle(
+                  color: Colors.orange.shade900,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (sessionAge.inMinutes > 5) {
+      final hours = sessionAge.inHours;
+      final minutes = sessionAge.inMinutes % 60;
+
+      String ageText = '';
+      if (hours > 0) {
+        ageText += '$hours ${l10n.hoursText} ';
+      }
+      if (minutes > 0 || hours == 0) {
+        ageText += '$minutes ${l10n.minutesText}';
+      }
+
+      return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.blue.shade200),
+        ),
+        child: Row(
+          children: [
+            Icon(LucideIcons.info, color: Colors.blue.shade700, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.sessionOpenInfo(ageText),
+                style: TextStyle(
+                  color: Colors.blue.shade900,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
+        final isNarrow = constraints.maxWidth < 1050;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // The global dashboard header owns the page title. Keep the
-              // key business metrics immediately below it.
+              // 1. Key Business Metrics / Stat Cards
               _buildStatisticalCards(),
               const SizedBox(height: 18),
 
-              Expanded(
-                child: Row(
+              // 2. Main Dashboard Section
+              if (isNarrow) ...[
+                // Stacked responsive layout for narrow screens
+                _buildStaleSessionBanner(l10n),
+                RecentOperationsTable(
+                  onShowAll: () => widget.onCardTap('invoices'),
+                ),
+                const SizedBox(height: 18),
+                _buildDailyPlanCard(),
+                const SizedBox(height: 18),
+                StockCapacityCard(
+                  onShowAll: () => widget.onCardTap('stock_alerts'),
+                ),
+                const SizedBox(height: 18),
+                _buildSalesTrendChart(),
+                const SizedBox(height: 18),
+                _buildFinancialComparison(),
+                const SizedBox(height: 18),
+                const SizedBox(
+                  height: 440,
+                  child: RecentOperations(),
+                ),
+              ] else ...[
+                // Behance ERP 2-column layout (62% / 38%)
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Main Dashboard content column - Takes 60% width
+                    // Primary Left Column (62% width)
                     Expanded(
-                      flex: 6,
-                      child: SingleChildScrollView(
-                        child: Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Stale session warning banner
-                            Builder(
-                              builder: (context) {
-                                final manager = getIt<SessionManager>();
-                                final sessionAge = manager.sessionAge;
-
-                                if (sessionAge == null) return const SizedBox.shrink();
-
-                                if (manager.isSessionStale) {
-                                  final hours = sessionAge.inHours;
-                                  final days = hours ~/ 24;
-                                  final remainingHours = hours % 24;
-                                  String ageText = '';
-                                  if (days > 0) {
-                                    ageText += '$days ${l10n.daysText} ';
-                                  }
-                                  if (remainingHours > 0 || days == 0) {
-                                    ageText += '$remainingHours ${l10n.hoursText}';
-                                  }
-
-                                  return Container(
-                                    width: double.infinity,
-                                    margin: const EdgeInsets.only(bottom: 12),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.orange.shade50,
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.orange.shade300),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(LucideIcons.triangleAlert,
-                                            color: Colors.orange.shade700, size: 20),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            l10n.sessionStaleWarning(ageText),
-                                            style: TextStyle(
-                                              color: Colors.orange.shade900,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                                // Info banner for existing previously opened session
-                                else if (sessionAge.inMinutes > 5) {
-                                  final hours = sessionAge.inHours;
-                                  final minutes = sessionAge.inMinutes % 60;
-
-                                  String ageText = '';
-                                  if (hours > 0) {
-                                    ageText += '$hours ${l10n.hoursText} ';
-                                  }
-                                  if (minutes > 0 || hours == 0) {
-                                    ageText += '$minutes ${l10n.minutesText}';
-                                  }
-
-                                  return Container(
-                                    width: double.infinity,
-                                    margin: const EdgeInsets.only(bottom: 12),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.shade50,
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.blue.shade200),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(LucideIcons.info,
-                                            color: Colors.blue.shade700, size: 20),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            l10n.sessionOpenInfo(ageText),
-                                            style: TextStyle(
-                                              color: Colors.blue.shade900,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-
-                                return const SizedBox.shrink();
-                              },
-                            ),
-
-                            // 7-day Sales Trend chart
-                            _buildSalesTrendChart(),
-
-                            _buildFinancialComparison(),
-                            const SizedBox(height: 16),
-                          ],
-                        ),
+                      flex: 62,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildStaleSessionBanner(l10n),
+                          RecentOperationsTable(
+                            onShowAll: () => widget.onCardTap('invoices'),
+                          ),
+                          const SizedBox(height: 18),
+                          _buildSalesTrendChart(),
+                          const SizedBox(height: 18),
+                          _buildFinancialComparison(),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 18),
 
-                    // Recent Operations list - Takes 30% width
-                    const Expanded(
-                      flex: 3,
-                      child: RecentOperations(),
+                    // Secondary Right Column (38% width)
+                    Expanded(
+                      flex: 38,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildDailyPlanCard(),
+                          const SizedBox(height: 18),
+                          StockCapacityCard(
+                            onShowAll: () => widget.onCardTap('stock_alerts'),
+                          ),
+                          const SizedBox(height: 18),
+                          const SizedBox(
+                            height: 440,
+                            child: RecentOperations(),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ],
           ),
         );
@@ -734,13 +912,19 @@ class _DashboardHomeState extends State<DashboardHome> {
                   .reduce((a, b) => a > b ? a : b) *
               1.2;
           return Container(
-            margin: const EdgeInsets.only(top: 8, bottom: 16),
+            margin: EdgeInsets.zero,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppColors.surfaceColor,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.borderColor),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(.035), blurRadius: 16, offset: const Offset(0, 6))],
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF0F172A).withOpacity(0.03),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [

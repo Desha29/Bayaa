@@ -271,7 +271,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
     final isHovered = _hoveredIndex == originalIndex;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.only(bottom: 6),
       child: MouseRegion(
         onEnter: (_) => setState(() => _hoveredIndex = originalIndex),
         onExit: (_) => setState(() => _hoveredIndex = -1),
@@ -282,23 +282,37 @@ class _CustomSidebarState extends State<CustomSidebar> {
           child: GestureDetector(
             onTap: () => widget.onItemSelected(originalIndex),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
               padding: EdgeInsets.symmetric(
-                horizontal: isNarrow ? 0 : 16,
-                vertical: 12,
+                horizontal: isNarrow ? 0 : 14,
+                vertical: 11,
               ),
               decoration: BoxDecoration(
+                gradient: isSelected
+                    ? const LinearGradient(
+                        colors: [
+                          AppColors.secondaryColor,
+                          AppColors.primaryColor,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null,
                 color: isSelected
-                    ? const Color(0xFFD67941)
+                    ? null
                     : isHovered
-                        ? const Color(0xFFD67941)
+                        ? Colors.white.withOpacity(0.09)
                         : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
-                border: isSelected
-                    ? Border.all(
-                        color: Colors.white.withOpacity(0.22),
-                        width: 1,
-                      )
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: AppColors.secondaryColor.withOpacity(0.35),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
                     : null,
               ),
               child: isNarrow
@@ -312,8 +326,8 @@ class _CustomSidebarState extends State<CustomSidebar> {
                                 ? Colors.white
                                 : isHovered
                                     ? Colors.white
-                                    : Colors.white60,
-                            size: 22,
+                                    : Colors.white70,
+                            size: 21,
                           ),
                           if (item.id == 'notifications')
                             Positioned(
@@ -324,56 +338,59 @@ class _CustomSidebarState extends State<CustomSidebar> {
                         ],
                       ),
                     )
-                  : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const NeverScrollableScrollPhysics(),
-                      child: SizedBox(
-                        width:
-                            184, // 240 width - 24 margin - 32 internal padding
-                        child: Row(
-                          children: [
-                            Icon(
-                              item.icon,
+                  : Row(
+                      children: [
+                        if (isSelected)
+                          Container(
+                            width: 3.5,
+                            height: 18,
+                            margin: const EdgeInsetsDirectional.only(end: 10),
+                            decoration: BoxDecoration(
+                              color: AppColors.accentColor,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        Icon(
+                          item.icon,
+                          color: isSelected
+                              ? Colors.white
+                              : isHovered
+                                  ? Colors.white
+                                  : Colors.white70,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            style: TextStyle(
                               color: isSelected
                                   ? Colors.white
                                   : isHovered
                                       ? Colors.white
-                                      : Colors.white60,
-                              size: 22,
+                                      : Colors.white.withOpacity(0.85),
+                              fontSize: 13.5,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              letterSpacing: 0.2,
                             ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Text(
-                                item.title,
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : isHovered
-                                          ? Colors.white
-                                          : Colors.white70,
-                                  fontSize: 14,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
-                            if (item.id == 'notifications')
-                              _buildNotificationsBadge(mini: false)
-                            else if (isSelected)
-                              Container(
-                                width: 6,
-                                height: 6,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                          ],
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
-                      ),
+                        if (item.id == 'notifications')
+                          _buildNotificationsBadge(mini: false)
+                        else if (isSelected)
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                      ],
                     ),
             ),
           ),
@@ -382,133 +399,200 @@ class _CustomSidebarState extends State<CustomSidebar> {
     );
   }
 
+  Widget _buildQuickActionButton(bool isNarrow) {
+    final l10n = AppLocalizations.of(context);
+    final salesIndex = widget.items.indexWhere((it) => it.id == 'sales');
+    if (salesIndex == -1) return const SizedBox.shrink();
+
+    final label = l10n.localeName == 'ar' ? 'بيع جديد' : 'New Sale';
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: isNarrow ? 8 : 12,
+        vertical: 8,
+      ),
+      child: Tooltip(
+        message: isNarrow ? label : '',
+        child: InkWell(
+          onTap: () => widget.onItemSelected(salesIndex),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  AppColors.accentColor,
+                  AppColors.darkGold,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.accentColor.withOpacity(0.35),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: isNarrow
+                ? const Center(
+                    child: Icon(LucideIcons.plus, color: Colors.white, size: 20),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(LucideIcons.plus, color: Colors.white, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHeader(bool isNarrow) {
     return Container(
-      height: 80,
-      padding: EdgeInsets.symmetric(horizontal: isNarrow ? 8 : 16),
+      height: 76,
+      padding: EdgeInsets.symmetric(horizontal: isNarrow ? 8 : 14),
       child: isNarrow
           ? Center(
               child: InkWell(
                 onTap: widget.onToggleCollapse,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  width: 36,
-                  height: 36,
-                  padding: const EdgeInsets.all(3),
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(11),
-                    border: Border.all(color: Colors.white.withOpacity(.75)),
+                    borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(.16),
-                        blurRadius: 10,
+                        color: Colors.black.withOpacity(0.25),
+                        blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
                     ],
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Image.asset(
-                    'assets/images/iconr.png',
-                    fit: BoxFit.contain,
+                    'assets/images/Icon_app.png',
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
             )
-          : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const NeverScrollableScrollPhysics(),
-              child: SizedBox(
-                width: 208, // 240 width - 32 padding
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 38,
-                      height: 38,
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(11),
-                        border: Border.all(color: Colors.white.withOpacity(.7)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(.16),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+          : Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.25),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Image.asset(
-                        'assets/images/iconr.png',
-                        width: 34,
-                        height: 34,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Flexible(
-                      child: Column(
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset(
+                    'assets/images/Icon_app.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: BlocBuilder<SettingsCubit, SettingsStates>(
+                    bloc: getIt<SettingsCubit>(),
+                    builder: (context, state) {
+                      final l10n = AppLocalizations.of(context);
+                      final configuredName =
+                          getIt<SettingsCubit>().currentStoreInfo?.name;
+                      final isDefaultBrand = configuredName == null ||
+                          configuredName.isEmpty ||
+                          configuredName == 'Bayaa POS';
+
+                      final name = isDefaultBrand
+                          ? l10n.loginBrandName
+                          : configuredName;
+                      final displayName = l10n.localeName == 'en'
+                          ? name.replaceAll(
+                              RegExp(r'\s+POS$', caseSensitive: false),
+                              '',
+                            )
+                          : name;
+                      return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          BlocBuilder<SettingsCubit, SettingsStates>(
-                            bloc: getIt<SettingsCubit>(),
-                            builder: (context, state) {
-                              final l10n = AppLocalizations.of(context);
-                              final configuredName =
-                                  getIt<SettingsCubit>().currentStoreInfo?.name;
-                              final isDefaultBrand = configuredName == null ||
-                                  configuredName.isEmpty ||
-                                  configuredName == 'Bayaa POS';
-
-                              final name = isDefaultBrand
-                                  ? l10n.loginBrandName
-                                  : configuredName;
-                              final displayName = l10n.localeName == 'en'
-                                  ? name.replaceAll(
-                                      RegExp(r'\s+POS$', caseSensitive: false),
-                                      '',
-                                    )
-                                  : name;
-                              return Text(
-                                displayName,
-                                style: const TextStyle(
-                                  color: Color(0xFFD67941),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: .3,
+                          Text(
+                            displayName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: .3,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: AppColors.accentColor.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: AppColors.accentColor.withOpacity(0.4), width: 0.5),
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              );
-                            },
+                                child: Text(
+                                  'ERP SaaS',
+                                  style: TextStyle(
+                                    color: AppColors.accentColor,
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    if (widget.onToggleCollapse != null)
-                      InkWell(
-                        onTap: widget.onToggleCollapse,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          child: Transform.flip(
-                            flipX:
-                                AppLocalizations.of(context).localeName == 'ar',
-                            child: const Icon(
-                              LucideIcons.chevronLeft,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
+                      );
+                    },
+                  ),
+                ),
+                if (widget.onToggleCollapse != null)
+                  InkWell(
+                    onTap: widget.onToggleCollapse,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      child: Transform.flip(
+                        flipX: AppLocalizations.of(context).localeName == 'ar',
+                        child: const Icon(
+                          LucideIcons.chevronLeft,
+                          color: Colors.white70,
+                          size: 19,
                         ),
                       ),
-                  ],
-                ),
-              ),
+                    ),
+                  ),
+              ],
             ),
     );
   }
@@ -526,7 +610,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
         color: AppColors.sidebarColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 20,
             offset: const Offset(2, 0),
           ),
@@ -535,13 +619,14 @@ class _CustomSidebarState extends State<CustomSidebar> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isNarrow = constraints.maxWidth < 140;
-
           final filteredItems = _getFilteredItems(context);
 
           return Column(
             children: [
               _buildHeader(isNarrow),
-              const SizedBox(height: 8),
+              const SizedBox(height: 2),
+              _buildQuickActionButton(isNarrow),
+              const SizedBox(height: 2),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(

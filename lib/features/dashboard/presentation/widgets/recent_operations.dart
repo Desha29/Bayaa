@@ -195,18 +195,17 @@ class _RecentOperationsState extends State<RecentOperations> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: EdgeInsets.zero,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderColor, width: 1.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            spreadRadius: 0,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF0F172A).withOpacity(0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           ),
         ],
       ),

@@ -1,4 +1,4 @@
-// lib/features/dashboard/presentation/dashboard_screen.dart
+import 'dart:async';
 import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
 import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'package:bayaa_pos/features/notifications/presentation/cubit/notifications_states.dart';
@@ -6,6 +6,7 @@ import 'package:bayaa_pos/features/stock/presentation/cubit/stock_cubit.dart';
 import 'package:bayaa_pos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -266,6 +267,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<Widget> _headerActions(BuildContext context, {bool compact = false}) {
     return [
+      if (!compact) const _DateTimeBadge(),
       _LanguageToggle(compact: compact),
       BlocBuilder<NotificationsCubit, NotificationsStates>(
         builder: (context, state) {
@@ -369,6 +371,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+class _DateTimeBadge extends StatefulWidget {
+  const _DateTimeBadge();
+
+  @override
+  State<_DateTimeBadge> createState() => _DateTimeBadgeState();
+}
+
+class _DateTimeBadgeState extends State<_DateTimeBadge> {
+  late DateTime _now;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _now = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() => _now = DateTime.now());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final formatted =
+        DateFormat('EEE d MMM, HH:mm:ss', l10n.localeName).format(_now);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.borderColor),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(LucideIcons.clock, size: 14, color: AppColors.mutedColor),
+          const SizedBox(width: 6),
+          Text(
+            formatted,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LanguageToggle extends StatelessWidget {
   final bool compact;
   const _LanguageToggle({required this.compact});
@@ -425,43 +488,70 @@ class _DesktopHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        height: 80,
-        padding: const EdgeInsets.symmetric(horizontal: 26),
+        height: 74,
+        padding: const EdgeInsets.symmetric(horizontal: 22),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Colors.white, Color(0xFFFBFDFF)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
+          color: Colors.white,
           border:
               const Border(bottom: BorderSide(color: AppColors.borderColor)),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF0F172A).withOpacity(.04),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
+              color: const Color(0xFF0F172A).withOpacity(.03),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Row(children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: AppColors.secondaryColor.withOpacity(.09),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(pageIcon, size: 19, color: AppColors.secondaryColor),
+            child: Icon(pageIcon, size: 18, color: AppColors.secondaryColor),
           ),
-          const SizedBox(width: 11),
+          const SizedBox(width: 10),
+          Text(
+            pageTitle,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(width: 18),
           Expanded(
-            child: Text(
-              pageTitle,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+            child: Container(
+              height: 40,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.borderColor),
+              ),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.search,
+                      size: 16, color: AppColors.mutedColor),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context).localeName == 'ar'
+                          ? 'ابحث برقم الفاتورة، المنتج، أو الباركود...'
+                          : 'Search by invoice #, product, or barcode...',
+                      style: const TextStyle(
+                        color: AppColors.mutedColor,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
