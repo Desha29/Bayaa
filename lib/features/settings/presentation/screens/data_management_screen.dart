@@ -1,18 +1,12 @@
-import 'dart:io';
+import 'package:bayaa_pos/shared/feedback/preview_action.dart';
+import 'package:bayaa_pos/preview/data/preview_data.dart';
+import 'package:bayaa_pos/preview/data/preview_archive.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import 'package:path/path.dart' as path;
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/di/dependency_injection.dart';
-import '../../../../core/data/services/backup_manager.dart';
-import '../../../../core/data/services/checkpoint_service.dart';
-import '../../../../core/functions/messege.dart';
-import '../../../../core/data/services/persistence_initializer.dart';
-import '../../../../core/data/services/debug_seeder.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class DataManagementScreen extends StatefulWidget {
   const DataManagementScreen({super.key});
@@ -25,49 +19,42 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isLoading = false;
-  List<Directory> _backups = [];
+  List<PreviewArchive> _backups = [];
   List<Map<String, dynamic>> _checkpoints = [];
   bool _isPersistenceReady = false;
-
-  BackupManager? get _backupManager {
-    if (getIt.isRegistered<BackupManager>()) {
-      return getIt<BackupManager>();
-    }
-    return null;
-  }
-
-  final _checkpointService = CheckpointService();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() => setState(() {}));
-    _isPersistenceReady = getIt.isRegistered<BackupManager>();
+    _isPersistenceReady = true;
     if (_isPersistenceReady) {
       _loadData();
     }
   }
 
   Future<void> _loadData() async {
-    final manager = _backupManager;
-    if (manager == null) {
-      setState(() => _isPersistenceReady = false);
-      return;
-    }
-    setState(() => _isLoading = true);
-    try {
-      final backups = await manager.getAllBackups();
-      final checkpoints = await _checkpointService.getAllCheckpoints();
-      setState(() {
-        _backups = backups;
-        _checkpoints = checkpoints;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (mounted) MotionSnackBarError(context, AppLocalizations.of(context).loadDataError(e.toString()));
-    }
+    setState(() {
+      _backups = List.generate(
+          3,
+          (i) => PreviewArchive(
+              'demo_backup_0${i + 1}',
+              PreviewData.today.subtract(Duration(days: i)),
+              2457600 - i * 102400));
+      _checkpoints = List.generate(
+          3,
+          (i) => {
+                'path': 'demo_checkpoint_$i',
+                'timestamp': PreviewData.today
+                    .subtract(Duration(hours: i))
+                    .toIso8601String(),
+                'reason': 'startup',
+                'user': PreviewData.users.first.name,
+                'size': 102400
+              });
+      _isLoading = false;
+    });
   }
 
   @override
@@ -77,189 +64,125 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Future<void> _createBackup() async {
-    final manager = _backupManager;
-    if (manager == null) return;
-    setState(() => _isLoading = true);
-    try {
-      final success = await manager.createBackup();
-      if (success) {
-        if (mounted) MotionSnackBarSuccess(context, AppLocalizations.of(context).msgDataSaved);
-        await _loadData();
-      } else {
-        if (mounted) MotionSnackBarError(context, AppLocalizations.of(context).backupFailed);
-      }
-    } catch (e) {
-      if (mounted) MotionSnackBarError(context, AppLocalizations.of(context).error);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    showPreviewAction(context);
   }
 
   Future<void> _restoreBackup(String backupPath) async {
     final l10n = AppLocalizations.of(context);
-    final confirm = await _showConfirmDialog(
-      l10n.confirmRestore,
-      l10n.confirmRestoreMessage,
-      icon: LucideIcons.triangleAlert,
-      iconColor: AppColors.warningColor,
-    );
-    if (!confirm) return;
-
-    setState(() => _isLoading = true);
-    try {
-      final manager = _backupManager;
-      if (manager == null) return;
-      final success = await manager.restoreFromBackup(backupPath);
-      if (success) {
-        if (mounted) {
-          MotionSnackBarSuccess(context, l10n.restoreSuccess);
-          await Future.delayed(const Duration(seconds: 2));
-          exit(0);
-        }
-      } else {
-        if (mounted) MotionSnackBarError(context, l10n.restoreFailed);
-      }
-    } catch (e) {
-      if (mounted) MotionSnackBarError(context, l10n.restoreError(e.toString()));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    final confirmed = await _showConfirmDialog(
+        l10n.confirmRestore, l10n.confirmRestoreMessage);
+    if (confirmed && mounted) showPreviewAction(context);
   }
 
   Future<void> _restoreCheckpoint(String checkpointPath) async {
     final l10n = AppLocalizations.of(context);
-    final confirm = await _showConfirmDialog(
-      l10n.confirmAutoRestore,
-      l10n.confirmAutoRestoreMessage,
-      icon: LucideIcons.triangleAlert,
-      iconColor: AppColors.warningColor,
-    );
-    if (!confirm) return;
-
-    setState(() => _isLoading = true);
-    try {
-      final success = await _checkpointService.restoreFromCheckpoint(checkpointPath);
-      if (success) {
-        if (mounted) {
-          MotionSnackBarSuccess(context, l10n.autoRestoreSuccess);
-          await Future.delayed(const Duration(seconds: 2));
-          exit(0);
-        }
-      } else {
-        if (mounted) MotionSnackBarError(context, l10n.autoRestoreFailed);
-      }
-    } catch (e) {
-      if (mounted) MotionSnackBarError(context, l10n.restoreError(e.toString()));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    final confirmed = await _showConfirmDialog(
+        l10n.confirmAutoRestore, l10n.confirmAutoRestoreMessage);
+    if (confirmed && mounted) showPreviewAction(context);
   }
 
   Future<void> _deleteBackup(String backupPath) async {
     final l10n = AppLocalizations.of(context);
-    final confirm = await _showConfirmDialog(
-      l10n.deleteBackup,
-      l10n.deleteBackupMessage,
-      icon: LucideIcons.trash2,
-      iconColor: AppColors.errorColor,
-    );
-    if (!confirm) return;
-
-    setState(() => _isLoading = true);
-    try {
-      final dir = Directory(backupPath);
-      if (await dir.exists()) {
-        await dir.delete(recursive: true);
-        if (mounted) MotionSnackBarSuccess(context, l10n.deleteBackupSuccess);
-        await _loadData();
-      }
-    } catch (e) {
-      if (mounted) MotionSnackBarError(context, l10n.deleteBackupFailed(e.toString()));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    final confirmed =
+        await _showConfirmDialog(l10n.deleteBackup, l10n.deleteBackupMessage);
+    if (confirmed && mounted) showPreviewAction(context);
   }
 
   Future<bool> _showConfirmDialog(
     String title,
     String content, {
     IconData icon = LucideIcons.circleAlert,
-    Color iconColor = AppColors.primaryColor,
+    Color? iconColor,
   }) async {
+    final effectiveIconColor = iconColor ?? AppColors.primaryColor;
     return await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: iconColor, size: 22),
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+            titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: effectiveIconColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: effectiveIconColor, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
+            content: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                content,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                  height: 1.6,
+                ),
               ),
             ),
-          ],
-        ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Text(
-            content,
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-              height: 1.6,
-            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+                child: Text(AppLocalizations.of(context).cancelBtn,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary)),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: iconColor == AppColors.errorColor
+                      ? AppColors.errorColor
+                      : AppColors.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  elevation: 0,
+                ),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(AppLocalizations.of(context).confirmBtn,
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(width: 8),
+            ],
+            actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: Text(AppLocalizations.of(context).cancelBtn, style: TextStyle(color: AppColors.textSecondary)),
-          ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: iconColor == AppColors.errorColor
-                  ? AppColors.errorColor
-                  : AppColors.primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              elevation: 0,
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(AppLocalizations.of(context).confirmBtn, style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(width: 8),
-        ],
-        actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final dateFormat = DateFormat('yyyy/MM/dd');
     final timeFormat = DateFormat('hh:mm a');
 
     return Directionality(
-      textDirection: l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+      textDirection:
+          l10n.localeName == 'ar' ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: !_isPersistenceReady
@@ -267,16 +190,21 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(LucideIcons.shieldOff, size: 64, color: Colors.orange.shade300),
+                    Icon(LucideIcons.shieldOff,
+                        size: 64, color: Colors.orange.shade300),
                     const SizedBox(height: 16),
                     Text(
                       l10n.protectionInactive,
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       l10n.enableProtection,
-                      style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
@@ -286,46 +214,52 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryColor,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ],
                 ),
               )
             : Column(
-          children: [
-            // Custom header
-            _buildHeader(),
-            // Tabs
-            _buildTabBar(),
-            // Content
-            Expanded(
-              child: _isLoading
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(color: AppColors.primaryColor),
-                          const SizedBox(height: 16),
-                          Text(
-                            l10n.loadingData,
-                            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                children: [
+                  // Custom header
+                  _buildHeader(),
+                  // Tabs
+                  _buildTabBar(),
+                  // Content
+                  Expanded(
+                    child: _isLoading
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator(
+                                    color: AppColors.primaryColor),
+                                const SizedBox(height: 16),
+                                Text(
+                                  l10n.loadingData,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textSecondary,
+                                      fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          )
+                        : TabBarView(
+                            controller: _tabController,
+                            children: [
+                              _buildBackupsTab(dateFormat, timeFormat),
+                              _buildCheckpointsTab(dateFormat, timeFormat),
+                              _buildAppModeTab(),
+                            ],
                           ),
-                        ],
-                      ),
-                    )
-                  : TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _buildBackupsTab(dateFormat, timeFormat),
-                        _buildCheckpointsTab(dateFormat, timeFormat),
-                        _buildAppModeTab(),
-                      ],
-                    ),
-            ),
-          ],
-        ),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -361,14 +295,15 @@ class _DataManagementScreenState extends State<DataManagementScreen>
         children: [
           // Back button
           Material(
-            color: Colors.white.withOpacity(0.15),
+            color: AppColors.surfaceColor.withOpacity(0.15),
             borderRadius: BorderRadius.circular(12),
             child: InkWell(
               borderRadius: BorderRadius.circular(12),
               onTap: () => Navigator.pop(context),
               child: const Padding(
                 padding: EdgeInsets.all(10),
-                child: Icon(LucideIcons.arrowRight, color: Colors.white, size: 20),
+                child:
+                    Icon(LucideIcons.arrowRight, color: Colors.white, size: 20),
               ),
             ),
           ),
@@ -390,6 +325,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                 Text(
                   l10n.backupAndRestore,
                   style: TextStyle(
+                    fontWeight: FontWeight.bold,
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 13,
                   ),
@@ -422,7 +358,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: AppColors.surfaceColor.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -440,7 +376,10 @@ class _DataManagementScreenState extends State<DataManagementScreen>
           ),
           Text(
             label,
-            style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 10),
           ),
         ],
       ),
@@ -448,7 +387,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Widget _buildTabBar() {
-      final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -459,7 +398,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -474,7 +413,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
         labelColor: AppColors.primaryColor,
         unselectedLabelColor: AppColors.textSecondary,
         labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+        unselectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         dividerColor: Colors.transparent,
         tabs: [
           Tab(
@@ -529,7 +469,10 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [AppColors.primaryColor, AppColors.primaryColor.withOpacity(0.8)],
+                    colors: [
+                      AppColors.primaryColor,
+                      AppColors.primaryColor.withOpacity(0.8)
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
@@ -546,10 +489,11 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: AppColors.surfaceColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(LucideIcons.save, color: Colors.white, size: 20),
+                      child: const Icon(LucideIcons.save,
+                          color: Colors.white, size: 20),
                     ),
                     const SizedBox(width: 12),
                     Text(
@@ -579,10 +523,10 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                   itemCount: _backups.length,
                   itemBuilder: (context, index) {
                     final backup = _backups[index];
-                    final stat = backup.statSync();
-                    final name = path.basename(backup.path);
-                    final date = stat.modified;
-                    final sizeBytes = _getDirSize(backup);
+
+                    final name = backup.name;
+                    final date = backup.modified;
+                    final sizeBytes = backup.sizeBytes;
                     final isLatest = index == 0;
 
                     return _buildBackupCard(
@@ -620,7 +564,9 @@ class _DataManagementScreenState extends State<DataManagementScreen>
         final reason = chk['reason'] as String? ?? l10n.autoSavePoint;
         final user = chk['user'] as String? ?? l10n.systemLabel;
         final timestampStr = chk['timestamp'] as String?;
-        final date = timestampStr != null ? DateTime.parse(timestampStr) : DateTime.now();
+        final date = timestampStr != null
+            ? DateTime.parse(timestampStr)
+            : DateTime.now();
         final isLatest = index == 0;
 
         return _buildCheckpointCard(
@@ -647,15 +593,17 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     required VoidCallback onDelete,
   }) {
     final sizeMB = (sizeBytes / 1024 / 1024).toStringAsFixed(2);
-  final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isLatest ? AppColors.primaryColor.withOpacity(0.3) : AppColors.borderColor,
+          color: isLatest
+              ? AppColors.primaryColor.withOpacity(0.3)
+              : AppColors.borderColor,
         ),
         boxShadow: [
           BoxShadow(
@@ -675,8 +623,14 @@ class _DataManagementScreenState extends State<DataManagementScreen>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: isLatest
-                      ? [AppColors.primaryColor.withOpacity(0.15), AppColors.primaryColor.withOpacity(0.05)]
-                      : [Colors.blue.withOpacity(0.1), Colors.blue.withOpacity(0.04)],
+                      ? [
+                          AppColors.primaryColor.withOpacity(0.15),
+                          AppColors.primaryColor.withOpacity(0.05)
+                        ]
+                      : [
+                          Colors.blue.withOpacity(0.1),
+                          Colors.blue.withOpacity(0.04)
+                        ],
                 ),
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -707,7 +661,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                       ),
                       if (isLatest)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: AppColors.successColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -780,15 +735,16 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     required DateFormat timeFormat,
     required VoidCallback onRestore,
   }) {
-      final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isLatest ? Colors.green.withOpacity(0.3) : AppColors.borderColor,
+          color:
+              isLatest ? Colors.green.withOpacity(0.3) : AppColors.borderColor,
         ),
         boxShadow: [
           BoxShadow(
@@ -808,8 +764,14 @@ class _DataManagementScreenState extends State<DataManagementScreen>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: isLatest
-                      ? [Colors.green.withOpacity(0.15), Colors.green.withOpacity(0.05)]
-                      : [Colors.teal.withOpacity(0.1), Colors.teal.withOpacity(0.04)],
+                      ? [
+                          Colors.green.withOpacity(0.15),
+                          Colors.green.withOpacity(0.05)
+                        ]
+                      : [
+                          Colors.teal.withOpacity(0.1),
+                          Colors.teal.withOpacity(0.04)
+                        ],
                 ),
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -840,7 +802,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                       ),
                       if (isLatest)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: AppColors.successColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -903,7 +866,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
           style: TextStyle(
             fontSize: 12,
             color: AppColors.textSecondary,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -948,7 +911,8 @@ class _DataManagementScreenState extends State<DataManagementScreen>
               color: AppColors.primaryColor.withOpacity(0.06),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 48, color: AppColors.primaryColor.withOpacity(0.4)),
+            child: Icon(icon,
+                size: 48, color: AppColors.primaryColor.withOpacity(0.4)),
           ),
           const SizedBox(height: 20),
           Text(
@@ -963,6 +927,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
           Text(
             subtitle,
             style: TextStyle(
+              fontWeight: FontWeight.bold,
               fontSize: 14,
               color: AppColors.textSecondary,
             ),
@@ -972,24 +937,10 @@ class _DataManagementScreenState extends State<DataManagementScreen>
     );
   }
 
-  int _getDirSize(Directory dir) {
-    int size = 0;
-    try {
-      if (dir.existsSync()) {
-        dir.listSync(recursive: true, followLinks: false).forEach((FileSystemEntity entity) {
-          if (entity is File) {
-            size += entity.lengthSync();
-          }
-        });
-      }
-    } catch (_) {}
-    return size;
-  }
-
   Widget _buildAppModeTab() {
-    final currentMode = PersistenceInitializer.persistenceManager?.config.appMode ?? 'release';
+    const currentMode = 'debug';
     final isDebug = currentMode == 'debug';
-  final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -1000,7 +951,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surfaceColor,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.borderColor),
               boxShadow: [
@@ -1022,7 +973,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                         color: AppColors.primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         LucideIcons.settings,
                         color: AppColors.primaryColor,
                         size: 24,
@@ -1043,13 +994,13 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            isDebug
-                                ? l10n.debugModeDesc
-                                : l10n.releaseModeDesc,
+                            isDebug ? l10n.debugModeDesc : l10n.releaseModeDesc,
                             style: TextStyle(
                               fontSize: 13,
-                              color: isDebug ? Colors.orange.shade700 : AppColors.successColor,
-                              fontWeight: FontWeight.w600,
+                              color: isDebug
+                                  ? Colors.orange.shade700
+                                  : AppColors.successColor,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -1103,7 +1054,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surfaceColor,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.red.shade100),
                 boxShadow: [
@@ -1149,6 +1100,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                             Text(
                               l10n.dbToolsDesc,
                               style: TextStyle(
+                                fontWeight: FontWeight.bold,
                                 fontSize: 13,
                                 color: AppColors.mutedColor,
                               ),
@@ -1167,7 +1119,7 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                       fontSize: 13,
                       height: 1.6,
                       color: Colors.grey.shade700,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -1176,12 +1128,14 @@ class _DataManagementScreenState extends State<DataManagementScreen>
                     icon: const Icon(LucideIcons.rotateCcw),
                     label: Text(
                       l10n.reseedDatabase,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade700,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 16),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -1251,9 +1205,12 @@ class _DataManagementScreenState extends State<DataManagementScreen>
             Text(
               description,
               style: TextStyle(
+                fontWeight: FontWeight.bold,
                 fontSize: 12,
                 height: 1.5,
-                color: isActive ? activeColor.withOpacity(0.8) : AppColors.textSecondary,
+                color: isActive
+                    ? activeColor.withOpacity(0.8)
+                    : AppColors.textSecondary,
               ),
             ),
           ],
@@ -1263,52 +1220,10 @@ class _DataManagementScreenState extends State<DataManagementScreen>
   }
 
   Future<void> _changeMode(String mode) async {
-    final manager = PersistenceInitializer.persistenceManager;
-    if (manager == null) return;
-    setState(() => _isLoading = true);
-    try {
-      manager.config.appMode = mode;
-      await manager.config.save();
-      
-      if (mode == 'debug') {
-        await DebugSeeder.seedIfNeeded();
-      }
-      
-      if (mounted) {
-        final l10n = AppLocalizations.of(context);
-        MotionSnackBarSuccess(context, l10n.modeChanged(mode == 'debug' ? l10n.modeDebug : l10n.modeRelease));
-      }
-    } catch (e) {
-      if (mounted) MotionSnackBarError(context, AppLocalizations.of(context).saveSettingsFailed(e.toString()));
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+    showPreviewAction(context);
   }
 
   Future<void> _resetAndSeedData() async {
-    final l10n = AppLocalizations.of(context);
-    final confirm = await _showConfirmDialog(
-      l10n.confirmReseed,
-      l10n.reseedConfirmMessage,
-      icon: LucideIcons.triangleAlert,
-      iconColor: AppColors.errorColor,
-    );
-    if (!confirm) return;
-
-    setState(() => _isLoading = true);
-    try {
-      await DebugSeeder.clearAndReSeed();
-      if (mounted) {
-        MotionSnackBarSuccess(context, l10n.reseedSuccess);
-      }
-    } catch (e) {
-      if (mounted) MotionSnackBarError(context, l10n.reseedError(e.toString()));
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+    showPreviewAction(context);
   }
 }

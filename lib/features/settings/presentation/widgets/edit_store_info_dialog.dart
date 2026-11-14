@@ -1,11 +1,9 @@
+import 'package:bayaa_pos/shared/feedback/preview_action.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
-import '../../../../core/components/app_logo.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/functions/messege.dart';
+import 'package:bayaa_pos/shared/widgets/app_logo.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
 
-import '../../../../l10n/app_localizations.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class EditStoreInfoDialog extends StatefulWidget {
   final Map<String, String> storeInfo;
@@ -52,40 +50,28 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
   }
 
   void _submit() {
-    final l10n = AppLocalizations.of(context);
-    // If the user cleared it, we save an empty string so it falls back to localized name
-    final nameToSave = nameCtrl.text.trim();
-
-    final Map<String, String> updatedInfo = {
-      'name': nameToSave,
-      'phone': phoneCtrl.text.trim(),
-      'email': emailCtrl.text.trim(),
-      'vat': vatCtrl.text.trim(),
-      'address': addressCtrl.text.trim(),
-      'logoPath': logoPath ?? '',
-    };
-
-    MotionSnackBarSuccess(context, l10n.infoSavedSuccess);
-
-    Navigator.of(context).pop(updatedInfo);
+    final navigator = Navigator.of(context);
+    final feedbackContext = navigator.context;
+    navigator.pop();
+    showPreviewAction(feedbackContext);
   }
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final l10n = AppLocalizations.of(context);
     return Dialog(
+      insetPadding: const EdgeInsets.all(12),
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 600),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [Colors.white, AppColors.surfaceColor],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: AppColors.surfaceColor,
         ),
-        child: Padding(
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -115,6 +101,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
                     ),
                   ),
                   IconButton(
+                    tooltip: l10n.localeName == 'ar' ? 'إغلاق' : 'Close',
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close),
                   ),
@@ -122,130 +109,124 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
               ),
               const SizedBox(height: 24),
               // Form
-              Flexible(
-                child: SingleChildScrollView(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isWide = constraints.maxWidth > 500;
-                      return Column(
-                        children: [
-                          Center(
-                            child: Stack(
-                              alignment: Alignment.bottomRight,
-                              children: [
-                                Container(
-                                  width: 100,
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                        color: AppColors.borderColor),
-                                  ),
-                                  child: ClipOval(
-                                    child:
-                                        logoPath != null && logoPath!.isNotEmpty
-                                            ? Image.file(File(logoPath!),
-                                                fit: BoxFit.cover)
-                                            : const AppLogo(
-                                                width: 100,
-                                                height: 100,
-                                                fit: BoxFit.cover),
-                                  ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth > 500;
+                  return Column(
+                    children: [
+                      Center(
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: AppColors.borderColor),
+                              ),
+                              child: ClipOval(
+                                child: logoPath != null && logoPath!.isNotEmpty
+                                    ? Image.asset(logoPath!, fit: BoxFit.cover)
+                                    : const AppLogo(
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.cover),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: _pickImage,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  shape: BoxShape.circle,
+                                  border:
+                                      Border.all(color: Colors.white, width: 2),
                                 ),
-                                GestureDetector(
-                                  onTap: _pickImage,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryColor,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: Colors.white, width: 2),
-                                    ),
-                                    child: const Icon(Icons.camera_alt,
-                                        size: 16, color: Colors.white),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          if (isWide) ...[
-                            _buildTwoColumnRow([
-                              _buildTextField(
-                                nameCtrl,
-                                l10n.storeNameRequired,
-                                Icons.store,
-                                null,
-                                l10n.appName,
+                                child: const Icon(Icons.camera_alt,
+                                    size: 16, color: Colors.white),
                               ),
-                              _buildTextField(
-                                phoneCtrl,
-                                l10n.storePhone,
-                                Icons.phone,
-                                TextInputType.phone,
-                              ),
-                            ]),
-                            const SizedBox(height: 16),
-                            _buildTwoColumnRow([
-                              _buildTextField(
-                                emailCtrl,
-                                l10n.storeEmail,
-                                Icons.email,
-                                TextInputType.emailAddress,
-                              ),
-                              _buildTextField(
-                                vatCtrl,
-                                l10n.storeVat,
-                                Icons.receipt_long,
-                              ),
-                            ]),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              addressCtrl,
-                              l10n.storeAddress,
-                              Icons.location_on,
-                            ),
-                          ] else ...[
-                            _buildTextField(
-                              nameCtrl,
-                              l10n.storeNameRequired,
-                              Icons.store,
-                              null,
-                              l10n.appName,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              phoneCtrl,
-                              l10n.storePhone,
-                              Icons.phone,
-                              TextInputType.phone,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              emailCtrl,
-                              l10n.storeEmail,
-                              Icons.email,
-                              TextInputType.emailAddress,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              vatCtrl,
-                              l10n.storeVat,
-                              Icons.receipt_long,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              addressCtrl,
-                              l10n.storeAddress,
-                              Icons.location_on,
                             ),
                           ],
-                        ],
-                      );
-                    },
-                  ),
-                ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      if (isWide) ...[
+                        _buildTwoColumnRow([
+                          _buildTextField(
+                            nameCtrl,
+                            l10n.storeNameRequired,
+                            Icons.store,
+                            null,
+                            l10n.appName,
+                          ),
+                          _buildTextField(
+                            phoneCtrl,
+                            l10n.storePhone,
+                            Icons.phone,
+                            TextInputType.phone,
+                          ),
+                        ]),
+                        const SizedBox(height: 16),
+                        _buildTwoColumnRow([
+                          _buildTextField(
+                            emailCtrl,
+                            l10n.storeEmail,
+                            Icons.email,
+                            TextInputType.emailAddress,
+                          ),
+                          _buildTextField(
+                            vatCtrl,
+                            l10n.storeVat,
+                            Icons.receipt_long,
+                          ),
+                        ]),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          addressCtrl,
+                          l10n.storeAddress,
+                          Icons.location_on,
+                        ),
+                      ] else ...[
+                        _buildTextField(
+                          nameCtrl,
+                          l10n.storeNameRequired,
+                          Icons.store,
+                          null,
+                          l10n.appName,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          phoneCtrl,
+                          l10n.storePhone,
+                          Icons.phone,
+                          TextInputType.phone,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          emailCtrl,
+                          l10n.storeEmail,
+                          Icons.email,
+                          TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          vatCtrl,
+                          l10n.storeVat,
+                          Icons.receipt_long,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          addressCtrl,
+                          l10n.storeAddress,
+                          Icons.location_on,
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 24),
               // Actions
@@ -306,7 +287,7 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
   ]) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
@@ -335,20 +316,6 @@ class _EditStoreInfoDialogState extends State<EditStoreInfoDialog> {
   }
 
   Future<void> _pickImage() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-      );
-
-      if (result != null && result.files.single.path != null) {
-        setState(() {
-          logoPath = result.files.single.path!;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        MotionSnackBarError(context, AppLocalizations.of(context).error);
-      }
-    }
+    showPreviewAction(context);
   }
 }

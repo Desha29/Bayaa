@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/di/dependency_injection.dart';
-import '../../../../l10n/app_localizations.dart';
-import '../../../stock/presentation/cubit/stock_cubit.dart';
-import '../../../stock/presentation/cubit/stock_states.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
+import 'package:bayaa_pos/app/bootstrap/service_locator.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
+import 'package:bayaa_pos/features/inventory/presentation/controllers/stock_alerts_cubit.dart';
+import 'package:bayaa_pos/features/inventory/presentation/controllers/stock_alerts_state.dart';
 
 class StockCapacityCard extends StatelessWidget {
   final VoidCallback onShowAll;
@@ -14,6 +14,7 @@ class StockCapacityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final isArabic = l10n.localeName == 'ar';
 
@@ -38,22 +39,26 @@ class StockCapacityCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                isArabic ? 'حالة المخزون والتنبيهات' : 'Stock Status & Capacity',
-                style: const TextStyle(
+              Expanded(
+                  child: Text(
+                isArabic
+                    ? 'حالة المخزون والتنبيهات'
+                    : 'Stock Status & Capacity',
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
-              ),
+              )),
               InkWell(
                 onTap: onShowAll,
                 borderRadius: BorderRadius.circular(6),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                   child: Text(
                     isArabic ? 'عرض الكل >' : 'Show all >',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color: AppColors.secondaryColor,
@@ -65,10 +70,10 @@ class StockCapacityCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          BlocBuilder<StockCubit, StockStates>(
-            bloc: getIt<StockCubit>(),
+          BlocBuilder<StockAlertsCubit, StockAlertsState>(
+            bloc: getIt<StockAlertsCubit>(),
             builder: (context, state) {
-              final stockCubit = getIt<StockCubit>();
+              final stockCubit = getIt<StockAlertsCubit>();
               final lowStockProducts = stockCubit.products
                   .where((p) => p.quantity <= p.minQuantity)
                   .toList();
@@ -76,7 +81,8 @@ class StockCapacityCard extends StatelessWidget {
               if (lowStockProducts.isEmpty) {
                 // Show healthy stock message
                 return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
                   alignment: Alignment.center,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -87,15 +93,18 @@ class StockCapacityCard extends StatelessWidget {
                           color: AppColors.successColor.withOpacity(0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(LucideIcons.checkCheck, color: AppColors.successColor, size: 18),
+                        child: Icon(LucideIcons.checkCheck,
+                            color: AppColors.successColor, size: 18),
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        isArabic ? 'المخزون في حالة ممتازة ومستقرة' : 'Inventory levels are optimal',
-                        style: const TextStyle(
+                        isArabic
+                            ? 'المخزون في حالة ممتازة ومستقرة'
+                            : 'Inventory levels are optimal',
+                        style: TextStyle(
                           color: AppColors.successColor,
                           fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -109,7 +118,8 @@ class StockCapacityCard extends StatelessWidget {
               return Column(
                 children: displayList.map((product) {
                   final qty = product.quantity;
-                  final minQty = product.minQuantity > 0 ? product.minQuantity : 10;
+                  final minQty =
+                      product.minQuantity > 0 ? product.minQuantity : 10;
                   final ratio = (qty / minQty).clamp(0.0, 1.0);
                   final percent = (ratio * 100).toInt();
 
@@ -132,9 +142,9 @@ class StockCapacityCard extends StatelessWidget {
                                 product.name,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.bold,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -156,7 +166,8 @@ class StockCapacityCard extends StatelessWidget {
                           child: LinearProgressIndicator(
                             value: ratio,
                             minHeight: 6,
-                            backgroundColor: AppColors.borderColor.withOpacity(0.5),
+                            backgroundColor:
+                                AppColors.borderColor.withOpacity(0.5),
                             valueColor: AlwaysStoppedAnimation<Color>(barColor),
                           ),
                         ),

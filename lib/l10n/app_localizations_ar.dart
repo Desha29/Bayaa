@@ -51,10 +51,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get quickLoginHeader => 'تجربة سريعة للنظام بأدوار مختلفة:';
 
   @override
-  String get sessionOpenWarning =>
-      'يوجد يومية مفتوحة حالياً. تسجيل الدخول سيتابع عليها.';
-
-  @override
   String get offlineFeature => 'عمل كامل دون اتصال بالإنترنت (أوفلاين)';
 
   @override
@@ -95,9 +91,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reports => 'الإحصائيات';
 
   @override
-  String get sessions => 'الايام';
-
-  @override
   String get notifications => 'التنبيهات';
 
   @override
@@ -113,7 +106,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get stockSection => 'المخازن والمنتجات';
 
   @override
-  String get systemSection => 'النظام والتقارير';
+  String get systemSection => 'النظام';
 
   @override
   String get roleManager => 'مدير النظام';
@@ -137,8 +130,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get logoutConfirmMessage => 'هل أنت متأكد من تسجيل الخروج؟';
 
   @override
-  String get logoutConfirmSub =>
-      'سيتم إنهاء يوم العمل الحالي والعودة إلى شاشة تسجيل الدخول.';
+  String get logoutConfirmSub => 'ستعود إلى شاشة تسجيل الدخول.';
 
   @override
   String get loggingOut => 'جاري تسجيل الخروج...';
@@ -204,18 +196,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reportsSubtitle => 'تحليلات النظام';
 
   @override
-  String get sessionsSubtitle => 'سجل الأيام المغلقة';
-
-  @override
   String get settingsSubtitle => 'إدارة إعدادات النظام';
 
   @override
   String get notificationsSubtitle => 'الإشعارات والتنبيهات';
-
-  @override
-  String closedSessionsCount(Object count) {
-    return '$count يوم مغلق';
-  }
 
   @override
   String get todaySalesNet => 'مبيعات اليوم (صافي)';
@@ -259,16 +243,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String sessionStaleWarning(Object time) {
-    return 'اليوم الحالي مفتوح منذ $time — يُنصح بإغلاقه وفتح يوم جديد';
-  }
-
-  @override
-  String sessionOpenInfo(Object time) {
-    return 'أنت الآن تعمل على يومية مفتوحة مسبقاً منذ $time';
-  }
-
-  @override
   String get daysText => 'يوم';
 
   @override
@@ -307,21 +281,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noRecentOperations => 'لا توجد عمليات حديثة';
 
   @override
-  String get noOperationsToday => 'لا توجد عمليات في هذا اليوم بعد';
-
-  @override
   String loginsCount(Object count) {
     return '$count تسجيل دخول';
-  }
-
-  @override
-  String activeDayUser(Object user) {
-    return 'يوم نشط • $user';
-  }
-
-  @override
-  String closedDayUser(Object user) {
-    return 'يوم مغلق • $user';
   }
 
   @override
@@ -358,12 +319,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get actUserDelete => 'حذف مستخدم';
-
-  @override
-  String get actSessionOpen => 'فتح يوم';
-
-  @override
-  String get actSessionClose => 'إغلاق يوم';
 
   @override
   String get actRestock => 'شحنة جديدة';
@@ -620,8 +575,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get infoSavedSuccess => 'تم حفظ المعلومات بنجاح';
 
   @override
-  String get logoutWarningMessage =>
-      'سيتم إنهاء يوم العمل الحالي والعودة لشاشة الدخول';
+  String get logoutWarningMessage => 'ستعود إلى شاشة تسجيل الدخول.';
 
   @override
   String get fullName => 'الاسم الكامل';
@@ -943,28 +897,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get instantPrint => 'طباعة فورية';
 
   @override
-  String get managerOnlyDelete => 'فقط المدير يمكنه حذف الورديات.';
-
-  @override
-  String get cannotDeleteOpenSession =>
-      'لا يمكن حذف الوردية الحالية وهي مفتوحة.';
-
-  @override
-  String get confirmDeleteSession => 'تأكيد حذف الوردية';
-
-  @override
-  String get confirmDeleteSessionMessage =>
-      'هل أنت متأكد من حذف هذه الوردية؟ سيتم حذف تقرير الإغلاق المرتبط بها نهائياً ولا يمكن التراجع.';
-
-  @override
-  String get sessionDeletedSuccess => 'تم حذف الوردية بنجاح.';
-
-  @override
-  String sessionDeleteFailed(Object error) {
-    return 'فشل حذف الوردية: $error';
-  }
-
-  @override
   String get activeNow => 'نشطة الآن';
 
   @override
@@ -978,66 +910,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get sessionsHistory => 'سجل الورديات';
-
-  @override
-  String sessionsCount(Object count) {
-    return '$count وردية مسجلة';
-  }
-
-  @override
-  String get sessionsList => 'قائمة الورديات';
-
-  @override
-  String get loadingSessions => 'جاري تحميل الورديات...';
-
-  @override
-  String get noSessions => 'لا توجد ورديات مسجلة';
-
-  @override
-  String get sessionsAutoAdd => 'ستُضاف الورديات تلقائياً فور فتحها وإغلاقها';
-
-  @override
-  String get sessionActive => 'نشطة';
-
-  @override
-  String get sessionClosed => 'مغلقة';
-
-  @override
-  String sessionId(Object id) {
-    return 'وردية #$id';
-  }
-
-  @override
-  String get selectSessionForDetails => 'اختر وردية لعرض تفاصيلها';
-
-  @override
-  String get selectSessionHint =>
-      'اختر إحدى الورديات من القائمة لعرض سجل العمليات والتقرير المالي';
-
-  @override
   String get operationsLog => 'سجل العمليات';
 
   @override
   String get financialReport => 'التقرير المالي';
 
   @override
-  String get activeSession => 'وردية نشطة';
-
-  @override
-  String get closedSession => 'وردية مغلقة';
-
-  @override
   String get printReport => 'طباعة التقرير';
-
-  @override
-  String get deleteSession => 'حذف الوردية';
-
-  @override
-  String get sessionStart => 'بدء الوردية';
-
-  @override
-  String get sessionEnd => 'إغلاق الوردية';
 
   @override
   String get totalDuration => 'إجمالي المدة';
@@ -1052,20 +931,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noMatchingOperations => 'لا توجد عمليات تطابق البحث';
 
   @override
-  String get reportAfterClose => 'التقرير يتاح بعد إغلاق الوردية';
-
-  @override
-  String get closeSessionForReport =>
-      'أغلق الوردية الحالية لإنشاء التقرير المالي وعرض الإحصائيات';
-
-  @override
   String get failedLoadReport => 'فشل تحميل التقرير المالي';
 
   @override
   String get noFinancialReport => 'لم يتم العثور على تقرير مالي';
-
-  @override
-  String get ensureSessionClosed => 'تأكد من إغلاق الوردية بنجاح';
 
   @override
   String get netSales => 'صافي المبيعات';
@@ -1078,9 +947,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get datasheet => 'الجدول';
-
-  @override
-  String get noReportForSession => 'لا يوجد تقرير لهذه الوردية';
 
   @override
   String get previewBeforePrint => 'معاينة التقرير قبل الطباعة';
@@ -1229,9 +1095,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get salesReportSubtitle => 'تحليل شامل لأداء المبيعات والأرباح';
-
-  @override
-  String get currentSession => 'الجلسة الحالية';
 
   @override
   String get allTime => 'كل الوقت';
@@ -1511,11 +1374,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cartIsEmpty => 'السلة فارغة';
 
   @override
-  String failedOpenSession(Object error) {
-    return 'فشل فتح يوم جديد: $error';
-  }
-
-  @override
   String get saleSuccess => 'تمت عملية البيع بنجاح';
 
   @override
@@ -1612,18 +1470,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errUpdateFailed => 'فشل في تحديث البيانات';
 
   @override
-  String get closeSession => 'إغلاق اليومية';
-
-  @override
-  String get closeSessionSub => 'إنهاء الوردية الحالية وإصدار تقرير الإغلاق';
-
-  @override
-  String get dayClosedSuccess => 'تم إغلاق اليوم بنجاح. جاري تسجيل الخروج...';
-
-  @override
-  String get dayClosedSuccessReport => 'تم إغلاق اليوم بنجاح';
-
-  @override
   String get viewDayReport => 'عرض تقرير اليوم';
 
   @override
@@ -1670,16 +1516,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get dataManagementSub =>
       'عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة';
-
-  @override
-  String activitySessionOpened(Object user) {
-    return 'فتح $user يومية عمل جديدة';
-  }
-
-  @override
-  String activitySessionClosed(Object user) {
-    return 'أغلق $user اليومية';
-  }
 
   @override
   String activityLogin(Object user) {
@@ -1816,27 +1652,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get categoryDeletedSuccess => 'تم الحذف بنجاح';
 
   @override
-  String get loginExistingSession =>
-      'تم تسجيل الدخول. ستمت المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.';
-
-  @override
-  String get loginNewSession => 'تم تسجيل الدخول وفتح يومية جديدة بنجاح';
-
-  @override
-  String failedOpenDay(Object error) {
-    return 'فشل فتح اليوم: $error';
-  }
-
-  @override
   String get wrongPassword => 'كلمة المرور غير صحيحة';
-
-  @override
-  String get noOpenSession => 'لا يوجد يوم مفتوح لإغلاقه.';
-
-  @override
-  String failedCloseDay(Object error) {
-    return 'فشل إغلاق اليومية: $error';
-  }
 
   @override
   String get storeInfoSaved => 'تم حفظ معلومات المتجر بنجاح';
@@ -1898,14 +1714,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sameCategoryError => 'لا يمكن إعادة تعيين المنتجات إلى نفس الفئة';
 
   @override
-  String get dailyReports => 'التقارير اليومية';
-
-  @override
   String get todayRevenue => 'إيرادات ومبيعات اليوم';
-
-  @override
-  String get dailyReportDesc =>
-      'مراجعة المؤشرات المالية، المبيعات، المرتجعات، وقائمة المنتجات الأكثر طلباً';
 
   @override
   String get noDataForDate => 'لا توجد بيانات متاحة لهذا التاريخ';
@@ -2043,10 +1852,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get openLabel => 'مفتوح';
-
-  @override
-  String get sessionsHistorySubtitle =>
-      'عرض وإدارة جلسات النظام والتقارير اليومية';
 
   @override
   String get taxSalesReceipt => 'إيصال مبيعات ضريبي';
@@ -2201,11 +2006,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get retry => 'إعادة المحاولة';
 
   @override
-  String sessionLabel(Object id) {
-    return 'جلسة: $id';
-  }
-
-  @override
   String get analyticsOverview => 'نظرة عامة';
 
   @override
@@ -2240,17 +2040,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get customRange => 'فترة مخصصة';
-
-  @override
-  String get allSessions => 'كل الجلسات';
-
-  @override
-  String get sessionFilter => 'تصفية حسب الجلسة';
-
-  @override
-  String sessionNumber(Object id) {
-    return 'جلسة #$id';
-  }
 
   @override
   String get selectedDate => 'التاريخ المحدد';

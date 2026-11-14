@@ -1,16 +1,12 @@
-import 'package:bayaa_pos/core/di/dependency_injection.dart';
-import 'package:bayaa_pos/core/components/local_image_view.dart';
-import 'package:bayaa_pos/core/data/services/local_image_storage.dart';
-import 'package:bayaa_pos/features/auth/presentation/cubit/user_cubit.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:bayaa_pos/shared/feedback/preview_action.dart';
+import 'package:bayaa_pos/shared/widgets/asset_image_view.dart';
 import 'package:flutter/material.dart';
-import 'package:bayaa_pos/features/auth/data/models/user_model.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/functions/messege.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:bayaa_pos/features/auth/presentation/models/user_view_data.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class AddEditUserDialog extends StatefulWidget {
-  final User? userToEdit;
+  final UserViewData? userToEdit;
   final bool profileOnly;
 
   const AddEditUserDialog({
@@ -28,7 +24,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   late final TextEditingController phoneCtrl;
   late final TextEditingController usernameCtrl;
   late final TextEditingController passwordCtrl;
-  late UserType selectedUserType;
+  late PreviewRole selectedUserType;
   String? _selectedImagePath;
   bool _isPasswordVisible = false;
 
@@ -40,7 +36,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
     phoneCtrl = TextEditingController(text: user?.phone ?? '');
     usernameCtrl = TextEditingController(text: user?.username ?? '');
     passwordCtrl = TextEditingController(text: user?.password ?? '');
-    selectedUserType = user?.userType ?? UserType.cashier;
+    selectedUserType = user?.userType ?? PreviewRole.cashier;
     _selectedImagePath = user?.imagePath;
   }
 
@@ -53,91 +49,35 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
     super.dispose();
   }
 
-  bool _isSubmitting = false;
+  final bool _isSubmitting = false;
 
   Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp', 'bmp'],
-    );
-    final selectedPath = result?.files.single.path;
-    if (selectedPath != null && mounted) {
-      setState(() => _selectedImagePath = selectedPath);
-    }
+    showPreviewAction(context);
   }
 
   Future<void> _submit() async {
-    final l10n = AppLocalizations.of(context);
-    if (_isSubmitting) return;
-
-    if (nameCtrl.text.trim().isEmpty ||
-        usernameCtrl.text.trim().isEmpty ||
-        (widget.userToEdit == null && passwordCtrl.text.trim().isEmpty)) {
-      MotionSnackBarError(context, l10n.fillRequiredFields);
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-
-    try {
-      final username = usernameCtrl.text.trim();
-      var storedImagePath = _selectedImagePath;
-      if (storedImagePath != null &&
-          storedImagePath != widget.userToEdit?.imagePath) {
-        storedImagePath = await LocalImageStorage.persist(
-          sourcePath: storedImagePath,
-          collection: 'profiles',
-          key: username,
-        );
-      }
-
-      final User user = User(
-        name: nameCtrl.text.trim(),
-        phone: phoneCtrl.text.trim(),
-        username: username,
-        password: passwordCtrl.text.trim(),
-        userType: selectedUserType,
-        imagePath: storedImagePath,
-      );
-
-      if (!mounted) return;
-      if (widget.userToEdit == null) {
-        getIt<UserCubit>().saveUser(user);
-        MotionSnackBarSuccess(context, l10n.msgUserCreated);
-      } else {
-        getIt<UserCubit>().updateUser(user);
-        MotionSnackBarSuccess(context, l10n.msgUserUpdated);
-      }
-
-      Navigator.of(context).pop(user);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _isSubmitting = false);
-      MotionSnackBarError(
-        context,
-        l10n.localeName == 'ar'
-            ? 'تعذر حفظ صورة الملف الشخصي'
-            : 'Could not save the profile image',
-      );
-    }
+    final navigator = Navigator.of(context);
+    final feedbackContext = navigator.context;
+    navigator.pop();
+    showPreviewAction(feedbackContext);
   }
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final l10n = AppLocalizations.of(context);
     return Dialog(
+      insetPadding: const EdgeInsets.all(12),
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 600),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [Colors.white, AppColors.surfaceColor],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: AppColors.surfaceColor,
         ),
-        child: Padding(
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -171,6 +111,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
                     ),
                   ),
                   IconButton(
+                    tooltip: l10n.localeName == 'ar' ? 'إغلاق' : 'Close',
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close),
                   ),
@@ -182,31 +123,26 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
               const SizedBox(height: 20),
 
               // Form
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildTextField(
-                          nameCtrl, l10n.nameRequired, Icons.person),
-                      const SizedBox(height: 16),
-                      _buildTextField(phoneCtrl, l10n.storePhone, Icons.phone,
-                          keyboardType: TextInputType.phone),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        usernameCtrl,
-                        l10n.usernameRequired,
-                        Icons.account_circle,
-                        readOnly: widget.userToEdit != null,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildPasswordField(l10n),
-                      if (!widget.profileOnly) ...[
-                        const SizedBox(height: 16),
-                        _buildUserTypeDropdown(l10n),
-                      ],
-                    ],
+              Column(
+                children: [
+                  _buildTextField(nameCtrl, l10n.nameRequired, Icons.person),
+                  const SizedBox(height: 16),
+                  _buildTextField(phoneCtrl, l10n.storePhone, Icons.phone,
+                      keyboardType: TextInputType.phone),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    usernameCtrl,
+                    l10n.usernameRequired,
+                    Icons.account_circle,
+                    readOnly: widget.userToEdit != null,
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  _buildPasswordField(l10n),
+                  if (!widget.profileOnly) ...[
+                    const SizedBox(height: 16),
+                    _buildUserTypeDropdown(l10n),
+                  ],
+                ],
               ),
               const SizedBox(height: 24),
 
@@ -271,66 +207,75 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.borderColor),
       ),
-      child: Row(
-        children: [
-          LocalImageView(
-            path: _selectedImagePath,
-            width: 72,
-            height: 72,
-            borderRadius: 36,
-            fallback: Container(
-              color: AppColors.primaryColor,
-              alignment: Alignment.center,
-              child: Text(
-                initial,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                ),
+      child: LayoutBuilder(builder: (context, size) {
+        final image = AssetImageView(
+          path: _selectedImagePath,
+          width: 72,
+          height: 72,
+          borderRadius: 36,
+          fallback: Container(
+            color: AppColors.primaryColor,
+            alignment: Alignment.center,
+            child: Text(
+              initial,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        );
+        final details = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isArabic ? 'صورة الملف الشخصي' : 'Profile image',
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              isArabic
+                  ? 'اختيارية ويمكن تغييرها لاحقاً'
+                  : 'Optional and changeable later',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.mutedColor,
+                fontSize: 11,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
               children: [
-                Text(
-                  isArabic ? 'صورة الملف الشخصي' : 'Profile image',
-                  style: const TextStyle(fontWeight: FontWeight.w800),
+                OutlinedButton.icon(
+                  onPressed: _pickImage,
+                  icon: const Icon(Icons.photo_camera_outlined, size: 17),
+                  label: Text(isArabic ? 'اختيار صورة' : 'Choose image'),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  isArabic ? 'اختيارية ويمكن تغييرها لاحقاً' : 'Optional and changeable later',
-                  style: const TextStyle(
-                    color: AppColors.mutedColor,
-                    fontSize: 11,
+                if (_selectedImagePath != null)
+                  TextButton.icon(
+                    onPressed: () => setState(() => _selectedImagePath = null),
+                    icon: const Icon(Icons.delete_outline, size: 17),
+                    label: Text(isArabic ? 'إزالة' : 'Remove'),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 6,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: _pickImage,
-                      icon: const Icon(Icons.photo_camera_outlined, size: 17),
-                      label: Text(isArabic ? 'اختيار صورة' : 'Choose image'),
-                    ),
-                    if (_selectedImagePath != null)
-                      TextButton.icon(
-                        onPressed: () => setState(() => _selectedImagePath = null),
-                        icon: const Icon(Icons.delete_outline, size: 17),
-                        label: Text(isArabic ? 'إزالة' : 'Remove'),
-                      ),
-                  ],
-                ),
               ],
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+        if (size.maxWidth < 340 ||
+            MediaQuery.textScalerOf(context).scale(1) > 1.4) {
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [image, const SizedBox(height: 12), details]);
+        }
+        return Row(children: [
+          image,
+          const SizedBox(width: 14),
+          Expanded(child: details)
+        ]);
+      }),
     );
   }
 
@@ -339,7 +284,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
       {TextInputType? keyboardType, bool readOnly = false}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
@@ -370,7 +315,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   Widget _buildPasswordField(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
@@ -388,6 +333,13 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
           labelText: l10n.passwordRequired,
           prefixIcon: Icon(Icons.lock, color: AppColors.primaryColor),
           suffixIcon: IconButton(
+            tooltip: _isPasswordVisible
+                ? (l10n.localeName == 'ar'
+                    ? 'إخفاء كلمة المرور'
+                    : 'Hide password')
+                : (l10n.localeName == 'ar'
+                    ? 'إظهار كلمة المرور'
+                    : 'Show password'),
             icon: Icon(
               _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
               color: AppColors.mutedColor,
@@ -411,7 +363,7 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
   Widget _buildUserTypeDropdown(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderColor),
         boxShadow: [
@@ -422,20 +374,21 @@ class _AddEditUserDialogState extends State<AddEditUserDialog> {
           ),
         ],
       ),
-      child: DropdownButtonFormField<UserType>(
+      child: DropdownButtonFormField<PreviewRole>(
+        isExpanded: true,
         value: selectedUserType,
         items: [
           DropdownMenuItem(
-            value: UserType.manager,
+            value: PreviewRole.manager,
             child: Text(l10n.roleManager),
           ),
           DropdownMenuItem(
-            value: UserType.cashier,
+            value: PreviewRole.cashier,
             child: Text(l10n.roleCashier),
           ),
         ],
         onChanged: (v) =>
-            setState(() => selectedUserType = v ?? UserType.cashier),
+            setState(() => selectedUserType = v ?? PreviewRole.cashier),
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: l10n.userType,

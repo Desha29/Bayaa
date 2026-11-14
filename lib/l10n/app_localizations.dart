@@ -182,12 +182,6 @@ abstract class AppLocalizations {
   /// **'تجربة سريعة للنظام بأدوار مختلفة:'**
   String get quickLoginHeader;
 
-  /// No description provided for @sessionOpenWarning.
-  ///
-  /// In ar, this message translates to:
-  /// **'يوجد يومية مفتوحة حالياً. تسجيل الدخول سيتابع عليها.'**
-  String get sessionOpenWarning;
-
   /// No description provided for @offlineFeature.
   ///
   /// In ar, this message translates to:
@@ -266,12 +260,6 @@ abstract class AppLocalizations {
   /// **'الإحصائيات'**
   String get reports;
 
-  /// No description provided for @sessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'الايام'**
-  String get sessions;
-
   /// No description provided for @notifications.
   ///
   /// In ar, this message translates to:
@@ -305,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @systemSection.
   ///
   /// In ar, this message translates to:
-  /// **'النظام والتقارير'**
+  /// **'النظام'**
   String get systemSection;
 
   /// No description provided for @roleManager.
@@ -353,7 +341,7 @@ abstract class AppLocalizations {
   /// No description provided for @logoutConfirmSub.
   ///
   /// In ar, this message translates to:
-  /// **'سيتم إنهاء يوم العمل الحالي والعودة إلى شاشة تسجيل الدخول.'**
+  /// **'ستعود إلى شاشة تسجيل الدخول.'**
   String get logoutConfirmSub;
 
   /// No description provided for @loggingOut.
@@ -482,12 +470,6 @@ abstract class AppLocalizations {
   /// **'تحليلات النظام'**
   String get reportsSubtitle;
 
-  /// No description provided for @sessionsSubtitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'سجل الأيام المغلقة'**
-  String get sessionsSubtitle;
-
   /// No description provided for @settingsSubtitle.
   ///
   /// In ar, this message translates to:
@@ -499,12 +481,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الإشعارات والتنبيهات'**
   String get notificationsSubtitle;
-
-  /// No description provided for @closedSessionsCount.
-  ///
-  /// In ar, this message translates to:
-  /// **'{count} يوم مغلق'**
-  String closedSessionsCount(Object count);
 
   /// No description provided for @todaySalesNet.
   ///
@@ -571,18 +547,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'مرحباً بك في نظام {name} لإدارة نقاط البيع'**
   String welcomeUser(Object name);
-
-  /// No description provided for @sessionStaleWarning.
-  ///
-  /// In ar, this message translates to:
-  /// **'اليوم الحالي مفتوح منذ {time} — يُنصح بإغلاقه وفتح يوم جديد'**
-  String sessionStaleWarning(Object time);
-
-  /// No description provided for @sessionOpenInfo.
-  ///
-  /// In ar, this message translates to:
-  /// **'أنت الآن تعمل على يومية مفتوحة مسبقاً منذ {time}'**
-  String sessionOpenInfo(Object time);
 
   /// No description provided for @daysText.
   ///
@@ -656,29 +620,11 @@ abstract class AppLocalizations {
   /// **'لا توجد عمليات حديثة'**
   String get noRecentOperations;
 
-  /// No description provided for @noOperationsToday.
-  ///
-  /// In ar, this message translates to:
-  /// **'لا توجد عمليات في هذا اليوم بعد'**
-  String get noOperationsToday;
-
   /// No description provided for @loginsCount.
   ///
   /// In ar, this message translates to:
   /// **'{count} تسجيل دخول'**
   String loginsCount(Object count);
-
-  /// No description provided for @activeDayUser.
-  ///
-  /// In ar, this message translates to:
-  /// **'يوم نشط • {user}'**
-  String activeDayUser(Object user);
-
-  /// No description provided for @closedDayUser.
-  ///
-  /// In ar, this message translates to:
-  /// **'يوم مغلق • {user}'**
-  String closedDayUser(Object user);
 
   /// No description provided for @operationsCount.
   ///
@@ -745,18 +691,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حذف مستخدم'**
   String get actUserDelete;
-
-  /// No description provided for @actSessionOpen.
-  ///
-  /// In ar, this message translates to:
-  /// **'فتح يوم'**
-  String get actSessionOpen;
-
-  /// No description provided for @actSessionClose.
-  ///
-  /// In ar, this message translates to:
-  /// **'إغلاق يوم'**
-  String get actSessionClose;
 
   /// No description provided for @actRestock.
   ///
@@ -1169,7 +1103,7 @@ abstract class AppLocalizations {
   /// No description provided for @logoutWarningMessage.
   ///
   /// In ar, this message translates to:
-  /// **'سيتم إنهاء يوم العمل الحالي والعودة لشاشة الدخول'**
+  /// **'ستعود إلى شاشة تسجيل الدخول.'**
   String get logoutWarningMessage;
 
   /// No description provided for @fullName.
@@ -1772,42 +1706,6 @@ abstract class AppLocalizations {
   /// **'طباعة فورية'**
   String get instantPrint;
 
-  /// No description provided for @managerOnlyDelete.
-  ///
-  /// In ar, this message translates to:
-  /// **'فقط المدير يمكنه حذف الورديات.'**
-  String get managerOnlyDelete;
-
-  /// No description provided for @cannotDeleteOpenSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'لا يمكن حذف الوردية الحالية وهي مفتوحة.'**
-  String get cannotDeleteOpenSession;
-
-  /// No description provided for @confirmDeleteSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'تأكيد حذف الوردية'**
-  String get confirmDeleteSession;
-
-  /// No description provided for @confirmDeleteSessionMessage.
-  ///
-  /// In ar, this message translates to:
-  /// **'هل أنت متأكد من حذف هذه الوردية؟ سيتم حذف تقرير الإغلاق المرتبط بها نهائياً ولا يمكن التراجع.'**
-  String get confirmDeleteSessionMessage;
-
-  /// No description provided for @sessionDeletedSuccess.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم حذف الوردية بنجاح.'**
-  String get sessionDeletedSuccess;
-
-  /// No description provided for @sessionDeleteFailed.
-  ///
-  /// In ar, this message translates to:
-  /// **'فشل حذف الوردية: {error}'**
-  String sessionDeleteFailed(Object error);
-
   /// No description provided for @activeNow.
   ///
   /// In ar, this message translates to:
@@ -1826,72 +1724,6 @@ abstract class AppLocalizations {
   /// **'{minutes}د'**
   String minutesOnly(Object minutes);
 
-  /// No description provided for @sessionsHistory.
-  ///
-  /// In ar, this message translates to:
-  /// **'سجل الورديات'**
-  String get sessionsHistory;
-
-  /// No description provided for @sessionsCount.
-  ///
-  /// In ar, this message translates to:
-  /// **'{count} وردية مسجلة'**
-  String sessionsCount(Object count);
-
-  /// No description provided for @sessionsList.
-  ///
-  /// In ar, this message translates to:
-  /// **'قائمة الورديات'**
-  String get sessionsList;
-
-  /// No description provided for @loadingSessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'جاري تحميل الورديات...'**
-  String get loadingSessions;
-
-  /// No description provided for @noSessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'لا توجد ورديات مسجلة'**
-  String get noSessions;
-
-  /// No description provided for @sessionsAutoAdd.
-  ///
-  /// In ar, this message translates to:
-  /// **'ستُضاف الورديات تلقائياً فور فتحها وإغلاقها'**
-  String get sessionsAutoAdd;
-
-  /// No description provided for @sessionActive.
-  ///
-  /// In ar, this message translates to:
-  /// **'نشطة'**
-  String get sessionActive;
-
-  /// No description provided for @sessionClosed.
-  ///
-  /// In ar, this message translates to:
-  /// **'مغلقة'**
-  String get sessionClosed;
-
-  /// No description provided for @sessionId.
-  ///
-  /// In ar, this message translates to:
-  /// **'وردية #{id}'**
-  String sessionId(Object id);
-
-  /// No description provided for @selectSessionForDetails.
-  ///
-  /// In ar, this message translates to:
-  /// **'اختر وردية لعرض تفاصيلها'**
-  String get selectSessionForDetails;
-
-  /// No description provided for @selectSessionHint.
-  ///
-  /// In ar, this message translates to:
-  /// **'اختر إحدى الورديات من القائمة لعرض سجل العمليات والتقرير المالي'**
-  String get selectSessionHint;
-
   /// No description provided for @operationsLog.
   ///
   /// In ar, this message translates to:
@@ -1904,41 +1736,11 @@ abstract class AppLocalizations {
   /// **'التقرير المالي'**
   String get financialReport;
 
-  /// No description provided for @activeSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'وردية نشطة'**
-  String get activeSession;
-
-  /// No description provided for @closedSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'وردية مغلقة'**
-  String get closedSession;
-
   /// No description provided for @printReport.
   ///
   /// In ar, this message translates to:
   /// **'طباعة التقرير'**
   String get printReport;
-
-  /// No description provided for @deleteSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'حذف الوردية'**
-  String get deleteSession;
-
-  /// No description provided for @sessionStart.
-  ///
-  /// In ar, this message translates to:
-  /// **'بدء الوردية'**
-  String get sessionStart;
-
-  /// No description provided for @sessionEnd.
-  ///
-  /// In ar, this message translates to:
-  /// **'إغلاق الوردية'**
-  String get sessionEnd;
 
   /// No description provided for @totalDuration.
   ///
@@ -1964,18 +1766,6 @@ abstract class AppLocalizations {
   /// **'لا توجد عمليات تطابق البحث'**
   String get noMatchingOperations;
 
-  /// No description provided for @reportAfterClose.
-  ///
-  /// In ar, this message translates to:
-  /// **'التقرير يتاح بعد إغلاق الوردية'**
-  String get reportAfterClose;
-
-  /// No description provided for @closeSessionForReport.
-  ///
-  /// In ar, this message translates to:
-  /// **'أغلق الوردية الحالية لإنشاء التقرير المالي وعرض الإحصائيات'**
-  String get closeSessionForReport;
-
   /// No description provided for @failedLoadReport.
   ///
   /// In ar, this message translates to:
@@ -1987,12 +1777,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'لم يتم العثور على تقرير مالي'**
   String get noFinancialReport;
-
-  /// No description provided for @ensureSessionClosed.
-  ///
-  /// In ar, this message translates to:
-  /// **'تأكد من إغلاق الوردية بنجاح'**
-  String get ensureSessionClosed;
 
   /// No description provided for @netSales.
   ///
@@ -2017,12 +1801,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الجدول'**
   String get datasheet;
-
-  /// No description provided for @noReportForSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'لا يوجد تقرير لهذه الوردية'**
-  String get noReportForSession;
 
   /// No description provided for @previewBeforePrint.
   ///
@@ -2287,12 +2065,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تحليل شامل لأداء المبيعات والأرباح'**
   String get salesReportSubtitle;
-
-  /// No description provided for @currentSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'الجلسة الحالية'**
-  String get currentSession;
 
   /// No description provided for @allTime.
   ///
@@ -2816,12 +2588,6 @@ abstract class AppLocalizations {
   /// **'السلة فارغة'**
   String get cartIsEmpty;
 
-  /// No description provided for @failedOpenSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'فشل فتح يوم جديد: {error}'**
-  String failedOpenSession(Object error);
-
   /// No description provided for @saleSuccess.
   ///
   /// In ar, this message translates to:
@@ -3014,30 +2780,6 @@ abstract class AppLocalizations {
   /// **'فشل في تحديث البيانات'**
   String get errUpdateFailed;
 
-  /// No description provided for @closeSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'إغلاق اليومية'**
-  String get closeSession;
-
-  /// No description provided for @closeSessionSub.
-  ///
-  /// In ar, this message translates to:
-  /// **'إنهاء الوردية الحالية وإصدار تقرير الإغلاق'**
-  String get closeSessionSub;
-
-  /// No description provided for @dayClosedSuccess.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم إغلاق اليوم بنجاح. جاري تسجيل الخروج...'**
-  String get dayClosedSuccess;
-
-  /// No description provided for @dayClosedSuccessReport.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم إغلاق اليوم بنجاح'**
-  String get dayClosedSuccessReport;
-
   /// No description provided for @viewDayReport.
   ///
   /// In ar, this message translates to:
@@ -3127,18 +2869,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'عرض سجلات النظام، النسخ الاحتياطي، ونقاط الاستعادة'**
   String get dataManagementSub;
-
-  /// No description provided for @activitySessionOpened.
-  ///
-  /// In ar, this message translates to:
-  /// **'فتح {user} يومية عمل جديدة'**
-  String activitySessionOpened(Object user);
-
-  /// No description provided for @activitySessionClosed.
-  ///
-  /// In ar, this message translates to:
-  /// **'أغلق {user} اليومية'**
-  String activitySessionClosed(Object user);
 
   /// No description provided for @activityLogin.
   ///
@@ -3339,41 +3069,11 @@ abstract class AppLocalizations {
   /// **'تم الحذف بنجاح'**
   String get categoryDeletedSuccess;
 
-  /// No description provided for @loginExistingSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم تسجيل الدخول. ستمت المتابعة على اليومية المفتوحة مسبقاً لحين إغلاقها.'**
-  String get loginExistingSession;
-
-  /// No description provided for @loginNewSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم تسجيل الدخول وفتح يومية جديدة بنجاح'**
-  String get loginNewSession;
-
-  /// No description provided for @failedOpenDay.
-  ///
-  /// In ar, this message translates to:
-  /// **'فشل فتح اليوم: {error}'**
-  String failedOpenDay(Object error);
-
   /// No description provided for @wrongPassword.
   ///
   /// In ar, this message translates to:
   /// **'كلمة المرور غير صحيحة'**
   String get wrongPassword;
-
-  /// No description provided for @noOpenSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'لا يوجد يوم مفتوح لإغلاقه.'**
-  String get noOpenSession;
-
-  /// No description provided for @failedCloseDay.
-  ///
-  /// In ar, this message translates to:
-  /// **'فشل إغلاق اليومية: {error}'**
-  String failedCloseDay(Object error);
 
   /// No description provided for @storeInfoSaved.
   ///
@@ -3489,23 +3189,11 @@ abstract class AppLocalizations {
   /// **'لا يمكن إعادة تعيين المنتجات إلى نفس الفئة'**
   String get sameCategoryError;
 
-  /// No description provided for @dailyReports.
-  ///
-  /// In ar, this message translates to:
-  /// **'التقارير اليومية'**
-  String get dailyReports;
-
   /// No description provided for @todayRevenue.
   ///
   /// In ar, this message translates to:
   /// **'إيرادات ومبيعات اليوم'**
   String get todayRevenue;
-
-  /// No description provided for @dailyReportDesc.
-  ///
-  /// In ar, this message translates to:
-  /// **'مراجعة المؤشرات المالية، المبيعات، المرتجعات، وقائمة المنتجات الأكثر طلباً'**
-  String get dailyReportDesc;
 
   /// No description provided for @noDataForDate.
   ///
@@ -3758,12 +3446,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'مفتوح'**
   String get openLabel;
-
-  /// No description provided for @sessionsHistorySubtitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'عرض وإدارة جلسات النظام والتقارير اليومية'**
-  String get sessionsHistorySubtitle;
 
   /// No description provided for @taxSalesReceipt.
   ///
@@ -4053,12 +3735,6 @@ abstract class AppLocalizations {
   /// **'إعادة المحاولة'**
   String get retry;
 
-  /// No description provided for @sessionLabel.
-  ///
-  /// In ar, this message translates to:
-  /// **'جلسة: {id}'**
-  String sessionLabel(Object id);
-
   /// No description provided for @analyticsOverview.
   ///
   /// In ar, this message translates to:
@@ -4130,24 +3806,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'فترة مخصصة'**
   String get customRange;
-
-  /// No description provided for @allSessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'كل الجلسات'**
-  String get allSessions;
-
-  /// No description provided for @sessionFilter.
-  ///
-  /// In ar, this message translates to:
-  /// **'تصفية حسب الجلسة'**
-  String get sessionFilter;
-
-  /// No description provided for @sessionNumber.
-  ///
-  /// In ar, this message translates to:
-  /// **'جلسة #{id}'**
-  String sessionNumber(Object id);
 
   /// No description provided for @selectedDate.
   ///

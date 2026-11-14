@@ -1,22 +1,22 @@
+import 'package:bayaa_pos/shared/feedback/preview_action.dart';
 // ignore_for_file: deprecated_member_use
 // store_info_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:bayaa_pos/core/components/app_logo.dart';
+import 'package:bayaa_pos/shared/widgets/app_logo.dart';
 
-import '../../../../core/functions/messege.dart';
+import 'package:bayaa_pos/shared/feedback/app_messages.dart';
 
-import '../../../../l10n/app_localizations.dart';
-import '../../data/models/store_info_model.dart';
-import '../cubit/settings_cubit.dart';
-import '../cubit/settings_states.dart';
-import 'edit_store_info_dialog.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
+import 'package:bayaa_pos/features/settings/presentation/models/store_view_data.dart';
+import 'package:bayaa_pos/features/settings/presentation/controllers/settings_cubit.dart';
+import 'package:bayaa_pos/features/settings/presentation/controllers/settings_state.dart';
+import 'package:bayaa_pos/features/settings/presentation/widgets/edit_store_info_dialog.dart';
 
-import 'package:bayaa_pos/core/localization/translation_helper.dart';
+import 'package:bayaa_pos/shared/localization/translation_helper.dart';
 
-import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
 
 class StoreInfoCard extends StatelessWidget {
   const StoreInfoCard({
@@ -28,13 +28,14 @@ class StoreInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SettingsCubit, SettingsStates>(
+    Theme.of(context);
+    return BlocConsumer<SettingsCubit, SettingsState>(
       listener: (context, state) {
         if (state is StoreInfoUpdateSuccess) {
-          MotionSnackBarSuccess(
+          showSuccessMessage(
               context, TranslationHelper.translate(context, state.message));
         } else if (state is StoreInfoUpdateFailure) {
-          MotionSnackBarError(
+          showErrorMessage(
               context, TranslationHelper.translate(context, state.message));
         }
       },
@@ -42,7 +43,7 @@ class StoreInfoCard extends StatelessWidget {
         final cubit = SettingsCubit.get(context);
         final isLoading = state is SettingsLoading;
 
-        StoreInfo? store;
+        StoreViewData? store;
         if (state is StoreInfoLoaded) {
           store = state.storeInfo;
         } else if (!isLoading) {
@@ -55,7 +56,7 @@ class StoreInfoCard extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surfaceColor,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: AppColors.borderColor.withOpacity(0.5),
@@ -105,7 +106,7 @@ class StoreInfoCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         AppLocalizations.of(context).storeInfo,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
@@ -140,7 +141,7 @@ class StoreInfoCard extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   AppLocalizations.of(context).edit,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'Cairo',
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
@@ -182,6 +183,7 @@ class StoreInfoCard extends StatelessWidget {
                                   Text(
                                     AppLocalizations.of(context).noStoreInfo,
                                     style: TextStyle(
+                                      fontWeight: FontWeight.bold,
                                       fontFamily: 'Cairo',
                                       color: AppColors.mutedColor,
                                       fontSize: 13,
@@ -200,7 +202,7 @@ class StoreInfoCard extends StatelessWidget {
   }
 
   Widget _buildStoreContent(
-      BuildContext context, StoreInfo store, SettingsCubit cubit) {
+      BuildContext context, StoreViewData store, SettingsCubit cubit) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 500;
@@ -281,7 +283,7 @@ class StoreInfoCard extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildInfoItems(BuildContext context, StoreInfo store) {
+  List<Widget> _buildInfoItems(BuildContext context, StoreViewData store) {
     final l10n = AppLocalizations.of(context);
     return [
       _StoreInfoRow(
@@ -321,31 +323,12 @@ class StoreInfoCard extends StatelessWidget {
     );
 
     if (result != null && context.mounted) {
-      SettingsCubit.get(context).updateStoreInfo(result);
+      showPreviewAction(context);
     }
   }
 
-  void _pickImage(BuildContext context, StoreInfo currentInfo) async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-      );
-
-      if (result != null && result.files.single.path != null) {
-        final newPath = result.files.single.path!;
-
-        final updatedMap = currentInfo.toMap();
-        updatedMap['logoPath'] = newPath;
-
-        if (context.mounted) {
-          SettingsCubit.get(context).updateStoreInfo(updatedMap);
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        MotionSnackBarError(context, AppLocalizations.of(context).error);
-      }
-    }
+  void _pickImage(BuildContext context, StoreViewData currentInfo) async {
+    showPreviewAction(context);
   }
 }
 
@@ -362,6 +345,7 @@ class _StoreInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -395,14 +379,14 @@ class _StoreInfoRow extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 10,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                     color: AppColors.mutedColor,
                   ),
                 ),
                 const SizedBox(height: 1),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 13,
                     fontWeight: FontWeight.w700,

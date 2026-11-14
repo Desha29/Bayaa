@@ -52,10 +52,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickLoginHeader => 'Quick system trial with different roles:';
 
   @override
-  String get sessionOpenWarning =>
-      'There is an active session. Logging in will continue it.';
-
-  @override
   String get offlineFeature => 'Fully offline operation';
 
   @override
@@ -96,9 +92,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reports => 'Analytics';
 
   @override
-  String get sessions => 'Sessions';
-
-  @override
   String get notifications => 'Notifications';
 
   @override
@@ -114,7 +107,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stockSection => 'Inventory & Products';
 
   @override
-  String get systemSection => 'System & Reports';
+  String get systemSection => 'System';
 
   @override
   String get roleManager => 'System Administrator';
@@ -138,8 +131,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logoutConfirmMessage => 'Are you sure you want to logout?';
 
   @override
-  String get logoutConfirmSub =>
-      'This will end the current session and return to the login screen.';
+  String get logoutConfirmSub => 'You will return to the sign-in screen.';
 
   @override
   String get loggingOut => 'Logging out...';
@@ -205,18 +197,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsSubtitle => 'System analytics';
 
   @override
-  String get sessionsSubtitle => 'Closed session history';
-
-  @override
   String get settingsSubtitle => 'Manage system settings';
 
   @override
   String get notificationsSubtitle => 'Notifications & alerts';
-
-  @override
-  String closedSessionsCount(Object count) {
-    return '$count closed days';
-  }
 
   @override
   String get todaySalesNet => 'Today\'s Sales (Net)';
@@ -260,16 +244,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String sessionStaleWarning(Object time) {
-    return 'The current session has been open for $time — it is recommended to close it and open a new one';
-  }
-
-  @override
-  String sessionOpenInfo(Object time) {
-    return 'You are working on a previously opened session since $time';
-  }
-
-  @override
   String get daysText => 'days';
 
   @override
@@ -308,21 +282,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRecentOperations => 'No recent operations found';
 
   @override
-  String get noOperationsToday => 'No operations in this session yet';
-
-  @override
   String loginsCount(Object count) {
     return '$count logins';
-  }
-
-  @override
-  String activeDayUser(Object user) {
-    return 'Active Session • $user';
-  }
-
-  @override
-  String closedDayUser(Object user) {
-    return 'Closed Session • $user';
   }
 
   @override
@@ -359,12 +320,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actUserDelete => 'Delete User';
-
-  @override
-  String get actSessionOpen => 'Open Session';
-
-  @override
-  String get actSessionClose => 'Close Session';
 
   @override
   String get actRestock => 'Restock';
@@ -621,8 +576,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get infoSavedSuccess => 'Information saved successfully';
 
   @override
-  String get logoutWarningMessage =>
-      'The current work session will end and return to the login screen';
+  String get logoutWarningMessage => 'You will return to the sign-in screen.';
 
   @override
   String get fullName => 'Full Name';
@@ -946,28 +900,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get instantPrint => 'Instant Print';
 
   @override
-  String get managerOnlyDelete => 'Only managers can delete sessions.';
-
-  @override
-  String get cannotDeleteOpenSession =>
-      'Cannot delete the current active session while it is open.';
-
-  @override
-  String get confirmDeleteSession => 'Confirm Delete Session';
-
-  @override
-  String get confirmDeleteSessionMessage =>
-      'Are you sure you want to delete this session? The associated closing report will be permanently deleted and this action cannot be undone.';
-
-  @override
-  String get sessionDeletedSuccess => 'Session deleted successfully.';
-
-  @override
-  String sessionDeleteFailed(Object error) {
-    return 'Failed to delete session: $error';
-  }
-
-  @override
   String get activeNow => 'Active Now';
 
   @override
@@ -981,67 +913,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get sessionsHistory => 'Sessions History';
-
-  @override
-  String sessionsCount(Object count) {
-    return '$count registered sessions';
-  }
-
-  @override
-  String get sessionsList => 'Sessions List';
-
-  @override
-  String get loadingSessions => 'Loading sessions...';
-
-  @override
-  String get noSessions => 'No registered sessions found';
-
-  @override
-  String get sessionsAutoAdd =>
-      'Sessions will be added automatically upon opening and closing';
-
-  @override
-  String get sessionActive => 'Active';
-
-  @override
-  String get sessionClosed => 'Closed';
-
-  @override
-  String sessionId(Object id) {
-    return 'Session #$id';
-  }
-
-  @override
-  String get selectSessionForDetails => 'Select a session to view its details';
-
-  @override
-  String get selectSessionHint =>
-      'Select a session from the list to view its activity log and financial report';
-
-  @override
   String get operationsLog => 'Operations Log';
 
   @override
   String get financialReport => 'Financial Report';
 
   @override
-  String get activeSession => 'Active Session';
-
-  @override
-  String get closedSession => 'Closed Session';
-
-  @override
   String get printReport => 'Print Report';
-
-  @override
-  String get deleteSession => 'Delete Session';
-
-  @override
-  String get sessionStart => 'Session Start';
-
-  @override
-  String get sessionEnd => 'Session End';
 
   @override
   String get totalDuration => 'Total Duration';
@@ -1056,22 +934,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noMatchingOperations => 'No operations matched the search';
 
   @override
-  String get reportAfterClose =>
-      'Report becomes available after closing the session';
-
-  @override
-  String get closeSessionForReport =>
-      'Close the current session to generate the financial report and view analytics';
-
-  @override
   String get failedLoadReport => 'Failed to load financial report';
 
   @override
   String get noFinancialReport => 'No financial report found';
-
-  @override
-  String get ensureSessionClosed =>
-      'Make sure the session is closed successfully';
 
   @override
   String get netSales => 'Net Sales';
@@ -1084,9 +950,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get datasheet => 'Datasheet';
-
-  @override
-  String get noReportForSession => 'No report available for this session';
 
   @override
   String get previewBeforePrint => 'Preview Report Before Printing';
@@ -1236,9 +1099,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get salesReportSubtitle =>
       'Comprehensive analysis of sales performance and profits';
-
-  @override
-  String get currentSession => 'Current Session';
 
   @override
   String get allTime => 'All Time';
@@ -1520,11 +1380,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cartIsEmpty => 'Cart is empty';
 
   @override
-  String failedOpenSession(Object error) {
-    return 'Failed to open new session: $error';
-  }
-
-  @override
   String get saleSuccess => 'Sale completed successfully';
 
   @override
@@ -1622,18 +1477,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errUpdateFailed => 'Failed to update data';
 
   @override
-  String get closeSession => 'Close Session';
-
-  @override
-  String get closeSessionSub => 'End current shift and generate closing report';
-
-  @override
-  String get dayClosedSuccess => 'Day closed successfully. Logging out...';
-
-  @override
-  String get dayClosedSuccessReport => 'Day closed successfully';
-
-  @override
   String get viewDayReport => 'View Day Report';
 
   @override
@@ -1679,16 +1522,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dataManagementSub =>
       'View system logs, backups, and restore points';
-
-  @override
-  String activitySessionOpened(Object user) {
-    return '$user opened a new work day';
-  }
-
-  @override
-  String activitySessionClosed(Object user) {
-    return '$user closed the session';
-  }
 
   @override
   String activityLogin(Object user) {
@@ -1825,27 +1658,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryDeletedSuccess => 'Category deleted successfully';
 
   @override
-  String get loginExistingSession =>
-      'Logged in. The system will continue with the previously open session until it is closed.';
-
-  @override
-  String get loginNewSession => 'Logged in and new session opened successfully';
-
-  @override
-  String failedOpenDay(Object error) {
-    return 'Failed to open day: $error';
-  }
-
-  @override
   String get wrongPassword => 'Incorrect password';
-
-  @override
-  String get noOpenSession => 'No open session to close.';
-
-  @override
-  String failedCloseDay(Object error) {
-    return 'Failed to close session: $error';
-  }
 
   @override
   String get storeInfoSaved => 'Store information saved successfully';
@@ -1907,14 +1720,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sameCategoryError => 'Cannot move products to the same category';
 
   @override
-  String get dailyReports => 'Daily Reports';
-
-  @override
   String get todayRevenue => 'Today\'s Revenue & Sales';
-
-  @override
-  String get dailyReportDesc =>
-      'Review financial metrics, sales, refunds, and top selling products';
 
   @override
   String get noDataForDate => 'No data available for this date';
@@ -2053,10 +1859,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openLabel => 'Open';
-
-  @override
-  String get sessionsHistorySubtitle =>
-      'View and manage system sessions and daily reports';
 
   @override
   String get taxSalesReceipt => 'Tax Sales Receipt';
@@ -2211,11 +2013,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Retry';
 
   @override
-  String sessionLabel(Object id) {
-    return 'Session: $id';
-  }
-
-  @override
   String get analyticsOverview => 'Overview';
 
   @override
@@ -2250,17 +2047,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customRange => 'Custom Range';
-
-  @override
-  String get allSessions => 'All Sessions';
-
-  @override
-  String get sessionFilter => 'Filter by Session';
-
-  @override
-  String sessionNumber(Object id) {
-    return 'Session #$id';
-  }
 
   @override
   String get selectedDate => 'Selected Date';

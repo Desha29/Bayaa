@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/customers": {
+      "targetKind": "new-in-codebase",
+      "projectId": "a0cdbbbb-1ee0-4ba2-afa8-2abe356cb471",
+      "activeDraftId": "7a719fe9-16e5-43ec-a11c-27ce8e109e0f",
+      "designSystemPath": ".superdesign/design-system.md",
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "lib/shared/widgets/erp/erp_module_screen.dart",
+        "lib/features/customers/presentation/views/customers_view.dart"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "21a1bfcc84fa26d6ab19fd8217ae5736c21a35cf64cd081668dc5be940da1af1",
+        "lib/shared/widgets/erp/erp_module_screen.dart": "e5f4986edf85e958b28b71f90054a83ceaf7710195eb527c6948d3f5cd27627b",
+        "lib/features/customers/presentation/views/customers_view.dart": "dc6b3ed79738b0bf5559c7b007256df1eeb3477d1bc65c22d69c5123713d0dfe"
+      },
+      "drafts": {
+        "7a719fe9-16e5-43ec-a11c-27ce8e109e0f": {
+          "title": "Bayaa ERP - Customer Workspace",
+          "visualDirection": "Original Bayaa navy and orange retail ERP"
+        }
+      },
+      "updatedAt": "2026-10-29T16:09:28.952Z"
+    }
+  }
+}

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:bayaa_pos/core/constants/app_colors.dart';
-import '../screens/data_management_screen.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
+import 'package:bayaa_pos/features/settings/presentation/screens/data_management_screen.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class DataManagementCard extends StatelessWidget {
   final bool isMobile;
@@ -11,9 +11,10 @@ class DataManagementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: AppColors.borderColor.withOpacity(0.5),
@@ -77,7 +78,7 @@ class DataManagementCard extends StatelessWidget {
                           fontFamily: 'Cairo',
                           fontSize: 11,
                           color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],

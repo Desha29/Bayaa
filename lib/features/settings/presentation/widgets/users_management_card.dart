@@ -1,22 +1,22 @@
 // ignore_for_file: deprecated_member_use
 // users_management_card.dart
-import 'package:bayaa_pos/core/di/dependency_injection.dart';
+import 'package:bayaa_pos/app/bootstrap/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../../../core/functions/messege.dart';
-import '../../../../l10n/app_localizations.dart';
-import '../../../auth/presentation/cubit/user_cubit.dart';
-import '../../../auth/presentation/cubit/user_states.dart';
-import '../../../auth/data/models/user_model.dart';
-import '../../data/models/user_row.dart';
+import 'package:bayaa_pos/shared/feedback/app_messages.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
+import 'package:bayaa_pos/features/auth/presentation/controllers/user_cubit.dart';
+import 'package:bayaa_pos/features/auth/presentation/controllers/user_state.dart';
+import 'package:bayaa_pos/features/auth/presentation/models/user_view_data.dart';
+import 'package:bayaa_pos/features/settings/presentation/models/user_row_view_data.dart';
 
-import 'desktop_user_table.dart';
-import 'add_edit_user_dialog.dart';
+import 'package:bayaa_pos/features/settings/presentation/widgets/desktop_user_table.dart';
+import 'package:bayaa_pos/features/settings/presentation/widgets/add_edit_user_dialog.dart';
 
-import 'package:bayaa_pos/core/localization/translation_helper.dart';
+import 'package:bayaa_pos/shared/localization/translation_helper.dart';
 
-import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
 
 class UsersManagementCard extends StatelessWidget {
   const UsersManagementCard({
@@ -28,24 +28,25 @@ class UsersManagementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<UserCubit, UserStates>(
+    Theme.of(context);
+    return BlocConsumer<UserCubit, UserState>(
       listener: (context, state) {
         if (state is UserSuccess) {
-          MotionSnackBarSuccess(
+          showSuccessMessage(
               context, TranslationHelper.translate(context, state.message));
         } else if (state is UserFailure) {
-          MotionSnackBarError(
+          showErrorMessage(
               context, TranslationHelper.translate(context, state.error));
         }
       },
       builder: (context, state) {
-        List<UserRow> userRows = [];
-        List<User> usersData = [];
+        List<UserRowViewData> userRows = [];
+        List<UserViewData> usersData = [];
 
         // Use state data if available, otherwise fallback to cached data in Cubit
         // This persists the list even if state changes to UserSuccess etc.
         if (state is UsersLoaded) {
-          usersData = state.users as List<User>;
+          usersData = state.users as List<UserViewData>;
         } else {
           usersData = context.read<UserCubit>().users;
         }
@@ -54,7 +55,7 @@ class UsersManagementCard extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surfaceColor,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: AppColors.borderColor.withOpacity(0.5),
@@ -104,7 +105,7 @@ class UsersManagementCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         AppLocalizations.of(context).usersManagement,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
@@ -118,7 +119,7 @@ class UsersManagementCard extends StatelessWidget {
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: getIt<UserCubit>().currentUser.userType ==
-                                UserType.cashier
+                                PreviewRole.cashier
                             ? null
                             : () => _showAddUserDialog(context),
                         borderRadius: BorderRadius.circular(10),
@@ -191,7 +192,7 @@ class UsersManagementCard extends StatelessWidget {
                                   fontFamily: 'Cairo',
                                   fontSize: 13,
                                   color: AppColors.mutedColor,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
@@ -210,12 +211,13 @@ class UsersManagementCard extends StatelessWidget {
     );
   }
 
-  List<UserRow> _convertUsersToRows(BuildContext context, List<User> users) {
+  List<UserRowViewData> _convertUsersToRows(
+      BuildContext context, List<UserViewData> users) {
     final l10n = AppLocalizations.of(context);
     return users.map((user) {
-      final isManager =
-          user.userType == UserType.manager; // ✅ Fixed: was UserType.manager
-      return UserRow(
+      final isManager = user.userType ==
+          PreviewRole.manager; // ✅ Fixed: was PreviewRole.manager
+      return UserRowViewData(
         name: user.name,
         email: user.username,
         roleLabel: isManager ? l10n.roleManager : l10n.roleCashier,
@@ -229,7 +231,7 @@ class UsersManagementCard extends StatelessWidget {
   }
 
   void _showAddUserDialog(BuildContext context) async {
-    final result = await showDialog<User>(
+    final result = await showDialog<UserViewData>(
       context: context,
       builder: (dialogContext) => const AddEditUserDialog(),
     );

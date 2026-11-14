@@ -1,10 +1,10 @@
-import 'package:bayaa_pos/core/functions/messege.dart';
+import 'package:bayaa_pos/shared/feedback/app_messages.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import 'package:bayaa_pos/core/constants/app_colors.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
 
-import '../../../../l10n/app_localizations.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
 class LogoutWarningBanner extends StatelessWidget {
   const LogoutWarningBanner({
@@ -16,6 +16,7 @@ class LogoutWarningBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Container(
       decoration: BoxDecoration(
         color: AppColors.errorColor.withOpacity(0.03),
@@ -48,7 +49,7 @@ class LogoutWarningBanner extends StatelessWidget {
                 children: [
                   Text(
                     AppLocalizations.of(context).logout,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Cairo',
                       fontWeight: FontWeight.w800,
                       fontSize: 13,
@@ -62,7 +63,7 @@ class LogoutWarningBanner extends StatelessWidget {
                       fontFamily: 'Cairo',
                       fontSize: 11,
                       color: AppColors.errorColor.withOpacity(0.7),
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

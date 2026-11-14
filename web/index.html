@@ -35,6 +35,12 @@
 </head>
 
 <body>
+  <!-- Serve the PDF engine locally so previews also work without a CDN. -->
+  <script src="vendor/pdfjs/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      new URL('vendor/pdfjs/pdf.worker.min.js', document.baseURI).href;
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 

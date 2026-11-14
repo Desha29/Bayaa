@@ -1,5 +1,5 @@
 name: bayaa_pos
-description: "Bayaa POS - Enterprise Desktop Point of Sale & Retail Management System."
+description: "Bayaa POS UI showcase with in-memory sample data."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -35,44 +35,27 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
   lucide_icons_flutter: ^3.1.14
   flutter_bloc: ^9.1.1
   get_it: ^8.2.0
   either_dart: ^1.0.0
   data_table_2: ^2.6.0
   dartz: ^0.10.1
-  motion_toast: ^2.14.0
   equatable: ^2.0.7
-  flutter_libserialport: ^0.6.0
   barcode: ^2.2.9
   pdf: ^3.11.3
   printing: ^5.14.2
-  google_fonts: ^6.3.2
   fl_chart: ^1.1.1
-  mobile_scanner: ^7.1.2
-  window_manager: ^0.5.1
-  screen_retriever: ^0.2.0
 
 
-  file_picker: ^10.3.7
   bloc: ^9.1.0
-  url_launcher: ^6.3.0
-  sqflite_common_ffi: ^2.3.0
-  sqlite3_flutter_libs: ^0.5.15
-  path_provider: ^2.1.5
-  path: ^1.9.1
-  crypto: ^3.0.3
-  uuid: ^4.5.2
   intl: ^0.20.2
+  cached_network_image: ^3.4.1
 
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   flutter_launcher_icons: ^0.13.1
   flutter_lints: ^5.0.0
-  build_runner: ^2.4.6
 
 flutter_launcher_icons:
   android: true

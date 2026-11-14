@@ -1,297 +1,94 @@
-import 'package:bayaa_pos/features/products/data/models/product_model.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../../../core/components/empty_state.dart';
-import '../../../../core/components/local_image_view.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:bayaa_pos/features/products/presentation/models/product_view_data.dart';
+import 'package:bayaa_pos/shared/theme/app_colors.dart';
+import 'package:bayaa_pos/shared/widgets/workspace/workspace_data_table.dart';
+import 'package:bayaa_pos/shared/widgets/workspace/workspace_summary.dart';
+import 'package:bayaa_pos/shared/widgets/asset_image_view.dart';
+import 'package:bayaa_pos/l10n/app_localizations.dart';
 
-class ProductsTableView extends StatelessWidget {
-  final List<Product> products;
-  final void Function(Product) onDelete;
-  final void Function(Product) onEdit;
+class ProductTableView extends StatelessWidget {
+  const ProductTableView(
+      {super.key,
+      required this.products,
+      required this.onDelete,
+      required this.onEdit,
+      required this.statusColorFn,
+      required this.statusTextFn,
+      this.isManager = false});
+  final List<ProductViewData> products;
+  final ValueChanged<ProductViewData> onDelete, onEdit;
   final Color Function(int, int) statusColorFn;
   final String Function(int, int) statusTextFn;
-  final ScrollController? scrollController;
-  final bool isLoadingMore;
-  final String? emptyTitle;
-  final String? emptyMessage;
   final bool isManager;
-
-  const ProductsTableView({
-    super.key,
-    required this.products,
-    required this.onDelete,
-    required this.onEdit,
-    required this.statusColorFn,
-    required this.statusTextFn,
-    this.scrollController,
-    this.isLoadingMore = false,
-    this.emptyTitle,
-    this.emptyMessage,
-    this.isManager = false,
-  });
-
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    if (products.isEmpty) {
-      return EmptyState(
-        variant: EmptyStateVariant.products,
-        title: emptyTitle ?? l10n.noProducts,
-        message: emptyMessage ?? l10n.addProductsHint,
-        icon: Icons.search,
-      );
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Align(
-          alignment: AlignmentDirectional.topStart,
-          child: SingleChildScrollView(
-            controller: scrollController,
-            scrollDirection: Axis.vertical,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    dividerColor: Colors.grey.withOpacity(0.2),
-                  ),
-                  child: DataTable(
-                    horizontalMargin: 20,
-                    columnSpacing: 20,
-                    headingRowHeight: 52,
-                    headingRowColor: MaterialStateProperty.all(
-                      AppColors.primaryColor.withOpacity(0.08),
-                    ),
-                    dataRowHeight: 60,
-                    dataRowColor: MaterialStateProperty.resolveWith((states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return AppColors.primaryColor.withOpacity(0.02);
-                      }
-                      return Colors.white;
-                    }),
-                    border: TableBorder(
-                      horizontalInside: BorderSide(
-                        color: Colors.grey.withOpacity(0.15),
-                        width: 1,
-                      ),
-                      bottom: BorderSide(
-                        color: Colors.grey.withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    columns: [
-                      DataColumn(
-                          label: Text(l10n.productName,
-                              style: const TextStyle(
+    final l = AppLocalizations.of(context);
+    return WorkspaceDataTable<ProductViewData>(
+        showViewToggle: false,
+        records: products,
+        columns: [
+          WorkspaceColumn(
+              label: l.productName,
+              compare: (a, b) => a.name.compareTo(b.name),
+              cell: (p) => SizedBox(
+                  width: 210,
+                  child: Row(children: [
+                    AssetImageView(
+                        fallback: Icon(Icons.inventory_2_outlined,
+                            color: AppColors.primaryColor),
+                        path: p.imagePath,
+                        width: 38,
+                        height: 38,
+                        borderRadius: 8),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          Text(p.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w700)),
+                          Text(p.barcode,
+                              style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: AppColors.primaryColor))),
-                      DataColumn(
-                          label: Text(l10n.barcode,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: AppColors.primaryColor))),
-                      DataColumn(
-                          label: Text(l10n.category,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: AppColors.primaryColor))),
-                      DataColumn(
-                          label: Text(l10n.price,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: AppColors.primaryColor))),
-                      if (isManager) ...[
-                        DataColumn(
-                            label: Text(l10n.wholesalePrice,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: AppColors.primaryColor))),
-                        DataColumn(
-                            label: Text(l10n.minPriceColumn,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: AppColors.primaryColor))),
-                      ],
-                      DataColumn(
-                          label: Text(l10n.quantity,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: AppColors.primaryColor))),
-                      DataColumn(
-                          label: Text(l10n.status,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: AppColors.primaryColor))),
-                      if (isManager)
-                        DataColumn(
-                            label: Text(l10n.actions,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: AppColors.primaryColor))),
-                    ],
-                    rows: [
-                      ...products.map((product) {
-                        final statusColor = statusColorFn(
-                            product.quantity, product.minQuantity);
-                        final statusText = statusTextFn(
-                            product.quantity, product.minQuantity);
-
-                        return DataRow(cells: [
-                          DataCell(
-                            Row(
-                              children: [
-                                LocalImageView(
-                                  path: product.imagePath,
-                                  width: 38,
-                                  height: 38,
-                                  borderRadius: 9,
-                                  fallback: Container(
-                                    color: AppColors.primaryColor.withOpacity(.08),
-                                    alignment: Alignment.center,
-                                    child: const Icon(Icons.inventory_2_outlined,
-                                        size: 18, color: AppColors.primaryColor),
-                                  ),
-                                ),
-                                const SizedBox(width: 9),
-                                Flexible(
-                                  child: Text(
-                                    product.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          DataCell(Text(product.barcode,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13))),
-                          DataCell(
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color:
-                                    AppColors.primaryColor.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(product.category,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      color: AppColors.primaryColor)),
-                            ),
-                          ),
-                          DataCell(Text(
-                              '${product.price.toStringAsFixed(2)} ${l10n.currencyEg}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13))),
-                          if (isManager) ...[
-                            DataCell(Text(
-                                '${product.wholesalePrice.toStringAsFixed(2)} ${l10n.currencyEg}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: Colors.blueGrey))),
-                            DataCell(Text(
-                                '${product.minPrice.toStringAsFixed(2)} ${l10n.currencyEg}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: Colors.deepOrange))),
-                          ],
-                          DataCell(Text('${product.quantity}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14))),
-                          DataCell(
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: statusColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                    color: statusColor.withOpacity(0.3)),
-                              ),
-                              child: Text(
-                                statusText,
-                                style: TextStyle(
-                                  color: statusColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (isManager)
-                            DataCell(
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(LucideIcons.pencil,
-                                        size: 18),
-                                    color: AppColors.primaryColor,
-                                    onPressed: () => onEdit(product),
-                                    tooltip: l10n.edit,
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(LucideIcons.trash2,
-                                        size: 18),
-                                    color: AppColors.errorColor,
-                                    onPressed: () => onDelete(product),
-                                    tooltip: l10n.delete,
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ]);
-                      }),
-                      if (isLoadingMore)
-                        DataRow(
-                          cells: List<DataCell>.generate(
-                            isManager ? 9 : 7,
-                            (index) => DataCell(
-                              index == 0
-                                  ? const Center(
-                                      child: SizedBox(
-                                        width: 22,
-                                        height: 22,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                                    )
-                                  : const SizedBox.shrink(),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+                                  fontSize: 10,
+                                  color: AppColors.mutedColor))
+                        ]))
+                  ]))),
+          WorkspaceColumn(label: l.category, cell: (p) => Text(p.category)),
+          WorkspaceColumn(
+              label: l.price,
+              numeric: true,
+              compare: (a, b) => a.price.compareTo(b.price),
+              cell: (p) => Text('${p.price.toStringAsFixed(2)} ${l.currencyEg}',
+                  style: const TextStyle(fontWeight: FontWeight.w800))),
+          WorkspaceColumn(
+              label: l.quantity,
+              numeric: true,
+              compare: (a, b) => a.quantity.compareTo(b.quantity),
+              cell: (p) => Text('${p.quantity}')),
+          WorkspaceColumn(
+              label: l.status,
+              cell: (p) => WorkspacePill(
+                  label: statusTextFn(p.quantity, p.minQuantity),
+                  color: statusColorFn(p.quantity, p.minQuantity))),
+          WorkspaceColumn(
+              label: l.actions,
+              cell: (p) => Row(mainAxisSize: MainAxisSize.min, children: [
+                    IconButton(
+                        tooltip: l.edit,
+                        onPressed: () => onEdit(p),
+                        icon: const Icon(Icons.edit_outlined, size: 18)),
+                    if (isManager)
+                      IconButton(
+                          tooltip: l.delete,
+                          onPressed: () => onDelete(p),
+                          icon: Icon(Icons.delete_outline,
+                              size: 18, color: AppColors.errorColor))
+                  ])),
+        ]);
   }
 }

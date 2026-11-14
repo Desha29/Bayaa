@@ -1,0 +1,79 @@
+// sale_model.dart
+
+// Removed Hive dependencies
+
+class InvoiceViewData {
+  final String id;
+  final double total;
+  final int items;
+  final DateTime date;
+  final List<InvoiceItemViewData> saleItems;
+  final String? cashierName; // NEW: Who made the sale
+  final String? cashierUsername; // NEW: Username for reference
+  final int invoiceTypeIndex; // 0: InvoiceViewData, 1: Refund
+  final String? refundOriginalInvoiceId;
+  final String paymentMethod;
+
+  InvoiceViewData({
+    required this.id,
+    required this.total,
+    required this.items,
+    required this.date,
+    required this.saleItems,
+    required this.cashierName,
+    this.cashierUsername,
+    this.invoiceTypeIndex = 0,
+    this.refundOriginalInvoiceId,
+    this.paymentMethod = 'cash',
+  });
+
+  bool get isRefund => invoiceTypeIndex == 1;
+  bool get canBeRefunded => !isRefund;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'total': total,
+      'items': items,
+      'date': date.toIso8601String(),
+      'cashierName': cashierName,
+      'cashierUsername': cashierUsername,
+      'invoiceTypeIndex': invoiceTypeIndex,
+      'refundOriginalInvoiceId': refundOriginalInvoiceId,
+      'paymentMethod': paymentMethod,
+      'saleItems': saleItems.map((x) => x.toMap()).toList(),
+    };
+  }
+}
+
+class InvoiceItemViewData {
+  final String productId;
+  final String name;
+  final double price;
+  final int quantity;
+  final double total;
+  final double wholesalePrice;
+  int refundedQuantity = 0; // NEW: Track refunded quantity permanently
+
+  InvoiceItemViewData({
+    required this.productId,
+    required this.name,
+    required this.price,
+    required this.quantity,
+    required this.total,
+    required this.wholesalePrice,
+    this.refundedQuantity = 0, // Default to 0
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'productId': productId,
+      'name': name,
+      'price': price,
+      'quantity': quantity,
+      'total': total,
+      'wholesalePrice': wholesalePrice,
+      'refundedQuantity': refundedQuantity,
+    };
+  }
+}
