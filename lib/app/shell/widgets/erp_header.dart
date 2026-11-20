@@ -82,41 +82,45 @@ class LanguageToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Theme.of(context);
-    final isArabic = AppLocalizations.of(context).localeName == 'ar';
-    final foreground =
-        compact ? AppColors.sidebarForeground : AppColors.textSecondary;
+    final localeProvider = getIt<LocaleProvider>();
+    return ListenableBuilder(
+      listenable: localeProvider,
+      builder: (context, _) {
+        final isArabic = localeProvider.isArabic;
+        final foreground =
+            compact ? AppColors.sidebarForeground : AppColors.textSecondary;
 
-    return Tooltip(
-      message: isArabic ? 'English' : 'العربية',
-      child: InkWell(
-        onTap: () => getIt<LocaleProvider>().toggleLocale(),
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          height: 38,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: EdgeInsets.symmetric(horizontal: compact ? 9 : 12),
-          decoration: BoxDecoration(
-            color: compact
-                ? Colors.white.withOpacity(.12)
-                : AppColors.backgroundColor,
+        return Tooltip(
+          message: isArabic ? 'Switch to English' : 'التحويل إلى العربية',
+          child: InkWell(
+            onTap: () => localeProvider.toggleLocale(),
             borderRadius: BorderRadius.circular(20),
-            border: compact ? null : Border.all(color: AppColors.borderColor),
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.language, size: 18, color: foreground),
-            if (!compact) ...[
-              const SizedBox(width: 6),
-              Text(
-                isArabic ? 'EN' : 'ع',
-                style: TextStyle(
-                    color: foreground,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700),
+            child: Container(
+              height: 38,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12),
+              decoration: BoxDecoration(
+                color: compact
+                    ? Colors.white.withOpacity(.12)
+                    : AppColors.backgroundColor,
+                borderRadius: BorderRadius.circular(20),
+                border: compact ? null : Border.all(color: AppColors.borderColor),
               ),
-            ],
-          ]),
-        ),
-      ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.language, size: 17, color: foreground),
+                const SizedBox(width: 4),
+                Text(
+                  isArabic ? 'EN' : 'ع',
+                  style: TextStyle(
+                      color: foreground,
+                      fontSize: compact ? 11 : 12,
+                      fontWeight: FontWeight.w800),
+                ),
+              ]),
+            ),
+          ),
+        );
+      },
     );
   }
 }

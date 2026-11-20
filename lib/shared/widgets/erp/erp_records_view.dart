@@ -72,9 +72,11 @@ class _ErpRecordsViewState extends State<ErpRecordsView> {
   }
 
   Widget _cards(BuildContext context, double availableWidth) {
-    final columns = (availableWidth / 350).floor().clamp(1, 3);
-    final cardWidth = (availableWidth - (columns - 1) * 14) / columns;
-    return Wrap(spacing: 14, runSpacing: 14, children: [
+    final isMobile = availableWidth < 600;
+    final columns = isMobile ? 2 : (availableWidth / 350).floor().clamp(1, 3);
+    final spacing = isMobile ? 10.0 : 14.0;
+    final cardWidth = (availableWidth - (columns - 1) * spacing) / columns;
+    return Wrap(spacing: spacing, runSpacing: spacing, children: [
       for (final record in records)
         SizedBox(
             width: cardWidth,
@@ -87,65 +89,80 @@ class _ErpRecordsViewState extends State<ErpRecordsView> {
               child: InkWell(
                   onTap: () => _open(context, record),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(isMobile ? 10 : 16),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(children: [
                             ErpRecordAvatar(
                                 tag: '${spec.id}-${record.id}',
-                                icon: spec.icon),
-                            const SizedBox(width: 12),
+                                icon: spec.icon,
+                                size: isMobile ? 32 : 40),
+                            SizedBox(width: isMobile ? 8 : 12),
                             Expanded(
                                 child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                   Text(record.title,
-                                      style: const TextStyle(
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontSize: isMobile ? 12 : 14,
                                           fontWeight: FontWeight.w700)),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Text(record.id,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 11,
+                                          fontSize: isMobile ? 9.5 : 11,
                                           color: AppColors.mutedColor)),
                                 ])),
-                            const SizedBox(width: 8),
-                            Icon(Icons.chevron_right,
-                                textDirection: Directionality.of(context),
-                                color: AppColors.mutedColor),
+                            if (!isMobile) ...[
+                              const SizedBox(width: 8),
+                              Icon(Icons.chevron_right,
+                                  textDirection: Directionality.of(context),
+                                  color: AppColors.mutedColor),
+                            ],
                           ]),
                           Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 8 : 14),
                               child: Divider(
                                   height: 1, color: AppColors.borderColor)),
-                          Wrap(spacing: 16, runSpacing: 14, children: [
+                          Wrap(spacing: 8, runSpacing: 8, children: [
                             for (var index = 1;
                                 index < spec.columns.length &&
                                     index < record.cells.length;
                                 index++)
                               SizedBox(
-                                  width: cardWidth < 330
-                                      ? cardWidth - 32
-                                      : (cardWidth - 48) / 2,
+                                  width: isMobile
+                                      ? cardWidth - 24
+                                      : (cardWidth < 330
+                                          ? cardWidth - 32
+                                          : (cardWidth - 48) / 2),
                                   child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(spec.columns[index].of(context),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 10,
+                                                fontSize: isMobile ? 9 : 10,
                                                 color: AppColors.mutedColor)),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: 2),
                                         Text(record.cells[index],
-                                            style: const TextStyle(
-                                                fontSize: 12,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize: isMobile ? 11 : 12,
                                                 fontWeight: FontWeight.bold)),
                                       ])),
                           ]),
-                          const SizedBox(height: 16),
+                          SizedBox(height: isMobile ? 10 : 16),
                           ErpStatusBadge(
                               label: record.status.of(context),
                               tone: record.tone),

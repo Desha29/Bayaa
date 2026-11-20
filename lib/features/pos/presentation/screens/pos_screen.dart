@@ -21,13 +21,14 @@ class PosScreen extends StatefulWidget {
   State<PosScreen> createState() => _PosScreenState();
 }
 
-class _PosScreenState extends State<PosScreen> {
+class _PosScreenState extends State<PosScreen>
+    with SingleTickerProviderStateMixin {
   final _search = TextEditingController();
   final _searchFocus = FocusNode();
   final _products = PreviewData.products;
   final List<Map<String, dynamic>> _cart = [];
   String? _category;
-  bool _showCart = false;
+  late final TabController _tabController;
   bool get _ar => Localizations.localeOf(context).languageCode == 'ar';
   String _copy(String ar, String en) => _ar ? ar : en;
   double get _total => _cart.fold(0.0,
@@ -36,6 +37,7 @@ class _PosScreenState extends State<PosScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     for (final product in _products.take(2)) {
       _add(product, notify: false);
     }
@@ -43,6 +45,7 @@ class _PosScreenState extends State<PosScreen> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _search.dispose();
     _searchFocus.dispose();
     super.dispose();
@@ -88,33 +91,53 @@ class _PosScreenState extends State<PosScreen> {
             padding: EdgeInsets.all(compact ? 12 : 20),
             child: Column(children: [
               if (!wide) ...[
-                SizedBox(
-                    width: double.infinity,
-                    child: SegmentedButton<bool>(
-                      segments: [
-                        ButtonSegment(
-                            value: false,
-                            icon:
-                                const Icon(Icons.grid_view_outlined, size: 17),
-                            label: Text(_copy('المنتجات', 'Products'))),
-                        ButtonSegment(
-                            value: true,
-                            icon: const Icon(Icons.shopping_bag_outlined,
-                                size: 17),
-                            label: Text(
-                                '${_copy('الفاتورة', 'Order')} (${_cart.length})'))
-                      ],
-                      selected: {_showCart},
-                      onSelectionChanged: (values) =>
-                          setState(() => _showCart = values.first),
-                      showSelectedIcon: false,
-                      style: SegmentedButton.styleFrom(
-                          selectedBackgroundColor: AppColors.primaryColor,
-                          selectedForegroundColor: AppColors.primaryForeground,
-                          foregroundColor: AppColors.mutedColor,
-                          side: BorderSide(color: AppColors.borderColor),
-                          padding: const EdgeInsets.symmetric(vertical: 12)),
-                    )),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.borderColor),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    labelColor: AppColors.primaryForeground,
+                    unselectedLabelColor: AppColors.mutedColor,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 0),
+                    dividerHeight: 0,
+                    tabs: [
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.grid_view_rounded, size: 17),
+                            const SizedBox(width: 6),
+                            Text(_copy('المنتجات', 'Products'),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.shopping_bag_rounded, size: 17),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${_copy('الفاتورة', 'Order')} (${_cart.length})',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 14),
               ],
               Expanded(
@@ -126,7 +149,10 @@ class _PosScreenState extends State<PosScreen> {
                               const SizedBox(width: 20),
                               SizedBox(width: 380, child: _order())
                             ])
-                      : (_showCart ? _order() : _catalog())),
+                      : TabBarView(
+                          controller: _tabController,
+                          children: [_catalog(), _order()],
+                        )),
             ]));
       })),
     );

@@ -72,6 +72,25 @@ class _ErpShellState extends State<ErpShell> {
   List<ErpDestination> get sidebarItems =>
       buildErpDestinations(context, onCardTap: handleCardTap);
 
+  /// Map a bottom-nav tab index (0-3) to the real `sidebarItems` index
+  /// by matching the destination `id`. Returns -1 if the section is absent
+  /// (e.g. user role hides it).
+  static const _bottomNavIds = ['dashboard', 'sales', 'invoices', 'products'];
+
+  int _sidebarIndexForBottomTab(int tab) {
+    if (tab < 0 || tab >= _bottomNavIds.length) return -1;
+    return sidebarItems.indexWhere((d) => d.id == _bottomNavIds[tab]);
+  }
+
+  /// Reverse lookup: which bottom-nav tab (0-4) corresponds to the current
+  /// `selectedIndex`?  Returns 4 ("More") when the page isn't one of the
+  /// four pinned tabs.
+  int get _activeBottomTab {
+    final currentId = sidebarItems[selectedIndex].id;
+    final idx = _bottomNavIds.indexOf(currentId);
+    return idx == -1 ? 4 : idx;
+  }
+
   @override
   Widget build(BuildContext context) {
     Theme.of(context);
@@ -118,12 +137,7 @@ class _ErpShellState extends State<ErpShell> {
                     backgroundColor: AppColors.sidebarColor,
                     foregroundColor: AppColors.sidebarForeground,
                     title: Text(sidebarItems[selectedIndex].title),
-                    leading: Builder(
-                      builder: (context) => IconButton(
-                        icon: const Icon(LucideIcons.menu),
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                      ),
-                    ),
+                    automaticallyImplyLeading: false,
                     actions: _headerActions(context, compact: true),
                   )
                 : null,
@@ -134,6 +148,51 @@ class _ErpShellState extends State<ErpShell> {
                       selectedIndex: selectedIndex,
                       onItemSelected: (index) =>
                           _onSidebarSelected(context, index),
+                    ),
+                  )
+                : null,
+            bottomNavigationBar: isMobileOrTablet
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceColor,
+                      border: Border(
+                        top: BorderSide(
+                          color: AppColors.borderColor.withOpacity(0.8),
+                          width: 1,
+                        ),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, -3),
+                        ),
+                      ],
+                    ),
+                    child: NavigationBar(
+                      height: 64,
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      indicatorColor:
+                          AppColors.primaryColor.withOpacity(0.12),
+                      indicatorShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      selectedIndex: _activeBottomTab,
+                      labelBehavior:
+                          NavigationDestinationLabelBehavior.alwaysShow,
+                      onDestinationSelected: (tab) {
+                        if (tab == 4) {
+                          // "More" — open the drawer
+                          _scaffoldKey.currentState?.openDrawer();
+                          return;
+                        }
+                        final realIndex = _sidebarIndexForBottomTab(tab);
+                        if (realIndex >= 0) {
+                          _onSidebarSelected(context, realIndex);
+                        }
+                      },
+                      destinations: _buildBottomDestinations(l10n),
                     ),
                   )
                 : null,
@@ -189,6 +248,41 @@ class _ErpShellState extends State<ErpShell> {
         ),
       ),
     );
+  }
+
+  List<NavigationDestination> _buildBottomDestinations(
+      AppLocalizations l10n) {
+    final isAr = l10n.localeName == 'ar';
+    return [
+      NavigationDestination(
+        icon: Icon(LucideIcons.layoutDashboard, color: AppColors.mutedColor),
+        selectedIcon:
+            Icon(LucideIcons.layoutDashboard, color: AppColors.primaryColor),
+        label: isAr ? 'لوحة التحكم' : 'Dashboard',
+      ),
+      NavigationDestination(
+        icon: Icon(LucideIcons.shoppingCart, color: AppColors.mutedColor),
+        selectedIcon:
+            Icon(LucideIcons.shoppingCart, color: AppColors.primaryColor),
+        label: isAr ? 'المبيعات' : 'Sales',
+      ),
+      NavigationDestination(
+        icon: Icon(LucideIcons.fileText, color: AppColors.mutedColor),
+        selectedIcon:
+            Icon(LucideIcons.fileText, color: AppColors.primaryColor),
+        label: isAr ? 'الفواتير' : 'Invoices',
+      ),
+      NavigationDestination(
+        icon: Icon(LucideIcons.box, color: AppColors.mutedColor),
+        selectedIcon: Icon(LucideIcons.box, color: AppColors.primaryColor),
+        label: isAr ? 'المنتجات' : 'Products',
+      ),
+      NavigationDestination(
+        icon: Icon(LucideIcons.menu, color: AppColors.mutedColor),
+        selectedIcon: Icon(LucideIcons.menu, color: AppColors.primaryColor),
+        label: isAr ? 'المزيد' : 'More',
+      ),
+    ];
   }
 
   List<Widget> _headerActions(BuildContext context, {bool compact = false}) {

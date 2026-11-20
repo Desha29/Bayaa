@@ -27,18 +27,24 @@ class ProductListView extends StatelessWidget {
           icon: Icons.search);
     }
     return LayoutBuilder(builder: (context, size) {
-      final columns =
-          size.maxWidth >= 1080 ? 6 : (size.maxWidth / 200).floor().clamp(1, 6);
-      final height = 290.0 +
-          ((MediaQuery.textScalerOf(context).scale(1) - 1).clamp(0, 2) * 90);
+      final isMobile = size.maxWidth < 600;
+      final columns = size.maxWidth >= 1080
+          ? 6
+          : isMobile
+              ? 2
+              : (size.maxWidth / 200).floor().clamp(2, 6);
+      final height = isMobile
+          ? 290.0
+          : 290.0 +
+              ((MediaQuery.textScalerOf(context).scale(1) - 1).clamp(0, 2) * 90);
       return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: products.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: columns,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
+              crossAxisSpacing: isMobile ? 10 : 14,
+              mainAxisSpacing: isMobile ? 10 : 14,
               mainAxisExtent: height),
           itemBuilder: (context, i) {
             final p = products[i];

@@ -207,13 +207,14 @@ class _ProductFact extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
         decoration: BoxDecoration(
           color: AppColors.backgroundColor,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Tooltip(
               message: label,
@@ -221,15 +222,17 @@ class _ProductFact extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      fontSize: 10,
-                      height: 1.3,
+                      fontSize: 9.5,
+                      height: 1.2,
                       fontWeight: FontWeight.bold,
                       color: AppColors.mutedColor)),
             ),
             Text(value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                    fontSize: 12,
-                    height: 1.3,
+                    fontSize: 11,
+                    height: 1.2,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary)),
           ],

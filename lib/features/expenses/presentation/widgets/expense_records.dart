@@ -125,11 +125,15 @@ class ExpenseRecords extends StatelessWidget {
                       cell: (item) => _RecordActions(expense: item)),
                 ]);
           }
-          final columns = size.maxWidth >= 580 ? 2 : 1;
-          final width = (size.maxWidth - (columns - 1) * 12) / columns;
-          return Wrap(spacing: 12, runSpacing: 12, children: [
+          final isMobile = size.maxWidth < 600;
+          final columns = isMobile ? 2 : (size.maxWidth >= 760 ? 3 : 2);
+          final spacing = isMobile ? 10.0 : 12.0;
+          final width = (size.maxWidth - (columns - 1) * spacing) / columns;
+          return Wrap(spacing: spacing, runSpacing: spacing, children: [
             for (final item in records)
-              SizedBox(width: width, child: _ExpenseCard(expense: item)),
+              SizedBox(
+                  width: width,
+                  child: _ExpenseCard(expense: item, compact: isMobile)),
           ]);
         }),
     ]);
@@ -137,50 +141,59 @@ class ExpenseRecords extends StatelessWidget {
 }
 
 class _ExpenseIcon extends StatelessWidget {
+  const _ExpenseIcon({this.compact = false});
+  final bool compact;
+
   @override
   Widget build(BuildContext context) => Container(
-      width: 38,
-      height: 38,
+      width: compact ? 30 : 38,
+      height: compact ? 30 : 38,
       decoration: BoxDecoration(
           color: AppColors.primaryColor.withValues(alpha: .07),
-          borderRadius: BorderRadius.circular(11)),
+          borderRadius: BorderRadius.circular(compact ? 9 : 11)),
       child: Icon(Icons.receipt_long_outlined,
-          size: 18, color: AppColors.primaryColor));
+          size: compact ? 15 : 18, color: AppColors.primaryColor));
 }
 
 class _ExpenseCard extends StatelessWidget {
-  const _ExpenseCard({required this.expense});
+  const _ExpenseCard({required this.expense, this.compact = false});
   final ExpenseViewData expense;
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     final labels = ExpenseLabels.of(context);
     return Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(compact ? 10 : 16),
         decoration: BoxDecoration(
             color: AppColors.surfaceColor,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.borderColor)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            _ExpenseIcon(),
-            const SizedBox(width: 10),
+            _ExpenseIcon(compact: compact),
+            const SizedBox(width: 8),
             Expanded(
                 child: Text(expense.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        fontSize: 13,
+                        fontSize: compact ? 11.5 : 13,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary))),
           ]),
-          const SizedBox(height: 16),
+          SizedBox(height: compact ? 8 : 16),
           Text(labels.money(expense.amount),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                  fontSize: 22,
+                  fontSize: compact ? 16 : 22,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary)),
-          const SizedBox(height: 10),
+          SizedBox(height: compact ? 6 : 10),
           Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 6,
+              runSpacing: 6,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 WorkspacePill(
@@ -189,10 +202,10 @@ class _ExpenseCard extends StatelessWidget {
                 Text(labels.date(expense.date),
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 11,
+                        fontSize: compact ? 9.5 : 11,
                         color: AppColors.mutedColor)),
               ]),
-          if (expense.notes?.isNotEmpty ?? false) ...[
+          if (!compact && (expense.notes?.isNotEmpty ?? false)) ...[
             const SizedBox(height: 12),
             Text(expense.notes!,
                 maxLines: 2,
@@ -202,9 +215,9 @@ class _ExpenseCard extends StatelessWidget {
                     color: AppColors.mutedColor,
                     fontSize: 12)),
           ],
-          const SizedBox(height: 12),
+          SizedBox(height: compact ? 6 : 12),
           Divider(color: AppColors.borderColor, height: 1),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Row(children: [
             Expanded(
                 child: Text(expense.id.toUpperCase(),
@@ -212,35 +225,50 @@ class _ExpenseCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 10,
+                        fontSize: compact ? 9 : 10,
                         color: AppColors.mutedColor))),
-            _RecordActions(expense: expense),
+            _RecordActions(expense: expense, compact: compact),
           ]),
         ]));
   }
 }
 
 class _RecordActions extends StatelessWidget {
-  const _RecordActions({required this.expense});
+  const _RecordActions({required this.expense, this.compact = false});
   final ExpenseViewData expense;
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     final labels = ExpenseLabels.of(context);
+    final iconSize = compact ? 15.0 : 18.0;
     return Row(mainAxisSize: MainAxisSize.min, children: [
       IconButton(
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(
+              minWidth: compact ? 26 : 32, minHeight: compact ? 26 : 32),
           tooltip: labels.text('عرض التفاصيل', 'View expense'),
           icon: Icon(Icons.visibility_outlined,
-              size: 18, color: AppColors.secondaryColor),
+              size: iconSize, color: AppColors.secondaryColor),
           onPressed: () => _showDetails(context)),
       IconButton(
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(
+              minWidth: compact ? 26 : 32, minHeight: compact ? 26 : 32),
           tooltip: labels.text('تعديل المصروف', 'Edit expense'),
-          icon:
-              Icon(Icons.edit_outlined, size: 18, color: AppColors.mutedColor),
+          icon: Icon(Icons.edit_outlined,
+              size: iconSize, color: AppColors.mutedColor),
           onPressed: () => showExpenseForm(context, expense: expense)),
       IconButton(
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(
+              minWidth: compact ? 26 : 32, minHeight: compact ? 26 : 32),
           tooltip: labels.text('حذف المصروف', 'Delete expense'),
           icon: Icon(Icons.delete_outline_rounded,
-              size: 18, color: AppColors.errorColor),
+              size: iconSize, color: AppColors.errorColor),
           onPressed: () => showPreviewAction(context)),
     ]);
   }

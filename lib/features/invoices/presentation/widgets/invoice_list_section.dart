@@ -135,31 +135,40 @@ class _InvoiceListSectionState extends State<InvoiceListSection> {
                                   size: 18))),
                     ])
               else ...[
-                GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: visible.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: size.maxWidth >= 1080
-                            ? 6
-                            : (size.maxWidth / 200).floor().clamp(1, 6),
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        mainAxisExtent: 286 +
-                            ((MediaQuery.textScalerOf(context).scale(1) - 1)
-                                    .clamp(0, 2) *
-                                110)),
-                    itemBuilder: (context, i) {
-                      final s = visible[i];
-                      return InvoiceCard(
-                          sale: s,
-                          onOpen: () => widget.onOpenInvoice(s),
-                          onDelete: () => widget.onDeleteSale(s),
-                          onPrint: () => widget.onPrintInvoice(s),
-                          onReturn:
-                              s.isRefund ? null : () => widget.onReturnSale(s),
-                          isManager: widget.isManager);
-                    }),
+                Builder(builder: (context) {
+                  final isMobile = size.maxWidth < 600;
+                  final crossAxisCount = size.maxWidth >= 1080
+                      ? 6
+                      : isMobile
+                          ? 2
+                          : (size.maxWidth / 200).floor().clamp(2, 6);
+                  final cardExtent = isMobile
+                      ? 198.0
+                      : 212.0 +
+                          ((MediaQuery.textScalerOf(context).scale(1) - 1)
+                                  .clamp(0, 2) *
+                              100);
+                  return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: visible.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: isMobile ? 10 : 12,
+                          mainAxisSpacing: isMobile ? 10 : 12,
+                          mainAxisExtent: cardExtent),
+                      itemBuilder: (context, i) {
+                        final s = visible[i];
+                        return InvoiceCard(
+                            sale: s,
+                            onOpen: () => widget.onOpenInvoice(s),
+                            onDelete: () => widget.onDeleteSale(s),
+                            onPrint: () => widget.onPrintInvoice(s),
+                            onReturn:
+                                s.isRefund ? null : () => widget.onReturnSale(s),
+                            isManager: widget.isManager);
+                      });
+                }),
                 const SizedBox(height: 12),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   IconButton(

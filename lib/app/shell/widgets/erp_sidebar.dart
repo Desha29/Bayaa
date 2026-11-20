@@ -484,30 +484,30 @@ class _ErpSidebarState extends State<ErpSidebar> {
                             maxLines: 1,
                           ),
                           const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color: AppColors.accentColor.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                      color: AppColors.accentColor
-                                          .withOpacity(0.4),
-                                      width: 0.5),
-                                ),
-                                child: Text(
-                                  'ERP SaaS',
-                                  style: TextStyle(
-                                    color: AppColors.accentColor,
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.5,
-                                  ),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: AppColors.accentColor.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                    color: AppColors.accentColor
+                                        .withOpacity(0.4),
+                                    width: 0.5),
+                              ),
+                              child: Text(
+                                'ERP SaaS',
+                                style: TextStyle(
+                                  color: AppColors.accentColor,
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       );
